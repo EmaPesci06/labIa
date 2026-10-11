@@ -1,0 +1,180 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Una sola corrida por PR (o por rama): si llega un push nuevo, se cancela la vieja.
+# En main no se cancela nada, así cada merge queda probado.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: "1"
+
+jobs:
+  calidad:
+    name: Calidad (lint, tipos, unidad, build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/preparar
+
+      - name: Formato (Prettier)
+        run: pnpm format:check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Tests de unidad
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+  base-de-datos:
+    name: Base de datos (migraciones, tests SQL, tipos)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      # Mientras no exista supabase/config.toml (lo crea LAB-11 con `supabase init`), el job pasa sin hacer nada.
+      - name: Detectar el proyecto de Supabase
+        id: detectar
+        run: |
+          if [ -f supabase/config.toml ]; then
+            echo "supabase=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "supabase=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Todavía no hay supabase/config.toml: se saltean los pasos de base de datos."
+          fi
+          if [ -d supabase/tests ] && find supabase/tests -name '*.sql' | grep -q .; then
+            echo "tests_sql=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "tests_sql=false" >> "$GITHUB_OUTPUT"
+          fi
+          if node -e "process.exit(require('./package.json').scripts?.['db:tipos'] ? 0 : 1)"; then
+            echo "db_tipos=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "db_tipos=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: ./.github/actions/preparar
+        if: steps.detectar.outputs.supabase == 'true'
+
+      # Sin `version`: usa la del devDependency `supabase` del lockfile si existe; si no, la última.
+      - uses: supabase/setup-cli@v3
+        if: steps.detectar.outputs.supabase == 'true'
+
+      - name: Levantar Supabase local
+        if: steps.detectar.outputs.supabase == 'true'
+        run: supabase start -x studio,imgproxy,edge-runtime,logflare,vector
+
+      - name: Resetear la base (migraciones + seed desde cero)
+        if: steps.detectar.outputs.supabase == 'true'
+        run: supabase db reset
+
+      - name: Tests de la base (pgTAP)
+        if: steps.detectar.outputs.supabase == 'true' && steps.detectar.outputs.tests_sql == 'true'
+        run: supabase test db
+
+      - name: Los tipos generados coinciden con los commiteados
+        if: steps.detectar.outputs.supabase == 'true' && steps.detectar.outputs.db_tipos == 'true'
+        run: |
+          pnpm db:tipos
+          if [ -n "$(git status --porcelain)" ]; then
+            git status --porcelain
+            git --no-pager diff
+            echo "::error::Los tipos de src/lib/supabase no coinciden con las migraciones. Corré 'pnpm db:tipos' y commiteá el resultado."
+            exit 1
+          fi
+
+      - name: Apagar Supabase
+        if: always() && steps.detectar.outputs.supabase == 'true'
+        run: supabase stop --no-backup
+
+  e2e:
+    name: E2E (Playwright celular y escritorio)
+    needs: [calidad, base-de-datos]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/preparar
+
+      - name: Versión de Playwright
+        id: playwright
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Caché de navegadores de Playwright
+        id: cache-playwright
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
+      - name: Instalar Chromium
+        if: steps.cache-playwright.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Instalar dependencias del sistema de Chromium
+        if: steps.cache-playwright.outputs.cache-hit == 'true'
+        run: pnpm exec playwright install-deps chromium
+
+      - name: Detectar el proyecto de Supabase
+        id: detectar
+        run: |
+          if [ -f supabase/config.toml ]; then
+            echo "supabase=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "supabase=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: supabase/setup-cli@v3
+        if: steps.detectar.outputs.supabase == 'true'
+
+      # Las claves de Supabase local son las de demo del CLI (no son secretos), pero igual se enmascaran.
+      - name: Levantar Supabase local y exportar sus variables
+        if: steps.detectar.outputs.supabase == 'true'
+        run: |
+          supabase start -x studio,imgproxy,edge-runtime,logflare,vector
+          supabase status -o env \
+            --override-name api.url=NEXT_PUBLIC_SUPABASE_URL \
+            --override-name auth.anon_key=NEXT_PUBLIC_SUPABASE_ANON_KEY \
+            --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY \
+            | grep -E '^(NEXT_PUBLIC_SUPABASE_URL|NEXT_PUBLIC_SUPABASE_ANON_KEY|SUPABASE_SERVICE_ROLE_KEY)=' \
+            | sed -E 's/="?([^"]*)"?$/=\1/' > supabase.env
+          while IFS='=' read -r nombre valor; do
+            if [ "$nombre" != "NEXT_PUBLIC_SUPABASE_URL" ]; then echo "::add-mask::$valor"; fi
+            echo "$nombre=$valor" >> "$GITHUB_ENV"
+          done < supabase.env
+          rm supabase.env
+
+      # El webServer de playwright.config.ts corre `pnpm build && pnpm start`.
+      - name: Pruebas de punta a punta
+        run: pnpm test:e2e
+        env:
+          NEXT_PUBLIC_SITE_URL: http://localhost:3000
+
+      - name: Subir el reporte de Playwright
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: reporte-playwright
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14

@@ -1,0 +1,32 @@
+version: 2
+updates:
+  # pnpm usa el ecosistema "npm". Las versiones quedan exactas (sin ^), como pide la guía.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/Argentina/Buenos_Aires
+    open-pull-requests-limit: 5
+    versioning-strategy: increase
+    commit-message:
+      prefix: "deps"
+    labels: [dependencias]
+    groups:
+      menores:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/Argentina/Buenos_Aires
+    commit-message:
+      prefix: "ci"
+    labels: [dependencias]
+    groups:
+      menores:
+        update-types: [minor, patch]
