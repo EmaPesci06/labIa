@@ -1,0 +1,6 @@
+allowBuilds:
+  sharp: false
+  unrs-resolver: false
+
+# Versiones exactas en package.json (sin ^ ni ~).
+saveExact: true
