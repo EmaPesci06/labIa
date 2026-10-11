@@ -2,6 +2,7 @@ allowBuilds:
   # core-js solo imprime un mensaje en postinstall (llega con posthog-js).
   core-js: false
   sharp: false
+  supabase: set this to true or false
   unrs-resolver: false
 
 # Versiones exactas en package.json (sin ^ ni ~).
