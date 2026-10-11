@@ -6,6 +6,9 @@ import { SCRIPT_TEMA } from "@/lib/tema";
 import { clasesFuentes } from "./fuentes";
 import "./globals.css";
 
+import { MetricasPostHog } from "@/components/MetricasPostHog";
+import { PieLegal } from "@/components/PieLegal";
+
 export const metadata: Metadata = {
   title: "LabÍA",
   description: "Oficios de confianza en Mar del Plata.",
@@ -29,6 +32,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         <SincronizarTema />
         {children}
+        <PieLegal />
+        <MetricasPostHog />
       </body>
     </html>
   );
