@@ -55,7 +55,11 @@ const EXTRAS: { nombre: string; centro: Punto; fuente: string }[] = [
     fuente: "OSM place=suburb n8529109122",
   },
   { nombre: "Camet", centro: [-57.5277, -37.9018], fuente: "OSM place=neighbourhood n2428071824" },
-  { nombre: "Sierra de los Padres", centro: [-57.7756, -37.9413], fuente: "OSM boundary Sierra de los Padres" },
+  {
+    nombre: "Sierra de los Padres",
+    centro: [-57.7756, -37.9413],
+    fuente: "OSM boundary Sierra de los Padres",
+  },
 ];
 
 export function slugificar(nombre: string): string {
@@ -131,7 +135,9 @@ function dentroDeAnillo(p: Punto, anillo: Punto[]): boolean {
 }
 
 function dentro(p: Punto, exteriores: Punto[][], interiores: Punto[][]): boolean {
-  return exteriores.some((r) => dentroDeAnillo(p, r)) && !interiores.some((r) => dentroDeAnillo(p, r));
+  return (
+    exteriores.some((r) => dentroDeAnillo(p, r)) && !interiores.some((r) => dentroDeAnillo(p, r))
+  );
 }
 
 /** Centroide del área; si cae afuera, el punto interior de una grilla más cercano al centroide. */
@@ -158,7 +164,12 @@ export function centroBarrio(exteriores: Punto[][], interiores: Punto[][]): Punt
   const todos = exteriores.flat();
   const xs = todos.map((p) => p[0]);
   const ys = todos.map((p) => p[1]);
-  const [minX, maxX, minY, maxY] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+  const [minX, maxX, minY, maxY] = [
+    Math.min(...xs),
+    Math.max(...xs),
+    Math.min(...ys),
+    Math.max(...ys),
+  ];
   const pasos = 60;
   let mejor: Punto | null = null;
   let mejorDist = Infinity;

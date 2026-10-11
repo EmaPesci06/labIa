@@ -1,4 +1,4 @@
--- LAB-11 · Tests del esquema inicial (pgTAP). Correr con `pnpm db:test` (supabase test db).
+-- LAB-11 · Tests del esquema inicial (pgTAP). Correr con `pnpm db:test`.
 -- Todo corre en una transacción y se deshace al final: no deja datos.
 begin;
 
