@@ -1,0 +1,4 @@
+# Variables de entorno con claves (nunca subir)
+.env
+.env*.local
+.claude/settings.local.json
