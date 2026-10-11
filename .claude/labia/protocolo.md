@@ -43,7 +43,7 @@ Solo `labia-revisor` mergea a `main`. Lo orquesta la sesión principal con `/lab
 
 1. Verificá la definición de terminado (Guía §8): `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build` en verde (y `pnpm test:e2e` si la tarea toca flujos). Pegá el resultado real; si algo falla, decilo, no lo escondas.
 2. Commits chicos, en español, terminando con:
-   `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
+   `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`
 3. `git push -u origin <rama>` y `gh pr create --base main --title "LAB-n: <título>"`. El cuerpo lleva: resumen, antes/después, cómo probar, criterios de aceptación tildados, decisiones no escritas en la tarea, y al final:
    `🤖 Generated with [Claude Code](https://claude.com/claude-code)`
 4. En Linear: adjuntá el PR (`save_issue` con `links: [{url, title}]`), comentá un resumen corto (qué se hizo, decisiones, lo que quedó afuera) y **pasá la tarea a `In Review`**.
