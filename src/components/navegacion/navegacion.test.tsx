@@ -16,6 +16,9 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(ruta.query),
 }));
 
+// "Salir" es una Server Action que usa cookies y Supabase: en jsdom se reemplaza por una vacía.
+vi.mock("@/lib/auth/acciones", () => ({ salir: async () => {} }));
+
 beforeEach(() => {
   ruta.path = "/inicio";
   ruta.query = "";
@@ -125,7 +128,7 @@ describe("MenuAvatar", () => {
     await userEvent.click(boton);
     expect(boton).toHaveAttribute("aria-expanded", "true");
     expect(screen.getByRole("link", { name: "Mi cuenta" })).toHaveAttribute("href", "/cuenta");
-    expect(screen.getByRole("link", { name: "Salir" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Salir" })).toBeInTheDocument();
     expect(screen.getByRole("group", { name: "Tema" })).toBeInTheDocument();
     const valores = screen.getAllByRole("radio").map((r) => r.getAttribute("value"));
     expect(valores).toEqual(["claro", "oscuro", "sistema"]);

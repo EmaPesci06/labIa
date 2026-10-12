@@ -1,32 +1,87 @@
+import { cache } from "react";
 import { connection } from "next/server";
 
+import { rolFalso } from "@/lib/auth/sesion-falsa";
+import type { RolUsuario } from "@/lib/auth/rutas";
+import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
+
+/** Roles con pantallas propias en `(app)`. El admin tiene su panel aparte. */
 export type RolApp = "cliente" | "profesional";
 
-export type SesionApp = {
-  id: string;
-  rol: RolApp;
-  nombre: string;
+export type SesionActual = {
+  usuario: { id: string; email: string | null };
+  rol: RolUsuario;
+  perfil: {
+    nombre: string | null;
+    apellido: string | null;
+    /** Nombre para mostrar en la interfaz (nunca vacío). */
+    nombreVisible: string;
+    /** ¿Ya completó sus datos de registro? (hoy: tiene nombre). */
+    completo: boolean;
+  };
 };
 
-/**
- * Sesión FALSA de la Fase 1 (LAB-13): el layout `(app)` necesita saber el rol para elegir la
- * navegación. La autenticación real llega con LAB-16, que reemplaza el cuerpo de esta función
- * (Supabase Auth) y deja la misma firma.
- *
- * El rol sale de `LABIA_ROL_DEV` ("cliente" por defecto). `LABIA_ID_DEV` es el id del profesional,
- * para armar el link a "Mi perfil". En producción (`NODE_ENV === "production"`) se ignoran, salvo
- * con `LABIA_PERMITIR_ROL_DEV=1`, bandera que solo usa Playwright (corre contra un build de
- * producción y necesita probar el rol profesional). No la cargues en Vercel.
- */
-export async function obtenerSesion(): Promise<SesionApp> {
-  // Se lee en cada pedido (no al compilar), así el rol se puede cambiar sin volver a construir.
-  await connection();
-  // En producción las variables de desarrollo se ignoran, salvo la bandera que usa Playwright.
-  const permitido =
-    process.env.NODE_ENV !== "production" || process.env.LABIA_PERMITIR_ROL_DEV === "1";
-  const rol: RolApp =
-    permitido && process.env.LABIA_ROL_DEV === "profesional" ? "profesional" : "cliente";
-  return rol === "profesional"
-    ? { id: process.env.LABIA_ID_DEV || "demo", rol, nombre: "Martín Gómez" }
-    : { id: "demo-cliente", rol, nombre: "Laura Fernández" };
+/** Nombre para mostrar: "Nombre Apellido", o lo que va antes de la @ del email, o "Tu cuenta". */
+export function nombreVisible(
+  nombre: string | null,
+  apellido: string | null,
+  email: string | null,
+): string {
+  const completo = [nombre, apellido].filter(Boolean).join(" ").trim();
+  if (completo) return completo;
+  const local = email?.split("@")[0]?.trim();
+  return local || "Tu cuenta";
 }
+
+/**
+ * Sesión del pedido actual para Server Components: `{ usuario, rol, perfil }` o `null` si no hay
+ * sesión. Se memoriza por pedido (`cache` de React): llamarla desde varios componentes cuesta una
+ * sola consulta. Valida el token con Supabase Auth (`getUser`), no solo la cookie.
+ */
+export const obtenerSesion = cache(async (): Promise<SesionActual | null> => {
+  // Se lee en cada pedido (no al compilar).
+  await connection();
+
+  const falso = rolFalso();
+  if (falso) {
+    return {
+      usuario: {
+        id: falso === "profesional" ? process.env.LABIA_ID_DEV || "demo" : "demo-cliente",
+        email: null,
+      },
+      rol: falso,
+      perfil: {
+        nombre: falso === "profesional" ? "Martín" : "Laura",
+        apellido: falso === "profesional" ? "Gómez" : "Fernández",
+        nombreVisible: falso === "profesional" ? "Martín Gómez" : "Laura Fernández",
+        completo: true,
+      },
+    };
+  }
+
+  if (!supabaseConfigurado()) return null;
+
+  const supabase = await crearClienteServidor();
+  const { data } = await supabase.auth.getUser();
+  if (!data.user) return null;
+
+  const { data: fila } = await supabase
+    .from("usuarios")
+    .select("rol, estado, nombre, apellido")
+    .eq("id", data.user.id)
+    .maybeSingle();
+  // Sin fila o con la cuenta suspendida/baja: se trata como sin sesión.
+  if (!fila || fila.estado !== "activa") return null;
+
+  const email = data.user.email ?? null;
+  return {
+    usuario: { id: data.user.id, email },
+    rol: fila.rol,
+    perfil: {
+      nombre: fila.nombre,
+      apellido: fila.apellido,
+      nombreVisible: nombreVisible(fila.nombre, fila.apellido, email),
+      completo: Boolean(fila.nombre),
+    },
+  };
+});

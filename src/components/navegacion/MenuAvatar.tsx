@@ -1,9 +1,10 @@
 "use client";
 
-import { LogOut, UserRound } from "lucide-react";
+import { UserRound } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 
+import { BotonSalir } from "@/components/auth/BotonSalir";
 import { SelectorTema } from "@/components/SelectorTema";
 import { Avatar } from "@/components/ui/Avatar";
 import { cn } from "@/lib/cn";
@@ -82,12 +83,8 @@ export function MenuAvatar({ nombre, rol }: Props) {
           <div className="border-t border-divisor px-3 pt-3">
             <SelectorTema />
           </div>
-          {/* Sesión falsa (LAB-13): LAB-16 lo cambia por la Server Action que cierra la sesión. */}
           <div className="border-t border-divisor pt-2">
-            <Link href="/" className={ITEM} onClick={() => setAbierto(false)}>
-              <LogOut aria-hidden strokeWidth={2} className="size-5" />
-              Salir
-            </Link>
+            <BotonSalir />
           </div>
         </div>
       ) : null}

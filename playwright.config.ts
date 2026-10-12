@@ -59,5 +59,17 @@ export default defineConfig({
         LABIA_PERMITIR_ROL_DEV: "1",
       },
     },
+    {
+      // Igual, con la sesión falsa de rol cliente (las pruebas de navegación del cliente).
+      // El servidor base (PUERTO) no tiene sesión falsa: es el que prueba la sesión real (LAB-16).
+      command: `pnpm start -p ${PUERTO + 200}`,
+      url: `http://localhost:${PUERTO + 200}`,
+      reuseExistingServer: !enCI,
+      timeout: 120_000,
+      env: {
+        LABIA_ROL_DEV: "cliente",
+        LABIA_PERMITIR_ROL_DEV: "1",
+      },
+    },
   ],
 });
