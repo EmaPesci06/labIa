@@ -1,5 +1,5 @@
 ---
-description: Orquesta una o varias tareas de Linear de LabÍA de punta a punta (constructor → seguridad → e2e → revisor que mergea). Uso - /labia-tarea LAB-8  |  /labia-tarea LAB-9 LAB-11 LAB-14  |  /labia-tarea ola  |  /labia-tarea pendientes
+description: Orquesta una o varias tareas de Linear de LabÍA de punta a punta (constructor → seguridad → e2e → revisor → integrador que mergea). Uso - /labia-tarea LAB-8  |  /labia-tarea LAB-9 LAB-11 LAB-14  |  /labia-tarea ola  |  /labia-tarea pendientes
 argument-hint: LAB-n [LAB-m ...] | ola | pendientes
 ---
 
@@ -30,10 +30,12 @@ Leé `.claude/labia/protocolo.md`. Cargá las herramientas de Linear con ToolSea
 2. Cuando llega el HANDOFF, chequeá que la tarea quedó en **In Review** en Linear; si no, pasala vos.
 3. **`labia-seguridad`** si la tarea tiene etiqueta Seguridad o Base de datos, o el HANDOFF dice que toca seguridad o datos. Si sale BLOQUEADO, devolvé los hallazgos al constructor (SendMessage) y repetí.
 4. **`labia-e2e`** (modo PR) si el HANDOFF dice que agrega un flujo de usuario y la base de Playwright ya existe.
-5. **`labia-revisor`** con el HANDOFF y los informes anteriores. Mergea y pasa a Done, o pide cambios.
+5. **`labia-revisor`** con el HANDOFF y los informes anteriores. Solo revisa: LISTO PARA MERGEAR o CAMBIOS.
    - CAMBIOS → mandale los hallazgos al constructor (SendMessage), que corrige y vuelve a In Review; repetí desde el paso 3. Máximo 3 vueltas; después frená y preguntale a Emanuel.
-   - CONFLICTO → el constructor hace rebase sobre `origin/main` y vuelve al paso 5.
-6. Cuando se cierra una tarea, fijate si destrabó otras (`blocks`) y avisá cuáles quedan listas.
+6. **`labia-integrador`**, solo si Emanuel autorizó el merge de esa tarea o de la ola (si no, avisale que está lista y esperá). Actualiza con `main`, espera la CI, mergea con squash y pasa a Done.
+   - CONFLICTO → el constructor hace rebase (y renombra su migración si hace falta) y vuelve al paso 6.
+   - NECESITA REVISIÓN → volvé al paso 5. CI ROJA → devolvé el log al constructor.
+7. Cuando se cierra una tarea, fijate si destrabó otras (`blocks`) y avisá cuáles quedan listas.
 
 En una ola con varias migraciones, mergeá de a una y pedile al siguiente constructor que haga rebase y renombre su migración si hace falta.
 
