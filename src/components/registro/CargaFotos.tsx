@@ -104,7 +104,7 @@ export function CargaFotosTrabajos({ fotos, onElegir, onQuitar, ocupado, error }
   const idError = useId();
   const lleno = fotos.length >= MAX_FOTOS_TRABAJOS;
   return (
-    <div className="flex flex-col gap-2.5">
+    <>
       <label className={cn(BASE_MOSAICO, (ocupado || lleno) && "cursor-not-allowed opacity-60")}>
         <ImageIcon aria-hidden strokeWidth={2} className="size-6 text-azul" />
         <span>
@@ -128,39 +128,42 @@ export function CargaFotosTrabajos({ fotos, onElegir, onQuitar, ocupado, error }
           }}
         />
       </label>
-      {fotos.length > 0 ? (
-        <ul className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 lg:grid-cols-5">
-          {fotos.map((foto, indice) => (
-            <li key={foto.id} className="relative aspect-square overflow-hidden rounded-campo">
-              <Image
-                src={foto.vista}
-                alt={`Foto de trabajo ${indice + 1}`}
-                fill
-                sizes="(min-width: 1024px) 120px, 33vw"
-                className="object-cover"
-              />
-              <button
-                type="button"
-                onClick={() => onQuitar(foto.id)}
-                aria-label={`Quitar foto de trabajo ${indice + 1}`}
-                className="absolute top-0.5 right-0.5 flex size-11 items-start justify-end p-1.5"
-              >
-                <span className="flex size-6 items-center justify-center rounded-full bg-azul text-sobre-azul">
-                  <X aria-hidden strokeWidth={2.5} className="size-3.5" />
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-      <p className="text-sm text-texto-terciario" role="status">
-        {fotos.length} de {MAX_FOTOS_TRABAJOS} fotos
-      </p>
-      {error ? (
-        <p id={idError} className="text-sm font-semibold text-error">
-          {error}
+      {/* Fila propia que ocupa las dos columnas del formulario: las miniaturas siguen la grilla. */}
+      <div className="col-span-2 flex flex-col gap-2.5">
+        {fotos.length > 0 ? (
+          <ul className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 lg:grid-cols-5">
+            {fotos.map((foto, indice) => (
+              <li key={foto.id} className="relative aspect-square overflow-hidden rounded-campo">
+                <Image
+                  src={foto.vista}
+                  alt={`Foto de trabajo ${indice + 1}`}
+                  fill
+                  sizes="(min-width: 1024px) 120px, 33vw"
+                  className="object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => onQuitar(foto.id)}
+                  aria-label={`Quitar foto de trabajo ${indice + 1}`}
+                  className="absolute top-0.5 right-0.5 flex size-11 items-start justify-end p-1.5"
+                >
+                  <span className="flex size-6 items-center justify-center rounded-full bg-azul text-sobre-azul">
+                    <X aria-hidden strokeWidth={2.5} className="size-3.5" />
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        <p className="text-sm text-texto-terciario" role="status">
+          {fotos.length} de {MAX_FOTOS_TRABAJOS} fotos
         </p>
-      ) : null}
-    </div>
+        {error ? (
+          <p id={idError} className="text-sm font-semibold text-error">
+            {error}
+          </p>
+        ) : null}
+      </div>
+    </>
   );
 }

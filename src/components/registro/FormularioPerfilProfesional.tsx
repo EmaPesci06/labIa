@@ -458,7 +458,11 @@ export function FormularioPerfilProfesional({ sesion, borrador, barrios, urls }:
               placeholder={tieneGas ? "N° de matrícula" : "Si tenés"}
               defaultValue={borrador.matricula}
               maxLength={40}
-              ayuda={tieneGas ? "La matrícula es obligatoria para gasistas." : undefined}
+              ayuda={
+                tieneGas && !errores.matricula
+                  ? "La matrícula es obligatoria para gasistas."
+                  : undefined
+              }
               error={errores.matricula}
               required={tieneGas}
             />

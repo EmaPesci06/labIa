@@ -44,7 +44,7 @@ test.describe("registro de profesional · paso 1", () => {
     await siguiente(page).click();
 
     await expect(page).toHaveURL(/\/registro\/profesional$/);
-    await expect(page.getByText("La matrícula es obligatoria para gasistas.").last()).toBeVisible();
+    await expect(page.getByText("La matrícula es obligatoria para gasistas.")).toBeVisible();
     await expect(page.getByLabel(/Matrícula/)).toHaveAttribute("aria-invalid", "true");
   });
 
