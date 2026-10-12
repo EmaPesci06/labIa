@@ -1,4 +1,4 @@
--- LAB-11 · Datos de prueba. SOLO local y labia-dev: nunca correr en producción.
+-- LAB-11 · Datos de prueba. SOLO local y CI: nunca en un proyecto remoto (labia-dev, preview ni producción).
 -- Los barrios NO están acá: vienen en la migración 20261011190100_barrios_mar_del_plata.sql.
 -- Contraseña de todas las cuentas: ver supabase/README.md.
 -- Los documentos de verificación apuntan a rutas ficticias (no hay archivos en Storage).

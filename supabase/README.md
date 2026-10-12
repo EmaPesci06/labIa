@@ -32,7 +32,7 @@ Después de cada migración nueva: `pnpm db:reset`, `pnpm db:test` y `pnpm db:ti
 
 ## Datos de prueba (`seed.sql`)
 
-Solo local y labia-dev, **nunca producción** (la CI de migraciones no aplica el seed). La contraseña de todas las
+Solo local y CI; **nunca en un proyecto remoto** (labia-dev, preview ni producción; la CI de migraciones no aplica el seed). La contraseña de todas las
 cuentas es `labia-prueba-1234`.
 
 | Cuenta                    | Rol         | Notas                                        |
@@ -52,6 +52,8 @@ cuentas es `labia-prueba-1234`.
 
 Más 5 trabajos abiertos, 3 postulaciones, 4 contactos y 4 reseñas. Los documentos de verificación apuntan a rutas
 ficticias: no hay archivos en Storage.
+
+Si alguna vez se activa Supabase Branching, hay que desactivar el seed en los branches de preview. En un proyecto remoto el admin se promueve a mano (con la service role), nunca con una clave fija.
 
 ## Modelo en una mirada
 
