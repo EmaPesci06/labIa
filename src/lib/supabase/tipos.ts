@@ -374,7 +374,7 @@ isOneToOne: true
 { Args: { "barrio_a": number,"barrio_b": number }; Returns: number
                            },
 "registrar_documento":
-{ Args: { "p_tipo": Database["public"]['Enums']["tipo_documento"],"p_storage_path": string }; Returns: string
+{ Args: { "p_storage_path": string,"p_tipo": Database["public"]['Enums']["tipo_documento"] }; Returns: string
                            }
           }
           Enums: {
