@@ -41,9 +41,7 @@ export const necesitaSesion = (ruta: string) =>
   esRutaAdmin(ruta) || esRutaConSesion(ruta) || esRutaSoloVisitantes(ruta);
 
 export type Decision =
-  | { tipo: "pasar" }
-  | { tipo: "redirigir"; destino: string }
-  | { tipo: "no-encontrada" };
+  { tipo: "pasar" } | { tipo: "redirigir"; destino: string } | { tipo: "no-encontrada" };
 
 /**
  * Qué hacer con un pedido según la ruta y el rol de la sesión (`null` = sin sesión).
