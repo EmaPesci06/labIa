@@ -18,7 +18,7 @@ Las herramientas de Linear son diferidas: cargalas con `ToolSearch` (`select:mcp
 |---|---|---|
 | Arranca la tarea | `In Progress` | Agente constructor |
 | PR abierto y DoD cumplida | `In Review` | Agente constructor (**obligatorio**) |
-| PR mergeado | `Done` | `labia-revisor` |
+| PR mergeado | `Done` | `labia-integrador` |
 | Revisión rechazada | vuelve a `In Progress` con comentario | `labia-revisor` |
 
 Se cambia con `mcp__claude_ai_Linear__save_issue` (`id: "LAB-n"`, `state: "In Review"`).
@@ -29,10 +29,11 @@ Se cambia con `mcp__claude_ai_Linear__save_issue` (`id: "LAB-n"`, `state: "In Re
 constructor (labia-infra | labia-db | labia-ui | labia-fullstack)  → In Review
   → labia-seguridad   si la tarea es de Seguridad o Base de datos (APROBADO / BLOQUEADO)
   → labia-e2e         si agrega un flujo de usuario
-  → labia-revisor     siempre al final: squash-merge + Done, o cambios + In Progress
+  → labia-revisor     siempre: LISTO PARA MERGEAR, o cambios + In Progress
+  → labia-integrador  con autorización de Emanuel: actualiza con main, espera CI, squash-merge + Done
 ```
 
-Solo `labia-revisor` mergea a `main`. Lo orquesta la sesión principal con `/labia-tarea`.
+Solo `labia-integrador` mergea a `main`, y solo con autorización de Emanuel. Lo orquesta la sesión principal con `/labia-tarea`.
 
 ## Antes de empezar (constructores)
 
