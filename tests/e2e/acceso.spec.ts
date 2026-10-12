@@ -95,7 +95,7 @@ test.describe("ingreso", () => {
 });
 
 test.describe("rutas protegidas", () => {
-  for (const ruta of ["/inicio", "/buscar", "/mis-trabajos", "/cuenta", "/trabajos/nuevo"]) {
+  for (const ruta of ["/mis-trabajos", "/cuenta", "/trabajos/nuevo"]) {
     test(`${ruta} sin sesión redirige a /ingresar con volver`, async ({ page }) => {
       await page.goto(ruta);
       await expect(page).toHaveURL(new RegExp(`/ingresar\\?volver=${encodeURIComponent(ruta)}$`));
@@ -180,9 +180,9 @@ test.describe("cuenta real", () => {
     await page.getByRole("button", { name: "Salir" }).first().click();
     await expect(page).toHaveURL(/\/$/);
 
-    // Sin sesión, /buscar manda a ingresar y al ingresar vuelve a /buscar.
-    await page.goto("/buscar");
-    await expect(page).toHaveURL(/\/ingresar\?volver=%2Fbuscar$/);
+    // Sin sesión, /mis-trabajos manda a ingresar y al ingresar vuelve a /mis-trabajos.
+    await page.goto("/mis-trabajos");
+    await expect(page).toHaveURL(/\/ingresar\?volver=%2Fmis-trabajos$/);
 
     await page.getByLabel("Email").fill(email);
     await page.getByLabel("Contraseña").fill("otra-clave-equivocada");
@@ -191,7 +191,7 @@ test.describe("cuenta real", () => {
 
     await page.getByLabel("Contraseña").fill(contrasena);
     await page.getByRole("button", { name: "Ingresar" }).click();
-    await expect(page).toHaveURL(/\/buscar$/);
+    await expect(page).toHaveURL(/\/mis-trabajos$/);
   });
 });
 
