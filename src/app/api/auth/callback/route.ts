@@ -2,9 +2,12 @@ import type { EmailOtpType } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { inicioDelRol, volverSeguro } from "@/lib/auth/rutas";
+import { guardarDatosDeCliente } from "@/lib/auth/datos-de-cliente";
+import { registrarEventoServidor } from "@/lib/metricas-servidor";
 import { urlDelSitio } from "@/lib/sitio";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import { ROLES_REGISTRABLES, type RolRegistrable } from "@/lib/validaciones/auth";
+import { esquemaCompletarCliente } from "@/lib/validaciones/registro-cliente";
 
 const TIPOS_OTP: readonly EmailOtpType[] = [
   "signup",
@@ -93,10 +96,32 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Sin WhatsApp todavía no completó el registro (los formularios completos son LAB-17 / LAB-18).
+  // Cliente que confirmó el email: el registro guardó WhatsApp y barrio en la metadata del
+  // usuario porque todavía no había sesión. Se aplican acá (LAB-17); se validan de nuevo.
+  if (fila && !fila.whatsapp && fila.rol === "cliente") {
+    const datos = esquemaCompletarCliente.safeParse({
+      whatsapp: String(usuario.user_metadata?.whatsapp ?? ""),
+      barrio: String(usuario.user_metadata?.barrio_id ?? ""),
+    });
+    if (datos.success) {
+      const guardado = await guardarDatosDeCliente(supabase, usuario.id, {
+        whatsapp: datos.data.whatsapp,
+        barrioId: datos.data.barrio,
+      });
+      if (guardado) {
+        await registrarEventoServidor(usuario.id, "registro_completado", { rol: "cliente" });
+        return NextResponse.redirect(`${base}${inicioDelRol("cliente")}`);
+      }
+    }
+  }
+
+  // Sin WhatsApp todavía no completó el registro: el profesional sigue en su formulario y el
+  // cliente (Google, o datos que no se pudieron aplicar) va a "un último paso".
   if (!fila?.whatsapp) {
     const camino = rolElegido ?? (fila?.rol === "profesional" ? "profesional" : "cliente");
-    return NextResponse.redirect(`${base}/registro/${camino}`);
+    return NextResponse.redirect(
+      `${base}/registro/${camino}${camino === "cliente" ? "/completar" : ""}`,
+    );
   }
 
   return NextResponse.redirect(

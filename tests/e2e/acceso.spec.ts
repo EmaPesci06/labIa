@@ -79,9 +79,9 @@ test.describe("ingreso", () => {
 
   test("el registro valida la contraseña mínima", async ({ page }) => {
     await page.goto("/registro/cliente");
-    await page.getByLabel("Nombre").fill("Laura");
+    await page.getByLabel("Nombre y apellido").fill("Laura Fernández");
     await page.getByLabel("Email").fill("laura@example.com");
-    await page.getByLabel("Contraseña").fill("corta");
+    await page.getByLabel("Contraseña", { exact: true }).fill("corta");
     await page.getByRole("button", { name: "Crear cuenta" }).click();
     await expect(
       page.getByText("La contraseña tiene que tener al menos 8 caracteres."),
@@ -169,9 +169,11 @@ test.describe("cuenta real", () => {
     const contrasena = "clave-de-prueba-123";
 
     await page.goto("/registro/cliente");
-    await page.getByLabel("Nombre").fill("Prueba");
+    await page.getByLabel("Nombre y apellido").fill("Prueba Uno");
+    await page.getByLabel("Celular de WhatsApp").fill("223 555 1234");
     await page.getByLabel("Email").fill(email);
-    await page.getByLabel("Contraseña").fill(contrasena);
+    await page.getByLabel("Contraseña", { exact: true }).fill(contrasena);
+    await page.getByRole("radio", { name: "Centro" }).click();
     await page.getByRole("button", { name: "Crear cuenta" }).click();
     await expect(page).toHaveURL(/\/inicio$/);
 
