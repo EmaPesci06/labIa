@@ -18,8 +18,10 @@
     "db:tipos": "supabase gen types typescript --local --schema public > src/lib/supabase/tipos.ts"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "1.2.0",
     "@sentry/nextjs": "11.6.0",
     "clsx": "2.1.1",
+    "lucide-react": "1.55.0",
     "next": "16.4.0",
     "posthog-js": "1.438.7",
     "posthog-node": "5.55.1",
@@ -29,6 +31,7 @@
     "zod": "4.6.5"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
     "@playwright/test": "1.64.0",
     "@tailwindcss/turbopack": "4.3.3",
     "@testing-library/dom": "10.4.2",
@@ -46,7 +49,7 @@
     "prettier-plugin-tailwindcss": "0.8.1",
     "supabase": "2.120.0",
     "tailwindcss": "4.3.3",
-    "typescript": "5.9.3",
+    "typescript": "6.0.3",
     "vite": "8.3.4",
     "vitest": "5.0.3"
   },
