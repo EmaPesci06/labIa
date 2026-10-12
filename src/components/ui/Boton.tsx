@@ -79,22 +79,17 @@ export function Boton({
   );
 
   if (href !== undefined) {
-    const { onClick, tabIndex, ...enlace } = resto as AnchorHTMLAttributes<HTMLAnchorElement>;
+    const { tabIndex, ...enlace } = resto as AnchorHTMLAttributes<HTMLAnchorElement>;
     return (
       <Link
         {...enlace}
         href={href}
-        className={clases}
+        // Sin manejador propio: así el botón-enlace también sirve en Server Components (una función
+        // creada acá no se puede pasar a <Link>). Cargando se bloquea con CSS y sale del tab.
+        className={cn(clases, cargando && "pointer-events-none")}
         aria-busy={cargando || undefined}
         aria-disabled={cargando || undefined}
         tabIndex={cargando ? -1 : tabIndex}
-        onClick={(evento) => {
-          if (cargando) {
-            evento.preventDefault();
-            return;
-          }
-          onClick?.(evento);
-        }}
       >
         {contenido}
       </Link>
