@@ -444,6 +444,11 @@ isOneToOne: true
                            },
 "elegir_rol_inicial":
 { Args: { "p_rol": Database["public"]['Enums']["rol"] }; Returns: undefined
+                           },
+"perfil_profesional":
+{ Args: { "p_id": string }; Returns: {
+              "anios_experiencia": number,"antecedentes_ok": boolean,"apellido": string,"apellido_inicial": string,"barrio_id": number,"cantidad_resenas": number,"descripcion": string,"disponibilidad": string,"es_propio": boolean,"especialidades": string,"foto_path": string,"fotos_trabajos": (string)[],"identidad_verificada": boolean,"matriculado": boolean,"nombre": string,"oficios": (Database["public"]['Enums']["oficio"])[],"promedio": number,"publicado": boolean,"toda_la_ciudad": boolean,"usuario_id": string,"zonas_texto": string
+            }[]
                            }
           }
           Enums: {
