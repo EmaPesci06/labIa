@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>LabÍA · Bienvenida (escritorio)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,600..900&amp;family=Atkinson+Hyperlegible+Next:wght@400..800&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+:focus-visible{outline:3px solid #D45F3A;outline-offset:2px}
+@keyframes cinta{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+a{color:#232F49}a:hover{color:#182136}
+</style>
+</helmet>
+<div style="min-height: 1400px; background: #F1F3F6; color: #1B2438; font-family: 'Atkinson Hyperlegible Next', sans-serif">
+  <header style="display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: 18px 40px; background: #FFFFFF; border-bottom: 1px solid #DDE0E6">
+    <a href="Desk-Bienvenida.dc.html" aria-label="labia, inicio" style="display: flex"><img src="/_blob/304edbcb89bf94400a05ef24027583ab" alt="labia" style="height: 40px; width: auto"></a>
+    <nav aria-label="Principal" style="display: flex; gap: 28px; flex-wrap: wrap; font-size: 15px; font-weight: 600">
+      <a href="Desk-Buscar.dc.html" style="color: #1B2438; text-decoration: none">Buscar profesionales</a>
+      <a href="Desk-PublicarTrabajo.dc.html" style="color: #1B2438; text-decoration: none">Publicar un trabajo</a>
+      <a href="Desk-Trabajos.dc.html" style="color: #1B2438; text-decoration: none">Trabajos disponibles</a>
+    </nav>
+    <div style="display: flex; align-items: center; gap: 16px">
+      <a href="Desk-Buscar.dc.html" style="font-size: 15px; font-weight: 700">Ingresar</a>
+      <a href="Desk-RegistroCliente.dc.html" style="display: flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 12px; background: #232F49; color: #FFFFFF; font-weight: 700; font-size: 15px; text-decoration: none">Crear cuenta</a>
+    </div>
+  </header>
+
+  <main style="max-width: 1200px; margin: 0 auto; padding: 72px 40px 56px; box-sizing: border-box; display: flex; flex-direction: column; gap: 80px">
+    <section style="display: flex; flex-wrap: wrap; gap: 56px; align-items: center">
+      <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 22px">
+        <div style="display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 600; color: #4B5468">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg>
+          Mar del Plata
+        </div>
+        <h1 style="margin: 0; font-family: Archivo, sans-serif; font-stretch: 118%; font-weight: 800; font-size: 64px; line-height: 1.02; letter-spacing: -2px">Oficios de confianza, cerca tuyo.</h1>
+        <p style="margin: 0; font-size: 20px; line-height: 1.5; color: #4B5468; max-width: 560px">Encontrá gasistas, electricistas, cerrajeros y más en tu barrio. Todos con identidad y antecedentes verificados.</p><div style="display: flex; flex-direction: column; gap: 12px; max-width: 640px"><span aria-hidden="true" style="display: block; flex: none; height: 28px; width: 100%; border-radius: 2px; border-right: 3px solid #232F49; box-sizing: border-box; background: repeating-linear-gradient(90deg, #232F49 0 1.5px, transparent 1.5px 40px) 0 0 / 100% 16px no-repeat, repeating-linear-gradient(90deg, #232F49 0 1px, transparent 1px 8px) 0 0 / 100% 9px no-repeat, #D45F3A; transform-origin: left; animation: cinta 1100ms cubic-bezier(.2,.7,.2,1) 150ms both"></span><div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; color: #4B5468">Carpintería · Plomería · Cerrajería · Gas · Pintura · Mecánica · Electricidad</div></div>
+        <form style="display: flex; flex-wrap: wrap; gap: 10px; padding: 10px; border-radius: 18px; background: #FFFFFF; border: 1px solid #CDD2DB; max-width: 640px">
+          <label style="flex: 2 1 220px; display: flex; flex-direction: column; gap: 2px; padding: 6px 12px; font-size: 12px; font-weight: 700; color: #4B5468">Oficio
+            <select style="border: none; font: inherit; font-size: 16px; font-weight: 600; color: #1B2438; background: transparent; padding: 0">
+              <option>Gas</option><option>Electricidad</option><option>Plomería</option><option>Cerrajería</option><option>Carpintería</option><option>Pintura</option><option>Mecánica</option>
+            </select>
+          </label>
+          <label style="flex: 1 1 160px; display: flex; flex-direction: column; gap: 2px; padding: 6px 12px; font-size: 12px; font-weight: 700; color: #4B5468; border-left: 1px solid #DDE0E6">Barrio
+            <select style="border: none; font: inherit; font-size: 16px; font-weight: 600; color: #1B2438; background: transparent; padding: 0">
+              <option>La Perla</option><option>Centro</option><option>Chauvín</option><option>Los Troncos</option><option>Punta Mogotes</option>
+            </select>
+          </label>
+          <a href="Desk-Buscar.dc.html" style="flex: 0 0 auto; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 24px; border-radius: 12px; background: #232F49; color: #FFFFFF; font-weight: 700; font-size: 16px; text-decoration: none">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+            Buscar
+          </a>
+        </form>
+      </div>
+
+      <div style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+        <div style="font-size: 15px; font-weight: 700; color: #4B5468">¿Qué querés hacer?</div>
+        <a href="Desk-RegistroCliente.dc.html" style="display: flex; flex-direction: column; gap: 6px; padding: 24px; border-radius: 20px; background: #232F49; color: #FFFFFF; text-decoration: none">
+          <span style="font-size: 22px; font-weight: 700">Quiero contratar</span>
+          <span style="font-size: 15px; color: #C9CFDC; line-height: 1.4">Buscá profesionales o publicá un trabajo y que ellos te escriban.</span>
+        </a>
+        <a href="Desk-RegistroProfesional.dc.html" style="display: flex; flex-direction: column; gap: 6px; padding: 24px; border-radius: 20px; background: #FFFFFF; color: #1B2438; text-decoration: none; border: 2px solid #B84A25">
+          <span style="font-size: 22px; font-weight: 700">Ofrezco mis servicios</span>
+          <span style="font-size: 15px; color: #4B5468; line-height: 1.4">Mostrá tu oficio, conseguí clientes y postulate a trabajos de tu zona.</span>
+        </a>
+      </div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 28px">
+      <h2 style="margin: 0; font-family: Archivo, sans-serif; font-stretch: 118%; font-weight: 800; font-size: 36px; letter-spacing: -0.5px">Cómo funciona</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px">
+        <div style="padding: 24px; border-radius: 18px; background: #FFFFFF; display: flex; flex-direction: column; gap: 10px">
+          <span style="width: 36px; height: 36px; border-radius: 999px; background: #E6E9F0; color: #232F49; font-weight: 800; display: flex; align-items: center; justify-content: center">1</span>
+          <span style="font-size: 18px; font-weight: 700">Buscá por oficio y barrio</span>
+          <span style="font-size: 15px; color: #4B5468; line-height: 1.5">O publicá lo que necesitás y los profesionales de tu zona se postulan.</span>
+        </div>
+        <div style="padding: 24px; border-radius: 18px; background: #FFFFFF; display: flex; flex-direction: column; gap: 10px">
+          <span style="width: 36px; height: 36px; border-radius: 999px; background: #E6E9F0; color: #232F49; font-weight: 800; display: flex; align-items: center; justify-content: center">2</span>
+          <span style="font-size: 18px; font-weight: 700">Mirá perfiles verificados</span>
+          <span style="font-size: 15px; color: #4B5468; line-height: 1.5">Fotos de trabajos, reseñas de vecinos, matrícula y antecedentes revisados.</span>
+        </div>
+        <div style="padding: 24px; border-radius: 18px; background: #FFFFFF; display: flex; flex-direction: column; gap: 10px">
+          <span style="width: 36px; height: 36px; border-radius: 999px; background: #E6E9F0; color: #232F49; font-weight: 800; display: flex; align-items: center; justify-content: center">3</span>
+          <span style="font-size: 18px; font-weight: 700">Hablá por WhatsApp</span>
+          <span style="font-size: 15px; color: #4B5468; line-height: 1.5">Acordás presupuesto, seña y horario directo con el profesional.</span>
+        </div>
+      </div>
+    </section>
+
+    <section style="display: flex; flex-wrap: wrap; gap: 32px; align-items: center; padding: 40px; border-radius: 24px; background: #232F49; color: #FFFFFF">
+      <div style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-family: Archivo, sans-serif; font-stretch: 118%; font-weight: 800; font-size: 32px">Tu seguridad primero</h2>
+        <p style="margin: 0; font-size: 16px; line-height: 1.5; color: #C9CFDC">Cada profesional presenta DNI y certificado de antecedentes, y acepta nuestras normas de seguridad antes de publicar su perfil.</p>
+      </div>
+      <div style="flex: 1 1 320px; display: flex; flex-wrap: wrap; gap: 10px">
+        <span style="padding: 10px 16px; border-radius: 999px; background: #FFFFFF; color: #232F49; font-weight: 700; font-size: 15px">Identidad verificada</span>
+        <span style="padding: 10px 16px; border-radius: 999px; background: #FFFFFF; color: #232F49; font-weight: 700; font-size: 15px">Sin antecedentes</span>
+        <span style="padding: 10px 16px; border-radius: 999px; background: #FBE5DC; color: #9A3A17; font-weight: 700; font-size: 15px">Matriculado</span>
+        <span style="padding: 10px 16px; border-radius: 999px; background: #FFFFFF; color: #232F49; font-weight: 700; font-size: 15px">Normas aceptadas</span>
+      </div>
+    </section>
+  </main>
+
+  <footer style="padding: 28px 40px; border-top: 1px solid #DDE0E6; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 14px; color: #565F72">
+    <span>LabÍA · Mar del Plata</span>
+    <span>Carpintería · Plomería · Cerrajería · Gas · Pintura · Mecánica · Electricidad</span>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1400}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

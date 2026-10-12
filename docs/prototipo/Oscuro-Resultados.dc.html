@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>LabÍA (oscuro) · Resultados</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,600..900&amp;family=Atkinson+Hyperlegible+Next:wght@400..800&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+:focus-visible{outline:3px solid #D45F3A;outline-offset:2px}
+@keyframes cinta{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+a{color:#C9D4EE}a:hover{color:#EEF0F5}
+</style>
+</helmet>
+<div style="width: 390px; height: 960px; box-sizing: border-box; padding: 20px 20px 28px; display: flex; flex-direction: column; gap: 16px; background: #121826; color: #EEF0F5; font-family: 'Atkinson Hyperlegible Next', sans-serif; color-scheme: dark">
+  <div style="display: flex; align-items: center; gap: 6px">
+    <a href="Oscuro-Inicio.dc.html" aria-label="Volver" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; color: #EEF0F5">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+    </a>
+    <div style="display: flex; flex-direction: column">
+      <h1 style="margin: 0; font-family: Archivo, sans-serif; font-stretch: 118%; font-weight: 800; font-size: 24px">Gasistas</h1>
+      <span style="font-size: 14px; color: #A9B2C6">Cerca de La Perla · {{count}} resultados, más cerca primero</span>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 8px; flex-wrap: wrap">
+    <button type="button" onClick="{{toggleMat}}" aria-pressed="{{matPressed}}" style="min-height: 40px; padding: 0 14px; border-radius: 999px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; background: {{matBg}}; color: {{matFg}}; border: 1.5px solid #B7C5E8">Solo matriculados</button>
+    <span style="display: flex; align-items: center; min-height: 40px; padding: 0 14px; border-radius: 999px; font-size: 14px; font-weight: 600; background: #1B2335; border: 1.5px solid #334060">Mejor calificados</span>
+    <span style="display: flex; align-items: center; min-height: 40px; padding: 0 14px; border-radius: 999px; font-size: 14px; font-weight: 600; background: #1B2335; border: 1.5px solid #334060">Toda la ciudad</span>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 12px">
+    <sc-for list="{{pros}}" as="p" hint-placeholder-count="4">
+      <a href="Oscuro-Perfil.dc.html" style="display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 18px; background: #1B2335; color: #EEF0F5; text-decoration: none">
+        <div style="display: flex; gap: 12px; align-items: center">
+          <span style="flex: none; width: 52px; height: 52px; border-radius: 999px; background: #2A3550; color: #C9D4EE; font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: center">{{p.ini}}</span>
+          <div style="display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0">
+            <span style="font-size: 17px; font-weight: 700">{{p.name}}</span>
+            <span style="font-size: 14px; color: #A9B2C6">{{p.sub}}</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 700">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#F2A07F" stroke="#F2A07F" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.8-4.4 4.3 1 6.1L12 17l-5.4 2.8 1-6.1-4.4-4.3 6.1-.8z"></path></svg>
+            {{p.rating}}
+          </div>
+        </div>
+        <span style="display: flex; align-items: center; gap: 10px"><span aria-hidden="true" style="display: block; flex: none; height: 12px; width: {{p.tape}}; border-radius: 2px; border-right: 3px solid #EEF0F5; box-sizing: border-box; background: repeating-linear-gradient(90deg, #121826 0 1.5px, transparent 1.5px 40px) 0 0 / 100% 7px no-repeat, repeating-linear-gradient(90deg, #121826 0 1px, transparent 1px 8px) 0 0 / 100% 4px no-repeat, #E8714B"></span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #EEF0F5">a {{p.km}}</span></span><div style="display: flex; flex-wrap: wrap; gap: 6px">
+          <span style="padding: 4px 10px; border-radius: 999px; background: #2A3550; color: #C9D4EE; font-size: 12px; font-weight: 700">Identidad verificada</span>
+          <span style="padding: 4px 10px; border-radius: 999px; background: #2A3550; color: #C9D4EE; font-size: 12px; font-weight: 700">Sin antecedentes</span>
+          <sc-if value="{{p.mat}}" hint-placeholder-val="{{ true }}">
+            <span style="padding: 4px 10px; border-radius: 999px; background: #3A241B; color: #F4B399; font-size: 12px; font-weight: 700">Matriculado</span>
+          </sc-if>
+        </div>
+      </a>
+    </sc-for>
+  </div>
+
+  <p style="margin: 0; font-size: 13px; color: #8D97AD; text-align: center">Perfiles de ejemplo para el prototipo.</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":960}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { soloMat: false };
+}
+renderVals() {
+const all = [
+{ ini: 'MG', km: '1,2 km', tape: '36px', name: 'Martín Gómez', sub: 'Gasista · 12 años · La Perla, Centro', rating: '4,9', mat: true },
+{ ini: 'SR', km: '2,8 km', tape: '84px', name: 'Silvia Romero', sub: 'Gas y plomería · 8 años · Chauvín', rating: '4,8', mat: true },
+{ ini: 'JP', km: '3,4 km', tape: '102px', name: 'Jorge Paz', sub: 'Gasista · 20 años · Toda la ciudad', rating: '4,7', mat: true },
+{ ini: 'DL', km: '4,6 km', tape: '138px', name: 'Diego Luna', sub: 'Plomería · 5 años · Los Troncos', rating: '4,6', mat: false }
+];
+const on = this.state.soloMat;
+const pros = on ? all.filter((p) => p.mat) : all;
+return {
+pros: pros,
+count: String(pros.length),
+matPressed: on ? 'true' : 'false',
+matBg: on ? '#B7C5E8' : '#1B2335',
+matFg: on ? '#121826' : '#C9D4EE',
+toggleMat: () => this.setState({ soloMat: !this.state.soloMat })
+};
+}
+}
+</script>
+</body>
+</html>

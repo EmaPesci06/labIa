@@ -6,6 +6,7 @@ Todos los agentes `labia-*` siguen este protocolo. Si una tarea de Linear lo con
 
 - **Linear**, equipo `LAB`, proyecto **LabÍA MVP** (`P-LAB-1`).
 - **Guía para agentes** (documento de Linear `ee4f4689-09c5-43b1-9acc-ab1aa21addab`): stack, estructura, convenciones, diseño (§5), modelo de datos (§6), seguridad (§7), definición de terminado (§8), olas (§9). Leela con `mcp__claude_ai_Linear__get_document` antes de tocar código.
+- **Prototipo de interfaz** en `docs/prototipo/` (leé primero su `README.md`): copia del canvas "LabÍA · Prototipo MVP". Toda pantalla y componente se construye igual a su pantalla del prototipo, usando los tokens (nunca hex sueltos).
 - `AGENTS.md` en la raíz del repo (existe desde LAB-8): resumen de la guía.
 - Repo: `github.com/EmaPesci06/labIa`, rama por defecto `main`. `gh` ya está autenticado como EmaPesci06.
 
@@ -43,7 +44,7 @@ Solo `labia-revisor` mergea a `main`. Lo orquesta la sesión principal con `/lab
 
 1. Verificá la definición de terminado (Guía §8): `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build` en verde (y `pnpm test:e2e` si la tarea toca flujos). Pegá el resultado real; si algo falla, decilo, no lo escondas.
 2. Commits chicos, en español, terminando con:
-   `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
+   `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`
 3. `git push -u origin <rama>` y `gh pr create --base main --title "LAB-n: <título>"`. El cuerpo lleva: resumen, antes/después, cómo probar, criterios de aceptación tildados, decisiones no escritas en la tarea, y al final:
    `🤖 Generated with [Claude Code](https://claude.com/claude-code)`
 4. En Linear: adjuntá el PR (`save_issue` con `links: [{url, title}]`), comentá un resumen corto (qué se hizo, decisiones, lo que quedó afuera) y **pasá la tarea a `In Review`**.
