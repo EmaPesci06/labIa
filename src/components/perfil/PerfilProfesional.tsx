@@ -104,7 +104,7 @@ function BannerDuenio({ publicado }: { publicado: boolean }) {
     <div
       role="status"
       className={cn(
-        "rounded-[14px] p-3.5 text-[15px] font-semibold leading-snug",
+        "rounded-[14px] p-3.5 text-[15px] leading-snug font-semibold",
         publicado
           ? "bg-exito-suave text-sobre-exito-suave"
           : "bg-naranja-suave text-sobre-naranja-suave",
@@ -135,10 +135,7 @@ export function PerfilProfesional({ perfil, resenas, distanciaKm }: Props) {
     <article className={cn("flex flex-col gap-5 lg:gap-6", !esPropio && "pb-36 lg:pb-0")}>
       {esPropio ? <BannerDuenio publicado={perfil.publicado} /> : null}
 
-      <EnlaceVolver
-        href={hrefVolver}
-        etiquetaEscritorio={`Volver a ${profesion.toLowerCase()}s`}
-      />
+      <EnlaceVolver href={hrefVolver} etiquetaEscritorio={`Volver a ${profesion.toLowerCase()}s`} />
 
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:gap-8">
         <div className="flex min-w-0 flex-col gap-5 lg:flex-[999_1_560px] lg:gap-7">
@@ -260,7 +257,13 @@ export function PerfilProfesional({ perfil, resenas, distanciaKm }: Props) {
       </div>
 
       {esPropio ? (
-        <Boton href="/cuenta/perfil" variante="cliente" tamano="grande" bloque className="lg:hidden">
+        <Boton
+          href="/cuenta/perfil"
+          variante="cliente"
+          tamano="grande"
+          bloque
+          className="lg:hidden"
+        >
           Editar perfil
         </Boton>
       ) : (

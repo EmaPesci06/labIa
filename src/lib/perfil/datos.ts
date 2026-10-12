@@ -114,7 +114,8 @@ export function descripcionCorta(
 ): string {
   const base = (descripcion ?? "").replace(/\s+/g, " ").trim();
   const texto =
-    base || `${nombre} ofrece servicios de ${textoOficios(oficios).toLowerCase()} en Mar del Plata.`;
+    base ||
+    `${nombre} ofrece servicios de ${textoOficios(oficios).toLowerCase()} en Mar del Plata.`;
   return texto.length > 160 ? `${texto.slice(0, 157).trimEnd()}…` : texto;
 }
 

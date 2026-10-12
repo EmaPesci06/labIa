@@ -83,8 +83,7 @@ export async function obtenerPerfil(
     antecedentesOk: fila.antecedentes_ok,
     matriculado: fila.matriculado,
     publicado: fila.publicado,
-    promedio:
-      fila.promedio === null || fila.promedio === undefined ? null : Number(fila.promedio),
+    promedio: fila.promedio === null || fila.promedio === undefined ? null : Number(fila.promedio),
     cantidadResenas: fila.cantidad_resenas,
     esPropio: fila.es_propio,
   };

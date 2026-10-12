@@ -7,10 +7,7 @@ import type { EstadoFormulario } from "@/lib/auth/estado";
 import { limitarIntentos } from "@/lib/rate-limit";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
-import {
-  datosDeFormularioPerfil,
-  esquemaPerfilProfesional,
-} from "@/lib/validaciones/perfil";
+import { datosDeFormularioPerfil, esquemaPerfilProfesional } from "@/lib/validaciones/perfil";
 
 import { obtenerResenas, type PaginaResenas } from "./cargar";
 import { RESENAS_POR_PAGINA } from "./datos";
