@@ -118,18 +118,3 @@ export function descripcionCorta(
     `${nombre} ofrece servicios de ${textoOficios(oficios).toLowerCase()} en Mar del Plata.`;
   return texto.length > 160 ? `${texto.slice(0, 157).trimEnd()}…` : texto;
 }
-
-// Rutas de Storage (bucket público `fotos`): perfiles/<uid>/… y trabajos-hechos/<uid>/…
-const RUTA_FOTO_SEGURA = /^(?:perfiles|trabajos-hechos)\/[A-Za-z0-9_-]+\/[A-Za-z0-9._-]+$/;
-
-/**
- * URL pública de una foto del bucket `fotos`, o `null` si la ruta no tiene la forma esperada.
- * La ruta la escribe el dueño del perfil, así que no se confía: solo carpetas conocidas y
- * caracteres simples, sin `..` ni barras de más.
- */
-export function urlFotoPublica(ruta: string | null | undefined, base?: string): string | null {
-  if (!ruta || !RUTA_FOTO_SEGURA.test(ruta) || ruta.includes("..")) return null;
-  const origen = (base ?? process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").replace(/\/+$/, "");
-  if (!origen) return null;
-  return `${origen}/storage/v1/object/public/fotos/${ruta}`;
-}

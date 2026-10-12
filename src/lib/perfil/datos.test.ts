@@ -11,7 +11,6 @@ import {
   textoCantidadResenas,
   textoPuntaje,
   tituloPerfil,
-  urlFotoPublica,
 } from "./datos";
 
 describe("nombreMostrado", () => {
@@ -52,22 +51,6 @@ describe("textos del perfil", () => {
       "Calefactores",
     ]);
     expect(separarEspecialidades(null)).toEqual([]);
-  });
-});
-
-describe("urlFotoPublica", () => {
-  const base = "https://x.supabase.co/";
-  it("arma la URL pública de una ruta válida", () => {
-    expect(urlFotoPublica("trabajos-hechos/abc-123/f1.jpg", base)).toBe(
-      "https://x.supabase.co/storage/v1/object/public/fotos/trabajos-hechos/abc-123/f1.jpg",
-    );
-  });
-  it("rechaza rutas raras", () => {
-    expect(urlFotoPublica("../secreto.png", base)).toBeNull();
-    expect(urlFotoPublica("otra/carpeta/f.jpg", base)).toBeNull();
-    expect(urlFotoPublica("perfiles/a/../b/f.jpg", base)).toBeNull();
-    expect(urlFotoPublica("https://malo.com/x.jpg", base)).toBeNull();
-    expect(urlFotoPublica(null, base)).toBeNull();
   });
 });
 

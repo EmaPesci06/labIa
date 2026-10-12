@@ -5,7 +5,9 @@ import type { Oficio } from "@/lib/busqueda";
 import { haceCuanto } from "@/lib/formato";
 import type { Database } from "@/lib/supabase/tipos";
 
-import { autorResena, nombreMostrado, urlFotoPublica } from "./datos";
+import { urlFoto } from "@/lib/fotos";
+
+import { autorResena, nombreMostrado } from "./datos";
 
 const esquemaId = z.uuid();
 
@@ -68,7 +70,7 @@ export async function obtenerPerfil(
     id: fila.usuario_id,
     nombre: nombreMostrado(fila.nombre, fila.apellido, fila.apellido_inicial),
     nombreCompleto: Boolean(fila.apellido),
-    fotoUrl: urlFotoPublica(fila.foto_path),
+    fotoUrl: urlFoto(fila.foto_path),
     barrioId: fila.barrio_id ?? null,
     oficios: fila.oficios,
     especialidades: fila.especialidades ?? null,
@@ -77,7 +79,7 @@ export async function obtenerPerfil(
     zonasTexto: fila.zonas_texto ?? "",
     disponibilidad: fila.disponibilidad ?? null,
     fotosTrabajos: (fila.fotos_trabajos ?? [])
-      .map((ruta) => urlFotoPublica(ruta))
+      .map((ruta) => urlFoto(ruta))
       .filter((url): url is string => url !== null),
     identidadVerificada: fila.identidad_verificada,
     antecedentesOk: fila.antecedentes_ok,
