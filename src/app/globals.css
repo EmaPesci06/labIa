@@ -32,6 +32,9 @@
 
   --color-acento: #b84a25;
 
+  /* Texto de error (LAB-10): 6,2:1 sobre blanco. La guía no define uno. */
+  --color-error: #b42318;
+
   --color-fondo: #f1f3f6;
   --color-superficie: #ffffff;
   --color-superficie-elevada: #ffffff;
@@ -47,6 +50,9 @@
   --color-foco: #d45f3a;
   --color-cinta: #d45f3a;
   --color-cinta-marcas: #232f49;
+
+  /* Fondo oscurecido detrás de las hojas y diálogos. */
+  --color-velo: rgb(27 36 56 / 0.55);
 }
 
 .dark {
@@ -70,6 +76,8 @@
   --color-sobre-exito-suave: #6fd3a0;
 
   --color-acento: #f2a07f;
+
+  --color-error: #ff8f85;
 
   --color-fondo: #121826;
   --color-superficie: #1b2335;
@@ -108,6 +116,7 @@
   --color-exito-suave: var(--color-exito-suave);
   --color-sobre-exito-suave: var(--color-sobre-exito-suave);
   --color-acento: var(--color-acento);
+  --color-error: var(--color-error);
   --color-fondo: var(--color-fondo);
   --color-superficie: var(--color-superficie);
   --color-superficie-elevada: var(--color-superficie-elevada);
@@ -119,6 +128,7 @@
   --color-foco: var(--color-foco);
   --color-cinta: var(--color-cinta);
   --color-cinta-marcas: var(--color-cinta-marcas);
+  --color-velo: var(--color-velo);
 
   /* Las variables --fuente-* las define next/font en src/app/fuentes.ts. */
   --font-texto: var(--fuente-atkinson), system-ui, sans-serif;
@@ -132,7 +142,7 @@
   --radius-tarjeta: 16px;
   --radius-hoja: 24px;
 
-  --animate-cinta: cinta 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-cinta: cinta 900ms ease-out both;
 
   @keyframes cinta {
     from {
@@ -154,6 +164,35 @@
   font-weight: 800;
   font-stretch: 118%;
   letter-spacing: -0.02em;
+}
+
+/*
+ * Cinta métrica (guía §5): naranja con marcas azul noche, finas cada 8 px (4 px de alto), gruesas
+ * cada 40 px (7 px de alto) y un tope de 3 px a la derecha. Las marcas no cambian con el tema.
+ */
+@utility cinta-regla {
+  height: 12px;
+  border-right: 3px solid var(--color-cinta-marcas);
+  border-radius: 2px;
+  background:
+    repeating-linear-gradient(90deg, var(--color-cinta-marcas) 0 1.5px, transparent 1.5px 40px) 0
+      0 / 100% 7px no-repeat,
+    repeating-linear-gradient(90deg, var(--color-cinta-marcas) 0 1px, transparent 1px 8px) 0 0 /
+      100% 4px no-repeat,
+    var(--color-cinta);
+}
+
+/* Versión grande (bienvenida): 22 px de alto, marcas gruesas de 13 px y finas de 7 px. */
+@utility cinta-regla-grande {
+  height: 22px;
+  border-right: 3px solid var(--color-cinta-marcas);
+  border-radius: 2px;
+  background:
+    repeating-linear-gradient(90deg, var(--color-cinta-marcas) 0 1.5px, transparent 1.5px 40px) 0
+      0 / 100% 13px no-repeat,
+    repeating-linear-gradient(90deg, var(--color-cinta-marcas) 0 1px, transparent 1px 8px) 0 0 /
+      100% 7px no-repeat,
+    var(--color-cinta);
 }
 
 @layer base {

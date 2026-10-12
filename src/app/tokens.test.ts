@@ -132,6 +132,8 @@ describe("contraste AA (≥ 4,5:1) de los pares texto/fondo principales", () => 
     ["sobre-exito-suave", "exito-suave"],
     ["acento", "superficie"],
     ["acento", "fondo"],
+    ["error", "superficie"],
+    ["error", "fondo"],
   ];
 
   for (const [nombreTema, tema] of [

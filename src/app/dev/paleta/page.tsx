@@ -29,6 +29,7 @@ const MUESTRA: Record<(typeof TOKENS_COLOR)[number], string> = {
   "exito-suave": "bg-exito-suave",
   "sobre-exito-suave": "bg-sobre-exito-suave",
   acento: "bg-acento",
+  error: "bg-error",
   fondo: "bg-fondo",
   superficie: "bg-superficie",
   "superficie-elevada": "bg-superficie-elevada",

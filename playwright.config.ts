@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PUERTO = 3000;
+const PUERTO = Number(process.env.PUERTO_E2E ?? 3000);
 const URL_BASE = `http://localhost:${PUERTO}`;
 const enCI = Boolean(process.env.CI);
 
@@ -37,9 +37,11 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "pnpm build && pnpm start",
+    command: `pnpm build && pnpm start -p ${PUERTO}`,
     url: URL_BASE,
     reuseExistingServer: !enCI,
     timeout: 300_000,
+    // Habilita /dev/ui en el build de producción para correr axe contra la biblioteca de componentes.
+    env: { MOSTRAR_DEV_UI: "1" },
   },
 });
