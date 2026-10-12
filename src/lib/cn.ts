@@ -18,6 +18,7 @@ export const TOKENS_COLOR = [
   "exito-suave",
   "sobre-exito-suave",
   "acento",
+  "error",
   "fondo",
   "superficie",
   "superficie-elevada",
@@ -38,7 +39,7 @@ export type TokenColor = (typeof TOKENS_COLOR)[number];
 const twMerge = extendTailwindMerge({
   extend: {
     theme: {
-      color: [...TOKENS_COLOR],
+      color: [...TOKENS_COLOR, "velo"],
       font: ["titulo", "texto", "mono"],
       radius: ["campo", "boton", "tarjeta", "hoja"],
     },
