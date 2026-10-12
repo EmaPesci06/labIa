@@ -1,6 +1,6 @@
 "use client";
 
-import { Hammer, MessageCircle } from "lucide-react";
+import { Hammer, MessageCircle, Star } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
 import { Aviso } from "@/components/ui/Aviso";
@@ -144,7 +144,11 @@ export function MuestraComponentes() {
               <p className="text-sm text-texto-secundario">Gasista · 12 años · La Perla</p>
             </div>
             <span className="flex items-center gap-1 text-sm font-bold">
-              <Estrellas valor={1} className="[&_svg]:size-4" />
+              <Star
+                aria-hidden
+                strokeWidth={1.5}
+                className="size-4 fill-current text-naranja-marca"
+              />
               4,9
             </span>
           </div>
