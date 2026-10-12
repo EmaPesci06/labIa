@@ -38,10 +38,22 @@ isOneToOne: false
       referencedRelation: "usuarios"
       referencedColumns: ["id"]
     },{
+      foreignKeyName: "contactos_cliente_id_fkey"
+      columns: ["cliente_id"]
+isOneToOne: false
+      referencedRelation: "usuarios_publicos"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "contactos_profesional_id_fkey"
       columns: ["profesional_id"]
 isOneToOne: false
       referencedRelation: "usuarios"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "contactos_profesional_id_fkey"
+      columns: ["profesional_id"]
+isOneToOne: false
+      referencedRelation: "usuarios_publicos"
       referencedColumns: ["id"]
     },{
       foreignKeyName: "contactos_trabajo_id_fkey"
@@ -69,6 +81,12 @@ isOneToOne: false
 isOneToOne: true
       referencedRelation: "usuarios"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "perfiles_profesionales_usuario_id_fkey"
+      columns: ["usuario_id"]
+isOneToOne: true
+      referencedRelation: "usuarios_publicos"
+      referencedColumns: ["id"]
     }
                   ]
                 },"postulaciones": {
@@ -88,6 +106,12 @@ isOneToOne: true
       columns: ["profesional_id"]
 isOneToOne: false
       referencedRelation: "usuarios"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "postulaciones_profesional_id_fkey"
+      columns: ["profesional_id"]
+isOneToOne: false
+      referencedRelation: "usuarios_publicos"
       referencedColumns: ["id"]
     },{
       foreignKeyName: "postulaciones_trabajo_id_fkey"
@@ -116,10 +140,22 @@ isOneToOne: false
       referencedRelation: "usuarios"
       referencedColumns: ["id"]
     },{
+      foreignKeyName: "reportes_autor_id_fkey"
+      columns: ["autor_id"]
+isOneToOne: false
+      referencedRelation: "usuarios_publicos"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "reportes_resuelto_por_fkey"
       columns: ["resuelto_por"]
 isOneToOne: false
       referencedRelation: "usuarios"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "reportes_resuelto_por_fkey"
+      columns: ["resuelto_por"]
+isOneToOne: false
+      referencedRelation: "usuarios_publicos"
       referencedColumns: ["id"]
     }
                   ]
@@ -142,10 +178,22 @@ isOneToOne: false
       referencedRelation: "usuarios"
       referencedColumns: ["id"]
     },{
+      foreignKeyName: "resenas_autor_id_fkey"
+      columns: ["autor_id"]
+isOneToOne: false
+      referencedRelation: "usuarios_publicos"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "resenas_profesional_id_fkey"
       columns: ["profesional_id"]
 isOneToOne: false
       referencedRelation: "usuarios"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "resenas_profesional_id_fkey"
+      columns: ["profesional_id"]
+isOneToOne: false
+      referencedRelation: "usuarios_publicos"
       referencedColumns: ["id"]
     },{
       foreignKeyName: "resenas_trabajo_id_fkey"
@@ -180,10 +228,22 @@ isOneToOne: false
       referencedRelation: "usuarios"
       referencedColumns: ["id"]
     },{
+      foreignKeyName: "trabajos_cliente_id_fkey"
+      columns: ["cliente_id"]
+isOneToOne: false
+      referencedRelation: "usuarios_publicos"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "trabajos_profesional_elegido_id_fkey"
       columns: ["profesional_elegido_id"]
 isOneToOne: false
       referencedRelation: "usuarios"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "trabajos_profesional_elegido_id_fkey"
+      columns: ["profesional_elegido_id"]
+isOneToOne: false
+      referencedRelation: "usuarios_publicos"
       referencedColumns: ["id"]
     }
                   ]
@@ -226,24 +286,87 @@ isOneToOne: false
       referencedRelation: "usuarios"
       referencedColumns: ["id"]
     },{
+      foreignKeyName: "verificaciones_revisado_por_fkey"
+      columns: ["revisado_por"]
+isOneToOne: false
+      referencedRelation: "usuarios_publicos"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "verificaciones_usuario_id_fkey"
       columns: ["usuario_id"]
 isOneToOne: false
       referencedRelation: "usuarios"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "verificaciones_usuario_id_fkey"
+      columns: ["usuario_id"]
+isOneToOne: false
+      referencedRelation: "usuarios_publicos"
       referencedColumns: ["id"]
     }
                   ]
                 }
           }
           Views: {
-            [_ in never]: never
+            "matricula_propia": {
+                  Row: {
+                    "matricula_numero": string | null,"usuario_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                           "matricula_numero"?: string | null,"usuario_id"?: string | null
+                         }
+                        Update: {
+                           "matricula_numero"?: string | null,"usuario_id"?: string | null
+                         }
+                        Relationships: [
+                    {
+      foreignKeyName: "perfiles_profesionales_usuario_id_fkey"
+      columns: ["usuario_id"]
+isOneToOne: true
+      referencedRelation: "usuarios"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "perfiles_profesionales_usuario_id_fkey"
+      columns: ["usuario_id"]
+isOneToOne: true
+      referencedRelation: "usuarios_publicos"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"mis_verificaciones": {
+                  Row: {
+                    "created_at": string | null,"estado": Database["public"]['Enums']["estado_verificacion"] | null,"id": string | null,"motivo_rechazo": string | null,"tipo": Database["public"]['Enums']["tipo_documento"] | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                           "created_at"?: string | null,"estado"?: Database["public"]['Enums']["estado_verificacion"] | null,"id"?: string | null,"motivo_rechazo"?: string | null,"tipo"?: Database["public"]['Enums']["tipo_documento"] | null
+                         }
+                        Update: {
+                           "created_at"?: string | null,"estado"?: Database["public"]['Enums']["estado_verificacion"] | null,"id"?: string | null,"motivo_rechazo"?: string | null,"tipo"?: Database["public"]['Enums']["tipo_documento"] | null
+                         }
+                        Relationships: [
+                    
+                  ]
+                },"usuarios_publicos": {
+                  Row: {
+                    "apellido_inicial": string | null,"barrio_id": number | null,"foto_path": string | null,"id": string | null,"nombre": string | null
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    
+                  ]
+                }
           }
           Functions: {
-            "distancia_km":
-{ Args: { "barrio_a": number,"barrio_b": number }; Returns: number
+            "aceptar_normas":
+{ Args: { "p_version": string }; Returns: undefined
                            },
-"recalcular_resenas_de":
-{ Args: { "p_profesional_id": string }; Returns: undefined
+"actualizar_whatsapp":
+{ Args: { "p_whatsapp": string }; Returns: undefined
+                           },
+"distancia_km":
+{ Args: { "barrio_a": number,"barrio_b": number }; Returns: number
                            }
           }
           Enums: {
