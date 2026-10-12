@@ -10,7 +10,7 @@ import { cargarDatosRegistro } from "@/lib/registro/borrador";
 export const metadata: Metadata = { title: "Armá tu perfil de profesional · LabÍA" };
 
 async function Contenido() {
-  const { sesion, rol, borrador, barrios, urls } = await cargarDatosRegistro();
+  const { sesion, rol, borrador, barrios, urls, verificaciones } = await cargarDatosRegistro();
 
   // Una cuenta de cliente (o admin) no arma perfil de profesional: se lo explicamos.
   if (sesion && rol && rol !== "profesional") {
@@ -36,6 +36,7 @@ async function Contenido() {
       borrador={borrador}
       barrios={barrios}
       urls={urls}
+      verificaciones={verificaciones}
     />
   );
 }

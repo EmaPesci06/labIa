@@ -1,4 +1,15 @@
 import type { EstadoFormulario } from "@/lib/auth/estado";
+import type { TipoDocumento } from "@/lib/validaciones/documentos";
+
+export type EstadoVerificacionDocumento = "pendiente" | "aprobado" | "rechazado";
+
+export type ItemVerificacion = {
+  id: string;
+  tipo: TipoDocumento;
+  estado: EstadoVerificacionDocumento;
+  motivoRechazo: string | null;
+  createdAt: string;
+};
 
 export type BarrioOpcion = { id: number; nombre: string };
 

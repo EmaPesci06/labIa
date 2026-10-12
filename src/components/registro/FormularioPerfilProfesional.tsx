@@ -20,10 +20,13 @@ import { GrupoChips } from "@/components/ui/Chip";
 import { comprimirImagen } from "@/lib/imagen";
 import { registrarEvento } from "@/lib/metricas";
 import { guardarFotosPerfil, guardarPerfilProfesional } from "@/lib/registro/profesional";
+import { registrarDocumentoAccion } from "@/lib/registro/documentos";
+import { generarRutaDocumento, type TipoDocumento } from "@/lib/validaciones/documentos";
 import type {
   BarrioOpcion,
   BorradorPerfil,
   EstadoPerfil,
+  ItemVerificacion,
   SesionRegistro,
 } from "@/lib/registro/tipos";
 import { crearClienteNavegador } from "@/lib/supabase/navegador";
@@ -52,6 +55,7 @@ type Props = {
   barrios: BarrioOpcion[];
   /** URLs públicas de las fotos ya subidas, por ruta. */
   urls: Record<string, string>;
+  verificaciones?: ItemVerificacion[];
 };
 
 function Seccion({ titulo, children }: { titulo: string; children: ReactNode }) {
@@ -99,7 +103,13 @@ const suscribirNada = () => () => undefined;
  * Paso 1 del registro de profesional: el perfil que van a ver los clientes. A la izquierda el
  * formulario; en escritorio, a la derecha, la vista previa en vivo, la verificación y el botón.
  */
-export function FormularioPerfilProfesional({ sesion, borrador, barrios, urls }: Props) {
+export function FormularioPerfilProfesional({
+  sesion,
+  borrador,
+  barrios,
+  urls,
+  verificaciones = [],
+}: Props) {
   const router = useRouter();
   const formulario = useRef<HTMLFormElement>(null);
   const [nombre, setNombre] = useState(borrador.nombreCompleto);
@@ -114,6 +124,9 @@ export function FormularioPerfilProfesional({ sesion, borrador, barrios, urls }:
   const [fotosTrabajos, setFotosTrabajos] = useState<FotoLocal[]>(() =>
     borrador.fotosTrabajos.flatMap((ruta) => fotoDeRuta(ruta, urls) ?? []),
   );
+  const [documentosLocales, setDocumentosLocales] = useState<
+    Partial<Record<TipoDocumento, File | null>>
+  >({});
   const [procesando, setProcesando] = useState(false);
   const [errorFotos, setErrorFotos] = useState<{ perfil?: string; trabajos?: string }>({});
   // Fotos ya subidas que la persona quitó: se borran del bucket al guardar.
@@ -186,6 +199,40 @@ export function FormularioPerfilProfesional({ sesion, borrador, barrios, urls }:
     return null;
   }
 
+  const elegirDocumento = (tipo: TipoDocumento, archivo: File) => {
+    setDocumentosLocales((prev) => ({ ...prev, [tipo]: archivo }));
+  };
+
+  const quitarDocumento = (tipo: TipoDocumento) => {
+    setDocumentosLocales((prev) => ({ ...prev, [tipo]: null }));
+  };
+
+  async function subirDocumentosPendientes(uid: string): Promise<string | null> {
+    const entradas = Object.entries(documentosLocales).filter(
+      (entry): entry is [TipoDocumento, File] => Boolean(entry[1]),
+    );
+    if (entradas.length === 0) return null;
+
+    const almacen = crearClienteNavegador().storage.from("documentos");
+    for (const [tipo, archivo] of entradas) {
+      const partes = archivo.name.split(".");
+      const ext = partes.length > 1 ? partes.pop()?.toLowerCase() || "jpg" : "jpg";
+      const ruta = generarRutaDocumento(uid, tipo, ext);
+      const { error: errorSubida } = await almacen.upload(ruta, archivo);
+      if (errorSubida) {
+        return "Guardamos tu perfil, pero no pudimos subir los documentos de verificación. Probá de nuevo.";
+      }
+      const registro = await registrarDocumentoAccion({
+        tipo,
+        storagePath: ruta,
+      });
+      if (!registro.ok) {
+        return registro.mensaje ?? "No pudimos registrar los documentos.";
+      }
+    }
+    return null;
+  }
+
   async function accion(anterior: EstadoPerfil, datos: FormData): Promise<EstadoPerfil> {
     const conErrores = validarEnNavegador(datos, conCuenta);
     if (conErrores) return conErrores;
@@ -195,6 +242,9 @@ export function FormularioPerfilProfesional({ sesion, borrador, barrios, urls }:
 
     const errorSubida = await subirFotosPendientes(resultado.guardado.uid);
     if (errorSubida) return { mensaje: errorSubida };
+
+    const errorDocs = await subirDocumentosPendientes(resultado.guardado.uid);
+    if (errorDocs) return { mensaje: errorDocs };
 
     router.push(DESTINO_SIGUIENTE);
     return resultado;
@@ -507,7 +557,15 @@ export function FormularioPerfilProfesional({ sesion, borrador, barrios, urls }:
             />
           </div>
 
-          <BloqueVerificacion className="lg:hidden" />
+          <BloqueVerificacion
+            className="lg:hidden"
+            tieneGas={tieneGas}
+            verificaciones={verificaciones}
+            documentosLocales={documentosLocales}
+            onElegirDocumento={elegirDocumento}
+            onQuitarDocumento={quitarDocumento}
+            ocupado={procesando}
+          />
 
           {estado.mensaje ? (
             <p role="alert" className="text-sm font-semibold text-error lg:hidden">
@@ -525,7 +583,14 @@ export function FormularioPerfilProfesional({ sesion, borrador, barrios, urls }:
           zonas={zonasTexto}
           foto={fotoPerfil?.vista ?? null}
         />
-        <BloqueVerificacion />
+        <BloqueVerificacion
+          tieneGas={tieneGas}
+          verificaciones={verificaciones}
+          documentosLocales={documentosLocales}
+          onElegirDocumento={elegirDocumento}
+          onQuitarDocumento={quitarDocumento}
+          ocupado={procesando}
+        />
         {estado.mensaje ? (
           <p role="alert" className="text-sm font-semibold text-error">
             {estado.mensaje}

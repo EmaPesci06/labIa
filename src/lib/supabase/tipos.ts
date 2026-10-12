@@ -372,6 +372,9 @@ isOneToOne: true
                            },
 "distancia_km":
 { Args: { "barrio_a": number,"barrio_b": number }; Returns: number
+                           },
+"registrar_documento":
+{ Args: { "p_tipo": Database["public"]['Enums']["tipo_documento"],"p_storage_path": string }; Returns: string
                            }
           }
           Enums: {
