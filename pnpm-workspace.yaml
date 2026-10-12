@@ -1,6 +1,8 @@
 allowBuilds:
   # core-js solo imprime un mensaje en postinstall (llega con posthog-js).
   core-js: false
+  # esbuild (llega con react-email) trae su binario por dependencias opcionales: no necesita postinstall.
+  esbuild: false
   sharp: false
   supabase: true
   unrs-resolver: false
