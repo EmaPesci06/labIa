@@ -308,7 +308,33 @@ isOneToOne: false
                 }
           }
           Views: {
-            "mis_verificaciones": {
+            "matricula_propia": {
+                  Row: {
+                    "matricula_numero": string | null,"usuario_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                           "matricula_numero"?: string | null,"usuario_id"?: string | null
+                         }
+                        Update: {
+                           "matricula_numero"?: string | null,"usuario_id"?: string | null
+                         }
+                        Relationships: [
+                    {
+      foreignKeyName: "perfiles_profesionales_usuario_id_fkey"
+      columns: ["usuario_id"]
+isOneToOne: true
+      referencedRelation: "usuarios"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "perfiles_profesionales_usuario_id_fkey"
+      columns: ["usuario_id"]
+isOneToOne: true
+      referencedRelation: "usuarios_publicos"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"mis_verificaciones": {
                   Row: {
                     "created_at": string | null,"estado": Database["public"]['Enums']["estado_verificacion"] | null,"id": string | null,"motivo_rechazo": string | null,"tipo": Database["public"]['Enums']["tipo_documento"] | null
                   }
@@ -327,20 +353,8 @@ isOneToOne: false
                     "apellido_inicial": string | null,"barrio_id": number | null,"foto_path": string | null,"id": string | null,"nombre": string | null
                   }
                   ComputedFields: never
-                  Insert: {
-                           "apellido_inicial"?: never,"barrio_id"?: number | null,"foto_path"?: string | null,"id"?: string | null,"nombre"?: string | null
-                         }
-                        Update: {
-                           "apellido_inicial"?: never,"barrio_id"?: number | null,"foto_path"?: string | null,"id"?: string | null,"nombre"?: string | null
-                         }
-                        Relationships: [
-                    {
-      foreignKeyName: "usuarios_barrio_id_fkey"
-      columns: ["barrio_id"]
-isOneToOne: false
-      referencedRelation: "barrios"
-      referencedColumns: ["id"]
-    }
+                  Relationships: [
+                    
                   ]
                 }
           }
