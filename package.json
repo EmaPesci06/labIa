@@ -20,6 +20,7 @@
   "dependencies": {
     "@radix-ui/react-dialog": "1.2.0",
     "@sentry/nextjs": "11.6.0",
+    "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.117.3",
     "clsx": "2.1.1",
     "lucide-react": "1.55.0",
