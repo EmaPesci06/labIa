@@ -5,6 +5,8 @@ import { expect, test, type Page } from "@playwright/test";
 // servidor base (sin sesión falsa). Las pruebas de datos necesitan un Supabase con profesionales
 // publicados (E2E_BUSQUEDA=1, por ejemplo con supabase/seed.sql en local).
 
+const URL_CLIENTE = `http://localhost:${Number(process.env.PUERTO_E2E ?? 3000) + 200}`;
+
 const esCelular = (page: Page) => (page.viewportSize()?.width ?? 0) < 1024;
 
 test.describe("inicio", () => {
@@ -32,6 +34,22 @@ test.describe("inicio", () => {
       "href",
       "/trabajos/nuevo",
     );
+  });
+});
+
+test.describe("barra según la sesión", () => {
+  test("sin cuenta: Ingresar y Crear cuenta; con cliente: navegación de la app", async ({
+    page,
+  }) => {
+    await page.goto("/buscar?oficio=gas&barrio=centro");
+    const cuenta = page.getByRole("navigation", { name: "Cuenta" });
+    await expect(cuenta.getByRole("link", { name: "Ingresar" })).toBeVisible();
+    await expect(cuenta.getByRole("link", { name: "Crear cuenta" })).toBeVisible();
+
+    await page.goto(`${URL_CLIENTE}/buscar?oficio=gas&barrio=centro`);
+    await expect(page.getByRole("heading", { level: 1, name: "Gasistas" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Crear cuenta" })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Ingresar" })).toHaveCount(0);
   });
 });
 
@@ -125,4 +143,59 @@ test.describe("con profesionales publicados", () => {
       await expect(page.getByText("Matriculado", { exact: true })).toHaveCount(despues);
     }).toPass();
   });
+  test("sin oficio, 'Ver más' acumula de a 20 por página y la URL guarda la página", async ({
+    page,
+  }) => {
+    await page.goto("/buscar?barrio=centro");
+    const tarjetas = page.locator("main ul li a[href^='/profesionales/']");
+    await expect(tarjetas).toHaveCount(20);
+    await page.getByRole("link", { name: "Ver más" }).click();
+    await expect(page).toHaveURL(/pagina=2/);
+    await expect(tarjetas).toHaveCount(40);
+    await page.reload();
+    await expect(tarjetas).toHaveCount(40);
+  });
+
+  test("la URL es el estado: recargar conserva los filtros y atrás/adelante los recorren", async ({
+    page,
+  }) => {
+    await page.goto("/buscar?oficio=gas&barrio=centro");
+    await expect(page.getByRole("heading", { level: 1, name: "Gasistas" })).toBeVisible();
+    await page.getByRole("button", { name: "Solo matriculados" }).click();
+    await expect(page).toHaveURL(/matriculados=1/);
+    await page.reload();
+    await expect(page).toHaveURL(/oficio=gas.*matriculados=1|matriculados=1.*oficio=gas/);
+    await expect(page.getByRole("button", { name: "Solo matriculados" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await page.goBack();
+    await expect(page).not.toHaveURL(/matriculados=1/);
+    await page.goForward();
+    await expect(page).toHaveURL(/matriculados=1/);
+  });
+
+  test("sin resultados muestra el estado vacío con la salida a publicar un trabajo", async ({
+    page,
+  }) => {
+    await page.goto("/buscar?oficio=carpinteria&barrio=centro&matriculados=1");
+    await expect(page.getByText("No hay profesionales con esos filtros todavía.")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Publicar un trabajo" })).toBeVisible();
+  });
+  for (const esquema of ["light", "dark"] as const) {
+    test(`con resultados y con estado vacío no hay problemas de accesibilidad (${esquema})`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ colorScheme: esquema });
+      for (const url of [
+        "/buscar?barrio=centro",
+        "/buscar?oficio=carpinteria&barrio=centro&matriculados=1",
+      ]) {
+        await page.goto(url);
+        await expect(page.locator("main h1")).toBeVisible();
+        const resultado = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
+        expect(resultado.violations, url).toEqual([]);
+      }
+    });
+  }
 });
