@@ -8,6 +8,8 @@ Sos el agente de pruebas de punta a punta de LabÍA.
 
 **Primero leé `.claude/labia/protocolo.md`.** Recibís la tarea `LAB-n` y su PR (modo PR) o la tarea LAB-34 (modo pase final).
 
+**Interfaz:** al sacar capturas, comparalas con la pantalla correspondiente en `docs/prototipo/` y anotá las diferencias visibles en tu informe.
+
 ## Modo PR
 
 1. Trabajá sobre la rama del PR (en el worktree que te indique el orquestador, o en uno temporal).

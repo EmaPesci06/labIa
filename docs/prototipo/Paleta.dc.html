@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>LabÍA · Paleta de colores</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,600..900&amp;family=Atkinson+Hyperlegible+Next:wght@400..800&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+:focus-visible{outline:3px solid #D45F3A;outline-offset:2px}
+@keyframes cinta{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+a{color:#232F49}a:hover{color:#182136}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1080px; box-sizing: border-box; padding: 48px 56px; display: flex; flex-direction: column; gap: 32px; background: #FFFFFF; color: #1B2438; font-family: 'Atkinson Hyperlegible Next', sans-serif">
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <h1 style="margin: 0; font-family: Archivo, sans-serif; font-stretch: 118%; font-weight: 800; font-size: 40px; letter-spacing: -1px">Paleta de colores</h1>
+      <p style="margin: 0; font-size: 17px; color: #4B5468">Sale del logo: azul noche #232F49 y naranja #D45F3A. Todos los textos cumplen contraste AA.</p>
+    </div>
+    <img src="/_blob/304edbcb89bf94400a05ef24027583ab" alt="labia" style="height: 64px; width: auto">
+  </div>
+
+  <div style="flex: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px">
+    <section style="padding: 28px; border-radius: 24px; background: #F1F3F6; display: flex; flex-direction: column; gap: 22px">
+      <div style="display: flex; align-items: center; justify-content: space-between">
+        <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: #1B2438">Modo claro</h2>
+        <img src="/_blob/304edbcb89bf94400a05ef24027583ab" alt="Logo en modo claro" style="height: 32px; width: auto">
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px">
+        <sc-for list="{{light}}" as="t" hint-placeholder-count="12">
+          <div style="display: flex; gap: 12px; align-items: center">
+            <span style="flex: none; width: 48px; height: 48px; border-radius: 12px; background: {{t.hex}}; border: 1px solid rgba(27, 36, 56, 0.15)"></span>
+            <span style="display: flex; flex-direction: column; min-width: 0">
+              <span style="font-size: 14px; font-weight: 700; color: #1B2438">{{t.name}} · {{t.hex}}</span>
+              <span style="font-size: 13px; color: #4B5468">{{t.use}}</span>
+            </span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="margin-top: auto; display: flex; flex-direction: column; gap: 12px; padding: 18px; border-radius: 16px; background: #FFFFFF">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap">
+          <span style="display: flex; align-items: center; min-height: 46px; padding: 0 18px; border-radius: 12px; background: #232F49; color: #FFFFFF; font-weight: 700; font-size: 15px">Buscar profesionales</span>
+          <span style="display: flex; align-items: center; min-height: 46px; padding: 0 18px; border-radius: 12px; background: #B84A25; color: #FFFFFF; font-weight: 700; font-size: 15px">Postularme</span>
+          <span style="display: flex; align-items: center; min-height: 46px; padding: 0 18px; border-radius: 12px; background: #1D6B45; color: #FFFFFF; font-weight: 700; font-size: 15px">WhatsApp</span>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+          <span style="padding: 8px 14px; border-radius: 999px; background: #232F49; color: #FFFFFF; font-size: 14px; font-weight: 600">Gas</span>
+          <span style="padding: 8px 14px; border-radius: 999px; background: #FFFFFF; color: #1B2438; font-size: 14px; font-weight: 600; border: 1.5px solid #CDD2DB">Pintura</span>
+          <span style="padding: 4px 10px; border-radius: 999px; background: #E6E9F0; color: #232F49; font-size: 12px; font-weight: 700">Identidad verificada</span>
+          <span style="padding: 4px 10px; border-radius: 999px; background: #FBE5DC; color: #9A3A17; font-size: 12px; font-weight: 700">Matriculado</span>
+        </div>
+      </div>
+    </section>
+
+    <section style="padding: 28px; border-radius: 24px; background: #121826; display: flex; flex-direction: column; gap: 22px">
+      <div style="display: flex; align-items: center; justify-content: space-between">
+        <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: #EEF0F5">Modo oscuro</h2>
+        <img src="/_blob/1ea767045ddc6c9a23a46ca50a3d8ddf" alt="Logo en modo oscuro" style="height: 32px; width: auto">
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px">
+        <sc-for list="{{dark}}" as="t" hint-placeholder-count="12">
+          <div style="display: flex; gap: 12px; align-items: center">
+            <span style="flex: none; width: 48px; height: 48px; border-radius: 12px; background: {{t.hex}}; border: 1px solid rgba(238, 240, 245, 0.18)"></span>
+            <span style="display: flex; flex-direction: column; min-width: 0">
+              <span style="font-size: 14px; font-weight: 700; color: #EEF0F5">{{t.name}} · {{t.hex}}</span>
+              <span style="font-size: 13px; color: #A9B2C6">{{t.use}}</span>
+            </span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="margin-top: auto; display: flex; flex-direction: column; gap: 12px; padding: 18px; border-radius: 16px; background: #1B2335">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap">
+          <span style="display: flex; align-items: center; min-height: 46px; padding: 0 18px; border-radius: 12px; background: #B7C5E8; color: #121826; font-weight: 700; font-size: 15px">Buscar profesionales</span>
+          <span style="display: flex; align-items: center; min-height: 46px; padding: 0 18px; border-radius: 12px; background: #E8714B; color: #121826; font-weight: 700; font-size: 15px">Postularme</span>
+          <span style="display: flex; align-items: center; min-height: 46px; padding: 0 18px; border-radius: 12px; background: #4CC38A; color: #121826; font-weight: 700; font-size: 15px">WhatsApp</span>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+          <span style="padding: 8px 14px; border-radius: 999px; background: #B7C5E8; color: #121826; font-size: 14px; font-weight: 600">Gas</span>
+          <span style="padding: 8px 14px; border-radius: 999px; background: #1B2335; color: #EEF0F5; font-size: 14px; font-weight: 600; border: 1.5px solid #334060">Pintura</span>
+          <span style="padding: 4px 10px; border-radius: 999px; background: #2A3550; color: #C9D4EE; font-size: 12px; font-weight: 700">Identidad verificada</span>
+          <span style="padding: 4px 10px; border-radius: 999px; background: #3A241B; color: #F4B399; font-size: 12px; font-weight: 700">Matriculado</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1080}}'>
+class Component extends DCLogic {
+renderVals() {
+const t = (name, hex, use) => ({ name: name, hex: hex, use: use });
+return {
+light: [
+t('Azul noche', '#232F49', 'Marca. Botones del cliente, encabezados'),
+t('Azul presionado', '#182136', 'Estado presionado de botones'),
+t('Azul suave', '#E6E9F0', 'Chips, insignias, avisos'),
+t('Naranja marca', '#D45F3A', 'Logo, estrellas, íconos'),
+t('Naranja acción', '#B84A25', 'Botones del profesional, texto blanco'),
+t('Naranja suave', '#FBE5DC', 'Matriculado y urgencias, texto #9A3A17'),
+t('Fondo', '#F1F3F6', 'Fondo: gris frío de plano'),
+t('Superficie', '#FFFFFF', 'Tarjetas y formularios'),
+t('Texto', '#1B2438', 'Texto principal'),
+t('Texto secundario', '#4B5468', 'Descripciones y etiquetas'),
+t('Borde', '#CDD2DB', 'Campos y separadores'),
+t('Éxito', '#1D6B45', 'WhatsApp y contratado')
+],
+dark: [
+t('Fondo', '#121826', 'Fondo de la app'),
+t('Superficie', '#1B2335', 'Tarjetas y formularios'),
+t('Superficie elevada', '#243049', 'Hojas, menús, destacados'),
+t('Borde', '#334060', 'Campos y separadores'),
+t('Texto', '#EEF0F5', 'Texto principal'),
+t('Texto secundario', '#A9B2C6', 'Descripciones y etiquetas'),
+t('Acción cliente', '#B7C5E8', 'Botones del cliente, texto oscuro'),
+t('Naranja acción', '#E8714B', 'Botones del profesional, texto oscuro'),
+t('Acento', '#F2A07F', 'Enlaces y estrellas'),
+t('Azul suave', '#2A3550', 'Chips e insignias, texto #C9D4EE'),
+t('Naranja suave', '#3A241B', 'Matriculado, texto #F4B399'),
+t('Éxito', '#4CC38A', 'WhatsApp y contratado, texto oscuro')
+]
+};
+}
+}
+</script>
+</body>
+</html>

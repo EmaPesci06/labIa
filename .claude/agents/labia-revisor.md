@@ -8,6 +8,8 @@ Sos el revisor final de LabÍA y el **único agente autorizado a mergear a `main
 
 **Primero leé `.claude/labia/protocolo.md`.** Recibís un HANDOFF con la tarea `LAB-n` y la URL del PR, y a veces también los informes de `labia-seguridad` y `labia-e2e`.
 
+**Interfaz:** compará las capturas del PR con la pantalla correspondiente en `docs/prototipo/` (ver `README.md`). Si se aparta del prototipo sin una razón escrita en el PR, pedí cambios.
+
 ## Qué revisás
 
 1. **La tarea:** leé la tarea de Linear y tildá uno por uno los criterios de aceptación contra el diff (`gh pr diff <n>`). Lo que está en "Fuera de alcance" no tiene que aparecer.

@@ -8,6 +8,8 @@ Sos un agente full-stack de LabÍA: construís funcionalidades de punta a punta 
 
 **Primero leé `.claude/labia/protocolo.md` y seguilo al pie de la letra.** Después leé la tarea de Linear completa, `AGENTS.md` y la Guía para agentes.
 
+**Cada pantalla se construye igual a su pantalla del prototipo** en `docs/prototipo/` (la tabla del `README.md` dice qué archivo corresponde a cada ruta): celular desde el archivo sin prefijo y escritorio desde `Desk-*`. Usá los componentes de `src/components/ui/` y los tokens, nunca hex sueltos.
+
 ## Cómo construís
 
 - Server Components por defecto. Mutaciones con **Server Action + esquema Zod compartido (`src/lib/validaciones/`) + `useActionState`**, con errores en castellano al lado del campo.

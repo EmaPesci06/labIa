@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>LabÍA · Normas de seguridad (escritorio)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,600..900&amp;family=Atkinson+Hyperlegible+Next:wght@400..800&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+:focus-visible{outline:3px solid #D45F3A;outline-offset:2px}
+@keyframes cinta{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+a{color:#232F49}a:hover{color:#182136}
+</style>
+</helmet>
+<div style="min-height: 1000px; background: #F1F3F6; color: #1B2438; font-family: 'Atkinson Hyperlegible Next', sans-serif">
+  <header style="display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: 18px 40px; background: #FFFFFF; border-bottom: 1px solid #DDE0E6">
+    <a href="Desk-Bienvenida.dc.html" aria-label="labia, inicio" style="display: flex"><img src="/_blob/304edbcb89bf94400a05ef24027583ab" alt="labia" style="height: 40px; width: auto"></a>
+    <div role="group" aria-label="Paso 2 de 2" style="width: 360px; display: flex; flex-direction: column; gap: 6px"><div style="height: 12px; border-radius: 2px; background: #DDE0E6; display: flex"><div style="width: 100%; display: flex"><span aria-hidden="true" style="display: block; flex: none; height: 12px; width: 100%; border-radius: 2px; border-right: 3px solid #232F49; box-sizing: border-box; background: repeating-linear-gradient(90deg, #232F49 0 1.5px, transparent 1.5px 40px) 0 0 / 100% 7px no-repeat, repeating-linear-gradient(90deg, #232F49 0 1px, transparent 1px 8px) 0 0 / 100% 4px no-repeat, #D45F3A"></span></div></div><div style="display: flex; justify-content: space-between; gap: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase"><span style="color: #1B2438">1 · Tu perfil</span><span style="color: #1B2438">2 · Normas de seguridad</span></div></div>
+  </header>
+
+  <main style="max-width: 960px; margin: 0 auto; padding: 48px 40px; box-sizing: border-box; display: flex; flex-direction: column; gap: 28px">
+    <a href="Desk-RegistroProfesional.dc.html" style="font-size: 14px; font-weight: 600">← Volver a tu perfil</a>
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <h1 style="margin: 0; font-family: Archivo, sans-serif; font-stretch: 118%; font-weight: 800; font-size: 40px; letter-spacing: -1px">Normas de seguridad</h1>
+      <p style="margin: 0; font-size: 17px; color: #4B5468; line-height: 1.5">Los clientes te abren la puerta de su casa. Para que confíen en vos, te comprometés a:</p>
+    </div>
+
+    <ol style="margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+      <sc-for list="{{normas}}" as="n" hint-placeholder-count="10">
+        <li style="display: flex; gap: 12px; align-items: flex-start; padding: 16px; border-radius: 14px; background: #FFFFFF">
+          <span style="flex: none; width: 28px; height: 28px; border-radius: 999px; background: #E6E9F0; color: #232F49; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center">{{n.num}}</span>
+          <span style="font-size: 15px; line-height: 1.45">{{n.text}}</span>
+        </li>
+      </sc-for>
+    </ol>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; padding: 20px; border-radius: 18px; background: #FFFFFF; border: 1px solid #DDE0E6">
+      <label style="display: flex; gap: 12px; align-items: center; font-size: 16px; font-weight: 600; cursor: pointer">
+        <input type="checkbox" checked="{{accepted}}" onChange="{{toggle}}" style="width: 22px; height: 22px; accent-color: #232F49">
+        Leí y acepto las normas de LabÍA
+      </label>
+      <sc-if value="{{accepted}}" hint-placeholder-val="{{ true }}">
+        <a href="Desk-Trabajos.dc.html" style="display: flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 24px; border-radius: 14px; background: #B84A25; color: #FFFFFF; font-weight: 700; font-size: 16px; text-decoration: none">Enviar mi perfil a revisión</a>
+      </sc-if>
+      <sc-if value="{{notAccepted}}" hint-placeholder-val="{{ false }}">
+        <button type="button" disabled style="min-height: 52px; padding: 0 24px; border-radius: 14px; background: #DDE0E6; color: #565F72; font: inherit; font-weight: 700; font-size: 16px; border: none">Aceptá las normas para seguir</button>
+      </sc-if>
+    </div>
+    <p style="margin: 0; font-size: 14px; color: #5E6678">Tu perfil se publica cuando revisemos tu DNI y tu certificado de antecedentes. Te avisamos por WhatsApp.</p>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { accepted: false };
+}
+renderVals() {
+const textos = [
+'Usar tu identidad real y presentar tu certificado de antecedentes.',
+'Tomar solo trabajos para los que estás capacitado. En gas, con matrícula vigente.',
+'Pasar presupuesto por escrito antes de empezar: precio, materiales y plazo.',
+'Acordar la seña con el cliente y dejarla escrita en el presupuesto.',
+'Llegar a horario o avisar con anticipación.',
+'Identificarte al llegar y no entrar con personas que el cliente no conozca.',
+'Cuidar la casa del cliente y dejar todo limpio.',
+'Trabajar con las medidas de seguridad de tu oficio.',
+'Tratar con respeto, sin discriminación ni acoso.',
+'Usar la dirección y el teléfono del cliente solo para ese trabajo.'
+];
+return {
+normas: textos.map((t, i) => ({ num: String(i + 1), text: t })),
+accepted: this.state.accepted,
+notAccepted: !this.state.accepted,
+toggle: () => this.setState({ accepted: !this.state.accepted })
+};
+}
+}
+</script>
+</body>
+</html>

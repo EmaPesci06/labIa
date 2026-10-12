@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>LabÍA · Detalle del trabajo</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,600..900&amp;family=Atkinson+Hyperlegible+Next:wght@400..800&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+:focus-visible{outline:3px solid #D45F3A;outline-offset:2px}
+@keyframes cinta{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+a{color:#232F49}a:hover{color:#182136}
+</style>
+</helmet>
+<div style="width: 390px; height: 1100px; box-sizing: border-box; padding: 20px 24px 28px; display: flex; flex-direction: column; gap: 18px; background: #F1F3F6; color: #1B2438; font-family: 'Atkinson Hyperlegible Next', sans-serif">
+  <a href="Trabajos.dc.html" aria-label="Volver" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; color: #1B2438">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+  </a>
+
+  <div style="display: flex; flex-direction: column; gap: 8px">
+    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; letter-spacing: 0.4px; color: #232F49">GAS · LA PERLA · HACE 20 MIN · A 0,8 KM</span>
+    <h1 style="margin: 0; font-family: Archivo, sans-serif; font-stretch: 118%; font-weight: 800; font-size: 28px; letter-spacing: -0.5px; line-height: 1.1">Olor a gas en la cocina</h1>
+    <span style="align-self: flex-start; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; background: #FBE5DC; color: #9A3A17">Lo antes posible</span>
+  </div>
+
+  <p style="margin: 0; font-size: 16px; line-height: 1.5">Desde ayer hay olor a gas cerca del horno. Ya cerré la llave de paso. Es un departamento en planta baja.</p>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+    <div style="aspect-ratio: 4 / 3; border-radius: 12px; background: #E1E4EA; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #565F72">Foto del cliente</div>
+    <div style="aspect-ratio: 4 / 3; border-radius: 12px; background: #E1E4EA; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #565F72">Foto del cliente</div>
+  </div>
+
+  <div style="display: flex; gap: 12px; align-items: center; padding: 14px; border-radius: 14px; background: #FFFFFF">
+    <span style="flex: none; width: 44px; height: 44px; border-radius: 999px; background: #232F49; color: #FFFFFF; font-weight: 700; display: flex; align-items: center; justify-content: center">LF</span>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <span style="font-size: 15px; font-weight: 700">Laura F.</span>
+      <span style="font-size: 13px; color: #4B5468">Cliente · La Perla · La dirección se comparte al acordar</span>
+    </div>
+  </div>
+
+  <sc-if value="{{notSent}}" hint-placeholder-val="{{ true }}">
+    <div style="display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 18px; background: #FFFFFF; border: 1.5px solid #CDD2DB">
+      <h2 style="margin: 0; font-size: 18px; font-weight: 700">Postularme</h2>
+      <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Mensaje para Laura
+        <textarea rows="3" placeholder="Puedo ir hoy a las 17 h. Reviso la pérdida y te paso presupuesto." style="padding: 12px 14px; border-radius: 12px; border: 1px solid #CDD2DB; background: #FAFAF8; font: inherit; font-weight: 400; font-size: 16px; color: #1B2438; resize: none"></textarea>
+      </label>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+        <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Precio estimado
+          <input type="text" placeholder="$" style="min-height: 46px; padding: 0 12px; border-radius: 12px; border: 1px solid #CDD2DB; background: #FAFAF8; font: inherit; font-weight: 400; font-size: 16px; color: #1B2438; min-width: 0">
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Seña que proponés
+          <input type="text" placeholder="$" style="min-height: 46px; padding: 0 12px; border-radius: 12px; border: 1px solid #CDD2DB; background: #FAFAF8; font: inherit; font-weight: 400; font-size: 16px; color: #1B2438; min-width: 0">
+        </label>
+      </div>
+      <button type="button" onClick="{{send}}" style="min-height: 52px; border-radius: 14px; border: none; background: #B84A25; color: #FFFFFF; font: inherit; font-weight: 700; font-size: 16px; cursor: pointer">Enviar postulación</button>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{sent}}" hint-placeholder-val="{{ false }}">
+    <div style="display: flex; flex-direction: column; gap: 12px; padding: 18px; border-radius: 18px; background: #DCEFE4">
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 700; color: #14532D">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L19 7"></path></svg>
+        Postulación enviada
+      </div>
+      <div style="font-size: 15px; line-height: 1.45">Laura ve tu mensaje y, si te elige, te escribe por WhatsApp.</div>
+      <a href="Trabajos.dc.html" style="display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 12px; background: #FFFFFF; color: #14532D; font-weight: 700; font-size: 15px; text-decoration: none">Ver más trabajos</a>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1100}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { sent: false };
+}
+renderVals() {
+return {
+sent: this.state.sent,
+notSent: !this.state.sent,
+send: () => this.setState({ sent: true })
+};
+}
+}
+</script>
+</body>
+</html>

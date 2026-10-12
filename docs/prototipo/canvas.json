@@ -1,0 +1,340 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-10-10T17:25:00Z"
+  },
+  "title": "LabÍA · Prototipo MVP",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [
+    {
+      "id": "mobile",
+      "name": "Celular"
+    },
+    {
+      "id": "desktop",
+      "name": "Escritorio"
+    },
+    {
+      "id": "oscuro",
+      "name": "Modo oscuro"
+    },
+    {
+      "id": "marca",
+      "name": "Marca y colores"
+    }
+  ],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Bienvenida",
+      "is_interactive": true,
+      "radius": 28
+    },
+    "RegistroCliente.dc.html": {
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Registro · Cliente",
+      "is_interactive": true,
+      "radius": 28
+    },
+    "RegistroProfesional.dc.html": {
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 1560,
+      "title": "Registro · Profesional",
+      "is_interactive": true,
+      "radius": 28
+    },
+    "Normas.dc.html": {
+      "x": 1410,
+      "y": 0,
+      "w": 390,
+      "h": 1100,
+      "title": "Normas de seguridad",
+      "is_interactive": true,
+      "radius": 28
+    },
+    "Inicio.dc.html": {
+      "x": 0,
+      "y": 1900,
+      "w": 390,
+      "h": 844,
+      "title": "Inicio · Cliente",
+      "is_interactive": true,
+      "radius": 28
+    },
+    "Resultados.dc.html": {
+      "x": 470,
+      "y": 1900,
+      "w": 390,
+      "h": 960,
+      "title": "Resultados de búsqueda",
+      "is_interactive": true,
+      "radius": 28
+    },
+    "Perfil.dc.html": {
+      "x": 940,
+      "y": 1900,
+      "w": 390,
+      "h": 1180,
+      "title": "Perfil del profesional",
+      "is_interactive": true,
+      "radius": 28
+    },
+    "PublicarTrabajo.dc.html": {
+      "x": 1410,
+      "y": 1900,
+      "w": 390,
+      "h": 1040,
+      "title": "Publicar un trabajo",
+      "is_interactive": true,
+      "radius": 28
+    },
+    "MisTrabajos.dc.html": {
+      "x": 1880,
+      "y": 1900,
+      "w": 390,
+      "h": 900,
+      "title": "Mis trabajos · Postulantes",
+      "is_interactive": true,
+      "radius": 28
+    },
+    "Trabajos.dc.html": {
+      "x": 0,
+      "y": 3400,
+      "w": 390,
+      "h": 900,
+      "title": "Trabajos disponibles",
+      "is_interactive": true,
+      "radius": 28
+    },
+    "DetalleTrabajo.dc.html": {
+      "x": 470,
+      "y": 3400,
+      "w": 390,
+      "h": 1100,
+      "title": "Detalle y postulación",
+      "is_interactive": true,
+      "radius": 28
+    },
+    "Desk-Bienvenida.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 1400,
+      "title": "Escritorio · Bienvenida",
+      "page": "desktop",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Desk-RegistroCliente.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "Escritorio · Registro cliente",
+      "page": "desktop",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Desk-RegistroProfesional.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 1300,
+      "title": "Escritorio · Registro profesional",
+      "page": "desktop",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Desk-Normas.dc.html": {
+      "x": 4560,
+      "y": 0,
+      "w": 1440,
+      "h": 1000,
+      "title": "Escritorio · Normas",
+      "page": "desktop",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Desk-Buscar.dc.html": {
+      "x": 0,
+      "y": 1900,
+      "w": 1440,
+      "h": 1150,
+      "title": "Escritorio · Buscar profesionales",
+      "page": "desktop",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Desk-Perfil.dc.html": {
+      "x": 1520,
+      "y": 1900,
+      "w": 1440,
+      "h": 1250,
+      "title": "Escritorio · Perfil",
+      "page": "desktop",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Desk-PublicarTrabajo.dc.html": {
+      "x": 3040,
+      "y": 1900,
+      "w": 1440,
+      "h": 1000,
+      "title": "Escritorio · Publicar trabajo",
+      "page": "desktop",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Desk-MisTrabajos.dc.html": {
+      "x": 4560,
+      "y": 1900,
+      "w": 1440,
+      "h": 1000,
+      "title": "Escritorio · Mis trabajos",
+      "page": "desktop",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Desk-Trabajos.dc.html": {
+      "x": 0,
+      "y": 3600,
+      "w": 1440,
+      "h": 1150,
+      "title": "Escritorio · Trabajos disponibles",
+      "page": "desktop",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Paleta.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 1080,
+      "title": "Paleta de colores",
+      "page": "marca"
+    },
+    "Oscuro-Inicio.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "title": "Oscuro · Inicio",
+      "page": "oscuro",
+      "is_interactive": true,
+      "radius": 28
+    },
+    "Oscuro-Resultados.dc.html": {
+      "x": 470,
+      "y": 0,
+      "w": 390,
+      "h": 960,
+      "title": "Oscuro · Resultados",
+      "page": "oscuro",
+      "is_interactive": true,
+      "radius": 28
+    },
+    "Oscuro-Perfil.dc.html": {
+      "x": 940,
+      "y": 0,
+      "w": 390,
+      "h": 1180,
+      "title": "Oscuro · Perfil",
+      "page": "oscuro",
+      "is_interactive": true,
+      "radius": 28
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "RegistroCliente.dc.html",
+    "RegistroProfesional.dc.html",
+    "Normas.dc.html",
+    "Inicio.dc.html",
+    "Resultados.dc.html",
+    "Perfil.dc.html",
+    "PublicarTrabajo.dc.html",
+    "MisTrabajos.dc.html",
+    "Trabajos.dc.html",
+    "DetalleTrabajo.dc.html",
+    "Desk-Bienvenida.dc.html",
+    "Desk-RegistroCliente.dc.html",
+    "Desk-RegistroProfesional.dc.html",
+    "Desk-Normas.dc.html",
+    "Desk-Buscar.dc.html",
+    "Desk-Perfil.dc.html",
+    "Desk-PublicarTrabajo.dc.html",
+    "Desk-MisTrabajos.dc.html",
+    "Desk-Trabajos.dc.html",
+    "Paleta.dc.html",
+    "Oscuro-Inicio.dc.html",
+    "Oscuro-Resultados.dc.html",
+    "Oscuro-Perfil.dc.html"
+  ],
+  "notes": {
+    "rowRegistro": {
+      "x": 0,
+      "y": -300,
+      "text": "1 · Registro",
+      "kind": "title1",
+      "maxW": 1800
+    },
+    "rowCliente": {
+      "x": 0,
+      "y": 1600,
+      "text": "2 · Cliente: buscar, contactar y publicar",
+      "kind": "title1",
+      "maxW": 2270
+    },
+    "rowProfesional": {
+      "x": 0,
+      "y": 3100,
+      "text": "3 · Profesional: ver trabajos y postularse",
+      "kind": "title1",
+      "maxW": 2270
+    },
+    "deskRegistro": {
+      "x": 0,
+      "y": -300,
+      "text": "1 · Registro (escritorio)",
+      "kind": "title1",
+      "maxW": 6000,
+      "page": "desktop"
+    },
+    "deskCliente": {
+      "x": 0,
+      "y": 1600,
+      "text": "2 · Cliente: buscar, contactar y publicar (escritorio)",
+      "kind": "title1",
+      "maxW": 6000,
+      "page": "desktop"
+    },
+    "deskProfesional": {
+      "x": 0,
+      "y": 3300,
+      "text": "3 · Profesional: trabajos y postulación (escritorio)",
+      "kind": "title1",
+      "maxW": 6000,
+      "page": "desktop"
+    },
+    "oscuroTitle": {
+      "x": 0,
+      "y": -300,
+      "text": "Modo oscuro · pantallas de muestra",
+      "kind": "title1",
+      "maxW": 1330,
+      "page": "oscuro"
+    }
+  },
+  "designSystems": []
+}

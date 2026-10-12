@@ -6,6 +6,7 @@ Todos los agentes `labia-*` siguen este protocolo. Si una tarea de Linear lo con
 
 - **Linear**, equipo `LAB`, proyecto **LabÍA MVP** (`P-LAB-1`).
 - **Guía para agentes** (documento de Linear `ee4f4689-09c5-43b1-9acc-ab1aa21addab`): stack, estructura, convenciones, diseño (§5), modelo de datos (§6), seguridad (§7), definición de terminado (§8), olas (§9). Leela con `mcp__claude_ai_Linear__get_document` antes de tocar código.
+- **Prototipo de interfaz** en `docs/prototipo/` (leé primero su `README.md`): copia del canvas "LabÍA · Prototipo MVP". Toda pantalla y componente se construye igual a su pantalla del prototipo, usando los tokens (nunca hex sueltos).
 - `AGENTS.md` en la raíz del repo (existe desde LAB-8): resumen de la guía.
 - Repo: `github.com/EmaPesci06/labIa`, rama por defecto `main`. `gh` ya está autenticado como EmaPesci06.
 
