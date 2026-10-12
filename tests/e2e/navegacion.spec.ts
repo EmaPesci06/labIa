@@ -3,6 +3,10 @@ import { expect, test, type Page } from "@playwright/test";
 
 // Segundo servidor (mismo build) con LABIA_ROL_DEV=profesional; ver playwright.config.ts.
 const URL_PROFESIONAL = `http://localhost:${Number(process.env.PUERTO_E2E ?? 3000) + 100}`;
+// Tercer servidor, con la sesión falsa de rol cliente; el servidor base no tiene sesión (LAB-16).
+const URL_CLIENTE = `http://localhost:${Number(process.env.PUERTO_E2E ?? 3000) + 200}`;
+
+test.use({ baseURL: URL_CLIENTE });
 
 const esCelular = (page: Page) => (page.viewportSize()?.width ?? 0) < 1024;
 const barraInferior = (page: Page) => page.getByRole("navigation", { name: "Navegación" });
@@ -60,7 +64,7 @@ test.describe("navegación del cliente", () => {
     await page.goto("/inicio");
     await page.getByRole("button", { name: /Cuenta de/ }).click();
     await expect(page.getByRole("link", { name: "Mi cuenta" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Salir" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Salir" })).toBeVisible();
     await page.getByText("Oscuro", { exact: true }).click();
     await expect(page.locator("html")).toHaveClass(/dark/);
     await page.keyboard.press("Escape");
