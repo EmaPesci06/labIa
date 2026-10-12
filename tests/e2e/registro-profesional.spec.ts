@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 // LAB-18: registro de profesional, paso 1 (el perfil).
@@ -97,6 +98,99 @@ test.describe("registro de profesional · paso 1", () => {
     await page.goto("/registro/profesional/normas");
     await expect(page.getByRole("group", { name: /Paso 2 de 2/ })).toBeVisible();
   });
+});
+
+// PNG de 1x1 px: alcanza para que el navegador lo decodifique y lo comprima.
+const PNG = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+  "base64",
+);
+// El botón se habilita cuando React tomó el control del formulario: recién ahí los inputs responden.
+const hidratada = async (page: import("@playwright/test").Page) => {
+  await page.goto("/registro/profesional");
+  await expect(siguiente(page)).toBeEnabled();
+};
+const foto = (n: number) => ({ name: `trabajo-${n}.png`, mimeType: "image/png", buffer: PNG });
+
+test.describe("registro de profesional · formulario completo", () => {
+  test("el contador llega a 500 y no deja escribir más", async ({ page }) => {
+    await hidratada(page);
+    const area = page.getByLabel("Contá cómo trabajás");
+    await area.fill("a".repeat(600));
+    await expect(area).toHaveValue("a".repeat(500));
+    await expect(page.getByText("500/500")).toBeVisible();
+  });
+
+  test("la ayuda de matrícula aparece con Gas y se va al sacar el oficio", async ({ page }) => {
+    await hidratada(page);
+    const gas = page.getByRole("button", { name: "Gas" });
+    await gas.click();
+    await expect(page.getByText("La matrícula es obligatoria para gasistas.")).toBeVisible();
+    await gas.click();
+    await expect(page.getByText("La matrícula es obligatoria para gasistas.")).toHaveCount(0);
+  });
+
+  test("fotos de trabajos: cargar, quitar y límite de 10", async ({ page }) => {
+    await hidratada(page);
+    const entrada = page.locator('input[type="file"][multiple]');
+    await expect(page.getByText("0 de 10 fotos")).toBeVisible();
+
+    await entrada.setInputFiles([foto(1), foto(2), foto(3)]);
+    await expect(page.getByText("3 de 10 fotos")).toBeVisible();
+    await expect(page.getByRole("img", { name: "Foto de trabajo 3" })).toBeVisible();
+
+    await page.getByRole("button", { name: "Quitar foto de trabajo 2" }).click();
+    await expect(page.getByText("2 de 10 fotos")).toBeVisible();
+
+    // 12 archivos de golpe: entran solo los que caben y se avisa.
+    await entrada.setInputFiles(Array.from({ length: 12 }, (_, i) => foto(i)));
+    await expect(page.getByText("10 de 10 fotos")).toBeVisible();
+    await expect(page.getByText(/Podés subir hasta 10 fotos/)).toBeVisible();
+    await expect(entrada).toBeDisabled();
+  });
+
+  test("foto de perfil: cargar y quitar", async ({ page }) => {
+    await hidratada(page);
+    await page.locator('input[type="file"]:not([multiple])').setInputFiles(foto(1));
+    await expect(page.getByRole("img", { name: "Tu foto de perfil" })).toBeVisible();
+    await page.getByRole("button", { name: "Quitar foto de perfil" }).click();
+    await expect(page.getByRole("img", { name: "Tu foto de perfil" })).toHaveCount(0);
+  });
+
+  test("un archivo que no es imagen no suma fotos", async ({ page }) => {
+    await hidratada(page);
+    await page
+      .locator('input[type="file"][multiple]')
+      .setInputFiles({ name: "nota.txt", mimeType: "text/plain", buffer: Buffer.from("hola") });
+    await expect(page.getByText("0 de 10 fotos")).toBeVisible();
+  });
+
+  test("con teclado: Tab llega a los oficios y Espacio los marca", async ({ page }) => {
+    await hidratada(page);
+    await page.getByLabel("Nombre y apellido").focus();
+    const plomeria = page.getByRole("button", { name: "Plomería" });
+    for (let i = 0; i < 25; i++) {
+      if (await plomeria.evaluate((e) => e === document.activeElement)) break;
+      await page.keyboard.press("Tab");
+    }
+    await expect(plomeria).toBeFocused();
+    await page.keyboard.press("Space");
+    await expect(plomeria).toHaveAttribute("aria-pressed", "true");
+  });
+
+  for (const esquema of ["light", "dark"] as const) {
+    test(`axe sin violaciones con fotos y errores (${esquema})`, async ({ page }) => {
+      await page.emulateMedia({ colorScheme: esquema });
+      await hidratada(page);
+      await page.locator('input[type="file"][multiple]').setInputFiles([foto(1), foto(2)]);
+      await expect(page.getByText("2 de 10 fotos")).toBeVisible();
+      await page.getByRole("button", { name: "Gas" }).click();
+      await siguiente(page).click();
+      await expect(page.getByText("Ingresá tu nombre y apellido.")).toBeVisible();
+      const resultado = await new AxeBuilder({ page }).analyze();
+      expect(resultado.violations).toEqual([]);
+    });
+  }
 });
 
 test.describe("cuenta real", () => {
