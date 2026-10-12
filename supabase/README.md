@@ -27,8 +27,10 @@ Después de cada migración nueva: `pnpm db:reset`, `pnpm db:test` y `pnpm db:ti
 - **Nunca se edita una migración ya mergeada.**
 - Los barrios (`20261011190100_barrios_mar_del_plata.sql`) son datos de referencia que necesita todo entorno, por eso
   van en una migración y no en el seed. Se generaron con `scripts/barrios.ts` (fuente: OpenStreetMap, ODbL).
-- RLS está activado en todas las tablas. Las políticas y los buckets llegan en LAB-12; hasta entonces ninguna tabla
-  es accesible por la API (solo con la service role).
+- RLS está activado en todas las tablas y las políticas y los buckets están en LAB-12
+  (`20261011200000_politicas.sql`, `20261011200100_storage.sql`). Ver "Seguridad" más abajo.
+- **Toda tabla o vista nueva en `public` empieza con `revoke all ... from anon, authenticated`** y después un `grant`
+  mínimo: Supabase da ALL a esos roles por defecto.
 
 ## Datos de prueba (`seed.sql`)
 
@@ -67,3 +69,25 @@ Si alguna vez se activa Supabase Branching, hay que desactivar el seed en los br
 - `promedio` y `cantidad_resenas` se recalculan al insertar, editar o borrar reseñas.
 - `distancia_km(barrio_a, barrio_b)`: distancia entre centros de barrio en km con una decimal. Nunca se guarda la
   dirección exacta.
+
+## Seguridad (LAB-12)
+
+Tests: `supabase/tests/database/politicas.test.sql` (permitido y denegado por tabla y por rol: anon, cliente,
+profesional, dueño y admin; permisos de funciones y columnas; buckets y políticas de Storage).
+
+- **Permisos por columna.** `anon` solo lee `barrios`, `perfiles_profesionales`, `resenas` y `usuarios_publicos`.
+  `authenticated` escribe solo columnas puntuales; nunca `usuarios.rol`, `whatsapp`, `normas_*`, ni `publicado`,
+  `promedio`, `cantidad_resenas`, `prioridad` de los perfiles. Las insignias las edita un admin (un trigger lo exige).
+- **Helpers** (`es_admin()`, `rol_actual()`, `cuenta_activa()` y otros) en el esquema `privado`, que la API no expone.
+  `recalcular_resenas_de` también vive ahí, así que ya no sale como RPC en `tipos.ts`.
+- **WhatsApp y normas** se escriben solo con las funciones `actualizar_whatsapp(text)` y `aceptar_normas(text)`.
+- **Vistas.** `usuarios_publicos` (nombre, inicial del apellido, barrio y foto; sin `whatsapp`) y `mis_verificaciones`
+  (el estado de mis documentos, sin `storage_path`). Son vistas con los privilegios del dueño a propósito: el `where`
+  acota las filas.
+- **Verificaciones.** El dueño inserta y no lee la tabla (usa `mis_verificaciones`). Con supabase-js hay que insertar
+  sin `.select()`: un `INSERT ... RETURNING` necesitaría una política de lectura que el dueño no tiene.
+- **Storage.** `fotos` público (3 MB; jpeg, png, webp): el dueño sube y borra en `perfiles/<uid>/`,
+  `trabajos-hechos/<uid>/` o `trabajos/<trabajo_id>/`. `documentos` privado (8 MB; jpeg, png, pdf): el dueño solo
+  inserta `<uid>/<tipo>-<timestamp>.<ext>`; lee un admin y la URL firmada de 60 s la genera `firmarDocumento`
+  (`src/lib/supabase/admin.ts`).
+- Un usuario `suspendida` no puede crear nada (trabajos, postulaciones, contactos, reseñas, reportes, archivos).
