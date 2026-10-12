@@ -28,7 +28,7 @@ const PUERTO = Number(process.env.PUERTO_E2E ?? 3000);
 const URL_PROFESIONAL = `http://localhost:${PUERTO + 100}`;
 const URL_CLIENTE = `http://localhost:${PUERTO + 200}`;
 // Mismo secreto que el servidor base en playwright.config.ts.
-const SECRETO = "secreto-solo-para-e2e";
+const SECRETO = "secreto-solo-para-e2e-de-32-caracteres-o-mas";
 const USUARIO = "11111111-1111-4111-8111-111111111111";
 
 function token(categoria: string, secreto = SECRETO): string {
@@ -51,7 +51,7 @@ test.describe("/baja con token válido", () => {
   }
 
   test("un token firmado con otro secreto es inválido", async ({ page }) => {
-    await page.goto(`/baja?t=${token("novedades", "otro-secreto")}`);
+    await page.goto(`/baja?t=${token("novedades", "otro-secreto-tambien-de-32-caracteres-xx")}`);
     await expect(page.getByText("Este enlace no es válido")).toBeVisible();
   });
 
