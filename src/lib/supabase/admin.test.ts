@@ -8,14 +8,17 @@ vi.mock("server-only", () => ({}));
 
 const RUTA = "cccccccc-1200-4000-a000-000000000004/dni_frente-1791734400000.jpg";
 
-function sesionCon(rol: "admin" | "cliente" | null): SupabaseClient<Database> {
+function sesionCon(
+  rol: "admin" | "cliente" | null,
+  estado: "activa" | "suspendida" = "activa",
+): SupabaseClient<Database> {
   return {
     auth: {
       getUser: async () => ({ data: { user: rol ? { id: "u1" } : null } }),
     },
     from: () => ({
       select: () => ({
-        eq: () => ({ maybeSingle: async () => ({ data: rol ? { rol } : null }) }),
+        eq: () => ({ maybeSingle: async () => ({ data: rol ? { rol, estado } : null }) }),
       }),
     }),
   } as unknown as SupabaseClient<Database>;
@@ -46,6 +49,14 @@ describe("firmarDocumento", () => {
     ).rejects.toBeInstanceOf(ErrorDocumento);
     await expect(
       firmarDocumento(RUTA, sesionCon(null), adminCon(createSignedUrl)),
+    ).rejects.toBeInstanceOf(ErrorDocumento);
+    expect(createSignedUrl).not.toHaveBeenCalled();
+  });
+
+  it("no firma si el admin está suspendido", async () => {
+    const createSignedUrl = vi.fn();
+    await expect(
+      firmarDocumento(RUTA, sesionCon("admin", "suspendida"), adminCon(createSignedUrl)),
     ).rejects.toBeInstanceOf(ErrorDocumento);
     expect(createSignedUrl).not.toHaveBeenCalled();
   });

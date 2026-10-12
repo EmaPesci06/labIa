@@ -353,40 +353,81 @@ grant execute on function public.aceptar_normas(text) to authenticated;
 -- asignado a mí, y quienes se postularon a un trabajo mío.
 -- Vista con los privilegios del dueño (no `security_invoker`): es la forma de leer columnas de
 -- `usuarios` sin dar acceso a la tabla; el `where` acota las filas.
+-- Los autores de reseñas se ven solo con nombre e inicial: el barrio (`barrio_id`) sale únicamente
+-- cuando hay una relación real (la propia cuenta, profesionales publicados, trabajos y postulaciones).
+-- Un profesional ve a los clientes de trabajos abiertos solo si está activo y con el perfil publicado.
 create view public.usuarios_publicos as
 select
-  u.id,
-  u.nombre,
-  left(u.apellido, 1) as apellido_inicial,
-  u.barrio_id,
-  u.foto_path
-from public.usuarios u
-where u.estado = 'activa'
-  and (
-    u.id = (select auth.uid())
-    or privado.perfil_publicado(u.id)
-    or exists (select 1 from public.resenas r where r.autor_id = u.id)
-    or exists (
-      select 1 from public.trabajos t
-      where t.cliente_id = u.id
-        and (
-          (t.estado = 'abierto' and privado.rol_actual() = 'profesional')
-          or t.profesional_elegido_id = (select auth.uid())
-        )
-    )
-    or exists (
-      select 1
-      from public.postulaciones po
-      join public.trabajos t on t.id = po.trabajo_id
-      where po.profesional_id = u.id and t.cliente_id = (select auth.uid())
-    )
-  );
+  x.id,
+  x.nombre,
+  left(x.apellido, 1) as apellido_inicial,
+  case when x.con_relacion then x.barrio_id end as barrio_id,
+  x.foto_path
+from (
+  select
+    u.id,
+    u.nombre,
+    u.apellido,
+    u.barrio_id,
+    u.foto_path,
+    (
+      u.id = (select auth.uid())
+      or privado.perfil_publicado(u.id)
+      or exists (
+        select 1 from public.trabajos t
+        where t.cliente_id = u.id
+          and (
+            (
+              t.estado = 'abierto'
+              and privado.rol_actual() = 'profesional'
+              and privado.cuenta_activa()
+              and privado.perfil_publicado((select auth.uid()))
+            )
+            or t.profesional_elegido_id = (select auth.uid())
+          )
+      )
+      or exists (
+        select 1
+        from public.postulaciones po
+        join public.trabajos t on t.id = po.trabajo_id
+        where po.profesional_id = u.id and t.cliente_id = (select auth.uid())
+      )
+    ) as con_relacion,
+    exists (select 1 from public.resenas r where r.autor_id = u.id) as es_autor_de_resena
+  from public.usuarios u
+  where u.estado = 'activa'
+) x
+where x.con_relacion or x.es_autor_de_resena;
 
 -- Verificaciones del usuario actual SIN `storage_path`: el dueño ve el estado, no el archivo.
 create view public.mis_verificaciones as
 select v.id, v.tipo, v.estado, v.motivo_rechazo, v.created_at
 from public.verificaciones v
 where v.usuario_id = (select auth.uid());
+
+-- Número de matrícula del perfil propio (o de cualquiera, si es admin). En público solo sale la
+-- insignia `matriculado`: la columna `matricula_numero` no se concede para leer en la tabla.
+create view public.matricula_propia as
+select p.usuario_id, p.matricula_numero
+from public.perfiles_profesionales p
+where p.usuario_id = (select auth.uid()) or privado.es_admin();
+
+-- Un solo documento pendiente por usuario y tipo; el formato de la ruta es el mismo que exige
+-- la política de Storage (<usuario_id>/<tipo>-<timestamp>.<ext>) y el tipo tiene que coincidir.
+alter table public.verificaciones
+  add constraint verificaciones_storage_path_formato check (
+    storage_path ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/(dni_frente|dni_dorso|antecedentes|matricula)-[0-9]+\.(jpg|jpeg|png|pdf)$'
+    and storage_path like usuario_id::text || '/' || tipo::text || '-%'
+  );
+
+create unique index verificaciones_un_pendiente_por_tipo_idx
+  on public.verificaciones (usuario_id, tipo)
+  where estado = 'pendiente';
+
+-- Una sola postulación elegida por trabajo.
+create unique index postulaciones_una_elegida_por_trabajo_idx
+  on public.postulaciones (trabajo_id)
+  where estado = 'elegida';
 
 -- ---------------------------------------------------------------------------
 -- Permisos de tablas y vistas: revoke all + grant mínimo
@@ -395,7 +436,7 @@ where v.usuario_id = (select auth.uid());
 revoke all on table
   public.barrios, public.usuarios, public.perfiles_profesionales, public.verificaciones,
   public.trabajos, public.postulaciones, public.contactos, public.resenas, public.reportes,
-  public.usuarios_publicos, public.mis_verificaciones
+  public.usuarios_publicos, public.mis_verificaciones, public.matricula_propia
 from anon, authenticated;
 
 -- barrios: lectura pública, nadie escribe.
@@ -405,12 +446,18 @@ grant select on public.barrios to anon, authenticated;
 -- y `estado` (que el trigger deja cambiar solo a un admin). rol, whatsapp y normas_* no se tocan.
 grant select on public.usuarios to authenticated;
 grant update (nombre, apellido, barrio_id, foto_path, estado) on public.usuarios to authenticated;
-grant delete on public.usuarios to authenticated;
+-- Sin delete: el borrado de cuentas lo hace un job de servidor (LAB-33) con la service role.
 grant select on public.usuarios_publicos to anon, authenticated;
 
 -- perfiles_profesionales: sin permiso de escritura sobre publicado, promedio, cantidad_resenas ni
 -- prioridad. Las insignias se conceden para que las edite un admin (el trigger lo exige).
-grant select on public.perfiles_profesionales to anon, authenticated;
+-- Lectura por columna: `matricula_numero` queda afuera (se lee por la vista matricula_propia).
+grant select (
+  usuario_id, oficios, especialidades, descripcion, anios_experiencia, toda_la_ciudad, zonas,
+  disponibilidad, fotos_trabajos, identidad_verificada, antecedentes_ok, matriculado, publicado,
+  promedio, cantidad_resenas, prioridad, created_at, updated_at
+) on public.perfiles_profesionales to anon, authenticated;
+grant select on public.matricula_propia to authenticated;
 grant insert (
   usuario_id, oficios, especialidades, descripcion, anios_experiencia, toda_la_ciudad, zonas,
   disponibilidad, fotos_trabajos, matricula_numero
@@ -420,7 +467,7 @@ grant update (
   disponibilidad, fotos_trabajos, matricula_numero,
   identidad_verificada, antecedentes_ok, matriculado
 ) on public.perfiles_profesionales to authenticated;
-grant delete on public.perfiles_profesionales to authenticated;
+-- Sin delete: se borra junto con la cuenta (LAB-33).
 
 -- verificaciones: el dueño solo inserta (no lee: usa la vista mis_verificaciones); admin lee y revisa.
 grant select on public.verificaciones to authenticated;
@@ -444,9 +491,10 @@ grant insert (trabajo_id, profesional_id, mensaje, precio_estimado, sena_propues
   on public.postulaciones to authenticated;
 grant update (estado) on public.postulaciones to authenticated;
 
--- contactos: solo se crean y se leen los propios.
+-- contactos: solo se leen los propios. No hay insert por la API: el contacto lo registra la función
+-- `security definer` de LAB-25, que chequea rol cliente, cuenta activa y perfil publicado y devuelve
+-- el WhatsApp.
 grant select on public.contactos to authenticated;
-grant insert (cliente_id, profesional_id, origen, trabajo_id) on public.contactos to authenticated;
 
 -- resenas: lectura pública.
 grant select on public.resenas to anon, authenticated;
@@ -479,17 +527,13 @@ create policy usuarios_admin_leer on public.usuarios
 
 create policy usuarios_actualizar_propio on public.usuarios
   for update to authenticated
-  using (id = (select auth.uid()))
-  with check (id = (select auth.uid()));
+  using (id = (select auth.uid()) and privado.cuenta_activa())
+  with check (id = (select auth.uid()) and privado.cuenta_activa());
 
 create policy usuarios_admin_actualizar on public.usuarios
   for update to authenticated
   using (privado.es_admin())
   with check (privado.es_admin());
-
-create policy usuarios_borrar_propio on public.usuarios
-  for delete to authenticated
-  using (id = (select auth.uid()));
 
 -- perfiles_profesionales
 create policy perfiles_leer_publicados on public.perfiles_profesionales
@@ -521,10 +565,6 @@ create policy perfiles_admin_actualizar on public.perfiles_profesionales
   for update to authenticated
   using (privado.es_admin())
   with check (privado.es_admin());
-
-create policy perfiles_borrar_propio on public.perfiles_profesionales
-  for delete to authenticated
-  using (usuario_id = (select auth.uid()));
 
 -- verificaciones
 create policy verificaciones_admin_leer on public.verificaciones
@@ -559,6 +599,7 @@ create policy trabajos_leer_abiertos on public.trabajos
     estado = 'abierto'
     and privado.rol_actual() = 'profesional'
     and privado.cuenta_activa()
+    and privado.perfil_publicado((select auth.uid()))
   );
 
 create policy trabajos_leer_asignado on public.trabajos
@@ -581,9 +622,10 @@ create policy trabajos_crear on public.trabajos
 
 create policy trabajos_actualizar_propio on public.trabajos
   for update to authenticated
-  using (cliente_id = (select auth.uid()))
+  using (cliente_id = (select auth.uid()) and privado.cuenta_activa())
   with check (
     cliente_id = (select auth.uid())
+    and privado.cuenta_activa()
     and (
       profesional_elegido_id is null
       or privado.postulacion_elegida(id, profesional_elegido_id)
@@ -621,14 +663,24 @@ create policy postulaciones_crear on public.postulaciones
 -- El autor solo puede retirar su postulación mientras está `enviada`.
 create policy postulaciones_retirar on public.postulaciones
   for update to authenticated
-  using (profesional_id = (select auth.uid()) and estado = 'enviada')
-  with check (profesional_id = (select auth.uid()) and estado = 'retirada');
+  using (profesional_id = (select auth.uid()) and estado = 'enviada' and privado.cuenta_activa())
+  with check (
+    profesional_id = (select auth.uid())
+    and estado = 'retirada'
+    and privado.cuenta_activa()
+  );
 
 -- El cliente dueño del trabajo elige o descarta.
 create policy postulaciones_resolver on public.postulaciones
   for update to authenticated
-  using (privado.trabajo_es_mio(trabajo_id) and estado <> 'retirada')
-  with check (privado.trabajo_es_mio(trabajo_id) and estado in ('elegida', 'descartada'));
+  using (privado.trabajo_es_mio(trabajo_id) and estado <> 'retirada' and privado.cuenta_activa())
+  with check (
+    privado.trabajo_es_mio(trabajo_id)
+    and privado.cuenta_activa()
+    and estado in ('elegida', 'descartada')
+    -- Solo se elige en un trabajo abierto; la unicidad de `elegida` la fuerza un índice parcial.
+    and (estado <> 'elegida' or privado.trabajo_abierto(trabajo_id))
+  );
 
 -- contactos
 create policy contactos_leer_propios on public.contactos
@@ -638,16 +690,6 @@ create policy contactos_leer_propios on public.contactos
 create policy contactos_admin_leer on public.contactos
   for select to authenticated
   using (privado.es_admin());
-
-create policy contactos_crear on public.contactos
-  for insert to authenticated
-  with check (
-    cliente_id = (select auth.uid())
-    and privado.rol_actual() = 'cliente'
-    and privado.cuenta_activa()
-    and privado.perfil_publicado(profesional_id)
-    and (trabajo_id is null or privado.trabajo_es_mio(trabajo_id))
-  );
 
 -- resenas: lectura pública (otra de las políticas con `using (true)`).
 create policy resenas_leer on public.resenas

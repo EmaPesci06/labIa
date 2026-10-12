@@ -34,8 +34,12 @@ export function crearClienteAdmin(): SupabaseClient<Database> {
 async function sesionEsAdmin(sesion: SupabaseClient<Database>): Promise<boolean> {
   const { data: auth } = await sesion.auth.getUser();
   if (!auth.user) return false;
-  const { data } = await sesion.from("usuarios").select("rol").eq("id", auth.user.id).maybeSingle();
-  return data?.rol === "admin";
+  const { data } = await sesion
+    .from("usuarios")
+    .select("rol, estado")
+    .eq("id", auth.user.id)
+    .maybeSingle();
+  return data?.rol === "admin" && data.estado === "activa";
 }
 
 /**

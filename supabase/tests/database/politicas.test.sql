@@ -87,17 +87,27 @@ from (values
   ('cccccccc-1200-4000-b000-000000000002', 'cccccccc-1200-4000-a000-000000000002', 'T2 asignado a P1', 'asignado', 'cccccccc-1200-4000-a000-000000000004'),
   ('cccccccc-1200-4000-b000-000000000003', 'cccccccc-1200-4000-a000-000000000003', 'T3 abierto de C2', 'abierto', null),
   ('cccccccc-1200-4000-b000-000000000004', 'cccccccc-1200-4000-a000-000000000002', 'T4 abierto sin postulaciones', 'abierto', null),
-  ('cccccccc-1200-4000-b000-000000000005', 'cccccccc-1200-4000-a000-000000000002', 'T5 asignado a P3', 'asignado', 'cccccccc-1200-4000-a000-000000000008')
+  ('cccccccc-1200-4000-b000-000000000005', 'cccccccc-1200-4000-a000-000000000002', 'T5 asignado a P3', 'asignado', 'cccccccc-1200-4000-a000-000000000008'),
+  ('cccccccc-1200-4000-b000-000000000006', 'cccccccc-1200-4000-a000-000000000006', 'T6 abierto de CS (suspendido)', 'abierto', null),
+  ('cccccccc-1200-4000-b000-000000000007', 'cccccccc-1200-4000-a000-000000000002', 'T7 asignado a P3', 'asignado', 'cccccccc-1200-4000-a000-000000000008')
 ) as t (id, cliente, titulo, estado, elegido);
 
 insert into public.postulaciones (trabajo_id, profesional_id, mensaje, estado)
 values
   ('cccccccc-1200-4000-b000-000000000001', 'cccccccc-1200-4000-a000-000000000004', 'Puedo ir mañana', 'enviada'),
   ('cccccccc-1200-4000-b000-000000000002', 'cccccccc-1200-4000-a000-000000000004', 'Hecho', 'elegida'),
-  ('cccccccc-1200-4000-b000-000000000005', 'cccccccc-1200-4000-a000-000000000008', 'Hecho', 'elegida');
+  ('cccccccc-1200-4000-b000-000000000005', 'cccccccc-1200-4000-a000-000000000008', 'Hecho', 'elegida'),
+  ('cccccccc-1200-4000-b000-000000000006', 'cccccccc-1200-4000-a000-000000000007', 'Puedo ir', 'enviada'),
+  ('cccccccc-1200-4000-b000-000000000006', 'cccccccc-1200-4000-a000-000000000008', 'Puedo ir', 'enviada'),
+  ('cccccccc-1200-4000-b000-000000000007', 'cccccccc-1200-4000-a000-000000000004', 'Puedo ir', 'enviada'),
+  ('cccccccc-1200-4000-b000-000000000007', 'cccccccc-1200-4000-a000-000000000008', 'Hecho', 'elegida');
 
+-- Los contactos no se crean por la API (los registra la función de LAB-25): se cargan acá.
 insert into public.contactos (cliente_id, profesional_id, origen)
-values ('cccccccc-1200-4000-a000-000000000002', 'cccccccc-1200-4000-a000-000000000004', 'perfil'), ('cccccccc-1200-4000-a000-000000000006', 'cccccccc-1200-4000-a000-000000000008', 'perfil');
+values
+  ('cccccccc-1200-4000-a000-000000000002', 'cccccccc-1200-4000-a000-000000000004', 'perfil'),
+  ('cccccccc-1200-4000-a000-000000000006', 'cccccccc-1200-4000-a000-000000000008', 'perfil'),
+  ('cccccccc-1200-4000-a000-000000000003', 'cccccccc-1200-4000-a000-000000000008', 'perfil');
 
 insert into public.resenas (autor_id, profesional_id, puntaje, texto, created_at)
 values
@@ -166,6 +176,11 @@ select is(
 );
 select is((select count(*) from public.usuarios_publicos where id = 'cccccccc-1200-4000-a000-000000000005'), 0::bigint, 'usuarios_publicos: anon no ve a un profesional sin publicar');
 select is((select count(*) from public.usuarios_publicos where id = 'cccccccc-1200-4000-a000-000000000009'), 0::bigint, 'usuarios_publicos: anon no ve a un cliente sin reseñas ni trabajos');
+select is((select count(*) from public.usuarios_publicos where id = 'cccccccc-1200-4000-a000-000000000002'), 1::bigint, 'usuarios_publicos: anon ve al autor de una reseña');
+select ok((select barrio_id is null from public.usuarios_publicos where id = 'cccccccc-1200-4000-a000-000000000002'), 'usuarios_publicos: del autor de una reseña no sale el barrio');
+select ok((select barrio_id is not null from public.usuarios_publicos where id = 'cccccccc-1200-4000-a000-000000000004'), 'usuarios_publicos: del profesional publicado sí sale el barrio');
+select throws_ok($$select matricula_numero from public.perfiles_profesionales$$, '42501', null, 'perfiles: anon no lee matricula_numero');
+select throws_ok($$select * from public.matricula_propia$$, '42501', null, 'matricula_propia: anon no la lee');
 select throws_ok($$select whatsapp from public.usuarios_publicos$$, '42703', null, 'usuarios_publicos: no tiene la columna whatsapp');
 select throws_ok($$select apellido from public.usuarios_publicos$$, '42703', null, 'usuarios_publicos: no tiene el apellido completo');
 
@@ -193,16 +208,20 @@ select lives_ok($$select public.aceptar_normas('v1')$$, 'usuarios: aceptar_norma
 select is((select normas_version from public.usuarios where id = 'cccccccc-1200-4000-a000-000000000002'), 'v1', 'usuarios: normas_version quedó guardada');
 select ok((select normas_aceptadas_at is not null from public.usuarios where id = 'cccccccc-1200-4000-a000-000000000002'), 'usuarios: normas_aceptadas_at quedó guardada');
 select throws_ok($$select public.aceptar_normas('')$$, '23514', null, 'usuarios: aceptar_normas rechaza una versión vacía');
-select is_empty($$delete from public.usuarios where id = 'cccccccc-1200-4000-a000-000000000003' returning 1$$, 'usuarios: no borra la cuenta de otro');
+select throws_ok($$delete from public.usuarios where id = 'cccccccc-1200-4000-a000-000000000003'$$, '42501', null, 'usuarios: no borra la cuenta de otro');
+select throws_ok($$delete from public.usuarios where id = 'cccccccc-1200-4000-a000-000000000002'$$, '42501', null, 'usuarios: ni siquiera borra la propia por la API (lo hace un job de servidor)');
+select is((select count(*) from public.usuarios_publicos where id = 'cccccccc-1200-4000-a000-000000000002'), 1::bigint, 'usuarios_publicos: el dueño se ve a sí mismo');
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000004');
 select is((select count(*) from public.usuarios_publicos where id = 'cccccccc-1200-4000-a000-000000000002'), 1::bigint, 'usuarios_publicos: un profesional ve al cliente de un trabajo abierto');
 select is((select count(*) from public.usuarios_publicos where id = 'cccccccc-1200-4000-a000-000000000009'), 0::bigint, 'usuarios_publicos: un profesional no ve a un cliente sin trabajos');
+select ok((select barrio_id is not null from public.usuarios_publicos where id = 'cccccccc-1200-4000-a000-000000000002'), 'usuarios_publicos: un profesional publicado ve el barrio del cliente de un trabajo abierto');
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000006');
 select throws_ok($$select public.actualizar_whatsapp('+5492235558888')$$, '42501', null, 'usuarios: una cuenta suspendida no ejecuta actualizar_whatsapp');
 select throws_ok($$select public.aceptar_normas('v1')$$, '42501', null, 'usuarios: una cuenta suspendida no ejecuta aceptar_normas');
-select throws_ok($$update public.usuarios set estado = 'activa' where id = 'cccccccc-1200-4000-a000-000000000006'$$, '42501', null, 'usuarios: una cuenta suspendida no se reactiva sola');
+select is_empty($$update public.usuarios set estado = 'activa' where id = 'cccccccc-1200-4000-a000-000000000006' returning 1$$, 'usuarios: una cuenta suspendida no se reactiva sola');
+select is_empty($$update public.usuarios set nombre = 'Hack' where id = 'cccccccc-1200-4000-a000-000000000006' returning 1$$, 'usuarios: una cuenta suspendida no edita su perfil');
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000001');
 select is((select count(*) from public.usuarios where id in ('cccccccc-1200-4000-a000-000000000002', 'cccccccc-1200-4000-a000-000000000003', 'cccccccc-1200-4000-a000-000000000004')), 3::bigint, 'usuarios: el admin lee todas las filas');
@@ -237,7 +256,10 @@ select throws_ok(
   $$insert into public.perfiles_profesionales (usuario_id, oficios, toda_la_ciudad) values ('cccccccc-1200-4000-a000-000000000002', '{plomeria}', true)$$,
   '23514', null, 'perfiles: un cliente no puede crear un perfil profesional'
 );
-select is_empty($$delete from public.perfiles_profesionales where usuario_id = 'cccccccc-1200-4000-a000-000000000004' returning 1$$, 'perfiles: un cliente no borra el perfil de otro');
+select throws_ok($$delete from public.perfiles_profesionales where usuario_id = 'cccccccc-1200-4000-a000-000000000004'$$, '42501', null, 'perfiles: nadie borra un perfil por la API (cliente)');
+select throws_ok($$select matricula_numero from public.perfiles_profesionales$$, '42501', null, 'perfiles: un cliente no lee matricula_numero de la tabla');
+select throws_ok($$select * from public.perfiles_profesionales$$, '42501', null, 'perfiles: un select * incluye matricula_numero y se rechaza');
+select is((select count(*) from public.matricula_propia), 0::bigint, 'matricula_propia: un cliente no ve ninguna matrícula');
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000005');
 select is((select count(*) from public.perfiles_profesionales where usuario_id = 'cccccccc-1200-4000-a000-000000000005'), 1::bigint, 'perfiles: el dueño ve su perfil aunque no esté publicado');
@@ -254,6 +276,11 @@ select throws_ok($$update public.perfiles_profesionales set promedio = 5 where u
 select throws_ok($$update public.perfiles_profesionales set cantidad_resenas = 99 where usuario_id = 'cccccccc-1200-4000-a000-000000000005'$$, '42501', null, 'perfiles: un profesional no se cambia cantidad_resenas');
 select throws_ok($$update public.perfiles_profesionales set prioridad = 9 where usuario_id = 'cccccccc-1200-4000-a000-000000000005'$$, '42501', null, 'perfiles: un profesional no se cambia la prioridad');
 select is_empty($$update public.perfiles_profesionales set descripcion = 'Hack' where usuario_id = 'cccccccc-1200-4000-a000-000000000004' returning 1$$, 'perfiles: un profesional no edita el perfil de otro');
+select throws_ok($$delete from public.perfiles_profesionales where usuario_id = 'cccccccc-1200-4000-a000-000000000005'$$, '42501', null, 'perfiles: el dueño no borra su perfil por la API');
+select lives_ok($$update public.perfiles_profesionales set matricula_numero = 'MP-1234' where usuario_id = 'cccccccc-1200-4000-a000-000000000005'$$, 'perfiles: el dueño carga su matrícula');
+select is((select matricula_numero from public.matricula_propia where usuario_id = 'cccccccc-1200-4000-a000-000000000005'), 'MP-1234', 'matricula_propia: el dueño lee su matrícula');
+select is((select count(*) from public.matricula_propia where usuario_id = 'cccccccc-1200-4000-a000-000000000004'), 0::bigint, 'matricula_propia: no ve la de otro');
+select throws_ok($$select matricula_numero from public.perfiles_profesionales where usuario_id = 'cccccccc-1200-4000-a000-000000000005'$$, '42501', null, 'perfiles: ni el dueño lee matricula_numero de la tabla (usa la vista)');
 select throws_ok(
   $$insert into public.perfiles_profesionales (usuario_id, oficios, toda_la_ciudad) values ('cccccccc-1200-4000-a000-000000000004', '{gas}', true)$$,
   '42501', null, 'perfiles: un profesional no crea un perfil a nombre de otro'
@@ -273,6 +300,8 @@ select results_eq(
   'perfiles: el admin da las insignias y el perfil se publica solo'
 );
 select throws_ok($$update public.perfiles_profesionales set publicado = true where usuario_id = 'cccccccc-1200-4000-a000-000000000005'$$, '42501', null, 'perfiles: ni el admin fuerza publicado por la API');
+select throws_ok($$delete from public.perfiles_profesionales where usuario_id = 'cccccccc-1200-4000-a000-000000000005'$$, '42501', null, 'perfiles: ni el admin borra perfiles por la API');
+select is((select count(*) from public.matricula_propia where usuario_id in ('cccccccc-1200-4000-a000-000000000004', 'cccccccc-1200-4000-a000-000000000005')), 2::bigint, 'matricula_propia: el admin la lee de cualquiera');
 
 -- ===========================================================================
 -- verificaciones (DNI y antecedentes: lo más sensible)
@@ -293,6 +322,26 @@ select throws_ok(
   $$insert into public.verificaciones (usuario_id, tipo, storage_path, estado)
     values ('cccccccc-1200-4000-a000-000000000005', 'antecedentes', 'cccccccc-1200-4000-a000-000000000005/antecedentes-1791734400001.pdf', 'aprobado')$$,
   '42501', null, 'verificaciones: el dueño no se auto-aprueba al insertar'
+);
+select throws_ok(
+  $$insert into public.verificaciones (usuario_id, tipo, storage_path)
+    values ('cccccccc-1200-4000-a000-000000000005', 'dni_frente', 'cccccccc-1200-4000-a000-000000000005/dni_frente-1791734400009.jpg')$$,
+  '23505', null, 'verificaciones: un solo documento pendiente por tipo'
+);
+select throws_ok(
+  $$insert into public.verificaciones (usuario_id, tipo, storage_path)
+    values ('cccccccc-1200-4000-a000-000000000005', 'antecedentes', 'cccccccc-1200-4000-a000-000000000005/dni_frente-1791734400009.jpg')$$,
+  '23514', null, 'verificaciones: la ruta tiene que corresponder al tipo'
+);
+select throws_ok(
+  $$insert into public.verificaciones (usuario_id, tipo, storage_path)
+    values ('cccccccc-1200-4000-a000-000000000005', 'matricula', 'cccccccc-1200-4000-a000-000000000005/matricula-1791734400009.exe')$$,
+  '23514', null, 'verificaciones: la ruta tiene que tener extensión permitida'
+);
+select throws_ok(
+  $$insert into public.verificaciones (usuario_id, tipo, storage_path)
+    values ('cccccccc-1200-4000-a000-000000000005', 'matricula', 'cccccccc-1200-4000-a000-000000000005/../cccccccc-1200-4000-a000-000000000004/matricula-1791734400009.pdf')$$,
+  '23514', null, 'verificaciones: la ruta no admite recorridos de carpetas'
 );
 select is_empty($$select * from public.verificaciones$$, 'verificaciones: el dueño no puede leer la tabla');
 select is_empty($$select storage_path from public.verificaciones where usuario_id = 'cccccccc-1200-4000-a000-000000000005'$$, 'verificaciones: el profesional no lee el storage_path de sus propias verificaciones');
@@ -338,6 +387,23 @@ select throws_ok($$delete from public.verificaciones where usuario_id = 'ccccccc
 reset role; select tests.anonimo();
 select throws_ok($$select id from public.trabajos$$, '42501', null, 'trabajos: anon no los ve');
 select throws_ok($$select id from public.contactos$$, '42501', null, 'contactos: anon no los ve');
+
+reset role; select tests.como('cccccccc-1200-4000-a000-000000000005');
+select is(
+  (select count(*) from public.trabajos where id in ('cccccccc-1200-4000-b000-000000000001', 'cccccccc-1200-4000-b000-000000000002', 'cccccccc-1200-4000-b000-000000000003', 'cccccccc-1200-4000-b000-000000000004', 'cccccccc-1200-4000-b000-000000000005', 'cccccccc-1200-4000-b000-000000000006', 'cccccccc-1200-4000-b000-000000000007')),
+  0::bigint,
+  'trabajos: un profesional sin verificar no ve ningún trabajo'
+);
+select is((select count(*) from public.usuarios_publicos where id = 'cccccccc-1200-4000-a000-000000000009'), 0::bigint, 'usuarios_publicos: un profesional sin verificar no ve clientes sin relación');
+select ok((select barrio_id is null from public.usuarios_publicos where id = 'cccccccc-1200-4000-a000-000000000003'), 'usuarios_publicos: un profesional sin verificar no ve el barrio de clientes con trabajos abiertos');
+select ok((select barrio_id is null from public.usuarios_publicos where id = 'cccccccc-1200-4000-a000-000000000002'), 'usuarios_publicos: ni el de otro cliente con trabajos abiertos');
+
+reset role; select tests.como('cccccccc-1200-4000-a000-000000000007');
+select is(
+  (select count(*) from public.trabajos where id in ('cccccccc-1200-4000-b000-000000000001', 'cccccccc-1200-4000-b000-000000000002', 'cccccccc-1200-4000-b000-000000000003', 'cccccccc-1200-4000-b000-000000000004', 'cccccccc-1200-4000-b000-000000000005', 'cccccccc-1200-4000-b000-000000000006', 'cccccccc-1200-4000-b000-000000000007')),
+  0::bigint,
+  'trabajos: un profesional suspendido no ve ningún trabajo'
+);
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000004');
 select is(
@@ -399,6 +465,8 @@ select throws_ok(
     select 'cccccccc-1200-4000-a000-000000000006', 'plomeria', 'x', 'x', id, 'sin_apuro' from public.barrios limit 1$$,
   '42501', null, 'trabajos: un usuario suspendido no puede crear trabajos'
 );
+select is_empty($$update public.trabajos set titulo = 'Hack' where id = 'cccccccc-1200-4000-b000-000000000006' returning 1$$, 'trabajos: un usuario suspendido no edita sus trabajos');
+select is((select count(*) from public.trabajos where id = 'cccccccc-1200-4000-b000-000000000006'), 1::bigint, 'trabajos: un usuario suspendido todavía ve los suyos');
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000001');
 select is((select count(*) from public.trabajos where id in ('cccccccc-1200-4000-b000-000000000001', 'cccccccc-1200-4000-b000-000000000002', 'cccccccc-1200-4000-b000-000000000003', 'cccccccc-1200-4000-b000-000000000005')), 4::bigint, 'trabajos: el admin los ve todos');
@@ -460,6 +528,16 @@ select throws_ok(
   $$insert into public.postulaciones (trabajo_id, profesional_id, mensaje) values ('cccccccc-1200-4000-b000-000000000001', 'cccccccc-1200-4000-a000-000000000007', 'Hola')$$,
   '42501', null, 'postulaciones: un usuario suspendido no puede postularse'
 );
+select is_empty(
+  $$update public.postulaciones set estado = 'retirada' where trabajo_id = 'cccccccc-1200-4000-b000-000000000006' and profesional_id = 'cccccccc-1200-4000-a000-000000000007' returning 1$$,
+  'postulaciones: un usuario suspendido no retira la suya'
+);
+
+reset role; select tests.como('cccccccc-1200-4000-a000-000000000006');
+select is_empty(
+  $$update public.postulaciones set estado = 'elegida' where trabajo_id = 'cccccccc-1200-4000-b000-000000000006' and profesional_id = 'cccccccc-1200-4000-a000-000000000008' returning 1$$,
+  'postulaciones: un cliente suspendido no elige'
+);
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000002');
 select throws_ok(
@@ -493,6 +571,16 @@ select throws_ok(
   '42501', null, 'postulaciones: el cliente solo elige o descarta'
 );
 select throws_ok($$delete from public.postulaciones where trabajo_id = 'cccccccc-1200-4000-b000-000000000001'$$, '42501', null, 'postulaciones: nadie las borra (cliente)');
+select throws_ok(
+  $$update public.postulaciones set estado = 'elegida' where trabajo_id = 'cccccccc-1200-4000-b000-000000000007' and profesional_id = 'cccccccc-1200-4000-a000-000000000004'$$,
+  '42501', null, 'postulaciones: no se elige en un trabajo que ya no está abierto'
+);
+
+reset role;
+select throws_ok(
+  $$update public.postulaciones set estado = 'elegida' where trabajo_id = 'cccccccc-1200-4000-b000-000000000007' and profesional_id = 'cccccccc-1200-4000-a000-000000000004'$$,
+  '23505', null, 'postulaciones: el índice único impide dos elegidas en el mismo trabajo (aun salteando RLS)'
+);
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000001');
 select is((select count(*) from public.postulaciones where trabajo_id in ('cccccccc-1200-4000-b000-000000000001', 'cccccccc-1200-4000-b000-000000000002', 'cccccccc-1200-4000-b000-000000000005')), 4::bigint, 'postulaciones: el admin las ve todas');
@@ -505,20 +593,17 @@ reset role; select tests.como('cccccccc-1200-4000-a000-000000000002');
 select is((select count(*) from public.contactos where profesional_id = 'cccccccc-1200-4000-a000-000000000004'), 1::bigint, 'contactos: el cliente ve los suyos');
 select throws_ok(
   $$insert into public.contactos (cliente_id, profesional_id, origen) values ('cccccccc-1200-4000-a000-000000000002', 'cccccccc-1200-4000-a000-000000000005', 'perfil')$$,
-  '42501', null, 'contactos: no se contacta a un profesional sin publicar'
-);
-select throws_ok(
-  $$insert into public.contactos (cliente_id, profesional_id, origen, trabajo_id) values ('cccccccc-1200-4000-a000-000000000002', 'cccccccc-1200-4000-a000-000000000004', 'postulacion', 'cccccccc-1200-4000-b000-000000000003')$$,
-  '42501', null, 'contactos: el trabajo asociado tiene que ser del cliente'
+  '42501', null, 'contactos: un cliente no inserta contactos por la API (grant de insert revocado)'
 );
 select throws_ok($$update public.contactos set origen = 'perfil'$$, '42501', null, 'contactos: nadie los edita');
 select throws_ok($$delete from public.contactos$$, '42501', null, 'contactos: nadie los borra');
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000003');
 select is((select count(*) from public.contactos where cliente_id = 'cccccccc-1200-4000-a000-000000000002'), 0::bigint, 'contactos: otro cliente no ve los ajenos');
-select lives_ok(
-  $$insert into public.contactos (cliente_id, profesional_id, origen) values ('cccccccc-1200-4000-a000-000000000003', 'cccccccc-1200-4000-a000-000000000008', 'perfil')$$,
-  'contactos: un cliente registra el contacto con un profesional publicado'
+select is((select count(*) from public.contactos where cliente_id = 'cccccccc-1200-4000-a000-000000000003'), 1::bigint, 'contactos: el cliente ve el suyo');
+select throws_ok(
+  $$insert into public.contactos (cliente_id, profesional_id, origen) values ('cccccccc-1200-4000-a000-000000000003', 'cccccccc-1200-4000-a000-000000000004', 'perfil')$$,
+  '42501', null, 'contactos: un cliente no inserta contactos por la API (lo hace la función de LAB-25)'
 );
 select throws_ok(
   $$insert into public.contactos (cliente_id, profesional_id, origen) values ('cccccccc-1200-4000-a000-000000000002', 'cccccccc-1200-4000-a000-000000000008', 'perfil')$$,
@@ -712,7 +797,7 @@ select ok(not has_function_privilege('anon', 'public.aceptar_normas(text)', 'exe
 select is(
   (select array_agg(c.relname::text order by c.relname)
    from pg_class c join pg_namespace n on n.oid = c.relnamespace
-   where n.nspname = 'public' and c.relkind in ('r', 'v', 'p') and has_table_privilege('anon', c.oid, 'select')),
+   where n.nspname = 'public' and c.relkind in ('r', 'v', 'p') and has_any_column_privilege('anon', c.oid, 'select')),
   array['barrios', 'perfiles_profesionales', 'resenas', 'usuarios_publicos'],
   'anon solo puede leer barrios, perfiles_profesionales, resenas y usuarios_publicos'
 );
@@ -756,6 +841,20 @@ select ok(
   'authenticated no escribe perfiles_profesionales.' || c.col
 )
 from (values ('publicado'), ('promedio'), ('cantidad_resenas'), ('prioridad')) as c (col);
+
+select ok(
+  not has_column_privilege(r.rol, 'public.perfiles_profesionales', 'matricula_numero', 'select'),
+  r.rol || ' no puede leer perfiles_profesionales.matricula_numero'
+)
+from (values ('anon'), ('authenticated')) as r (rol);
+
+select ok(
+  not has_any_column_privilege('authenticated', 'public.contactos', 'insert,update')
+  and not has_table_privilege('authenticated', 'public.contactos', 'insert'),
+  'authenticated no inserta ni actualiza contactos por la API'
+);
+select ok(not has_table_privilege('authenticated', 'public.usuarios', 'delete'), 'nadie borra usuarios por la API');
+select ok(not has_table_privilege('authenticated', 'public.perfiles_profesionales', 'delete'), 'nadie borra perfiles_profesionales por la API');
 
 select ok(
   not has_column_privilege('authenticated', 'public.perfiles_profesionales', c.col, 'insert'),

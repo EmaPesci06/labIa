@@ -91,3 +91,8 @@ profesional, dueño y admin; permisos de funciones y columnas; buckets y políti
   inserta `<uid>/<tipo>-<timestamp>.<ext>`; lee un admin y la URL firmada de 60 s la genera `firmarDocumento`
   (`src/lib/supabase/admin.ts`).
 - Un usuario `suspendida` no puede crear nada (trabajos, postulaciones, contactos, reseñas, reportes, archivos).
+- **Sin delete** de `usuarios` ni `perfiles_profesionales` por la API: el borrado de cuentas es un job de servidor (LAB-33).
+- **`contactos` no se inserta por la API**: lo registra la función `security definer` de LAB-25.
+- **`matricula_numero`** no se lee de la tabla (tampoco con `select *`: hay que pedir las columnas); el dueño y el admin la leen por la vista `matricula_propia`. En público solo la insignia `matriculado`.
+- Un profesional solo ve trabajos abiertos (y los datos de sus clientes) si está activo y con el perfil publicado.
+- `verificaciones`: ruta con formato fijo y un solo documento `pendiente` por usuario y tipo. `postulaciones`: una sola `elegida` por trabajo.
