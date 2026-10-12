@@ -63,6 +63,9 @@ from (values
   (12, 'Cliente', 'cliente'), (13, 'Admin', 'cliente')
 ) as d (n, letra, rol);
 
+-- Se descartan las cuentas del seed (también las borra el rollback): el test cuenta resultados exactos.
+delete from auth.users where email not like 'busq-%';
+
 update public.usuarios set rol = 'admin' where id = 'cccccccc-2200-4000-a000-00000000000d';
 
 update public.usuarios u

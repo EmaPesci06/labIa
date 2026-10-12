@@ -367,21 +367,8 @@ isOneToOne: true
                            },
 "buscar_profesionales":
 { Args: { "p_barrio"?: number,"p_desde"?: number,"p_limite"?: number,"p_oficio"?: Database["public"]['Enums']["oficio"],"p_orden"?: string,"p_solo_matriculados"?: boolean,"p_toda_la_ciudad"?: boolean }; Returns: {
-                              anios_experiencia: number
-                              antecedentes_ok: boolean
-                              apellido_inicial: string
-                              cantidad_resenas: number
-                              distancia_km: number
-                              foto_path: string
-                              identidad_verificada: boolean
-                              matriculado: boolean
-                              nombre: string
-                              oficios: Database["public"]['Enums']["oficio"][]
-                              promedio: number
-                              total: number
-                              usuario_id: string
-                              zonas_texto: string
-                            }[]
+              "anios_experiencia": number,"antecedentes_ok": boolean,"apellido_inicial": string,"cantidad_resenas": number,"distancia_km": number,"foto_path": string,"identidad_verificada": boolean,"matriculado": boolean,"nombre": string,"oficios": (Database["public"]['Enums']["oficio"])[],"promedio": number,"total": number,"usuario_id": string,"zonas_texto": string
+            }[]
                            },
 "distancia_km":
 { Args: { "barrio_a": number,"barrio_b": number }; Returns: number
