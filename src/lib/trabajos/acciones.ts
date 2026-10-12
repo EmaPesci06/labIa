@@ -127,10 +127,12 @@ export async function adjuntarFotos(trabajoId: string, rutas: string[]): Promise
   if (rolFalso()) return { ok: true };
   if (!supabaseConfigurado()) return { ok: false };
   const supabase = await crearClienteServidor();
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("trabajos")
     .update({ fotos: validas.data })
     .eq("id", trabajoId)
-    .eq("cliente_id", sesion.usuario.id);
-  return { ok: !error };
+    .eq("cliente_id", sesion.usuario.id)
+    .select("id");
+  // Si no se actualizó ninguna fila (no es suyo o no existe), no es un éxito.
+  return { ok: !error && (data?.length ?? 0) > 0 };
 }
