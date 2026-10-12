@@ -185,3 +185,129 @@ test.describe("PWA", () => {
     await context.setOffline(false);
   });
 });
+
+test.describe("teclado", () => {
+  test('"Saltar al contenido" es el primer foco y lleva el foco a #contenido', async ({ page }) => {
+    await page.goto("/inicio");
+    await page.keyboard.press("Tab");
+    const salto = page.getByRole("link", { name: "Saltar al contenido" });
+    await expect(salto).toBeFocused();
+    // Foco visible: outline sólido de 3 px.
+    await expect(salto).toHaveCSS("outline-width", "3px");
+    await expect(salto).toHaveCSS("outline-style", "solid");
+
+    await page.keyboard.press("Enter");
+    await expect(page.locator("#contenido")).toBeFocused();
+  });
+
+  test("en las pantallas públicas el salto también deja el foco en #contenido", async ({
+    page,
+  }) => {
+    await page.goto("/sin-conexion");
+    await page.keyboard.press("Tab");
+    await expect(page.getByRole("link", { name: "Saltar al contenido" })).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(page.locator("#contenido")).toBeFocused();
+  });
+
+  test("el menú del avatar abre con Enter, cierra con Esc y devuelve el foco al botón", async ({
+    page,
+  }) => {
+    test.skip(esCelular(page), "El avatar está en la barra superior de escritorio");
+    await page.goto("/inicio");
+    const boton = page.getByRole("button", { name: /Cuenta de/ });
+    await boton.focus();
+    await expect(boton).toHaveCSS("outline-width", "3px");
+    await page.keyboard.press("Enter");
+    await expect(boton).toHaveAttribute("aria-expanded", "true");
+    await expect(page.getByRole("link", { name: "Mi cuenta" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(boton).toHaveAttribute("aria-expanded", "false");
+    await expect(boton).toBeFocused();
+  });
+});
+
+const INTERACTIVOS =
+  'a[href], button, select, textarea, input:not([type="hidden"]):not([type="radio"]), label:has(input[type="radio"]), [role="button"], [tabindex]:not([tabindex="-1"])';
+
+test.describe("objetivos táctiles de 44 px", () => {
+  for (const ruta of ["/inicio", "/mis-trabajos", "/cuenta", "/esto-no-existe", "/sin-conexion"]) {
+    test(`${ruta}: nada interactivo mide menos de 44×44`, async ({ page }) => {
+      await page.goto(ruta);
+      const chicos = await page.evaluate((selector) => {
+        return [...document.querySelectorAll<HTMLElement>(selector)]
+          .filter((el) => el.getAttribute("href") !== "#contenido") // salto: oculto hasta tener foco
+          .map((el) => ({ el, caja: el.getBoundingClientRect() }))
+          .filter(({ caja }) => caja.width > 0 && caja.height > 0)
+          .filter(({ caja }) => caja.width < 43.5 || caja.height < 43.5)
+          .map(
+            ({ el, caja }) =>
+              `${el.tagName} "${el.textContent?.trim()}" ${caja.width}×${caja.height}`,
+          );
+      }, INTERACTIVOS);
+      expect(chicos).toEqual([]);
+    });
+  }
+
+  test("el menú del avatar abierto también cumple", async ({ page }) => {
+    test.skip(esCelular(page), "El avatar está en la barra superior de escritorio");
+    await page.goto("/inicio");
+    await page.getByRole("button", { name: /Cuenta de/ }).click();
+    const chicos = await page.evaluate((selector) => {
+      return [...document.querySelectorAll<HTMLElement>(selector)]
+        .filter((el) => el.getAttribute("href") !== "#contenido")
+        .map((el) => ({ el, caja: el.getBoundingClientRect() }))
+        .filter(({ caja }) => caja.width > 0 && caja.height > 0)
+        .filter(({ caja }) => caja.width < 43.5 || caja.height < 43.5)
+        .map(
+          ({ el, caja }) =>
+            `${el.tagName} "${el.textContent?.trim()}" ${caja.width}×${caja.height}`,
+        );
+    }, INTERACTIVOS);
+    expect(chicos).toEqual([]);
+  });
+});
+
+async function sinViolaciones(page: Page) {
+  const resultado = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
+  expect(resultado.violations).toEqual([]);
+}
+
+test.describe("axe en más pantallas", () => {
+  for (const esquema of ["light", "dark"] as const) {
+    for (const ruta of ["/mis-trabajos", "/cuenta", "/esto-no-existe", "/sin-conexion"]) {
+      test(`${ruta} (${esquema})`, async ({ page }) => {
+        await page.emulateMedia({ colorScheme: esquema });
+        await page.goto(ruta);
+        await sinViolaciones(page);
+      });
+    }
+
+    test(`menú del avatar abierto (${esquema})`, async ({ page }) => {
+      test.skip(esCelular(page), "El avatar está en la barra superior de escritorio");
+      await page.emulateMedia({ colorScheme: esquema });
+      await page.goto("/inicio");
+      await page.getByRole("button", { name: /Cuenta de/ }).click();
+      await expect(page.getByRole("link", { name: "Mi cuenta" })).toBeVisible();
+      await sinViolaciones(page);
+    });
+  }
+
+  test.describe("profesional", () => {
+    test.use({ baseURL: URL_PROFESIONAL });
+
+    for (const esquema of ["light", "dark"] as const) {
+      test(`/trabajos (${esquema})`, async ({ page }) => {
+        await page.emulateMedia({ colorScheme: esquema });
+        await page.goto("/trabajos");
+        await sinViolaciones(page);
+      });
+
+      test(`/trabajos?vista=mias (${esquema})`, async ({ page }) => {
+        await page.emulateMedia({ colorScheme: esquema });
+        await page.goto("/trabajos?vista=mias");
+        await sinViolaciones(page);
+      });
+    }
+  });
+});

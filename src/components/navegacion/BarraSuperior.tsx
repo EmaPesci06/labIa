@@ -24,7 +24,11 @@ export function BarraSuperior({ navegacion, rol, nombre }: Props) {
       data-barra-superior=""
       className="hidden h-[72px] shrink-0 items-center justify-between gap-6 border-b border-divisor bg-superficie px-10 lg:flex"
     >
-      <Link href="/inicio" aria-label="LabÍA, inicio" className="flex rounded-campo">
+      <Link
+        href="/inicio"
+        aria-label="LabÍA, inicio"
+        className="flex min-h-11 items-center rounded-campo"
+      >
         <Logo alt="" prioritario />
       </Link>
       <EnlacesSuperiores destinos={navegacion.escritorio} rol={rol} />

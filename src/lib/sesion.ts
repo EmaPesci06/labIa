@@ -14,12 +14,18 @@ export type SesionApp = {
  * (Supabase Auth) y deja la misma firma.
  *
  * El rol sale de `LABIA_ROL_DEV` ("cliente" por defecto). `LABIA_ID_DEV` es el id del profesional,
- * para armar el link a "Mi perfil".
+ * para armar el link a "Mi perfil". En producción (`NODE_ENV === "production"`) se ignoran, salvo
+ * con `LABIA_PERMITIR_ROL_DEV=1`, bandera que solo usa Playwright (corre contra un build de
+ * producción y necesita probar el rol profesional). No la cargues en Vercel.
  */
 export async function obtenerSesion(): Promise<SesionApp> {
   // Se lee en cada pedido (no al compilar), así el rol se puede cambiar sin volver a construir.
   await connection();
-  const rol: RolApp = process.env.LABIA_ROL_DEV === "profesional" ? "profesional" : "cliente";
+  // En producción las variables de desarrollo se ignoran, salvo la bandera que usa Playwright.
+  const permitido =
+    process.env.NODE_ENV !== "production" || process.env.LABIA_PERMITIR_ROL_DEV === "1";
+  const rol: RolApp =
+    permitido && process.env.LABIA_ROL_DEV === "profesional" ? "profesional" : "cliente";
   return rol === "profesional"
     ? { id: process.env.LABIA_ID_DEV || "demo", rol, nombre: "Martín Gómez" }
     : { id: "demo-cliente", rol, nombre: "Laura Fernández" };

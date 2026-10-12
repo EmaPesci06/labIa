@@ -52,7 +52,12 @@ export default defineConfig({
       url: `http://localhost:${PUERTO + 100}`,
       reuseExistingServer: !enCI,
       timeout: 120_000,
-      env: { LABIA_ROL_DEV: "profesional", LABIA_ID_DEV: "demo" },
+      env: {
+        LABIA_ROL_DEV: "profesional",
+        LABIA_ID_DEV: "demo",
+        // En producción la sesión falsa ignora el rol de desarrollo salvo con esta bandera.
+        LABIA_PERMITIR_ROL_DEV: "1",
+      },
     },
   ],
 });

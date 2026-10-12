@@ -14,13 +14,18 @@ export default function LayoutPublico({ children }: { children: ReactNode }) {
     <>
       <SaltarAlContenido />
       <header className="px-5 py-4 lg:px-10 lg:py-[18px]">
-        <Link href="/" aria-label="LabÍA, inicio" className="inline-flex rounded-campo">
+        <Link
+          href="/"
+          aria-label="LabÍA, inicio"
+          className="inline-flex min-h-11 items-center rounded-campo"
+        >
           <Logo alt="" prioritario />
         </Link>
       </header>
       <main
         id="contenido"
-        className="mx-auto flex w-full max-w-[480px] flex-1 flex-col px-5 pb-8 lg:max-w-[560px]"
+        tabIndex={-1}
+        className="mx-auto flex w-full max-w-[480px] flex-1 flex-col px-5 pb-8 focus:outline-none lg:max-w-[560px]"
       >
         {children}
       </main>
