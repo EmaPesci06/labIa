@@ -1,0 +1,66 @@
+name: Migraciones
+
+# Aplica las migraciones nuevas de supabase/migrations al proyecto remoto cuando se mergean a main.
+# El seed (supabase/seed.sql) NO se aplica acá: es solo para la base local.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "supabase/migrations/**"
+  workflow_dispatch:
+
+# Nunca dos `db push` a la vez contra la misma base; tampoco se cancela uno a mitad de camino.
+concurrency:
+  group: migraciones
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  dev:
+    name: Aplicar en labia-dev
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD_DEV }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF_DEV }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: supabase/setup-cli@v3
+
+      - name: Vincular el proyecto
+        run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: Migraciones pendientes
+        run: supabase migration list
+
+      - name: Aplicar migraciones
+        run: supabase db push
+
+  # Producción (Fase 6, LAB-37): se activa creando la variable de repositorio MIGRAR_PRODUCCION=true,
+  # los secretos SUPABASE_PROJECT_REF_PROD y SUPABASE_DB_PASSWORD_PROD, y el entorno `produccion`
+  # (Settings → Environments) con aprobación manual.
+  produccion:
+    name: Aplicar en producción
+    needs: dev
+    if: vars.MIGRAR_PRODUCCION == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: produccion
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD_PROD }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF_PROD }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: supabase/setup-cli@v3
+
+      - name: Vincular el proyecto
+        run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: Aplicar migraciones
+        run: supabase db push

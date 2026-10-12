@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>LabÍA · Registro de profesional</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,600..900&amp;family=Atkinson+Hyperlegible+Next:wght@400..800&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+:focus-visible{outline:3px solid #D45F3A;outline-offset:2px}
+@keyframes cinta{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+a{color:#232F49}a:hover{color:#182136}
+</style>
+</helmet>
+<div style="width: 390px; height: 1560px; box-sizing: border-box; padding: 20px 24px 32px; display: flex; flex-direction: column; gap: 22px; background: #F1F3F6; color: #1B2438; font-family: 'Atkinson Hyperlegible Next', sans-serif">
+  <div style="display: flex; align-items: center; justify-content: space-between">
+    <a href="Main.dc.html" aria-label="Volver" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; color: #1B2438">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+    </a>
+    <div role="group" aria-label="Paso 1 de 2" style="width: 210px; display: flex; flex-direction: column; gap: 6px"><div style="height: 12px; border-radius: 2px; background: #DDE0E6; display: flex"><div style="width: 50%; display: flex"><span aria-hidden="true" style="display: block; flex: none; height: 12px; width: 100%; border-radius: 2px; border-right: 3px solid #232F49; box-sizing: border-box; background: repeating-linear-gradient(90deg, #232F49 0 1.5px, transparent 1.5px 40px) 0 0 / 100% 7px no-repeat, repeating-linear-gradient(90deg, #232F49 0 1px, transparent 1px 8px) 0 0 / 100% 4px no-repeat, #D45F3A"></span></div></div><div style="display: flex; justify-content: space-between; gap: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase"><span style="color: #1B2438">1 · Tu perfil</span><span style="color: #4B5468">2 · Normas</span></div></div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 6px">
+    <h1 style="margin: 0; font-family: Archivo, sans-serif; font-stretch: 118%; font-weight: 800; font-size: 30px; letter-spacing: -0.5px">Contanos qué sabés hacer</h1>
+    <p style="margin: 0; font-size: 15px; color: #4B5468">Esto es lo que van a ver los clientes en tu perfil.</p>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 12px">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; letter-spacing: 0.4px; letter-spacing: 0.6px; text-transform: uppercase; color: #5E6678">Tus datos</div>
+    <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Nombre y apellido
+      <input type="text" placeholder="Martín Gómez" style="min-height: 46px; padding: 0 14px; border-radius: 12px; border: 1px solid #CDD2DB; background: #FFFFFF; font: inherit; font-weight: 400; font-size: 16px; color: #1B2438">
+    </label>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+      <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">WhatsApp
+        <input type="tel" placeholder="223 555-0000" style="min-height: 46px; padding: 0 12px; border-radius: 12px; border: 1px solid #CDD2DB; background: #FFFFFF; font: inherit; font-weight: 400; font-size: 16px; color: #1B2438; min-width: 0">
+      </label>
+      <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Email
+        <input type="email" placeholder="martin@email.com" style="min-height: 46px; padding: 0 12px; border-radius: 12px; border: 1px solid #CDD2DB; background: #FFFFFF; font: inherit; font-weight: 400; font-size: 16px; color: #1B2438; min-width: 0">
+      </label>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; letter-spacing: 0.4px; letter-spacing: 0.6px; text-transform: uppercase; color: #5E6678">Tus oficios</div>
+    <div style="font-size: 14px; color: #4B5468">Elegí uno o varios.</div>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px">
+      <sc-for list="{{oficios}}" as="o" hint-placeholder-count="7">
+        <button type="button" onClick="{{o.pick}}" aria-pressed="{{o.on}}" style="min-height: 44px; padding: 0 14px; border-radius: 999px; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; background: {{o.bg}}; color: {{o.fg}}; border: 1.5px solid {{o.bd}}">{{o.label}}</button>
+      </sc-for>
+    </div>
+    <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Especialidades (opcional)
+      <input type="text" placeholder="Ej: instalación de calefactores, pérdidas" style="min-height: 46px; padding: 0 14px; border-radius: 12px; border: 1px solid #CDD2DB; background: #FFFFFF; font: inherit; font-weight: 400; font-size: 16px; color: #1B2438">
+    </label>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; letter-spacing: 0.4px; letter-spacing: 0.6px; text-transform: uppercase; color: #5E6678">Dónde trabajás</div>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px">
+      <sc-for list="{{zonas}}" as="z" hint-placeholder-count="8">
+        <button type="button" onClick="{{z.pick}}" aria-pressed="{{z.on}}" style="min-height: 44px; padding: 0 14px; border-radius: 999px; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; background: {{z.bg}}; color: {{z.fg}}; border: 1.5px solid {{z.bd}}">{{z.label}}</button>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+    <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Años de experiencia
+      <input type="number" placeholder="12" style="min-height: 46px; padding: 0 12px; border-radius: 12px; border: 1px solid #CDD2DB; background: #FFFFFF; font: inherit; font-weight: 400; font-size: 16px; color: #1B2438; min-width: 0">
+    </label>
+    <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Matrícula
+      <input type="text" placeholder="N° de matrícula" style="min-height: 46px; padding: 0 12px; border-radius: 12px; border: 1px solid #CDD2DB; background: #FFFFFF; font: inherit; font-weight: 400; font-size: 16px; color: #1B2438; min-width: 0">
+    </label>
+  </div>
+  <div style="margin-top: -14px; font-size: 13px; color: #5E6678">La matrícula es obligatoria para gasistas.</div>
+
+  <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Contá cómo trabajás
+    <textarea rows="4" placeholder="Gasista matriculado. Instalaciones, reparaciones y pruebas de hermeticidad. Paso presupuesto por escrito." style="padding: 12px 14px; border-radius: 12px; border: 1px solid #CDD2DB; background: #FFFFFF; font: inherit; font-weight: 400; font-size: 16px; color: #1B2438; resize: none"></textarea>
+    <span style="font-weight: 400; font-size: 13px; color: #5E6678; text-align: right">0 / 500</span>
+  </label>
+
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+    <button type="button" style="min-height: 104px; border-radius: 14px; border: 1.5px dashed #A3A9B6; background: #FFFFFF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font: inherit; font-size: 14px; font-weight: 600; color: #1B2438; cursor: pointer">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#232F49" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>
+      Foto de perfil
+    </button>
+    <button type="button" style="min-height: 104px; border-radius: 14px; border: 1.5px dashed #A3A9B6; background: #FFFFFF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font: inherit; font-size: 14px; font-weight: 600; color: #1B2438; cursor: pointer">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#232F49" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="9" cy="11" r="2"></circle><path d="m21 17-5-5-8 7"></path></svg>
+      Fotos de trabajos
+      <span style="font-weight: 400; font-size: 12px; color: #5E6678">Hasta 10</span>
+    </button>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 16px; background: #E6E9F0">
+    <div style="display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; color: #232F49">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6z"></path><path d="m9 12 2 2 4-4"></path></svg>
+      Verificación obligatoria
+    </div>
+    <div style="font-size: 14px; color: #1B2438; line-height: 1.4">La revisamos a mano. No se muestra en tu perfil: solo aparecen las insignias.</div>
+    <button type="button" style="min-height: 52px; border-radius: 12px; border: 1px solid #A9B1C3; background: #FFFFFF; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; font: inherit; font-size: 15px; font-weight: 600; color: #1B2438; cursor: pointer">DNI, frente y dorso <span style="color: #232F49">Subir</span></button>
+    <button type="button" style="min-height: 52px; border-radius: 12px; border: 1px solid #A9B1C3; background: #FFFFFF; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; font: inherit; font-size: 15px; font-weight: 600; color: #1B2438; cursor: pointer">Certificado de antecedentes <span style="color: #232F49">Subir PDF</span></button>
+  </div>
+
+  <a href="Normas.dc.html" style="margin-top: auto; display: flex; align-items: center; justify-content: center; min-height: 52px; border-radius: 14px; background: #B84A25; color: #FFFFFF; font-weight: 700; font-size: 16px; text-decoration: none">Siguiente: normas de seguridad</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1560}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { oficios: ['Gas', 'Plomería'], zonas: ['La Perla', 'Centro'] };
+}
+chips(labels, key) {
+const picked = this.state[key];
+return labels.map((label) => {
+const on = picked.indexOf(label) !== -1;
+return {
+label: label,
+on: on ? 'true' : 'false',
+bg: on ? '#232F49' : '#FFFFFF',
+fg: on ? '#FFFFFF' : '#1B2438',
+bd: on ? '#232F49' : '#CDD2DB',
+pick: () => {
+const cur = this.state[key];
+const next = cur.indexOf(label) !== -1 ? cur.filter((x) => x !== label) : cur.concat([label]);
+this.setState({ [key]: next });
+}
+};
+});
+}
+renderVals() {
+return {
+oficios: this.chips(['Carpintería', 'Plomería', 'Cerrajería', 'Gas', 'Pintura', 'Mecánica', 'Electricidad'], 'oficios'),
+zonas: this.chips(['Toda la ciudad', 'Centro', 'La Perla', 'Chauvín', 'Los Troncos', 'Punta Mogotes', 'Constitución', 'Puerto'], 'zonas')
+};
+}
+}
+</script>
+</body>
+</html>
