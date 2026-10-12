@@ -92,7 +92,7 @@ export async function enviarResumenTrabajosCerca(
 
 /**
  * 24 h después de marcar un trabajo como terminado, si el cliente no dejó reseña, se la pide.
- * Mira los trabajos cerrados entre 24 y 72 h atrás (el cron corre cada hora) y no repite.
+ * Mira los trabajos cerrados entre 24 y 72 h atrás (el cron corre una vez por día) y no repite.
  * Devuelve cuántos emails se mandaron.
  */
 export async function enviarPedidosDeResena(

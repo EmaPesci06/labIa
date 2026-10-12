@@ -6,7 +6,7 @@ import { enviarPedidosDeResena } from "@/lib/emails/resumenes";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 
 /**
- * Vercel Cron, cada hora. Pide reseñas 24 h después de terminar un trabajo y, de paso, manda los
+ * Vercel Cron, una vez por día (12:00 UTC = 9:00 en Argentina; Hobby no admite más). Pide reseñas 24 h después de terminar un trabajo y, de paso, manda los
  * avisos de postulaciones que esperaban para agruparse. Protegido con `CRON_SECRET`.
  */
 export async function GET(request: NextRequest) {
