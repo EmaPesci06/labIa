@@ -791,6 +791,10 @@ select is(
 -- Storage: documentos (privado)
 -- ===========================================================================
 
+-- Un trigger de Storage (protect_delete) frena todo DELETE directo sobre storage.objects, aun
+-- sin filas. Se habilita para esta transacción y así se prueba lo que decide RLS, no el trigger.
+select set_config('storage.allow_delete_query', 'true', true);
+
 select tests.como('cccccccc-1200-4000-a000-000000000004');
 select lives_ok(
   $$insert into storage.objects (bucket_id, name) values ('documentos', 'cccccccc-1200-4000-a000-000000000004/antecedentes-1791734400002.pdf')$$,
@@ -909,7 +913,6 @@ select throws_ok(
 );
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000004');
-select set_config('storage.allow_delete_query', 'true', true);
 select results_eq(
   $$delete from storage.objects where bucket_id = 'fotos' and name = 'perfiles/cccccccc-1200-4000-a000-000000000004/foto.jpg' returning 1$$,
   $$values (1)$$,
