@@ -96,3 +96,20 @@ profesional, dueño y admin; permisos de funciones y columnas; buckets y políti
 - **`matricula_numero`** no se lee de la tabla (tampoco con `select *`: hay que pedir las columnas); el dueño y el admin la leen por la vista `matricula_propia`. En público solo la insignia `matriculado`.
 - Un profesional solo ve trabajos abiertos (y los datos de sus clientes) si está activo y con el perfil publicado.
 - `verificaciones`: ruta con formato fijo y un solo documento `pendiente` por usuario y tipo. `postulaciones`: una sola `elegida` por trabajo.
+
+## Búsqueda de profesionales (LAB-22)
+
+`public.buscar_profesionales(p_oficio, p_barrio, p_solo_matriculados, p_orden, p_toda_la_ciudad, p_limite, p_desde)`
+(RPC, `security invoker`; la usan el inicio, los resultados y el buscador). Wrapper tipado: `src/lib/busqueda.ts`.
+Tests: `supabase/tests/database/busqueda.test.sql`.
+
+- Solo perfiles `publicado` de cuentas activas; lee `usuarios_publicos`, así que nunca sale whatsapp, email ni el
+  apellido completo (solo la inicial).
+- Distancia entre centros de barrio, en km con una decimal. Aparece quien trabaja en toda la ciudad, quien tiene el
+  barrio buscado entre sus zonas o quien vive a 6 km o menos; `p_toda_la_ciudad = true` no filtra por zona.
+- Orden `cercania`: `distancia_km asc, promedio desc nulls last`. Orden `calificacion`: `promedio desc nulls last,
+cantidad_resenas desc, distancia_km asc`. Los dos empiezan con `prioridad desc` (reservado para la suscripción
+  post-MVP; hoy todos valen 0).
+- `p_limite` se acota a 1..100; `total` es la cantidad de toda la búsqueda (para paginar).
+- Medir con 2.000 perfiles falsos (solo local): `node scripts/generar-perfiles.ts --medir | docker exec -i supabase_db_labia psql -U postgres`
+  (`--limpiar` los borra, `--solo-medir` mide sin recargar). Ver el encabezado del script.
