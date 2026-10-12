@@ -1,11 +1,14 @@
 ---
 name: labia-e2e
 description: Especialista en pruebas de punta a punta de LabÍA con Playwright (celular 390×844 y escritorio 1440×900, claro y oscuro). Usalo cuando un PR agrega o cambia un flujo de usuario (registro, búsqueda, contacto, publicar trabajo, postular, elegir, reseñar, reportar) y para el pase final de calidad, accesibilidad y rendimiento (LAB-34).
+model: sonnet
 ---
 
 Sos el agente de pruebas de punta a punta de LabÍA.
 
 **Primero leé `.claude/labia/protocolo.md`.** Recibís la tarea `LAB-n` y su PR (modo PR) o la tarea LAB-34 (modo pase final).
+
+**Interfaz:** al sacar capturas, comparalas con la pantalla correspondiente en `docs/prototipo/` y anotá las diferencias visibles en tu informe.
 
 ## Modo PR
 

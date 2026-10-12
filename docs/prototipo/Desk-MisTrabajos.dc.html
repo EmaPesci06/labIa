@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>LabÍA · Mis trabajos (escritorio)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,600..900&amp;family=Atkinson+Hyperlegible+Next:wght@400..800&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+:focus-visible{outline:3px solid #D45F3A;outline-offset:2px}
+@keyframes cinta{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+a{color:#232F49}a:hover{color:#182136}
+</style>
+</helmet>
+<div style="min-height: 1000px; background: #F1F3F6; color: #1B2438; font-family: 'Atkinson Hyperlegible Next', sans-serif">
+  <header style="display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: 16px 40px; background: #FFFFFF; border-bottom: 1px solid #DDE0E6">
+    <a href="Desk-Bienvenida.dc.html" aria-label="labia, inicio" style="display: flex"><img src="/_blob/304edbcb89bf94400a05ef24027583ab" alt="labia" style="height: 40px; width: auto"></a>
+    <nav aria-label="Principal" style="display: flex; gap: 28px; flex-wrap: wrap; font-size: 15px; font-weight: 600">
+      <a href="Desk-Buscar.dc.html" style="color: #1B2438; text-decoration: none">Buscar profesionales</a>
+      <a href="Desk-PublicarTrabajo.dc.html" style="color: #1B2438; text-decoration: none">Publicar un trabajo</a>
+      <a href="Desk-MisTrabajos.dc.html" style="color: #232F49; text-decoration: underline; text-underline-offset: 6px">Mis trabajos</a>
+    </nav>
+    <span style="width: 40px; height: 40px; border-radius: 999px; background: #232F49; color: #FFFFFF; font-weight: 700; display: flex; align-items: center; justify-content: center">LF</span>
+  </header>
+
+  <main style="max-width: 1240px; margin: 0 auto; padding: 40px 40px 56px; box-sizing: border-box; display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start">
+    <section style="flex: 1 1 320px; max-width: 400px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+      <h1 style="margin: 0 0 6px; font-family: Archivo, sans-serif; font-stretch: 118%; font-weight: 800; font-size: 32px; letter-spacing: -0.5px">Mis trabajos</h1>
+      <div style="display: flex; flex-direction: column; gap: 6px; padding: 18px; border-radius: 18px; background: #FFFFFF; border: 2px solid #232F49">
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; letter-spacing: 0.4px; color: #232F49">GAS · LA PERLA</span>
+          <span style="padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; background: {{statusBg}}; color: {{statusFg}}">{{status}}</span>
+        </div>
+        <span style="font-size: 17px; font-weight: 700">Olor a gas en la cocina</span>
+        <span style="font-size: 14px; color: #4B5468">Publicado hoy · 3 postulantes</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px; padding: 18px; border-radius: 18px; background: #FFFFFF; border: 1px solid #DDE0E6">
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; letter-spacing: 0.4px; color: #232F49">PINTURA · LA PERLA</span>
+          <span style="padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; background: #EEF0F3; color: #4B5468">Terminado</span>
+        </div>
+        <span style="font-size: 17px; font-weight: 700">Pintar dormitorio</span>
+        <span style="font-size: 14px; color: #4B5468">Hace 3 semanas · Reseña enviada</span>
+      </div>
+      <a href="Desk-PublicarTrabajo.dc.html" style="display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 12px; border: 1.5px dashed #A3A9B6; color: #232F49; font-weight: 700; font-size: 15px; text-decoration: none">+ Publicar otro trabajo</a>
+    </section>
+
+    <section style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+      <sc-if value="{{hasHired}}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 16px 18px; border-radius: 14px; background: #DCEFE4; color: #1B2438; font-size: 16px; line-height: 1.45">Elegiste a <strong>{{hiredName}}</strong>. Escribile por WhatsApp para coordinar. Cuando termine, dejale una reseña.</div>
+      </sc-if>
+      <h2 style="margin: 0; font-size: 22px; font-weight: 700">Postulantes para “Olor a gas en la cocina”</h2>
+      <sc-for list="{{postulantes}}" as="p" hint-placeholder-count="3">
+        <div style="display: flex; flex-wrap: wrap; gap: 18px; align-items: center; padding: 20px; border-radius: 18px; background: #FFFFFF">
+          <span style="flex: none; width: 56px; height: 56px; border-radius: 999px; background: #E6E9F0; color: #232F49; font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: center">{{p.ini}}</span>
+          <div style="flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+            <span style="font-size: 17px; font-weight: 700">{{p.name}}</span>
+            <span style="font-size: 14px; color: #4B5468">{{p.sub}}</span>
+            <span style="font-size: 15px; line-height: 1.45">“{{p.msg}}”</span>
+          </div>
+          <div style="display: flex; gap: 8px">
+            <a href="Desk-Perfil.dc.html" style="display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1.5px solid #232F49; color: #232F49; font-weight: 700; font-size: 14px; text-decoration: none">Ver perfil</a>
+            <button type="button" onClick="{{p.pick}}" style="min-height: 44px; padding: 0 18px; border-radius: 12px; border: none; background: {{p.btnBg}}; color: #FFFFFF; font: inherit; font-weight: 700; font-size: 14px; cursor: pointer">{{p.btn}}</button>
+          </div>
+        </div>
+      </sc-for>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { hired: null };
+}
+renderVals() {
+const list = [
+{ ini: 'MG', name: 'Martín Gómez', sub: 'Gasista matriculado · 4,9 estrellas', msg: 'Puedo ir hoy a las 17 h. Reviso la pérdida y te paso presupuesto en el momento.' },
+{ ini: 'JP', name: 'Jorge Paz', sub: 'Gasista matriculado · 4,7 estrellas', msg: 'Mañana a primera hora estoy por La Perla. Llevo detector de pérdidas.' },
+{ ini: 'SR', name: 'Silvia Romero', sub: 'Gas y plomería · 4,8 estrellas', msg: 'Te puedo dar un turno el jueves por la tarde.' }
+];
+const hired = this.state.hired;
+return {
+postulantes: list.map((p) => ({
+...p,
+btn: hired === p.name ? 'Elegido' : 'Elegir',
+btnBg: hired === p.name ? '#1D6B45' : '#B84A25',
+pick: () => this.setState({ hired: p.name })
+})),
+hasHired: !!hired,
+hiredName: hired || '',
+status: hired ? 'Contratado' : 'Abierto',
+statusBg: hired ? '#DCEFE4' : '#E6E9F0',
+statusFg: hired ? '#14532D' : '#232F49'
+};
+}
+}
+</script>
+</body>
+</html>

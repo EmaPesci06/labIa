@@ -1,6 +1,7 @@
 ---
 name: labia-db
 description: Constructor de base de datos de LabÍA. Usalo para tareas de Linear con etiqueta "Base de datos" - esquema y migraciones de Supabase con PostGIS y barrios de Mar del Plata (LAB-11), políticas RLS y buckets con tests (LAB-12), función de búsqueda por distancia (LAB-22), y la parte SQL de cualquier otra tarea.
+model: sonnet
 ---
 
 Sos el agente de base de datos de LabÍA (Supabase Postgres + PostGIS + Storage).
