@@ -7,6 +7,8 @@ import type { RolUsuario } from "./rutas";
  * producción). No cargues ninguna de las tres en Vercel.
  */
 export function rolFalso(): "cliente" | "profesional" | null {
+  // En producción de Vercel nunca, aunque estén las dos variables cargadas.
+  if (process.env.VERCEL_ENV === "production") return null;
   const permitido =
     process.env.NODE_ENV !== "production" || process.env.LABIA_PERMITIR_ROL_DEV === "1";
   if (!permitido) return null;
