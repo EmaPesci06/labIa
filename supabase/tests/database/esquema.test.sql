@@ -25,10 +25,11 @@ select is(
   'todas las tablas de public tienen RLS activado'
 );
 
-select is(
+select cmp_ok(
   (select count(*) from pg_policies where schemaname = 'public'),
-  0::bigint,
-  'todavía no hay políticas (van en LAB-12): sin políticas nadie accede por la API'
+  '>=',
+  9::bigint,
+  'hay políticas (LAB-12); las pruebas por tabla están en politicas.test.sql'
 );
 
 -- ---------------------------------------------------------------------------
