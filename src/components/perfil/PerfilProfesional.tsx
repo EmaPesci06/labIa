@@ -28,6 +28,8 @@ type Props = {
   resenas: PaginaResenas;
   /** Distancia a la persona que mira (solo con sesión de cliente); `null` si no corresponde. */
   distanciaKm: number | null;
+  /** Visitante sin sesión: el botón de contacto lleva a `/ingresar?volver=…`. */
+  hrefIngreso?: string;
 };
 
 function Insignias({ perfil, className }: { perfil: PerfilPublico; className?: string }) {
@@ -125,7 +127,7 @@ function BannerDuenio({ publicado }: { publicado: boolean }) {
  *
  * Nunca recibe ni muestra WhatsApp, email, DNI ni documentos: no están en `PerfilPublico`.
  */
-export function PerfilProfesional({ perfil, resenas, distanciaKm }: Props) {
+export function PerfilProfesional({ perfil, resenas, distanciaKm, hrefIngreso }: Props) {
   const { esPropio } = perfil;
   const profesion = profesionPrincipal(perfil.oficios);
   const especialidades = separarEspecialidades(perfil.especialidades);
@@ -240,7 +242,7 @@ export function PerfilProfesional({ perfil, resenas, distanciaKm }: Props) {
               </Boton>
             ) : (
               <>
-                <BotonContactar />
+                <BotonContactar hrefIngreso={hrefIngreso} />
                 <Link
                   href="#"
                   className="flex min-h-11 items-center justify-center text-sm text-texto-terciario underline"
@@ -268,7 +270,7 @@ export function PerfilProfesional({ perfil, resenas, distanciaKm }: Props) {
         </Boton>
       ) : (
         <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 border-t border-divisor bg-fondo px-5 py-3 lg:hidden">
-          <BotonContactar />
+          <BotonContactar hrefIngreso={hrefIngreso} />
         </div>
       )}
     </article>

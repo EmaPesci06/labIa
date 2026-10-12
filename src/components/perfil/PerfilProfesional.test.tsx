@@ -105,4 +105,20 @@ describe("PerfilProfesional", () => {
     );
     expect(screen.getByText("Tu perfil está publicado.")).toBeInTheDocument();
   });
+
+  it("sin sesión el botón de contacto lleva a ingresar", () => {
+    render(
+      <PerfilProfesional
+        perfil={perfil}
+        resenas={resenas}
+        distanciaKm={null}
+        hrefIngreso="/ingresar?volver=%2Fprofesionales%2F1"
+      />,
+    );
+    const enlaces = screen.getAllByRole("link", { name: /Contactar por WhatsApp/ });
+    expect(enlaces.length).toBeGreaterThan(0);
+    for (const enlace of enlaces) {
+      expect(enlace).toHaveAttribute("href", "/ingresar?volver=%2Fprofesionales%2F1");
+    }
+  });
 });

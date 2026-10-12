@@ -69,7 +69,16 @@ export default async function PerfilDelProfesional({ params }: Props) {
   return (
     <>
       {perfil.esPropio ? null : <RegistrarVistaPerfil oficio={perfil.oficios[0] ?? "plomeria"} />}
-      <PerfilProfesional perfil={perfil} resenas={resenas} distanciaKm={distanciaKm} />
+      <PerfilProfesional
+        perfil={perfil}
+        resenas={resenas}
+        distanciaKm={distanciaKm}
+        hrefIngreso={
+          sesion
+            ? undefined
+            : `/ingresar?volver=${encodeURIComponent(`/profesionales/${perfil.id}`)}`
+        }
+      />
     </>
   );
 }
