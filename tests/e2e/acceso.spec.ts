@@ -211,3 +211,55 @@ test.describe("accesibilidad", () => {
     });
   }
 });
+
+test.describe("modo oscuro", () => {
+  test.use({ colorScheme: "dark" });
+
+  for (const ruta of [
+    "/",
+    "/ingresar",
+    "/registro/cliente",
+    "/registro/profesional",
+    "/restablecer",
+  ]) {
+    test(`${ruta} sin violaciones de axe en oscuro`, async ({ page }) => {
+      await page.goto(ruta);
+      await page.waitForLoadState("networkidle");
+      const resultado = await new AxeBuilder({ page }).analyze();
+      expect(resultado.violations).toEqual([]);
+    });
+  }
+});
+
+test.describe("teclado", () => {
+  test("se puede ingresar y recorrer el formulario solo con teclado", async ({ page }) => {
+    await page.goto("/ingresar");
+    await page.getByLabel("Email").focus();
+    await page.keyboard.type("laura@example.com");
+    await page.keyboard.press("Tab");
+    await expect(page.getByLabel("Contraseña")).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(page.getByRole("link", { name: "¿Olvidaste tu contraseña?" })).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(page.getByRole("button", { name: "Ingresar" })).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(page.getByText("Ingresá tu contraseña.")).toBeVisible();
+  });
+
+  test("los links de la bienvenida tienen foco visible", async ({ page }) => {
+    await page.goto("/");
+    const enlace = page.getByRole("link", { name: /Quiero contratar/ });
+    await enlace.focus();
+    await expect(enlace).toBeFocused();
+    const contorno = await enlace.evaluate((el) => getComputedStyle(el).outlineStyle);
+    expect(contorno).not.toBe("none");
+  });
+});
+
+test.describe("restablecer", () => {
+  test("pide el email y muestra el error en castellano", async ({ page }) => {
+    await page.goto("/restablecer");
+    await page.getByRole("button", { name: "Enviar enlace" }).click();
+    await expect(page.getByText("Ingresá tu email.")).toBeVisible();
+  });
+});
