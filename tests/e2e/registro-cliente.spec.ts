@@ -1,8 +1,8 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-// LAB-17: registro de cliente. Sin Supabase en el servidor de pruebas solo se puede probar la
-// pantalla y la validación; el registro completo corre con E2E_AUTH=1 (proyecto de desarrollo
+// LAB-17: registro de cliente. Estas pruebas no dependen de que el servidor tenga Supabase: solo
+// miran la pantalla y la validación; el registro completo corre con E2E_AUTH=1 (proyecto de desarrollo
 // con confirmación de email desactivada).
 
 test.describe("registro de cliente", () => {
@@ -20,7 +20,18 @@ test.describe("registro de cliente", () => {
     }
     await expect(page.getByLabel("Contraseña", { exact: true })).toBeVisible();
     await expect(page.getByRole("radiogroup", { name: "Tu barrio" })).toBeVisible();
-    await expect(page.getByRole("radio")).toHaveCount(7); // sin Supabase no hay "Otro barrio"
+    // Los 7 barrios más comunes están siempre; "Otro barrio" depende de que haya Supabase.
+    for (const barrio of [
+      "La Perla",
+      "Centro",
+      "Chauvín",
+      "Los Troncos",
+      "Punta Mogotes",
+      "Constitución",
+      "Puerto",
+    ]) {
+      await expect(page.getByRole("radio", { name: barrio, exact: true })).toBeVisible();
+    }
     await expect(
       page.getByText("Tu dirección exacta nunca se muestra. Solo tu barrio."),
     ).toBeVisible();
@@ -29,6 +40,17 @@ test.describe("registro de cliente", () => {
       "href",
       "/privacidad",
     );
+  });
+
+  test("el link a registrarse como profesional aparece solo en escritorio", async ({ page }) => {
+    await page.goto("/registro/cliente");
+    const enlace = page.getByRole("link", { name: "Registrate como profesional" });
+    if ((page.viewportSize()?.width ?? 0) >= 1024) {
+      await expect(page.getByText("¿Ofrecés un servicio?")).toBeVisible();
+      await expect(enlace).toHaveAttribute("href", "/registro/profesional");
+    } else {
+      await expect(enlace).toBeHidden();
+    }
   });
 
   test("el panel de beneficios aparece solo en escritorio", async ({ page }) => {

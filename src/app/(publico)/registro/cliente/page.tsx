@@ -48,6 +48,15 @@ export default function RegistroCliente() {
             Ingresar
           </Link>
         </p>
+        <p className="hidden text-center text-[15px] text-texto-secundario lg:block">
+          ¿Ofrecés un servicio?{" "}
+          <Link
+            href="/registro/profesional"
+            className="inline-block py-3 font-bold text-azul underline underline-offset-2"
+          >
+            Registrate como profesional
+          </Link>
+        </p>
       </div>
       <div className="lg:sticky lg:top-8 lg:mt-[72px]">
         <PanelBeneficios />
