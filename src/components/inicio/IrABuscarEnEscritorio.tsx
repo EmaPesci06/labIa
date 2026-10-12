@@ -6,6 +6,5 @@
  */
 export function IrABuscarEnEscritorio({ destino }: { destino: string }) {
   const codigo = `if(window.matchMedia("(min-width: 1024px)").matches)window.location.replace(${JSON.stringify(destino).replace(/</g, "\\u003c")})`;
-  // eslint-disable-next-line react/no-danger -- script fijo con un destino interno ya serializado
   return <script dangerouslySetInnerHTML={{ __html: codigo }} />;
 }

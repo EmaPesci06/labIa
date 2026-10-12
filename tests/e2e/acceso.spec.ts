@@ -118,17 +118,17 @@ test.describe("rutas protegidas", () => {
 
     test("en / va a /inicio", async ({ page }) => {
       await page.goto("/");
-      await expect(page).toHaveURL(/\/inicio$/);
+      await expect(page).toHaveURL(/\/(inicio|buscar\?barrio=[a-z0-9-]+)$/);
     });
 
     test("en /ingresar va a /inicio", async ({ page }) => {
       await page.goto("/ingresar");
-      await expect(page).toHaveURL(/\/inicio$/);
+      await expect(page).toHaveURL(/\/(inicio|buscar\?barrio=[a-z0-9-]+)$/);
     });
 
     test("las rutas de profesional lo devuelven a /inicio", async ({ page }) => {
       await page.goto("/trabajos");
-      await expect(page).toHaveURL(/\/inicio$/);
+      await expect(page).toHaveURL(/\/(inicio|buscar\?barrio=[a-z0-9-]+)$/);
     });
 
     test("tiene la acción Salir", async ({ page }) => {
@@ -173,7 +173,7 @@ test.describe("cuenta real", () => {
     await page.getByLabel("Email").fill(email);
     await page.getByLabel("Contraseña").fill(contrasena);
     await page.getByRole("button", { name: "Crear cuenta" }).click();
-    await expect(page).toHaveURL(/\/inicio$/);
+    await expect(page).toHaveURL(/\/(inicio|buscar\?barrio=[a-z0-9-]+)$/);
 
     // Salir: en celular está en /cuenta; en escritorio, en el menú del avatar.
     await page.goto("/cuenta");

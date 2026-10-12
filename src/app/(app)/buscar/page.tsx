@@ -194,7 +194,6 @@ export default async function Buscar({ searchParams }: Props) {
                 todaLaCiudad: validos.todaLaCiudad,
                 pagina: pagina.pagina + 1,
               })}
-              scroll={false}
               variante="secundario"
               bloque
             >
