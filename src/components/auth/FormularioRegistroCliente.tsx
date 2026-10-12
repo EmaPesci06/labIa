@@ -30,6 +30,10 @@ export function FormularioRegistroCliente({ barrios }: { barrios: BarrioOpcion[]
 
   if (estado.confirmarEmail) return <ConfirmarEmail email={estado.confirmarEmail} />;
 
+  function limpiarError(campo: string) {
+    setErroresLocales((actuales) => ({ ...actuales, [campo]: undefined }));
+  }
+
   function validarAntes(evento: FormEvent<HTMLFormElement>) {
     const datos = new FormData(evento.currentTarget);
     const entrada = Object.fromEntries(CAMPOS.map((campo) => [campo, datos.get(campo) ?? ""]));
@@ -43,7 +47,13 @@ export function FormularioRegistroCliente({ barrios }: { barrios: BarrioOpcion[]
   }
 
   return (
-    <form action={accion} onSubmit={validarAntes} noValidate className="flex flex-col gap-3.5">
+    <form
+      action={accion}
+      onSubmit={validarAntes}
+      onChange={(e) => e.target instanceof HTMLInputElement && limpiarError(e.target.name)}
+      noValidate
+      className="flex flex-col gap-3.5"
+    >
       <Campo
         etiqueta="Nombre y apellido"
         name="nombreCompleto"
@@ -85,6 +95,7 @@ export function FormularioRegistroCliente({ barrios }: { barrios: BarrioOpcion[]
         barrios={barrios}
         valorInicial={estado.valores?.barrio}
         error={errores.barrio}
+        alCambiar={() => limpiarError("barrio")}
       />
 
       {estado.emailExistente ? (

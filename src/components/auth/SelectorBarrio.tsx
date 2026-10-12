@@ -20,6 +20,8 @@ type Props = {
   /** Id del barrio elegido (texto) para repoblar el formulario. */
   valorInicial?: string;
   error?: string;
+  /** Se llama al elegir o borrar un barrio (para limpiar el error). */
+  alCambiar?: () => void;
   /** Nombre del campo oculto que viaja al servidor. */
   name?: string;
 };
@@ -29,7 +31,13 @@ type Props = {
  * (combobox accesible) con todos los de la tabla, filtrado por texto sin acentos.
  * Manda el id del barrio en un campo oculto. Nunca se pide la dirección.
  */
-export function SelectorBarrio({ barrios, valorInicial = "", error, name = "barrio" }: Props) {
+export function SelectorBarrio({
+  barrios,
+  valorInicial = "",
+  error,
+  alCambiar,
+  name = "barrio",
+}: Props) {
   const id = useId();
   const idError = `${id}-error`;
   const idAviso = `${id}-aviso`;
@@ -59,6 +67,7 @@ export function SelectorBarrio({ barrios, valorInicial = "", error, name = "barr
   ];
 
   function elegirChip(nuevo: string) {
+    alCambiar?.();
     if (nuevo === OTRO) {
       setAbiertoOtro(true);
       // Si venía de un chip frecuente, se pide elegir de nuevo en el buscador.
@@ -72,6 +81,7 @@ export function SelectorBarrio({ barrios, valorInicial = "", error, name = "barr
   }
 
   function elegirDeLista(barrio: BarrioOpcion) {
+    alCambiar?.();
     setValor(String(barrio.id));
     setConsulta(barrio.nombre);
     setListaVisible(false);

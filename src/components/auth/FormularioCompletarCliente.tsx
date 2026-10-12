@@ -20,6 +20,10 @@ export function FormularioCompletarCliente({ barrios }: { barrios: BarrioOpcion[
   const [erroresLocales, setErroresLocales] = useState<Record<string, string | undefined>>({});
   const errores = { ...estado.errores, ...erroresLocales };
 
+  function limpiarError(campo: string) {
+    setErroresLocales((actuales) => ({ ...actuales, [campo]: undefined }));
+  }
+
   function validarAntes(evento: FormEvent<HTMLFormElement>) {
     const datos = new FormData(evento.currentTarget);
     const resultado = esquemaCompletarCliente.safeParse({
@@ -35,7 +39,13 @@ export function FormularioCompletarCliente({ barrios }: { barrios: BarrioOpcion[
   }
 
   return (
-    <form action={accion} onSubmit={validarAntes} noValidate className="flex flex-col gap-3.5">
+    <form
+      action={accion}
+      onSubmit={validarAntes}
+      onChange={(e) => e.target instanceof HTMLInputElement && limpiarError(e.target.name)}
+      noValidate
+      className="flex flex-col gap-3.5"
+    >
       <Campo
         variante="telefono"
         etiqueta="Celular de WhatsApp"
@@ -49,6 +59,7 @@ export function FormularioCompletarCliente({ barrios }: { barrios: BarrioOpcion[
         barrios={barrios}
         valorInicial={estado.valores?.barrio}
         error={errores.barrio}
+        alCambiar={() => limpiarError("barrio")}
       />
       {estado.mensaje ? (
         <p role="alert" className="text-sm font-semibold text-error">
