@@ -9,7 +9,7 @@ import { urlDelSitio } from "@/lib/sitio";
 
 import type { DatosPie } from "./Layout";
 import { definicion, type DatosPlantillas, type Plantilla } from "./plantillas";
-import { firmarTokenBaja } from "./token";
+import { firmarTokenBaja, secretoValido } from "./token";
 
 /** Mientras no haya dominio verificado (LAB-7), Resend solo permite este remitente de prueba. */
 const REMITENTE_POR_DEFECTO = "LabÍA <onboarding@resend.dev>";
@@ -33,7 +33,7 @@ export function armarPie(usuarioId: string | undefined, plantilla: Plantilla): D
   const sitio = urlDelSitio();
   const urlPreferencias = `${sitio}/cuenta/emails`;
   const secreto = process.env.EMAILS_SECRET;
-  if (!usuarioId || !secreto) return { urlBaja: urlPreferencias, urlPreferencias };
+  if (!usuarioId || !secretoValido(secreto)) return { urlBaja: urlPreferencias, urlPreferencias };
 
   const categoria = definicion(plantilla).preferencia ?? "novedades";
   const token = firmarTokenBaja({ usuarioId, categoria }, secreto);

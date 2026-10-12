@@ -3,7 +3,7 @@ import { Suspense } from "react";
 
 import { Boton } from "@/components/ui/Boton";
 import { confirmarBaja } from "@/lib/emails/acciones";
-import { verificarTokenBaja } from "@/lib/emails/token";
+import { secretoValido, verificarTokenBaja } from "@/lib/emails/token";
 
 export const metadata: Metadata = { title: "Darte de baja · LabÍA", robots: { index: false } };
 
@@ -21,7 +21,7 @@ const QUE_DEJAS_DE_RECIBIR: Record<string, string> = {
 async function Contenido({ searchParams }: { searchParams: Promise<Params> }) {
   const { t, listo, error } = await searchParams;
   const secreto = process.env.EMAILS_SECRET;
-  const carga = t && secreto ? verificarTokenBaja(t, secreto) : null;
+  const carga = t && secretoValido(secreto) ? verificarTokenBaja(t, secreto) : null;
 
   return (
     <>

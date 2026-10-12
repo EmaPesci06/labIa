@@ -2,7 +2,7 @@ import "server-only";
 
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 
-import { verificarTokenBaja, type CategoriaBaja } from "./token";
+import { secretoValido, verificarTokenBaja, type CategoriaBaja } from "./token";
 
 export type ResultadoBaja =
   { ok: true; categoria: CategoriaBaja } | { ok: false; motivo: "invalido" | "error" };
@@ -13,7 +13,7 @@ export type ResultadoBaja =
  */
 export async function aplicarBaja(token: string | null | undefined): Promise<ResultadoBaja> {
   const secreto = process.env.EMAILS_SECRET;
-  if (!token || !secreto) return { ok: false, motivo: "invalido" };
+  if (!token || !secretoValido(secreto)) return { ok: false, motivo: "invalido" };
   const carga = verificarTokenBaja(token, secreto);
   if (!carga) return { ok: false, motivo: "invalido" };
 

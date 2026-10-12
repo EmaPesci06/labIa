@@ -26,7 +26,7 @@ describe("enviarEmail", () => {
     enviarMock.mockReset();
     capturarMock.mockReset();
     vi.stubEnv("RESEND_API_KEY", "re_test");
-    vi.stubEnv("EMAILS_SECRET", "secreto");
+    vi.stubEnv("EMAILS_SECRET", "ssssssssssssssssssssssssssssssssssssssss");
     vi.stubEnv("EMAIL_REMITENTE", "LabÍA <hola@labia.example>");
     vi.stubEnv("EMAIL_SOPORTE", "soporte@labia.example");
   });
