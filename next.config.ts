@@ -18,7 +18,8 @@ const nextConfig: NextConfig = {
         ]
       : [],
     // Supabase local (127.0.0.1) cuenta como IP privada para el optimizador de imágenes.
-    dangerouslyAllowLocalIP: hostSupabase?.hostname === "127.0.0.1",
+    dangerouslyAllowLocalIP:
+      process.env.NODE_ENV !== "production" && hostSupabase?.hostname === "127.0.0.1",
   },
   cacheComponents: true,
   partialPrefetching: true,

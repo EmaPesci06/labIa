@@ -206,6 +206,11 @@ export async function guardarPerfilProfesional(
     : await supabase.from("perfiles_profesionales").insert({ usuario_id: uid, ...campos });
   if (errorPerfil) return { mensaje: MENSAJE_ERROR_GENERAL };
 
+  // Ya está todo en la base: el borrador (con el WhatsApp) no tiene que quedar en el JWT.
+  if (usuario.user_metadata?.perfil_borrador) {
+    await supabase.auth.updateUser({ data: { perfil_borrador: null } });
+  }
+
   return { guardado: { uid } };
 }
 
