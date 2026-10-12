@@ -43,7 +43,7 @@ export default defineConfig({
       reuseExistingServer: !enCI,
       timeout: 300_000,
       // Habilita /dev/ui en el build de producción para correr axe contra la biblioteca de componentes.
-      env: { MOSTRAR_DEV_UI: "1" },
+      env: { MOSTRAR_DEV_UI: "1", EMAILS_SECRET: "secreto-solo-para-e2e" },
     },
     {
       // Mismo build, otro puerto y la sesión falsa (LAB-13) con rol profesional: se lee en cada
