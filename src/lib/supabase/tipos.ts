@@ -179,6 +179,12 @@ isOneToOne: false
 isOneToOne: true
       referencedRelation: "usuarios"
       referencedColumns: ["id"]
+    },{
+      foreignKeyName: "preferencias_email_usuario_id_fkey"
+      columns: ["usuario_id"]
+isOneToOne: true
+      referencedRelation: "usuarios_publicos"
+      referencedColumns: ["id"]
     }
                   ]
                 },"reportes": {
