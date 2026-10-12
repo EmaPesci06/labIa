@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>LabÍA · Buscar profesionales (escritorio)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,600..900&amp;family=Atkinson+Hyperlegible+Next:wght@400..800&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+:focus-visible{outline:3px solid #D45F3A;outline-offset:2px}
+@keyframes cinta{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+a{color:#232F49}a:hover{color:#182136}
+</style>
+</helmet>
+<div style="min-height: 1150px; background: #F1F3F6; color: #1B2438; font-family: 'Atkinson Hyperlegible Next', sans-serif">
+  <header style="display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: 16px 40px; background: #FFFFFF; border-bottom: 1px solid #DDE0E6">
+    <a href="Desk-Bienvenida.dc.html" aria-label="labia, inicio" style="display: flex"><img src="/_blob/304edbcb89bf94400a05ef24027583ab" alt="labia" style="height: 40px; width: auto"></a>
+    <nav aria-label="Principal" style="display: flex; gap: 28px; flex-wrap: wrap; font-size: 15px; font-weight: 600">
+      <a href="Desk-Buscar.dc.html" style="color: #232F49; text-decoration: underline; text-underline-offset: 6px">Buscar profesionales</a>
+      <a href="Desk-PublicarTrabajo.dc.html" style="color: #1B2438; text-decoration: none">Publicar un trabajo</a>
+      <a href="Desk-MisTrabajos.dc.html" style="color: #1B2438; text-decoration: none">Mis trabajos</a>
+    </nav>
+    <span style="width: 40px; height: 40px; border-radius: 999px; background: #232F49; color: #FFFFFF; font-weight: 700; display: flex; align-items: center; justify-content: center">LF</span>
+  </header>
+
+  <main style="max-width: 1240px; margin: 0 auto; padding: 40px 40px 56px; box-sizing: border-box; display: flex; flex-direction: column; gap: 28px">
+    <div style="display: flex; flex-wrap: wrap; gap: 10px; padding: 10px; border-radius: 18px; background: #FFFFFF; border: 1px solid #CDD2DB">
+      <div style="flex: 2 1 280px; display: flex; align-items: center; gap: 10px; padding: 0 12px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4B5468" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <input type="search" aria-label="Buscar" placeholder="¿Qué necesitás arreglar?" style="flex: 1; min-height: 48px; border: none; outline: none; font: inherit; font-size: 16px; background: transparent; color: #1B2438; min-width: 0">
+      </div>
+      <label style="flex: 1 1 180px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-left: 1px solid #DDE0E6; font-size: 14px; font-weight: 600; color: #4B5468">Barrio
+        <select style="flex: 1; min-height: 48px; border: none; font: inherit; font-size: 16px; font-weight: 600; color: #1B2438; background: transparent">
+          <option>La Perla</option><option>Centro</option><option>Chauvín</option><option>Toda la ciudad</option>
+        </select>
+      </label>
+      <a href="Desk-Buscar.dc.html" style="display: flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 24px; border-radius: 12px; background: #232F49; color: #FFFFFF; font-weight: 700; font-size: 16px; text-decoration: none">Buscar</a>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start">
+      <aside aria-label="Filtros" style="flex: 1 1 240px; max-width: 280px; display: flex; flex-direction: column; gap: 22px; padding: 22px; border-radius: 18px; background: #FFFFFF">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; letter-spacing: 0.4px; letter-spacing: 0.6px; text-transform: uppercase; color: #5E6678">Oficio</div>
+          <sc-for list="{{oficios}}" as="o" hint-placeholder-count="8">
+            <button type="button" onClick="{{o.pick}}" aria-pressed="{{o.on}}" style="text-align: left; min-height: 40px; padding: 0 12px; border-radius: 10px; border: none; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; background: {{o.bg}}; color: {{o.fg}}">{{o.label}}</button>
+          </sc-for>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; letter-spacing: 0.4px; letter-spacing: 0.6px; text-transform: uppercase; color: #5E6678">Confianza</div>
+          <label style="display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; cursor: pointer">
+            <input type="checkbox" checked="{{soloMat}}" onChange="{{toggleMat}}" style="width: 20px; height: 20px; accent-color: #232F49">
+            Solo matriculados
+          </label>
+          <div style="font-size: 13px; color: #5E6678; line-height: 1.4">Todos los perfiles tienen identidad y antecedentes verificados.</div>
+        </div>
+      </aside>
+
+      <section style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 18px">
+        <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap">
+          <h1 style="margin: 0; font-family: Archivo, sans-serif; font-stretch: 118%; font-weight: 800; font-size: 32px; letter-spacing: -0.5px">{{titulo}}</h1>
+          <span style="font-size: 15px; color: #4B5468">{{count}} resultados cerca de La Perla, más cerca primero</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px">
+          <sc-for list="{{pros}}" as="p" hint-placeholder-count="6">
+            <a href="Desk-Perfil.dc.html" style="display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 18px; background: #FFFFFF; color: #1B2438; text-decoration: none; border: 1px solid #DDE0E6">
+              <div style="display: flex; gap: 12px; align-items: center">
+                <span style="flex: none; width: 52px; height: 52px; border-radius: 999px; background: #E6E9F0; color: #232F49; font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: center">{{p.ini}}</span>
+                <div style="display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0">
+                  <span style="font-size: 17px; font-weight: 700">{{p.name}}</span>
+                  <span style="font-size: 14px; color: #4B5468">{{p.oficio}} · {{p.anios}} años</span>
+                </div>
+                <span style="display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 700">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#D45F3A" stroke="#D45F3A" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.8-4.4 4.3 1 6.1L12 17l-5.4 2.8 1-6.1-4.4-4.3 6.1-.8z"></path></svg>
+                  {{p.rating}}
+                </span>
+              </div>
+              <span style="display: flex; align-items: center; gap: 10px"><span aria-hidden="true" style="display: block; flex: none; height: 12px; width: {{p.tape}}; border-radius: 2px; border-right: 3px solid #232F49; box-sizing: border-box; background: repeating-linear-gradient(90deg, #232F49 0 1.5px, transparent 1.5px 40px) 0 0 / 100% 7px no-repeat, repeating-linear-gradient(90deg, #232F49 0 1px, transparent 1px 8px) 0 0 / 100% 4px no-repeat, #D45F3A"></span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #1B2438">a {{p.km}}</span></span><span style="font-size: 14px; color: #4B5468">Zonas: {{p.zona}}</span>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px">
+                <span style="padding: 4px 10px; border-radius: 999px; background: #E6E9F0; color: #232F49; font-size: 12px; font-weight: 700">Identidad verificada</span>
+                <span style="padding: 4px 10px; border-radius: 999px; background: #E6E9F0; color: #232F49; font-size: 12px; font-weight: 700">Sin antecedentes</span>
+                <sc-if value="{{p.mat}}" hint-placeholder-val="{{ true }}">
+                  <span style="padding: 4px 10px; border-radius: 999px; background: #FBE5DC; color: #9A3A17; font-size: 12px; font-weight: 700">Matriculado</span>
+                </sc-if>
+              </div>
+            </a>
+          </sc-for>
+        </div>
+        <sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
+          <div style="padding: 24px; border-radius: 18px; background: #FFFFFF; font-size: 16px">No hay profesionales con esos filtros todavía.</div>
+        </sc-if>
+        <a href="Desk-PublicarTrabajo.dc.html" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 24px; border-radius: 18px; background: #232F49; color: #FFFFFF; text-decoration: none">
+          <span style="display: flex; flex-direction: column; gap: 4px">
+            <span style="font-size: 18px; font-weight: 700">¿No encontrás a quién llamar?</span>
+            <span style="font-size: 15px; color: #C9CFDC">Publicá un trabajo y los profesionales de tu zona se postulan.</span>
+          </span>
+          <span style="padding: 10px 18px; border-radius: 999px; background: #FFFFFF; color: #232F49; font-size: 15px; font-weight: 700">Publicar un trabajo</span>
+        </a>
+        <p style="margin: 0; font-size: 13px; color: #5E6678">Perfiles de ejemplo para el prototipo.</p>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1150}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { oficio: 'Gas', soloMat: false };
+}
+renderVals() {
+const all = [
+{ ini: 'MG', km: '1,2 km', tape: '36px', name: 'Martín Gómez', oficio: 'Gas', anios: '12', zona: 'La Perla, Centro', rating: '4,9', mat: true },
+{ ini: 'SR', km: '2,8 km', tape: '84px', name: 'Silvia Romero', oficio: 'Gas', anios: '8', zona: 'Chauvín', rating: '4,8', mat: true },
+{ ini: 'JP', km: '3,4 km', tape: '102px', name: 'Jorge Paz', oficio: 'Gas', anios: '20', zona: 'Toda la ciudad', rating: '4,7', mat: true },
+{ ini: 'DL', km: '4,6 km', tape: '138px', name: 'Diego Luna', oficio: 'Plomería', anios: '5', zona: 'Los Troncos', rating: '4,6', mat: false },
+{ ini: 'AR', km: '1,9 km', tape: '57px', name: 'Ana Ríos', oficio: 'Electricidad', anios: '10', zona: 'Centro', rating: '4,9', mat: true },
+{ ini: 'PS', km: '3,0 km', tape: '90px', name: 'Pablo Suárez', oficio: 'Cerrajería', anios: '15', zona: 'Toda la ciudad', rating: '4,8', mat: false },
+{ ini: 'LB', km: '4,8 km', tape: '144px', name: 'Lucía Benítez', oficio: 'Pintura', anios: '7', zona: 'Punta Mogotes', rating: '4,7', mat: false },
+{ ini: 'CI', km: '4,1 km', tape: '123px', name: 'Carlos Ibarra', oficio: 'Carpintería', anios: '18', zona: 'Puerto', rating: '4,9', mat: false },
+{ ini: 'RO', km: '3,6 km', tape: '108px', name: 'Ramiro Ojeda', oficio: 'Mecánica', anios: '9', zona: 'Constitución', rating: '4,6', mat: false }
+];
+const sel = this.state.oficio;
+const pros = all.filter((p) => (sel === 'Todos' || p.oficio === sel) && (!this.state.soloMat || p.mat));
+const labels = ['Todos', 'Gas', 'Electricidad', 'Plomería', 'Cerrajería', 'Carpintería', 'Pintura', 'Mecánica'];
+return {
+oficios: labels.map((label) => ({
+label: label,
+on: sel === label ? 'true' : 'false',
+bg: sel === label ? '#232F49' : '#FFFFFF',
+fg: sel === label ? '#FFFFFF' : '#1B2438',
+pick: () => this.setState({ oficio: label })
+})),
+pros: pros,
+count: String(pros.length),
+empty: pros.length === 0,
+titulo: sel === 'Todos' ? 'Todos los oficios' : sel,
+soloMat: this.state.soloMat,
+toggleMat: () => this.setState({ soloMat: !this.state.soloMat })
+};
+}
+}
+</script>
+</body>
+</html>

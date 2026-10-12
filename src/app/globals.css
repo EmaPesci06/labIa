@@ -1,0 +1,228 @@
+@import "tailwindcss";
+
+/*
+ * Tokens de diseño de LabÍA (Guía para agentes §5).
+ * Este es el ÚNICO archivo donde se escriben colores en hex. El resto del código usa las clases
+ * de Tailwind que salen de acá (bg-azul, text-texto-secundario, border-borde…).
+ *
+ * - Modo claro en :root (y en .claro, para forzarlo en un bloque, por ejemplo en /dev/paleta).
+ * - Modo oscuro en .dark. La clase la pone el script de src/lib/tema.ts antes de pintar.
+ * - "sobre-X" es el color del texto que va encima de X.
+ */
+:root,
+.claro {
+  color-scheme: light;
+
+  --color-azul: #232f49;
+  --color-azul-presionado: #182136;
+  --color-sobre-azul: #ffffff;
+  --color-azul-suave: #e6e9f0;
+  --color-sobre-azul-suave: #232f49;
+
+  --color-naranja-marca: #d45f3a;
+  --color-naranja-accion: #b84a25;
+  --color-sobre-naranja: #ffffff;
+  --color-naranja-suave: #fbe5dc;
+  --color-sobre-naranja-suave: #9a3a17;
+
+  --color-exito: #1d6b45;
+  --color-sobre-exito: #ffffff;
+  --color-exito-suave: #dcefe4;
+  --color-sobre-exito-suave: #14532d;
+
+  --color-acento: #b84a25;
+
+  /* Texto de error (LAB-10): 6,2:1 sobre blanco. La guía no define uno. */
+  --color-error: #b42318;
+
+  --color-fondo: #f1f3f6;
+  --color-superficie: #ffffff;
+  --color-superficie-elevada: #ffffff;
+
+  --color-texto: #1b2438;
+  --color-texto-secundario: #4b5468;
+  --color-texto-terciario: #5e6678;
+
+  --color-borde: #cdd2db;
+  --color-divisor: #dde0e6;
+
+  /* Fijos en los dos temas: foco, cinta métrica y logo. */
+  --color-foco: #d45f3a;
+  --color-cinta: #d45f3a;
+  --color-cinta-marcas: #232f49;
+
+  /* Fondo oscurecido detrás de las hojas y diálogos. */
+  --color-velo: rgb(27 36 56 / 0.55);
+}
+
+.dark {
+  color-scheme: dark;
+
+  --color-azul: #b7c5e8;
+  --color-azul-presionado: #c9d4ee;
+  --color-sobre-azul: #121826;
+  --color-azul-suave: #2a3550;
+  --color-sobre-azul-suave: #c9d4ee;
+
+  --color-naranja-marca: #d45f3a;
+  --color-naranja-accion: #e8714b;
+  --color-sobre-naranja: #121826;
+  --color-naranja-suave: #3a241b;
+  --color-sobre-naranja-suave: #f4b399;
+
+  --color-exito: #4cc38a;
+  --color-sobre-exito: #121826;
+  --color-exito-suave: #16362a;
+  --color-sobre-exito-suave: #6fd3a0;
+
+  --color-acento: #f2a07f;
+
+  --color-error: #ff8f85;
+
+  --color-fondo: #121826;
+  --color-superficie: #1b2335;
+  --color-superficie-elevada: #243049;
+
+  --color-texto: #eef0f5;
+  --color-texto-secundario: #a9b2c6;
+  --color-texto-terciario: #8d97ad;
+
+  --color-borde: #334060;
+  --color-divisor: #334060;
+}
+
+/* `dark:` aplica dentro de .dark, salvo en un bloque forzado a claro con .claro. */
+@custom-variant dark (&:where(.dark, .dark *):where(:not(.claro, .claro *)));
+
+/*
+ * Mapeo de tokens a Tailwind (bg-azul, text-texto…). Se borra la paleta por defecto: solo existen
+ * los colores de la marca. `inline reference`: las clases usan var(--color-x) directo y Tailwind no
+ * vuelve a declarar las variables (ya están arriba).
+ */
+@theme inline reference {
+  --color-*: initial;
+  --color-azul: var(--color-azul);
+  --color-azul-presionado: var(--color-azul-presionado);
+  --color-sobre-azul: var(--color-sobre-azul);
+  --color-azul-suave: var(--color-azul-suave);
+  --color-sobre-azul-suave: var(--color-sobre-azul-suave);
+  --color-naranja-marca: var(--color-naranja-marca);
+  --color-naranja-accion: var(--color-naranja-accion);
+  --color-sobre-naranja: var(--color-sobre-naranja);
+  --color-naranja-suave: var(--color-naranja-suave);
+  --color-sobre-naranja-suave: var(--color-sobre-naranja-suave);
+  --color-exito: var(--color-exito);
+  --color-sobre-exito: var(--color-sobre-exito);
+  --color-exito-suave: var(--color-exito-suave);
+  --color-sobre-exito-suave: var(--color-sobre-exito-suave);
+  --color-acento: var(--color-acento);
+  --color-error: var(--color-error);
+  --color-fondo: var(--color-fondo);
+  --color-superficie: var(--color-superficie);
+  --color-superficie-elevada: var(--color-superficie-elevada);
+  --color-texto: var(--color-texto);
+  --color-texto-secundario: var(--color-texto-secundario);
+  --color-texto-terciario: var(--color-texto-terciario);
+  --color-borde: var(--color-borde);
+  --color-divisor: var(--color-divisor);
+  --color-foco: var(--color-foco);
+  --color-cinta: var(--color-cinta);
+  --color-cinta-marcas: var(--color-cinta-marcas);
+  --color-velo: var(--color-velo);
+
+  /* Las variables --fuente-* las define next/font en src/app/fuentes.ts. */
+  --font-texto: var(--fuente-atkinson), system-ui, sans-serif;
+  --font-sans: var(--fuente-atkinson), system-ui, sans-serif;
+  --font-mono: var(--fuente-plex-mono), ui-monospace, monospace;
+}
+
+@theme {
+  --radius-campo: 12px;
+  --radius-boton: 14px;
+  --radius-tarjeta: 16px;
+  --radius-hoja: 24px;
+
+  --animate-cinta: cinta 900ms ease-out both;
+
+  @keyframes cinta {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+}
+
+:root {
+  --font-titulo: var(--fuente-archivo), system-ui, sans-serif;
+}
+
+/* Títulos: Archivo 800 ensanchada al 118 % y con letter-spacing levemente negativo. */
+@utility font-titulo {
+  font-family: var(--font-titulo);
+  font-weight: 800;
+  font-stretch: 118%;
+  letter-spacing: -0.02em;
+}
+
+/*
+ * Cinta métrica (guía §5): naranja con marcas azul noche, finas cada 8 px (4 px de alto), gruesas
+ * cada 40 px (7 px de alto) y un tope de 3 px a la derecha. Las marcas no cambian con el tema.
+ */
+@utility cinta-regla {
+  height: 12px;
+  border-right: 3px solid var(--color-cinta-marcas);
+  border-radius: 2px;
+  background:
+    repeating-linear-gradient(90deg, var(--color-cinta-marcas) 0 1.5px, transparent 1.5px 40px) 0
+      0 / 100% 7px no-repeat,
+    repeating-linear-gradient(90deg, var(--color-cinta-marcas) 0 1px, transparent 1px 8px) 0 0 /
+      100% 4px no-repeat,
+    var(--color-cinta);
+}
+
+/* Versión grande (bienvenida): 22 px de alto, marcas gruesas de 13 px y finas de 7 px. */
+@utility cinta-regla-grande {
+  height: 22px;
+  border-right: 3px solid var(--color-cinta-marcas);
+  border-radius: 2px;
+  background:
+    repeating-linear-gradient(90deg, var(--color-cinta-marcas) 0 1.5px, transparent 1.5px 40px) 0
+      0 / 100% 13px no-repeat,
+    repeating-linear-gradient(90deg, var(--color-cinta-marcas) 0 1px, transparent 1px 8px) 0 0 /
+      100% 7px no-repeat,
+    var(--color-cinta);
+}
+
+@layer base {
+  body {
+    @apply bg-fondo font-texto text-texto;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-foco);
+    outline-offset: 2px;
+  }
+}
+
+/*
+ * Celular: la barra inferior (64 px + área segura) es fija; el body le deja ese lugar para que no
+ * tape el final de la página ni el pie. Solo hasta `lg` (1024 px), donde la barra no se muestra.
+ */
+@media (max-width: 1023.98px) {
+  body:has([data-barra-inferior]) {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

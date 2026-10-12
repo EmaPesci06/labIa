@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>LabÍA · Trabajos disponibles (escritorio)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,600..900&amp;family=Atkinson+Hyperlegible+Next:wght@400..800&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+:focus-visible{outline:3px solid #D45F3A;outline-offset:2px}
+@keyframes cinta{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+a{color:#232F49}a:hover{color:#182136}
+</style>
+</helmet>
+<div style="min-height: 1150px; background: #F1F3F6; color: #1B2438; font-family: 'Atkinson Hyperlegible Next', sans-serif">
+  <header style="display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; padding: 16px 40px; background: #FFFFFF; border-bottom: 1px solid #DDE0E6">
+    <a href="Desk-Bienvenida.dc.html" aria-label="labia, inicio" style="display: flex"><img src="/_blob/304edbcb89bf94400a05ef24027583ab" alt="labia" style="height: 40px; width: auto"></a>
+    <nav aria-label="Principal" style="display: flex; gap: 28px; flex-wrap: wrap; font-size: 15px; font-weight: 600">
+      <a href="Desk-Trabajos.dc.html" style="color: #B84A25; text-decoration: underline; text-underline-offset: 6px">Trabajos disponibles</a>
+      <a href="Desk-Trabajos.dc.html" style="color: #1B2438; text-decoration: none">Mis postulaciones</a>
+      <a href="Desk-Perfil.dc.html" style="color: #1B2438; text-decoration: none">Mi perfil</a>
+    </nav>
+    <span style="width: 40px; height: 40px; border-radius: 999px; background: #B84A25; color: #FFFFFF; font-weight: 700; display: flex; align-items: center; justify-content: center">MG</span>
+  </header>
+
+  <main style="max-width: 1240px; margin: 0 auto; padding: 32px 40px 56px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px">
+    <div style="display: flex; gap: 10px; align-items: center; padding: 14px 18px; border-radius: 14px; background: #FBE5DC; font-size: 15px; line-height: 1.4">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9A3A17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+      Estamos revisando tu DNI y tus antecedentes. Mientras tanto ya podés ver trabajos y postularte.
+    </div>
+
+    <div style="display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 12px">
+      <h1 style="margin: 0; font-family: Archivo, sans-serif; font-stretch: 118%; font-weight: 800; font-size: 34px; letter-spacing: -0.5px">Trabajos para vos</h1>
+      <span style="font-size: 15px; color: #4B5468">Gas, Plomería · La Perla, Centro</span>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start">
+      <section aria-label="Lista de trabajos" style="flex: 1 1 320px; max-width: 420px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+        <sc-for list="{{jobs}}" as="j" hint-placeholder-count="3">
+          <button type="button" onClick="{{j.pick}}" aria-pressed="{{j.on}}" style="text-align: left; display: flex; flex-direction: column; gap: 6px; padding: 18px; border-radius: 18px; background: #FFFFFF; font: inherit; color: #1B2438; cursor: pointer; border: {{j.border}}">
+            <span style="display: flex; justify-content: space-between; gap: 8px; width: 100%">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; letter-spacing: 0.4px; color: #232F49">{{j.tag}}</span>
+              <span style="font-size: 13px; color: #565F72">{{j.when}}</span>
+            </span>
+            <span style="font-size: 17px; font-weight: 700">{{j.title}}</span>
+            <span style="display: flex; align-items: center; gap: 10px"><span aria-hidden="true" style="display: block; flex: none; height: 12px; width: {{j.tape}}; border-radius: 2px; border-right: 3px solid #232F49; box-sizing: border-box; background: repeating-linear-gradient(90deg, #232F49 0 1.5px, transparent 1.5px 40px) 0 0 / 100% 7px no-repeat, repeating-linear-gradient(90deg, #232F49 0 1px, transparent 1px 8px) 0 0 / 100% 4px no-repeat, #D45F3A"></span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #1B2438">a {{j.km}}</span></span><span style="display: flex; gap: 6px; flex-wrap: wrap">
+              <span style="padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; background: {{j.urgBg}}; color: {{j.urgFg}}">{{j.urg}}</span>
+              <span style="padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; background: #EEF0F3; color: #4B5468">{{j.count}}</span>
+            </span>
+          </button>
+        </sc-for>
+      </section>
+
+      <section style="flex: 999 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 18px; padding: 28px; border-radius: 22px; background: #FFFFFF">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; letter-spacing: 0.4px; color: #232F49">{{cur.tag}} · {{cur.when}} · a {{cur.km}}</span>
+        <h2 style="margin: 0; font-family: Archivo, sans-serif; font-stretch: 118%; font-weight: 800; font-size: 30px; letter-spacing: -0.5px">{{cur.title}}</h2>
+        <p style="margin: 0; font-size: 17px; line-height: 1.55">{{cur.desc}}</p>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+          <div style="aspect-ratio: 4 / 3; border-radius: 12px; background: #E1E4EA; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #565F72">Foto del cliente</div>
+          <div style="aspect-ratio: 4 / 3; border-radius: 12px; background: #E1E4EA; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #565F72">Foto del cliente</div>
+        </div>
+        <div style="font-size: 14px; color: #4B5468">Cliente: {{cur.client}} · La dirección se comparte al acordar</div>
+
+        <sc-if value="{{notSent}}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; flex-direction: column; gap: 12px; padding-top: 18px; border-top: 1px solid #DDE0E6">
+            <h3 style="margin: 0; font-size: 18px; font-weight: 700">Postularme</h3>
+            <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Mensaje
+              <textarea rows="3" placeholder="Puedo ir hoy a las 17 h. Reviso y te paso presupuesto." style="padding: 12px 14px; border-radius: 12px; border: 1px solid #CDD2DB; background: #FAFAF8; font: inherit; font-weight: 400; font-size: 16px; color: #1B2438; resize: none"></textarea>
+            </label>
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+              <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Precio estimado
+                <input type="text" placeholder="$" style="min-height: 46px; padding: 0 14px; border-radius: 12px; border: 1px solid #CDD2DB; background: #FAFAF8; font: inherit; font-weight: 400; font-size: 16px; color: #1B2438; min-width: 0">
+              </label>
+              <label style="display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600">Seña que proponés
+                <input type="text" placeholder="$" style="min-height: 46px; padding: 0 14px; border-radius: 12px; border: 1px solid #CDD2DB; background: #FAFAF8; font: inherit; font-weight: 400; font-size: 16px; color: #1B2438; min-width: 0">
+              </label>
+            </div>
+            <button type="button" onClick="{{send}}" style="align-self: flex-start; min-height: 52px; padding: 0 28px; border-radius: 14px; border: none; background: #B84A25; color: #FFFFFF; font: inherit; font-weight: 700; font-size: 16px; cursor: pointer">Enviar postulación</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{sent}}" hint-placeholder-val="{{ false }}">
+          <div style="display: flex; align-items: center; gap: 10px; padding: 16px 18px; border-radius: 14px; background: #DCEFE4; color: #14532D; font-size: 16px; font-weight: 600">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L19 7"></path></svg>
+            Postulación enviada. Si te elige, el cliente te escribe por WhatsApp.
+          </div>
+        </sc-if>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1150}}'>
+class Component extends DCLogic {
+constructor(props) {
+super(props);
+this.state = { sel: 0, sent: {} };
+}
+renderVals() {
+const raw = [
+{ tag: 'GAS · LA PERLA', when: 'Hace 20 min', km: '0,8 km', tape: '24px', title: 'Olor a gas en la cocina', desc: 'Desde ayer hay olor a gas cerca del horno. Ya cerré la llave de paso. Es un departamento en planta baja.', urgent: true, urg: 'Lo antes posible', count: '2 postulantes', client: 'Laura F.' },
+{ tag: 'PLOMERÍA · CENTRO', when: 'Hace 2 h', km: '2,1 km', tape: '63px', title: 'Cambiar canilla del baño', desc: 'Gotea aunque esté cerrada. Ya compré la canilla nueva.', urgent: false, urg: 'Esta semana', count: 'Sin postulantes', client: 'Hernán T.' },
+{ tag: 'GAS · LA PERLA', when: 'Ayer', km: '1,5 km', tape: '45px', title: 'Instalar calefactor tiro balanceado', desc: 'Calefactor nuevo de 5000 kcal para el living. La pared da a la calle.', urgent: false, urg: 'Sin apuro', count: '1 postulante', client: 'Marta G.' }
+];
+const sel = this.state.sel;
+const sent = !!this.state.sent[sel];
+return {
+jobs: raw.map((j, i) => ({
+...j,
+on: i === sel ? 'true' : 'false',
+border: i === sel ? '2px solid #B84A25' : '1px solid #DDE0E6',
+urgBg: j.urgent ? '#FBE5DC' : '#E6E9F0',
+urgFg: j.urgent ? '#9A3A17' : '#232F49',
+pick: () => this.setState({ sel: i })
+})),
+cur: raw[sel],
+sent: sent,
+notSent: !sent,
+send: () => this.setState({ sent: Object.assign({}, this.state.sent, { [sel]: true }) })
+};
+}
+}
+</script>
+</body>
+</html>
