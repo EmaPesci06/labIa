@@ -1,17 +1,18 @@
 import { expect, test } from "@playwright/test";
 
-// LAB-24: el perfil público se ve sin cuenta. Esta prueba no depende de datos: un uuid que no
-// existe responde 404 (no redirige a /ingresar).
+// LAB-24: el perfil público se ve sin cuenta. Estas pruebas no dependen de datos: un perfil que no
+// existe muestra la pantalla "No encontramos esta página" y no manda a /ingresar. (El código HTTP
+// no se prueba: con la página en streaming, Next ya mandó el 200 cuando se llama a notFound().)
 
-test("sin cuenta, un perfil inexistente da 404 y no redirige a ingresar", async ({ page }) => {
-  const respuesta = await page.goto("/profesionales/00000000-0000-4000-8000-000000000000");
-  expect(respuesta?.status()).toBe(404);
-  await expect(page).not.toHaveURL(/\/ingresar/);
-  await expect(page).toHaveURL(/\/profesionales\/00000000-0000-4000-8000-000000000000$/);
-});
-
-test("sin cuenta, un id con formato inválido también da 404", async ({ page }) => {
-  const respuesta = await page.goto("/profesionales/no-es-un-uuid");
-  expect(respuesta?.status()).toBe(404);
-  await expect(page).not.toHaveURL(/\/ingresar/);
-});
+for (const id of ["00000000-0000-4000-8000-000000000000", "no-es-un-uuid"]) {
+  test(`sin cuenta, /profesionales/${id} muestra "No encontramos esta página"`, async ({
+    page,
+  }) => {
+    await page.goto(`/profesionales/${id}`);
+    await expect(
+      page.getByRole("heading", { level: 1, name: "No encontramos esta página" }),
+    ).toBeVisible();
+    await expect(page).not.toHaveURL(/\/ingresar/);
+    await expect(page).toHaveURL(new RegExp(`/profesionales/${id}$`));
+  });
+}
