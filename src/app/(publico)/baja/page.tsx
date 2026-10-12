@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
+import { BotonConfirmarBaja } from "@/components/emails/BotonConfirmarBaja";
 import { Boton } from "@/components/ui/Boton";
 import { confirmarBaja } from "@/lib/emails/acciones";
 import { secretoValido, verificarTokenBaja } from "@/lib/emails/token";
@@ -52,9 +53,7 @@ async function Contenido({ searchParams }: { searchParams: Promise<Params> }) {
               No pudimos darte de baja. Probá de nuevo en unos minutos.
             </p>
           ) : null}
-          <Boton type="submit" variante="cliente" tamano="grande" bloque>
-            Confirmar la baja
-          </Boton>
+          <BotonConfirmarBaja />
         </form>
       ) : (
         <>

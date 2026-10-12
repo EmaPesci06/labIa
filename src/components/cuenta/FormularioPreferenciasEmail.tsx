@@ -43,7 +43,7 @@ function Interruptor({
         role="switch"
         defaultChecked={marcado}
         aria-describedby={`${id}-d`}
-        className="after:bg-white relative mt-0.5 h-7 w-12 shrink-0 cursor-pointer appearance-none rounded-full bg-borde transition-colors after:absolute after:top-0.5 after:left-0.5 after:size-6 after:rounded-full after:transition-transform checked:bg-azul checked:after:translate-x-5 motion-reduce:transition-none motion-reduce:after:transition-none"
+        className="relative mt-0.5 h-7 w-12 shrink-0 cursor-pointer appearance-none rounded-full bg-borde transition-colors after:absolute after:top-0.5 after:left-0.5 after:size-6 after:rounded-full after:bg-superficie after:shadow-sm after:transition-transform checked:bg-azul checked:after:translate-x-5 motion-reduce:transition-none motion-reduce:after:transition-none"
       />
     </label>
   );
