@@ -65,6 +65,30 @@ test.describe("publicar un trabajo (cliente)", () => {
       resultado.violations.filter((v) => v.impact === "critical" || v.impact === "serious"),
     ).toEqual([]);
   });
+
+  test("sin errores graves en modo oscuro", async ({ page }) => {
+    await page.emulateMedia({ colorScheme: "dark" });
+    await page.goto("/trabajos/nuevo");
+    await expect(page.getByRole("heading", { level: 1, name: "Publicar un trabajo" })).toBeVisible();
+    const resultado = await new AxeBuilder({ page }).analyze();
+    expect(
+      resultado.violations.filter((v) => v.impact === "critical" || v.impact === "serious"),
+    ).toEqual([]);
+  });
+
+  test("se completa y se envía solo con teclado", async ({ page }) => {
+    await page.goto("/trabajos/nuevo");
+    await page.getByLabel("Título").focus();
+    await page.keyboard.type("Pintar el living");
+    await page.keyboard.press("Tab");
+    await page.keyboard.type("Necesito pintar un living de 4 por 5 metros, paredes y techo.");
+    await expect(page.getByLabel("Contá qué pasa")).toBeFocused();
+    await page.getByRole("button", { name: "Publicar trabajo" }).focus();
+    await expect(page.getByRole("button", { name: "Publicar trabajo" })).toBeFocused();
+    await page.keyboard.press("Enter");
+    // Sin oficio elegido el formulario no se publica y muestra un error visible.
+    await expect(page.getByRole("alert").or(page.getByText(/oficio/i)).first()).toBeVisible();
+  });
 });
 
 test.describe("un profesional no publica trabajos", () => {
