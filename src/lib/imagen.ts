@@ -18,7 +18,10 @@ export function tamanoAjustado(
   const mayor = Math.max(ancho, alto);
   if (mayor <= maximo) return { ancho, alto };
   const factor = maximo / mayor;
-  return { ancho: Math.max(1, Math.round(ancho * factor)), alto: Math.max(1, Math.round(alto * factor)) };
+  return {
+    ancho: Math.max(1, Math.round(ancho * factor)),
+    alto: Math.max(1, Math.round(alto * factor)),
+  };
 }
 
 /** Cuadrado centrado dentro de `ancho` × `alto`: origen y lado del recorte. */

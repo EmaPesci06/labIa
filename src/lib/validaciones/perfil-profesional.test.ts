@@ -139,9 +139,9 @@ describe("leerPerfilProfesional", () => {
 
 describe("esquemaCuentaNueva", () => {
   it("pide email válido y contraseña de 8 o más caracteres", () => {
-    expect(
-      esquemaCuentaNueva.safeParse({ email: "a@b.com", contrasena: "12345678" }).success,
-    ).toBe(true);
+    expect(esquemaCuentaNueva.safeParse({ email: "a@b.com", contrasena: "12345678" }).success).toBe(
+      true,
+    );
     expect(esquemaCuentaNueva.safeParse({ email: "a@b.com", contrasena: "123" }).success).toBe(
       false,
     );

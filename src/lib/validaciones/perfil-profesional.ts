@@ -182,13 +182,15 @@ function rutaPropia(ruta: string, carpeta: string, uid: string): boolean {
   if (!UUID.test(uid)) return false;
   const partes = ruta.split("/");
   return (
-    partes.length === 3 && partes[0] === carpeta && partes[1] === uid && ARCHIVO.test(partes[2] ?? "")
+    partes.length === 3 &&
+    partes[0] === carpeta &&
+    partes[1] === uid &&
+    ARCHIVO.test(partes[2] ?? "")
   );
 }
 
 /** ¿La ruta es una foto de perfil de esta persona? (`perfiles/<uid>/<archivo>`) */
-export const esRutaFotoPerfil = (ruta: string, uid: string) =>
-  rutaPropia(ruta, "perfiles", uid);
+export const esRutaFotoPerfil = (ruta: string, uid: string) => rutaPropia(ruta, "perfiles", uid);
 
 /** ¿La ruta es una foto de trabajo de esta persona? (`trabajos-hechos/<uid>/<archivo>`) */
 export const esRutaFotoTrabajo = (ruta: string, uid: string) =>
