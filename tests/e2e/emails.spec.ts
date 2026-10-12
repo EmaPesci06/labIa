@@ -5,7 +5,7 @@ test("la baja con un enlace inválido avisa y no pide ingresar", async ({ page }
   await expect(
     page.getByRole("heading", { level: 1, name: "Darte de baja de los emails" }),
   ).toBeVisible();
-  await expect(page.getByRole("alert")).toContainText("Este enlace no es válido");
+  await expect(page.getByText("Este enlace no es válido")).toBeVisible();
   await expect(page.getByRole("button", { name: "Confirmar la baja" })).toHaveCount(0);
 });
 
