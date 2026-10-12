@@ -20,6 +20,7 @@ const nextConfig: NextConfig = {
             protocol: "https",
             hostname: hostSupabase,
             pathname: "/storage/v1/object/public/fotos/**",
+            search: "",
           },
         ]
       : [],

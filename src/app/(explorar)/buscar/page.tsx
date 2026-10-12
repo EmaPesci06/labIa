@@ -60,17 +60,24 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 }
 
 /** Páginas 1..N juntas: "Ver más" agrega 20 sin perder lo que ya se veía. */
+const MAX_PAGINAS_ACUMULADAS = 5;
+
 async function cargarResultados(
   crudo: ParametrosUrl,
   slug: string,
   hasta: number,
+  barrioId: number | undefined,
 ): Promise<PaginaResultados> {
   const supabase = await crearClienteServidor();
-  const primera = await buscarProfesionales(supabase, { ...crudo, barrio: slug, pagina: "1" });
-  const ultima = Math.min(hasta, primera.paginas);
+  const primera = await buscarProfesionales(
+    supabase,
+    { ...crudo, barrio: slug, pagina: "1" },
+    barrioId,
+  );
+  const ultima = Math.min(hasta, primera.paginas, MAX_PAGINAS_ACUMULADAS);
   const siguientes = await Promise.all(
     Array.from({ length: Math.max(0, ultima - 1) }, (_, i) =>
-      buscarProfesionales(supabase, { ...crudo, barrio: slug, pagina: String(i + 2) }),
+      buscarProfesionales(supabase, { ...crudo, barrio: slug, pagina: String(i + 2) }, barrioId),
     ),
   );
   const profesionales: ResultadoProfesional[] = [
@@ -114,6 +121,9 @@ export default async function Buscar({ searchParams }: Props) {
   if (validos instanceof ErrorBusqueda) throw validos;
   const nombreBarrio = nombreDeBarrio(barrios, slug);
 
+  // El id del barrio se resuelve una sola vez por pedido (la lista ya está en memoria).
+  const barrioId = barrios.find((b) => b.slug === slug)?.id;
+
   let pagina: PaginaResultados | null = null;
   let mensajeError: string | null = params instanceof ErrorBusqueda ? params.message : null;
   if (!mensajeError) {
@@ -121,7 +131,7 @@ export default async function Buscar({ searchParams }: Props) {
       mensajeError = MENSAJE_FALLA;
     } else {
       try {
-        pagina = await cargarResultados(crudo, slug, validos.pagina);
+        pagina = await cargarResultados(crudo, slug, validos.pagina, barrioId);
       } catch (error) {
         if (!(error instanceof ErrorBusqueda)) throw error;
         mensajeError = error.message;
@@ -155,8 +165,6 @@ export default async function Buscar({ searchParams }: Props) {
     </div>
   );
 
-  const barrioId = barrios.find((b) => b.slug === slug)?.id;
-
   return (
     <PanelBusqueda
       oficio={validos.oficio}
@@ -184,7 +192,11 @@ export default async function Buscar({ searchParams }: Props) {
               ))}
             </ul>
           )}
-          {hayMas ? (
+          {hayMas && pagina.pagina >= MAX_PAGINAS_ACUMULADAS ? (
+            <p className="text-center text-[15px] text-texto-secundario">
+              Refiná la búsqueda con los filtros para ver menos resultados.
+            </p>
+          ) : hayMas ? (
             <Boton
               href={urlBusqueda({
                 oficio: validos.oficio,

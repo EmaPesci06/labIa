@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { decidirAcceso, inicioDelRol, necesitaSesion, rolExigido, volverSeguro } from "./rutas";
+import {
+  decidirAcceso,
+  esRutaPublicaDeApp,
+  inicioDelRol,
+  necesitaSesion,
+  rolExigido,
+  volverSeguro,
+} from "./rutas";
 
 describe("inicioDelRol", () => {
   it("manda a cada rol a su pantalla", () => {
@@ -15,6 +22,19 @@ describe("decidirAcceso", () => {
     expect(decidirAcceso("/mis-trabajos", "?x=1", null)).toEqual({
       tipo: "redirigir",
       destino: "/ingresar?volver=%2Fmis-trabajos%3Fx%3D1",
+    });
+  });
+
+  it("rutas con nombre parecido a las públicas no son públicas", () => {
+    for (const ruta of ["/buscarX", "/profesionalesX", "/inicio-viejo"]) {
+      expect(esRutaPublicaDeApp(ruta)).toBe(false);
+    }
+  });
+
+  it("/cuenta sin sesión redirige a ingresar", () => {
+    expect(decidirAcceso("/cuenta", "", null)).toEqual({
+      tipo: "redirigir",
+      destino: "/ingresar?volver=%2Fcuenta",
     });
   });
 
