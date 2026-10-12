@@ -36,12 +36,28 @@ export default defineConfig({
       },
     },
   ],
-  webServer: {
-    command: `pnpm build && pnpm start -p ${PUERTO}`,
-    url: URL_BASE,
-    reuseExistingServer: !enCI,
-    timeout: 300_000,
-    // Habilita /dev/ui en el build de producción para correr axe contra la biblioteca de componentes.
-    env: { MOSTRAR_DEV_UI: "1" },
-  },
+  webServer: [
+    {
+      command: `pnpm build && pnpm start -p ${PUERTO}`,
+      url: URL_BASE,
+      reuseExistingServer: !enCI,
+      timeout: 300_000,
+      // Habilita /dev/ui en el build de producción para correr axe contra la biblioteca de componentes.
+      env: { MOSTRAR_DEV_UI: "1" },
+    },
+    {
+      // Mismo build, otro puerto y la sesión falsa (LAB-13) con rol profesional: se lee en cada
+      // pedido, así que no hace falta volver a construir. Arranca después del primero.
+      command: `pnpm start -p ${PUERTO + 100}`,
+      url: `http://localhost:${PUERTO + 100}`,
+      reuseExistingServer: !enCI,
+      timeout: 120_000,
+      env: {
+        LABIA_ROL_DEV: "profesional",
+        LABIA_ID_DEV: "demo",
+        // En producción la sesión falsa ignora el rol de desarrollo salvo con esta bandera.
+        LABIA_PERMITIR_ROL_DEV: "1",
+      },
+    },
+  ],
 });

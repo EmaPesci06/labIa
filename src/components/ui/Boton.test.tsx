@@ -60,4 +60,16 @@ describe("Boton", () => {
     expect(enlace).toHaveAttribute("href", "/registro");
     expect(enlace).toHaveClass("border-borde");
   });
+
+  it("como enlace cargando no recibe clics ni foco", () => {
+    render(
+      <Boton href="/registro" cargando>
+        Crear cuenta
+      </Boton>,
+    );
+    const enlace = screen.getByRole("link", { name: "Crear cuenta" });
+    expect(enlace).toHaveAttribute("aria-disabled", "true");
+    expect(enlace).toHaveAttribute("tabindex", "-1");
+    expect(enlace).toHaveClass("pointer-events-none");
+  });
 });
