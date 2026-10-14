@@ -12,6 +12,7 @@ export const metadata: Metadata = { title: "Ingresar · LabÍA" };
 const ERRORES: Record<string, string> = {
   enlace: "El enlace venció o ya se usó. Pedí uno nuevo o ingresá con tu contraseña.",
   cancelado: "No se completó el ingreso con Google. Probá de nuevo.",
+  rol: "No pudimos guardar tu tipo de cuenta. Probá de nuevo.",
   config: "El ingreso todavía no está disponible. Probá de nuevo más tarde.",
 };
 
