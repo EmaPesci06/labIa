@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { inicioDelRol } from "@/lib/auth/rutas";
+import { destinoParaAceptarNormas } from "@/lib/normas";
 import { navegacionPara } from "@/lib/navegacion";
 import { obtenerSesion } from "@/lib/sesion";
 
@@ -17,6 +18,10 @@ export async function ShellApp({ children }: { children: ReactNode }) {
   const sesion = await obtenerSesion();
   if (!sesion) redirect("/ingresar");
   if (sesion.rol === "admin") redirect(inicioDelRol("admin"));
+
+  // LAB-20: un profesional sin las normas vigentes las acepta antes de seguir.
+  const aceptarNormas = destinoParaAceptarNormas(sesion.rol, sesion.normasVersion);
+  if (aceptarNormas) redirect(aceptarNormas);
 
   const navegacion = navegacionPara(sesion.rol, sesion.usuario.id);
 

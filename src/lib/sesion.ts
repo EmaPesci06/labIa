@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { connection } from "next/server";
 
+import { VERSION_NORMAS } from "@/lib/normas";
 import { rolFalso } from "@/lib/auth/sesion-falsa";
 import type { RolUsuario } from "@/lib/auth/rutas";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
@@ -11,6 +12,8 @@ export type RolApp = "cliente" | "profesional";
 export type SesionActual = {
   usuario: { id: string; email: string | null };
   rol: RolUsuario;
+  /** Versión de las normas que aceptó (LAB-20), o `null` si todavía no aceptó. */
+  normasVersion: string | null;
   perfil: {
     nombre: string | null;
     apellido: string | null;
@@ -50,6 +53,7 @@ export const obtenerSesion = cache(async (): Promise<SesionActual | null> => {
         email: null,
       },
       rol: falso,
+      normasVersion: VERSION_NORMAS,
       perfil: {
         nombre: falso === "profesional" ? "Martín" : "Laura",
         apellido: falso === "profesional" ? "Gómez" : "Fernández",
@@ -67,7 +71,7 @@ export const obtenerSesion = cache(async (): Promise<SesionActual | null> => {
 
   const { data: fila } = await supabase
     .from("usuarios")
-    .select("rol, estado, nombre, apellido")
+    .select("rol, estado, nombre, apellido, normas_version")
     .eq("id", data.user.id)
     .maybeSingle();
   // Sin fila o con la cuenta suspendida/baja: se trata como sin sesión.
@@ -77,6 +81,7 @@ export const obtenerSesion = cache(async (): Promise<SesionActual | null> => {
   return {
     usuario: { id: data.user.id, email },
     rol: fila.rol,
+    normasVersion: fila.normas_version,
     perfil: {
       nombre: fila.nombre,
       apellido: fila.apellido,
