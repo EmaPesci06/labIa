@@ -5,7 +5,7 @@ export type Database = {
   
   "public": {
           Tables: {
-"accesos_documentos": {
+            "accesos_documentos": {
                   Row: {
                     "admin_id": string | null,"created_at": string,"id": string,"storage_path": string
                   }
@@ -31,8 +31,7 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
-                },
-            "acciones_moderacion": {
+                },"acciones_moderacion": {
                   Row: {
                     "accion": string,"admin_id": string | null,"created_at": string,"id": string,"motivo": string | null,"objetivo_id": string | null
                   }
