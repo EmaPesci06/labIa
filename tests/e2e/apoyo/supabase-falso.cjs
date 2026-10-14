@@ -11,6 +11,10 @@ const PUERTO = Number(process.env.LABIA_SUPABASE_FALSO_PUERTO ?? 54399);
 const ID_PUBLICADO = "11111111-1111-4111-8111-111111111111";
 const ID_EN_REVISION = "22222222-2222-4222-8222-222222222222";
 const ID_CLIENTE = "33333333-3333-4333-8333-333333333333";
+// Clientes para los errores de contacto (LAB-25). Cada token tiene su propio usuario: así las pruebas
+// no comparten estado (el límite diario se simula por token, no con un contador global).
+const ID_CLIENTE_LIMITE = "44444444-4444-4444-8444-444444444444";
+const ID_CLIENTE_DESPUBLICADO = "55555555-5555-4555-8555-555555555555";
 
 // token -> usuario
 const USUARIOS = {
@@ -19,6 +23,20 @@ const USUARIOS = {
     rol: "cliente",
     nombre: "Laura",
     apellido: "Fernández",
+    barrio_id: 1,
+  },
+  "tok-cliente-limite": {
+    id: ID_CLIENTE_LIMITE,
+    rol: "cliente",
+    nombre: "Ana",
+    apellido: "Pérez",
+    barrio_id: 1,
+  },
+  "tok-cliente-despublicado": {
+    id: ID_CLIENTE_DESPUBLICADO,
+    rol: "cliente",
+    nombre: "Bruno",
+    apellido: "Dávila",
     barrio_id: 1,
   },
   "tok-dueno": {
@@ -135,6 +153,20 @@ const server = http.createServer((req, res) => {
         return responder(res, 403, {
           code: "42501",
           message: "Necesitás una cuenta de cliente activa para contactar",
+        });
+      }
+      // Límite diario simulado para este cliente: la función real devuelve 53400.
+      if (yo.id === ID_CLIENTE_LIMITE) {
+        return responder(res, 400, {
+          code: "53400",
+          message: "Llegaste al máximo de contactos por hoy. Probá mañana.",
+        });
+      }
+      // Profesional que dejó de estar disponible entre que se abrió la hoja y se confirmó.
+      if (yo.id === ID_CLIENTE_DESPUBLICADO) {
+        return responder(res, 404, {
+          code: "P0002",
+          message: "Ese profesional no está disponible",
         });
       }
       if (id !== ID_PUBLICADO) {
