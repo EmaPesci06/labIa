@@ -5,7 +5,33 @@ export type Database = {
   
   "public": {
           Tables: {
-            "barrios": {
+            "acciones_moderacion": {
+                  Row: {
+                    "accion": string,"admin_id": string | null,"created_at": string,"id": string,"motivo": string | null,"objetivo_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "accion": string,"admin_id"?: string | null,"created_at"?: string,"id"?: string,"motivo"?: string | null,"objetivo_id"?: string | null
+                  }
+                  Update: {
+                    "accion"?: string,"admin_id"?: string | null,"created_at"?: string,"id"?: string,"motivo"?: string | null,"objetivo_id"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "acciones_moderacion_admin_id_fkey"
+      columns: ["admin_id"]
+isOneToOne: false
+      referencedRelation: "usuarios"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "acciones_moderacion_admin_id_fkey"
+      columns: ["admin_id"]
+isOneToOne: false
+      referencedRelation: "usuarios_publicos"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"barrios": {
                   Row: {
                     "centro": unknown,"id": number,"nombre": string,"slug": string
                   }
@@ -227,14 +253,14 @@ isOneToOne: false
                   ]
                 },"resenas": {
                   Row: {
-                    "autor_id": string,"created_at": string,"id": string,"profesional_id": string,"puntaje": number,"texto": string | null,"trabajo_id": string | null
+                    "autor_id": string | null,"created_at": string,"id": string,"profesional_id": string,"puntaje": number,"texto": string | null,"trabajo_id": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "autor_id": string,"created_at"?: string,"id"?: string,"profesional_id": string,"puntaje": number,"texto"?: string | null,"trabajo_id"?: string | null
+                    "autor_id"?: string | null,"created_at"?: string,"id"?: string,"profesional_id": string,"puntaje": number,"texto"?: string | null,"trabajo_id"?: string | null
                   }
                   Update: {
-                    "autor_id"?: string,"created_at"?: string,"id"?: string,"profesional_id"?: string,"puntaje"?: number,"texto"?: string | null,"trabajo_id"?: string | null
+                    "autor_id"?: string | null,"created_at"?: string,"id"?: string,"profesional_id"?: string,"puntaje"?: number,"texto"?: string | null,"trabajo_id"?: string | null
                   }
                   Relationships: [
                     {
