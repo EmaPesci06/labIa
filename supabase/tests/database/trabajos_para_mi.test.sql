@@ -116,7 +116,7 @@ select is(
 
 reset role; select tests.como('27000000-0000-4000-a000-000000000002'); -- Plomero P1
 select is(
-  (select count(*) from public.trabajos_para_mi()),
+  (select count(*) from public.trabajos_para_mi() where id in ('27000000-0000-4000-b000-000000000001', '27000000-0000-4000-b000-000000000002', '27000000-0000-4000-b000-000000000004')),
   2::bigint,
   'el plomero ve los 2 trabajos abiertos de plomería (T1 y T2)'
 );

@@ -105,6 +105,7 @@ from (
               t.estado = 'abierto'
               and privado.rol_actual() = 'profesional'
               and privado.cuenta_activa()
+              and privado.perfil_publicado((select auth.uid()))
             )
             or t.profesional_elegido_id = (select auth.uid())
           )
