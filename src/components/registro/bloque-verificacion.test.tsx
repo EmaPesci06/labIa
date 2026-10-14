@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
@@ -35,23 +35,23 @@ describe("BloqueVerificacion", () => {
     const onElegir = vi.fn();
     render(<BloqueVerificacion onElegirDocumento={onElegir} />);
 
-    const entrada = document.getElementById("doc-antecedentes") as HTMLInputElement;
+    const entrada = screen.getByLabelText(/Certificado de antecedentes/) as HTMLInputElement;
     expect(entrada).toBeInTheDocument();
 
-    const archivo = new File(["dummy pdf content"], "antecedentes.pdf", {
+    const archivo = new File(["%PDF-1.4 contenido"], "antecedentes.pdf", {
       type: "application/pdf",
     });
 
     fireEvent.change(entrada, { target: { files: [archivo] } });
 
-    expect(onElegir).toHaveBeenCalledWith("antecedentes", archivo);
+    await waitFor(() => expect(onElegir).toHaveBeenCalledWith("antecedentes", archivo));
   });
 
   it("muestra error si el archivo supera los 8 MB", async () => {
     const onElegir = vi.fn();
     render(<BloqueVerificacion onElegirDocumento={onElegir} />);
 
-    const entrada = document.getElementById("doc-antecedentes") as HTMLInputElement;
+    const entrada = screen.getByLabelText(/Certificado de antecedentes/) as HTMLInputElement;
     const archivoGrande = new File([new Uint8Array(9 * 1024 * 1024)], "pesado.pdf", {
       type: "application/pdf",
     });
@@ -77,6 +77,6 @@ describe("BloqueVerificacion", () => {
       />,
     );
 
-    expect(screen.getByText("Verificado")).toBeInTheDocument();
+    expect(screen.getByText("Aprobado")).toBeInTheDocument();
   });
 });

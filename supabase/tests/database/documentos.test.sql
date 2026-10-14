@@ -23,7 +23,11 @@ insert into auth.users (instance_id, id, aud, role, email, raw_user_meta_data)
 values
   ('00000000-0000-0000-0000-000000000000', 'cccccccc-1900-4000-a000-000000000001', 'authenticated', 'authenticated', 'doc-p@labia.test', '{"rol": "profesional", "nombre": "Pablo", "apellido": "Doc"}'),
   ('00000000-0000-0000-0000-000000000000', 'cccccccc-1900-4000-a000-000000000002', 'authenticated', 'authenticated', 'doc-c@labia.test', '{"nombre": "Carla", "apellido": "Doc"}'),
-  ('00000000-0000-0000-0000-000000000000', 'cccccccc-1900-4000-a000-000000000003', 'authenticated', 'authenticated', 'doc-p2@labia.test', '{"rol": "profesional", "nombre": "Paula", "apellido": "Doc"}');
+  ('00000000-0000-0000-0000-000000000000', 'cccccccc-1900-4000-a000-000000000003', 'authenticated', 'authenticated', 'doc-p2@labia.test', '{"rol": "profesional", "nombre": "Paula", "apellido": "Doc"}'),
+  ('00000000-0000-0000-0000-000000000000', 'cccccccc-1900-4000-a000-000000000004', 'authenticated', 'authenticated', 'doc-p3@labia.test', '{"rol": "profesional", "nombre": "Sofia", "apellido": "Doc"}');
+
+-- El cuarto profesional (…0004) está suspendido.
+update public.usuarios set estado = 'suspendida' where id = 'cccccccc-1900-4000-a000-000000000004';
 
 -- Archivos ya subidos al bucket (como lo hace la URL firmada de subida).
 insert into storage.objects (bucket_id, name)
@@ -31,7 +35,8 @@ values
   ('documentos', 'cccccccc-1900-4000-a000-000000000001/dni_frente-1791734400001.jpg'),
   ('documentos', 'cccccccc-1900-4000-a000-000000000001/dni_frente-1791734400002.jpg'),
   ('documentos', 'cccccccc-1900-4000-a000-000000000001/antecedentes-1791734400003.pdf'),
-  ('documentos', 'cccccccc-1900-4000-a000-000000000003/dni_dorso-1791734400004.png');
+  ('documentos', 'cccccccc-1900-4000-a000-000000000003/dni_dorso-1791734400004.png'),
+  ('documentos', 'cccccccc-1900-4000-a000-000000000004/dni_frente-1791734400005.jpg');
 
 select tests.como('cccccccc-1900-4000-a000-000000000001');
 
@@ -83,6 +88,15 @@ select throws_ok(
   $$select public.registrar_documento('dni_frente', 'cccccccc-1900-4000-a000-000000000001/dni_frente-1791734400001.gif')$$,
   '23514', null, 'registrar_documento: rechaza extensiones no permitidas'
 );
+select lives_ok(
+  $$select public.registrar_documento('antecedentes', 'cccccccc-1900-4000-a000-000000000001/antecedentes-1791734400003.pdf')$$,
+  'registrar_documento: registrar dos veces la misma ruta no falla'
+);
+select is(
+  (select count(*) from public.mis_verificaciones where tipo = 'antecedentes' and estado = 'pendiente'),
+  1::bigint,
+  'registrar_documento: la misma ruta repetida deja un solo pendiente'
+);
 select is_empty(
   $$select storage_path from public.verificaciones$$,
   'registrar_documento: el dueño sigue sin poder leer la tabla ni el path'
@@ -92,6 +106,12 @@ reset role; select tests.como('cccccccc-1900-4000-a000-000000000002');
 select throws_ok(
   $$select public.registrar_documento('dni_frente', 'cccccccc-1900-4000-a000-000000000002/dni_frente-1791734400001.jpg')$$,
   '42501', null, 'registrar_documento: un cliente no registra documentos'
+);
+
+reset role; select tests.como('cccccccc-1900-4000-a000-000000000004');
+select throws_ok(
+  $$select public.registrar_documento('dni_frente', 'cccccccc-1900-4000-a000-000000000004/dni_frente-1791734400005.jpg')$$,
+  '42501', null, 'registrar_documento: un profesional suspendido no registra documentos'
 );
 
 reset role;

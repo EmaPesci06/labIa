@@ -141,7 +141,7 @@ test.describe("documentos de verificación", () => {
   });
 
   // Convención de la app: táctiles de 44 px.
-  test.fixme("el botón de quitar mide al menos 44 px", async ({ page }) => {
+  test("el botón de quitar mide al menos 44 px", async ({ page }) => {
     await abrir(page);
     const b = bloque(page);
     await entrada(b, "Certificado de antecedentes").setInputFiles(PDF);
@@ -152,7 +152,7 @@ test.describe("documentos de verificación", () => {
   });
 
   // Criterio de aceptación de LAB-19 (lógica 5): sin los documentos obligatorios no se pasa al paso 2.
-  test.fixme("no se puede avanzar sin DNI y antecedentes", async ({ page }) => {
+  test("no se puede avanzar sin DNI y antecedentes", async ({ page }) => {
     await abrir(page);
     await page.getByLabel("Nombre y apellido").fill("Martín Gómez");
     await page.getByLabel("WhatsApp").fill("223 555-0000");
@@ -162,18 +162,68 @@ test.describe("documentos de verificación", () => {
     await page.getByRole("button", { name: "Toda la ciudad" }).click();
     await siguiente(page).click();
     await expect(
-      page.getByText(
+      bloque(page).getByText(
         "Para publicar tu perfil necesitamos tu DNI y tu certificado de antecedentes.",
       ),
     ).toBeVisible();
   });
 
   // Criterio: en celular se abre la cámara directamente.
-  test.fixme("las entradas de documentos piden la cámara en celular", async ({ page }) => {
+  // El certificado de antecedentes es un PDF: sin `capture` el celular deja elegirlo.
+  test("las entradas de fotos piden la cámara en celular", async ({ page }) => {
     await abrir(page);
-    await expect(entrada(bloque(page), "Certificado de antecedentes")).toHaveAttribute(
-      "capture",
-      "environment",
+    await page.getByRole("button", { name: "Gas" }).click();
+    const b = bloque(page);
+    await abrirDni(page);
+    for (const etiqueta of ["Frente del DNI", "Dorso del DNI", "Constancia de matrícula"]) {
+      await expect(entrada(b, etiqueta)).toHaveAttribute("capture", "environment");
+    }
+    await expect(entrada(b, "Certificado de antecedentes")).not.toHaveAttribute("capture");
+  });
+
+  test("ids únicos y la etiqueta apunta al input del bloque visible", async ({ page }) => {
+    await abrir(page);
+    const repetidos = await page.evaluate(() => {
+      const ids = [...document.querySelectorAll("[id]")].map((e) => e.id);
+      return ids.filter((id, i) => ids.indexOf(id) !== i);
+    });
+    expect(repetidos).toEqual([]);
+    await expect(
+      bloque(page).getByLabel("Certificado de antecedentes", { exact: false }),
+    ).toBeAttached();
+  });
+
+  test("muestra la ayuda con el link del Registro Nacional de Reincidencia", async ({ page }) => {
+    await abrir(page);
+    const b = bloque(page);
+    await expect(b.getByText(/Tiene que tener menos de 90 días/)).toBeVisible();
+    await expect(
+      b.getByRole("link", { name: "Registro Nacional de Reincidencia" }),
+    ).toHaveAttribute(
+      "href",
+      "https://www.argentina.gob.ar/justicia/reincidencia/antecedentespenales",
+    );
+    await expect(b.getByText("Falta subir").first()).toBeVisible();
+  });
+
+  test("un archivo cuyo contenido no coincide con su extensión se rechaza", async ({ page }) => {
+    await abrir(page);
+    const b = bloque(page);
+    await entrada(b, "Certificado de antecedentes").setInputFiles({
+      name: "falso.pdf",
+      mimeType: "application/pdf",
+      buffer: Buffer.from("esto no es un pdf"),
+    });
+    await expect(b.getByRole("alert")).toHaveText(
+      "Formato no válido. Subí una imagen (JPG, PNG) o un PDF.",
+    );
+    await entrada(b, "Certificado de antecedentes").setInputFiles({
+      name: "foto.pdf",
+      mimeType: "image/png",
+      buffer: PNG,
+    });
+    await expect(b.getByRole("alert")).toHaveText(
+      "Formato no válido. Subí una imagen (JPG, PNG) o un PDF.",
     );
   });
 

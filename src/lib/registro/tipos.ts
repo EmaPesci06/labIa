@@ -17,6 +17,8 @@ export type BarrioOpcion = { id: number; nombre: string };
 export type EstadoPerfil = EstadoFormulario & {
   /** Se guardó el perfil; `uid` sirve para subir las fotos a su carpeta. */
   guardado?: { uid: string };
+  /** Falta algún documento obligatorio: se muestra dentro del bloque de verificación. */
+  documentos?: string;
 };
 
 /** Lo que se muestra en el formulario: lo ya guardado, o lo que quedó en el borrador. */

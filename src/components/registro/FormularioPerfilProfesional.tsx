@@ -20,8 +20,13 @@ import { GrupoChips } from "@/components/ui/Chip";
 import { comprimirImagen } from "@/lib/imagen";
 import { registrarEvento } from "@/lib/metricas";
 import { guardarFotosPerfil, guardarPerfilProfesional } from "@/lib/registro/profesional";
-import { registrarDocumentoAccion } from "@/lib/registro/documentos";
-import { generarRutaDocumento, type TipoDocumento } from "@/lib/validaciones/documentos";
+import { tiposVigentes } from "@/lib/registro/documentos-estado";
+import { subirDocumentos } from "@/lib/registro/subir-documentos";
+import {
+  documentosFaltantes,
+  mensajeDocumentosFaltantes,
+  type TipoDocumento,
+} from "@/lib/validaciones/documentos";
 import type {
   BarrioOpcion,
   BorradorPerfil,
@@ -127,6 +132,8 @@ export function FormularioPerfilProfesional({
   const [documentosLocales, setDocumentosLocales] = useState<
     Partial<Record<TipoDocumento, File | null>>
   >({});
+  const [subidosAhora, setSubidosAhora] = useState<Partial<Record<TipoDocumento, boolean>>>({});
+  const [progreso, setProgreso] = useState<{ hechos: number; total: number } | null>(null);
   const [procesando, setProcesando] = useState(false);
   const [errorFotos, setErrorFotos] = useState<{ perfil?: string; trabajos?: string }>({});
   // Fotos ya subidas que la persona quitó: se borran del bucket al guardar.
@@ -207,35 +214,51 @@ export function FormularioPerfilProfesional({
     setDocumentosLocales((prev) => ({ ...prev, [tipo]: null }));
   };
 
+  /** Documentos obligatorios que no están ni elegidos, ni subidos, ni registrados sin rechazo. */
+  function faltantes(): TipoDocumento[] {
+    const presentes = tiposVigentes(verificaciones);
+    for (const tipo of Object.keys(subidosAhora) as TipoDocumento[]) {
+      if (subidosAhora[tipo]) presentes.add(tipo);
+    }
+    for (const tipo of Object.keys(documentosLocales) as TipoDocumento[]) {
+      if (documentosLocales[tipo]) presentes.add(tipo);
+    }
+    return documentosFaltantes(tieneGas, presentes);
+  }
+
   async function subirDocumentosPendientes(uid: string): Promise<string | null> {
-    const entradas = Object.entries(documentosLocales).filter(
-      (entry): entry is [TipoDocumento, File] => Boolean(entry[1]),
+    const entradas = (Object.entries(documentosLocales) as [TipoDocumento, File | null][]).filter(
+      (entrada): entrada is [TipoDocumento, File] => Boolean(entrada[1]),
     );
     if (entradas.length === 0) return null;
 
-    const almacen = crearClienteNavegador().storage.from("documentos");
-    for (const [tipo, archivo] of entradas) {
-      const partes = archivo.name.split(".");
-      const ext = partes.length > 1 ? partes.pop()?.toLowerCase() || "jpg" : "jpg";
-      const ruta = generarRutaDocumento(uid, tipo, ext);
-      const { error: errorSubida } = await almacen.upload(ruta, archivo);
-      if (errorSubida) {
-        return "Guardamos tu perfil, pero no pudimos subir los documentos de verificación. Probá de nuevo.";
-      }
-      const registro = await registrarDocumentoAccion({
-        tipo,
-        storagePath: ruta,
-      });
-      if (!registro.ok) {
-        return registro.mensaje ?? "No pudimos registrar los documentos.";
-      }
+    const resultado = await subirDocumentos(uid, entradas, (hechos, total) =>
+      setProgreso({ hechos, total }),
+    );
+    setProgreso(null);
+    if (resultado.subidos.length > 0) {
+      // Lo que ya quedó subido no se vuelve a subir en un reintento.
+      setSubidosAhora((previos) => ({
+        ...previos,
+        ...Object.fromEntries(resultado.subidos.map((tipo) => [tipo, true])),
+      }));
+      setDocumentosLocales((previos) => ({
+        ...previos,
+        ...Object.fromEntries(resultado.subidos.map((tipo) => [tipo, null])),
+      }));
     }
+    if (!resultado.ok) return resultado.mensaje;
+    registrarEvento("documentos_enviados");
     return null;
   }
 
   async function accion(anterior: EstadoPerfil, datos: FormData): Promise<EstadoPerfil> {
     const conErrores = validarEnNavegador(datos, conCuenta);
-    if (conErrores) return conErrores;
+    // Sin DNI y antecedentes (y matrícula si es gasista) no se pasa al paso 2. El servidor lo
+    // vuelve a exigir en el paso 2.
+    const documentos = faltantes().length > 0 ? mensajeDocumentosFaltantes(tieneGas) : undefined;
+    if (conErrores) return { ...conErrores, documentos };
+    if (documentos) return { documentos };
 
     const resultado = await guardarPerfilProfesional(anterior, datos);
     if (!resultado.guardado) return resultado;
@@ -564,7 +587,10 @@ export function FormularioPerfilProfesional({
             documentosLocales={documentosLocales}
             onElegirDocumento={elegirDocumento}
             onQuitarDocumento={quitarDocumento}
-            ocupado={procesando}
+            subidosAhora={subidosAhora}
+            progreso={progreso}
+            error={estado.documentos}
+            ocupado={procesando || pendiente}
           />
 
           {estado.mensaje ? (
@@ -589,7 +615,10 @@ export function FormularioPerfilProfesional({
           documentosLocales={documentosLocales}
           onElegirDocumento={elegirDocumento}
           onQuitarDocumento={quitarDocumento}
-          ocupado={procesando}
+          subidosAhora={subidosAhora}
+          progreso={progreso}
+          error={estado.documentos}
+          ocupado={procesando || pendiente}
         />
         {estado.mensaje ? (
           <p role="alert" className="text-sm font-semibold text-error">

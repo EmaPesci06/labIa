@@ -21,6 +21,13 @@ async function ipDelPedido(): Promise<string> {
   return reenviado || encabezados.get("x-real-ip") || "desconocida";
 }
 
+function mensajeDeError(codigo: string | undefined): string {
+  if (codigo === "42501") return "Tu cuenta no puede cargar documentos de verificación.";
+  if (codigo === "23514") return "No encontramos el archivo subido. Probá de nuevo.";
+  if (codigo === "23505") return "Ese documento ya estaba registrado.";
+  return "No pudimos registrar el documento. Probá de nuevo.";
+}
+
 /**
  * Consulta las verificaciones registradas del usuario autenticado.
  * Usa la vista `mis_verificaciones` que no expone `storage_path`.
@@ -104,7 +111,8 @@ export async function registrarDocumentoAccion(
   });
 
   if (error) {
-    return { ok: false, mensaje: error.message || "No pudimos registrar el documento." };
+    // Mensajes fijos: el texto de Postgres no se muestra.
+    return { ok: false, mensaje: mensajeDeError(error.code) };
   }
 
   return { ok: true, id: data ?? undefined };

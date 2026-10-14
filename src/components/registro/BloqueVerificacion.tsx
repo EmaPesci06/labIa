@@ -6,12 +6,30 @@ import { useId, useState } from "react";
 import { cn } from "@/lib/cn";
 import type { ItemVerificacion } from "@/lib/registro/tipos";
 import {
-  MAX_BYTES_DOCUMENTO,
+  errorDeArchivoDocumento,
   MIMES_DOCUMENTO_ACEPTADOS,
+  tipoPorCabecera,
   type TipoDocumento,
 } from "@/lib/validaciones/documentos";
 
-const ACEPTADOS = ".jpg,.jpeg,.png,.pdf," + MIMES_DOCUMENTO_ACEPTADOS.join(",");
+const ACEPTADOS = ".jpg,.jpeg,.png,.webp,.pdf," + MIMES_DOCUMENTO_ACEPTADOS.join(",");
+const URL_REINCIDENCIA = "https://www.argentina.gob.ar/justicia/reincidencia/antecedentespenales";
+
+/** Primeros bytes del archivo, para comprobar que el contenido es lo que dice ser. */
+async function leerCabecera(archivo: File): Promise<Uint8Array | null> {
+  const trozo = archivo.slice(0, 12);
+  try {
+    if (typeof trozo.arrayBuffer === "function") return new Uint8Array(await trozo.arrayBuffer());
+    return await new Promise((resolver) => {
+      const lector = new FileReader();
+      lector.onload = () => resolver(new Uint8Array(lector.result as ArrayBuffer));
+      lector.onerror = () => resolver(null);
+      lector.readAsArrayBuffer(trozo);
+    });
+  } catch {
+    return null;
+  }
+}
 
 type Props = {
   className?: string;
@@ -20,6 +38,10 @@ type Props = {
   documentosLocales?: Partial<Record<TipoDocumento, File | null>>;
   onElegirDocumento?: (tipo: TipoDocumento, archivo: File) => void;
   onQuitarDocumento?: (tipo: TipoDocumento) => void;
+  /** Tipos que se subieron en esta sesión (todavía no figuran en `verificaciones`). */
+  subidosAhora?: Partial<Record<TipoDocumento, boolean>>;
+  /** Avance de la subida, si hay una en curso. */
+  progreso?: { hechos: number; total: number } | null;
   ocupado?: boolean;
   error?: string | null;
 };
@@ -31,14 +53,19 @@ export function BloqueVerificacion({
   documentosLocales = {},
   onElegirDocumento,
   onQuitarDocumento,
+  subidosAhora = {},
+  progreso = null,
   ocupado = false,
   error,
 }: Props) {
   const [expandirDni, setExpandirDni] = useState(false);
   const [errorLocal, setErrorLocal] = useState<string | null>(null);
-  const idError = useId();
+  // El bloque se renderiza dos veces (celular y escritorio): los id tienen que ser únicos.
+  const base = useId();
+  const idError = `${base}-error`;
+  const describedBy = error || errorLocal ? idError : undefined;
 
-  // Mapear la última verificación de cada tipo
+  // La última verificación de cada tipo (vienen ordenadas de la más nueva a la más vieja).
   const verifPorTipo = verificaciones.reduce<Partial<Record<TipoDocumento, ItemVerificacion>>>(
     (acc, v) => {
       if (!acc[v.tipo]) acc[v.tipo] = v;
@@ -47,21 +74,19 @@ export function BloqueVerificacion({
     {},
   );
 
-  function manejarArchivo(tipo: TipoDocumento, archivo: File | undefined) {
+  async function manejarArchivo(tipo: TipoDocumento, archivo: File | undefined) {
     if (!archivo) return;
     setErrorLocal(null);
 
-    if (archivo.size > MAX_BYTES_DOCUMENTO) {
-      setErrorLocal("El archivo no puede superar los 8 MB.");
+    const mensaje = errorDeArchivoDocumento(archivo);
+    if (mensaje) {
+      setErrorLocal(mensaje);
       return;
     }
 
-    const esValido =
-      MIMES_DOCUMENTO_ACEPTADOS.includes(
-        archivo.type as (typeof MIMES_DOCUMENTO_ACEPTADOS)[number],
-      ) || /\.(jpg|jpeg|png|pdf)$/i.test(archivo.name);
-
-    if (!esValido) {
+    // Que el contenido coincida con el tipo declarado: no alcanza con el nombre.
+    const cabecera = await leerCabecera(archivo);
+    if (cabecera && tipoPorCabecera(cabecera) !== archivo.type) {
       setErrorLocal("Formato no válido. Subí una imagen (JPG, PNG) o un PDF.");
       return;
     }
@@ -69,10 +94,13 @@ export function BloqueVerificacion({
     onElegirDocumento?.(tipo, archivo);
   }
 
-  // Estado del DNI conjunto
-  const dniFrenteListo = Boolean(documentosLocales.dni_frente || verifPorTipo.dni_frente);
-  const dniDorsoListo = Boolean(documentosLocales.dni_dorso || verifPorTipo.dni_dorso);
-  const cantidadDni = (dniFrenteListo ? 1 : 0) + (dniDorsoListo ? 1 : 0);
+  // Un documento cuenta como listo si está elegido, recién subido o ya registrado sin rechazo.
+  const listo = (tipo: TipoDocumento) => {
+    if (documentosLocales[tipo] || subidosAhora[tipo]) return true;
+    const remota = verifPorTipo[tipo];
+    return remota !== undefined && remota.estado !== "rechazado";
+  };
+  const cantidadDni = (listo("dni_frente") ? 1 : 0) + (listo("dni_dorso") ? 1 : 0);
 
   function renderizarEstado(tipo: TipoDocumento, etiquetaVacia: string) {
     const local = documentosLocales[tipo];
@@ -87,28 +115,41 @@ export function BloqueVerificacion({
       );
     }
 
+    const enRevision = (
+      <span className="font-semibold text-texto-secundario">Subido · en revisión</span>
+    );
+    if (subidosAhora[tipo]) return enRevision;
+
     if (remota) {
       if (remota.estado === "aprobado") {
         return (
           <span className="flex items-center gap-1 font-bold text-exito">
-            <Check aria-hidden className="size-4" /> Verificado
+            <Check aria-hidden className="size-4" /> Aprobado
           </span>
         );
       }
-      if (remota.estado === "pendiente") {
-        return <span className="font-semibold text-texto-secundario">En revisión</span>;
-      }
-      if (remota.estado === "rechazado") {
-        return <span className="font-semibold text-error">Rechazado (subir de nuevo)</span>;
-      }
+      if (remota.estado === "pendiente") return enRevision;
+      return (
+        <span className="flex flex-col items-end text-right">
+          <span className="text-xs font-semibold text-error">
+            Rechazado{remota.motivoRechazo ? `: ${remota.motivoRechazo}` : ""}. Volvé a subirlo.
+          </span>
+          <span className="font-bold text-sobre-azul-suave">Volver a subir</span>
+        </span>
+      );
     }
 
-    return <span className="font-bold text-sobre-azul-suave">{etiquetaVacia}</span>;
+    return (
+      <span className="flex flex-col items-end text-right">
+        <span className="text-xs font-semibold text-texto-secundario">Falta subir</span>
+        <span className="font-bold text-sobre-azul-suave">{etiquetaVacia}</span>
+      </span>
+    );
   }
 
   return (
     <section
-      aria-labelledby="verificacion-titulo"
+      aria-labelledby={`${base}-titulo`}
       className={cn(
         "flex flex-col gap-3 rounded-tarjeta bg-azul-suave p-4 lg:rounded-[20px] lg:p-5",
         className,
@@ -116,7 +157,7 @@ export function BloqueVerificacion({
     >
       <div className="flex flex-col gap-1">
         <h2
-          id="verificacion-titulo"
+          id={`${base}-titulo`}
           className="flex items-center gap-2 text-base font-bold text-sobre-azul-suave lg:text-[17px]"
         >
           <ShieldCheck aria-hidden strokeWidth={2} className="size-5" />
@@ -128,7 +169,7 @@ export function BloqueVerificacion({
       </div>
 
       <div className="flex flex-col gap-2.5">
-        {/* DNI: Selector con acordeón de frente y dorso */}
+        {/* DNI: acordeón con frente y dorso */}
         <div className="flex flex-col overflow-hidden rounded-campo border border-borde bg-superficie">
           <button
             type="button"
@@ -163,53 +204,86 @@ export function BloqueVerificacion({
           {expandirDni ? (
             <div className="flex flex-col gap-2 border-t border-borde bg-fondo p-3">
               <FilaArchivo
-                id="doc-dni-frente"
+                id={`${base}-dni-frente`}
                 etiqueta="Frente del DNI"
                 estadoTexto={renderizarEstado("dni_frente", "Subir foto o PDF")}
                 tieneArchivo={Boolean(documentosLocales.dni_frente)}
+                camara
                 ocupado={ocupado}
-                onSeleccionar={(arch) => manejarArchivo("dni_frente", arch)}
+                describedBy={describedBy}
+                onSeleccionar={(arch) => void manejarArchivo("dni_frente", arch)}
                 onQuitar={() => onQuitarDocumento?.("dni_frente")}
               />
               <FilaArchivo
-                id="doc-dni-dorso"
+                id={`${base}-dni-dorso`}
                 etiqueta="Dorso del DNI"
                 estadoTexto={renderizarEstado("dni_dorso", "Subir foto o PDF")}
                 tieneArchivo={Boolean(documentosLocales.dni_dorso)}
+                camara
                 ocupado={ocupado}
-                onSeleccionar={(arch) => manejarArchivo("dni_dorso", arch)}
+                describedBy={describedBy}
+                onSeleccionar={(arch) => void manejarArchivo("dni_dorso", arch)}
                 onQuitar={() => onQuitarDocumento?.("dni_dorso")}
               />
             </div>
           ) : null}
         </div>
 
-        {/* Certificado de antecedentes */}
+        {/* Antecedentes: PDF o foto. Sin `capture`, para que el celular deje elegir el PDF. */}
         <FilaArchivo
-          id="doc-antecedentes"
+          id={`${base}-antecedentes`}
           etiqueta="Certificado de antecedentes"
           estadoTexto={renderizarEstado("antecedentes", "Subir PDF")}
           tieneArchivo={Boolean(documentosLocales.antecedentes)}
           ocupado={ocupado}
+          describedBy={describedBy}
           envolturaBoton
-          onSeleccionar={(arch) => manejarArchivo("antecedentes", arch)}
+          onSeleccionar={(arch) => void manejarArchivo("antecedentes", arch)}
           onQuitar={() => onQuitarDocumento?.("antecedentes")}
         />
+        <p className="-mt-1 text-xs leading-snug text-texto-secundario">
+          Lo sacás online en el sitio del{" "}
+          <a
+            href={URL_REINCIDENCIA}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-azul underline"
+          >
+            Registro Nacional de Reincidencia
+          </a>
+          . Tiene que tener menos de 90 días.
+        </p>
 
         {/* Matrícula (solo si tiene gas) */}
         {tieneGas ? (
           <FilaArchivo
-            id="doc-matricula"
+            id={`${base}-matricula`}
             etiqueta="Constancia de matrícula"
-            estadoTexto={renderizarEstado("matricula", "Subir PDF o foto")}
+            estadoTexto={renderizarEstado("matricula", "Subir foto del carnet")}
             tieneArchivo={Boolean(documentosLocales.matricula)}
+            camara
             ocupado={ocupado}
+            describedBy={describedBy}
             envolturaBoton
-            onSeleccionar={(arch) => manejarArchivo("matricula", arch)}
+            onSeleccionar={(arch) => void manejarArchivo("matricula", arch)}
             onQuitar={() => onQuitarDocumento?.("matricula")}
           />
         ) : null}
       </div>
+
+      {progreso ? (
+        <div role="status" className="flex flex-col gap-1.5 text-sm text-texto">
+          <span>
+            Subiendo documentos… {progreso.hechos} de {progreso.total}
+          </span>
+          <progress
+            value={progreso.hechos}
+            max={progreso.total}
+            aria-label="Avance de la subida"
+            className="h-2 w-full overflow-hidden rounded-full accent-azul"
+          />
+        </div>
+      ) : null}
 
       {errorLocal || error ? (
         <p id={idError} role="alert" className="text-sm font-semibold text-error">
@@ -227,6 +301,8 @@ function FilaArchivo({
   tieneArchivo,
   ocupado,
   envolturaBoton = false,
+  camara = false,
+  describedBy,
   onSeleccionar,
   onQuitar,
 }: {
@@ -236,6 +312,9 @@ function FilaArchivo({
   tieneArchivo: boolean;
   ocupado: boolean;
   envolturaBoton?: boolean;
+  /** Pide la cámara trasera en el celular. */
+  camara?: boolean;
+  describedBy?: string;
   onSeleccionar: (archivo: File) => void;
   onQuitar: () => void;
 }) {
@@ -251,18 +330,20 @@ function FilaArchivo({
         className="flex flex-1 cursor-pointer items-center justify-between gap-2 py-3 text-[15px] font-semibold text-texto focus-within:outline-[3px] focus-within:outline-offset-2 focus-within:outline-foco"
       >
         <span className="flex items-center gap-2">
-          <FileText aria-hidden className="size-4.5 text-azul" />
+          <FileText aria-hidden className="size-4.5 shrink-0 text-azul" />
           {etiqueta}
         </span>
         <div className="flex items-center gap-2">
           {estadoTexto}
-          {!tieneArchivo ? <Upload aria-hidden className="size-4 text-azul" /> : null}
+          {!tieneArchivo ? <Upload aria-hidden className="size-4 shrink-0 text-azul" /> : null}
         </div>
         <input
           id={id}
           type="file"
           accept={ACEPTADOS}
+          capture={camara ? "environment" : undefined}
           disabled={ocupado}
+          aria-describedby={describedBy}
           className="sr-only"
           onChange={(e) => {
             const arch = e.target.files?.[0];
@@ -276,7 +357,7 @@ function FilaArchivo({
           type="button"
           onClick={onQuitar}
           aria-label={`Quitar archivo de ${etiqueta}`}
-          className="ml-2 flex size-8 items-center justify-center rounded-full text-texto-secundario hover:bg-divisor hover:text-texto"
+          className="-mr-3 ml-1 flex size-11 shrink-0 items-center justify-center rounded-full text-texto-secundario hover:bg-divisor hover:text-texto focus-visible:outline-[3px] focus-visible:outline-offset-[-2px] focus-visible:outline-foco"
         >
           <X aria-hidden className="size-4" />
         </button>
