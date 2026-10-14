@@ -684,7 +684,11 @@ const server = http.createServer((req, res) => {
       });
     }
     if (ruta === "/rest/v1/usuarios_publicos") {
-      return responder(res, 200, [{ id: ID_CLIENTE, nombre: "Laura", apellido_inicial: "F" }]);
+      const cli = { id: ID_CLIENTE, nombre: "Laura", apellido_inicial: "F" };
+      return responder(res, 200, unObjeto ? cli : [cli]);
+    }
+    if (ruta === "/rest/v1/rpc/distancia_km") {
+      return responder(res, 200, 0.8);
     }
     if (ruta === "/rest/v1/usuarios") {
       if (!yo)
@@ -699,6 +703,27 @@ const server = http.createServer((req, res) => {
       };
       return responder(res, 200, unObjeto ? fila : [fila]);
     }
+    if (ruta.startsWith("/rest/v1/trabajos")) {
+      const tid = url.searchParams.get("id");
+      const idBuscado = tid ? tid.replace("eq.", "") : null;
+      const t = TRABAJOS_MOCK.find((x) => x.id === idBuscado) ?? TRABAJOS_MOCK[0];
+      if (!t) return responder(res, 404, { message: "sin filas" });
+      const fila = {
+        id: t.id,
+        oficio: t.oficio,
+        titulo: t.titulo,
+        descripcion: t.descripcion,
+        urgencia: t.urgencia,
+        presupuesto_estimado: t.presupuesto_estimado,
+        fotos: t.fotos ?? [],
+        barrio_id: t.barrio_id,
+        estado: "abierto",
+        created_at: t.created_at,
+        cliente_id: ID_CLIENTE,
+        barrios: { nombre: t.barrio_nombre },
+      };
+      return responder(res, 200, unObjeto ? fila : [fila]);
+    }
     if (ruta === "/rest/v1/rpc/trabajos_para_mi") {
       const { p_oficio } = JSON.parse(cuerpo || "{}");
       let lista = TRABAJOS_MOCK;
@@ -708,13 +733,50 @@ const server = http.createServer((req, res) => {
       return responder(res, 200, lista);
     }
     if (ruta.startsWith("/rest/v1/postulaciones")) {
+      if (req.method === "POST") {
+        const datos = JSON.parse(cuerpo || "{}");
+        const id = "99999999-9999-4999-9999-99999999999" + (POSTULACIONES_MOCK.length + 1);
+        const nueva = {
+          id,
+          trabajo_id: datos.trabajo_id,
+          profesional_id: yo?.id ?? ID_PUBLICADO,
+          mensaje: datos.mensaje,
+          precio_estimado: datos.precio_estimado ?? null,
+          sena_propuesta: datos.sena_propuesta ?? null,
+          estado: "enviada",
+          created_at: new Date().toISOString(),
+        };
+        POSTULACIONES_MOCK.unshift(nueva);
+        const targetTrabajo = TRABAJOS_MOCK.find((t) => t.id === datos.trabajo_id);
+        if (targetTrabajo) {
+          targetTrabajo.ya_me_postule = true;
+          targetTrabajo.cantidad_postulaciones = (targetTrabajo.cantidad_postulaciones || 0) + 1;
+        }
+        return responder(res, 201, unObjeto ? nueva : [nueva]);
+      }
       if (req.method === "PATCH") {
         const id = (url.searchParams.get("id") ?? "").replace("eq.", "");
         const post = POSTULACIONES_MOCK.find((p) => p.id === id);
         if (post) post.estado = "retirada";
         return responder(res, 200, post ? [post] : []);
       }
-      return responder(res, 200, POSTULACIONES_MOCK);
+      let lista = POSTULACIONES_MOCK;
+      const tid = url.searchParams.get("trabajo_id");
+      if (tid) {
+        const idBuscado = tid.replace("eq.", "");
+        lista = lista.filter((p) => p.trabajo_id === idBuscado);
+      }
+      const st = url.searchParams.get("estado");
+      if (st && st.startsWith("neq.")) {
+        const excluido = st.replace("neq.", "");
+        lista = lista.filter((p) => p.estado !== excluido);
+      }
+      if (unObjeto) {
+        return lista[0]
+          ? responder(res, 200, lista[0])
+          : responder(res, 406, { message: "sin filas" });
+      }
+      return responder(res, 200, lista);
     }
     if (ruta === "/rest/v1/mis_verificaciones") {
       if (yo?.id === ID_EN_REVISION) {
@@ -740,6 +802,7 @@ const server = http.createServer((req, res) => {
         disponibilidad: "Lunes a viernes",
         toda_la_ciudad: false,
         zonas: [1, 2],
+        publicado: yo?.id !== ID_EN_REVISION,
       };
       return responder(res, 200, unObjeto ? fila : [fila]);
     }

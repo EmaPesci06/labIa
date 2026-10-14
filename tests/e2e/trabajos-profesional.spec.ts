@@ -109,4 +109,89 @@ test.describe("Trabajos para profesionales (LAB-27)", () => {
     );
     expect(graves).toEqual([]);
   });
+
+  test("LAB-28: detalle del trabajo muestra info completa y permite postularse con precio y seña", async ({
+    page,
+    context,
+  }) => {
+    await iniciarSesion(context, "http://localhost:3000", "tok-dueno");
+    await page.goto("/trabajos/88888888-8888-4888-8888-888888888881");
+
+    // Botón volver
+    await expect(page.getByRole("link", { name: "Volver" })).toBeVisible();
+
+    // Datos del trabajo y del cliente
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Olor a gas en la cocina" }),
+    ).toBeVisible();
+    await expect(page.getByText("Laura F.")).toBeVisible();
+    await expect(page.getByText(/La Perla · La dirección se comparte al acordar/)).toBeVisible();
+
+    // Formulario de postulación
+    await expect(page.getByRole("heading", { level: 2, name: "Postularme" })).toBeVisible();
+    const mensajeInput = page.getByLabel("Mensaje para Laura");
+    await expect(mensajeInput).toBeVisible();
+    const precioInput = page.getByLabel("Precio estimado");
+    await expect(precioInput).toBeVisible();
+    const senaInput = page.getByLabel("Seña que proponés");
+    await expect(senaInput).toBeVisible();
+
+    // Completar y enviar postulación
+    await mensajeInput.fill("Puedo ir hoy a las 17 h. Reviso la pérdida y te paso presupuesto.");
+    await precioInput.fill("15000");
+    await senaInput.fill("3000");
+    await page.getByRole("button", { name: "Enviar postulación" }).click();
+
+    // Estado enviado
+    await expect(page.getByText("Postulación enviada")).toBeVisible();
+    await expect(
+      page.getByText("Laura ve tu mensaje y, si te elige, te escribe por WhatsApp."),
+    ).toBeVisible();
+    await expect(page.getByRole("link", { name: "Ver más trabajos" })).toBeVisible();
+  });
+
+  test("LAB-28: profesional en revisión ve aviso de documentos en el detalle", async ({
+    page,
+    context,
+  }) => {
+    await iniciarSesion(context, "http://localhost:3000", "tok-dueno-revision");
+    await page.goto("/trabajos/88888888-8888-4888-8888-888888888881");
+
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Olor a gas en la cocina" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText("Vas a poder postularte cuando aprobemos tus documentos."),
+    ).toBeVisible();
+    await expect(page.getByRole("button", { name: "Enviar postulación" })).not.toBeVisible();
+  });
+
+  test("LAB-28: detalle de trabajo ya postulado muestra datos y permite retirar", async ({
+    page,
+    context,
+  }) => {
+    await iniciarSesion(context, "http://localhost:3000", "tok-dueno");
+    await page.goto("/trabajos/88888888-8888-4888-8888-888888888882");
+
+    await expect(page.getByText("Postulación enviada")).toBeVisible();
+    await expect(page.getByText("Puedo pasar hoy a la tarde a revisar.")).toBeVisible();
+
+    const botonRetirar = page.getByRole("button", { name: "Retirar postulación" });
+    await expect(botonRetirar).toBeVisible();
+    await botonRetirar.click();
+
+    await expect(page.getByText("¿Seguro que querés retirar tu postulación?")).toBeVisible();
+    await page.getByRole("button", { name: "Sí, retirar" }).click();
+  });
+
+  test("LAB-28: accesibilidad en /trabajos/[id]", async ({ page, context }) => {
+    await iniciarSesion(context, "http://localhost:3000", "tok-dueno");
+    await page.goto("/trabajos/88888888-8888-4888-8888-888888888881");
+
+    const resultado = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
+    const graves = resultado.violations.filter(
+      (v) => v.impact === "serious" || v.impact === "critical",
+    );
+    expect(graves).toEqual([]);
+  });
 });

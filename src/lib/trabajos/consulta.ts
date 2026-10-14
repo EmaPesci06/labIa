@@ -196,6 +196,7 @@ export type PerfilParaTrabajos = {
   zonas: number[];
   zonasNombres: string[];
   todaLaCiudad: boolean;
+  publicado: boolean;
 };
 
 /** Carga oficios y nombres de zonas del profesional para los filtros y el encabezado de /trabajos. */
@@ -207,7 +208,7 @@ export async function obtenerPerfilParaTrabajos(
 
   const { data: perfil } = await supabase
     .from("perfiles_profesionales")
-    .select("oficios, zonas, toda_la_ciudad")
+    .select("oficios, zonas, toda_la_ciudad, publicado")
     .eq("usuario_id", usuarioId)
     .maybeSingle();
 
@@ -216,6 +217,7 @@ export async function obtenerPerfilParaTrabajos(
   const oficios = (perfil.oficios ?? []) as Oficio[];
   const zonas = perfil.zonas ?? [];
   const todaLaCiudad = perfil.toda_la_ciudad ?? false;
+  const publicado = perfil.publicado ?? false;
 
   let zonasNombres: string[] = [];
   if (!todaLaCiudad && zonas.length > 0) {
@@ -227,7 +229,183 @@ export async function obtenerPerfilParaTrabajos(
     }
   }
 
-  return { oficios, zonas, zonasNombres, todaLaCiudad };
+  return { oficios, zonas, zonasNombres, todaLaCiudad, publicado };
+}
+
+export type TrabajoDetalle = {
+  id: string;
+  oficio: Oficio;
+  titulo: string;
+  descripcion: string;
+  urgencia: UrgenciaTrabajo;
+  presupuestoEstimado: number | null;
+  fotos: string[];
+  barrioId: number;
+  barrioNombre: string;
+  distanciaKm: number | null;
+  estado: string;
+  createdAt: string;
+  cliente: {
+    nombre: string | null;
+    apellidoInicial: string | null;
+  };
+  miPostulacion: {
+    id: string;
+    mensaje: string;
+    precioEstimado: number | null;
+    senaPropuesta: number | null;
+    estado: EstadoPostulacion;
+    createdAt: string;
+  } | null;
+};
+
+/**
+ * Consulta el detalle de un trabajo para la pantalla /trabajos/[id].
+ * - Para profesionales publicados o que ya postularon: consulta directa sobre `trabajos`.
+ * - Para profesionales en revisión: fallback a `trabajos_para_mi` para ver trabajos abiertos.
+ */
+export async function obtenerTrabajoDetalle(
+  trabajoId: string,
+  profesionalId: string,
+): Promise<{
+  trabajo: TrabajoDetalle | null;
+  perfil: PerfilParaTrabajos | null;
+}> {
+  if (!supabaseConfigurado()) return { trabajo: null, perfil: null };
+  const supabase = await crearClienteServidor();
+
+  const perfil = await obtenerPerfilParaTrabajos(profesionalId);
+
+  // 1. Postulación del profesional si ya existe
+  const { data: miPost } = await supabase
+    .from("postulaciones")
+    .select("id, mensaje, precio_estimado, sena_propuesta, estado, created_at")
+    .eq("trabajo_id", trabajoId)
+    .eq("profesional_id", profesionalId)
+    .neq("estado", "retirada")
+    .maybeSingle();
+
+  // 2. Consulta del trabajo directo por RLS (funciona si está publicado o si ya se postuló)
+  const { data: fila } = await supabase
+    .from("trabajos")
+    .select(
+      `
+      id,
+      oficio,
+      titulo,
+      descripcion,
+      urgencia,
+      presupuesto_estimado,
+      fotos,
+      barrio_id,
+      estado,
+      created_at,
+      cliente_id,
+      barrios (nombre)
+    `,
+    )
+    .eq("id", trabajoId)
+    .maybeSingle();
+
+  if (fila) {
+    let clienteNombre: string | null = null;
+    let clienteApellidoInicial: string | null = null;
+    if (fila.cliente_id) {
+      const { data: cli } = await supabase
+        .from("usuarios_publicos")
+        .select("nombre, apellido_inicial")
+        .eq("id", fila.cliente_id)
+        .maybeSingle();
+      if (cli) {
+        clienteNombre = cli.nombre;
+        clienteApellidoInicial = cli.apellido_inicial;
+      }
+    }
+
+    let distanciaKm: number | null = null;
+    const { data: usr } = await supabase
+      .from("usuarios")
+      .select("barrio_id")
+      .eq("id", profesionalId)
+      .maybeSingle();
+
+    if (usr?.barrio_id && fila.barrio_id) {
+      if (usr.barrio_id === fila.barrio_id) {
+        distanciaKm = 0;
+      } else {
+        const { data: dKm } = await supabase.rpc("distancia_km", {
+          barrio_a: usr.barrio_id,
+          barrio_b: fila.barrio_id,
+        });
+        distanciaKm = dKm !== null ? Number(dKm) : null;
+      }
+    }
+
+    const barriosObj = fila.barrios as { nombre?: string } | null;
+    const barrioNombre = barriosObj?.nombre ?? "Mar del Plata";
+
+    return {
+      trabajo: {
+        id: fila.id,
+        oficio: fila.oficio as Oficio,
+        titulo: fila.titulo,
+        descripcion: fila.descripcion,
+        urgencia: fila.urgencia as UrgenciaTrabajo,
+        presupuestoEstimado: fila.presupuesto_estimado,
+        fotos: fila.fotos ?? [],
+        barrioId: fila.barrio_id,
+        barrioNombre,
+        distanciaKm,
+        estado: fila.estado,
+        createdAt: fila.created_at,
+        cliente: {
+          nombre: clienteNombre,
+          apellidoInicial: clienteApellidoInicial,
+        },
+        miPostulacion: miPost
+          ? {
+              id: miPost.id,
+              mensaje: miPost.mensaje,
+              precioEstimado: miPost.precio_estimado,
+              senaPropuesta: miPost.sena_propuesta,
+              estado: miPost.estado as EstadoPostulacion,
+              createdAt: miPost.created_at,
+            }
+          : null,
+      },
+      perfil,
+    };
+  }
+
+  // 3. Si fila es null (profesional en revisión), buscar en trabajos_para_mi
+  const { trabajos } = await obtenerTrabajosParaMi({ soloMisZonas: false, limite: 100 });
+  const t = trabajos.find((item) => item.id === trabajoId);
+  if (t) {
+    return {
+      trabajo: {
+        id: t.id,
+        oficio: t.oficio,
+        titulo: t.titulo,
+        descripcion: t.descripcion,
+        urgencia: t.urgencia,
+        presupuestoEstimado: t.presupuestoEstimado,
+        fotos: t.fotos,
+        barrioId: t.barrioId,
+        barrioNombre: t.barrioNombre,
+        distanciaKm: t.distanciaKm,
+        estado: "abierto",
+        createdAt: t.createdAt,
+        cliente: {
+          nombre: t.clienteNombre,
+          apellidoInicial: t.clienteApellidoInicial,
+        },
+        miPostulacion: null,
+      },
+      perfil,
+    };
+  }
+
+  return { trabajo: null, perfil };
 }
 
 export { formatearBajadaTrabajos } from "./formato";

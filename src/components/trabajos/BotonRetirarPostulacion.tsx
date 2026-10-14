@@ -32,13 +32,13 @@ export function BotonRetirarPostulacion({ postulacionId }: BotonRetirarPostulaci
     return (
       <div className="flex flex-col gap-2 rounded-xl bg-superficie-elevada p-3 text-sm">
         <p className="font-semibold text-texto">¿Seguro que querés retirar tu postulación?</p>
-        {error ? <p className="text-rojo text-xs">{error}</p> : null}
+        {error ? <p className="text-xs text-error">{error}</p> : null}
         <div className="flex items-center gap-2">
           <Boton
             variante="secundario"
             cargando={isPending}
             onClick={manejarRetiro}
-            className="text-rojo hover:border-rojo h-9 px-3 text-xs"
+            className="h-9 px-3 text-xs text-error hover:border-error"
           >
             Sí, retirar
           </Boton>
@@ -60,11 +60,11 @@ export function BotonRetirarPostulacion({ postulacionId }: BotonRetirarPostulaci
 
   return (
     <div className="flex flex-col items-start gap-1">
-      {error ? <p className="text-rojo text-xs">{error}</p> : null}
+      {error ? <p className="text-xs text-error">{error}</p> : null}
       <button
         type="button"
         onClick={() => setConfirmando(true)}
-        className="hover:text-rojo rounded text-xs font-semibold text-texto-secundario underline underline-offset-2 focus-visible:ring-2 focus-visible:ring-naranja-accion focus-visible:outline-none"
+        className="rounded text-xs font-semibold text-texto-secundario underline underline-offset-2 hover:text-error focus-visible:ring-2 focus-visible:ring-naranja-accion focus-visible:outline-none"
       >
         Retirar postulación
       </button>

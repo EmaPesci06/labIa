@@ -1,23 +1,30 @@
-import Image from "next/image";
 import { Check } from "lucide-react";
+import Link from "next/link";
 
-import { Boton } from "@/components/ui/Boton";
 import { CintaDistancia } from "@/components/ui/cinta-metrica";
 import { EtiquetaMono } from "@/components/ui/EtiquetaMono";
 import { Insignia } from "@/components/ui/Insignia";
-import { haceCuanto } from "@/lib/formato";
+import { formatearPesos, haceCuanto } from "@/lib/formato";
 import type { TrabajoParaMi } from "@/lib/trabajos/consulta";
 import { ETIQUETA_OFICIO, ETIQUETA_URGENCIA } from "@/lib/validaciones/trabajo";
 
+import { FormularioPostulacion } from "./FormularioPostulacion";
+import { GaleriaFotosTrabajo } from "./GaleriaFotosTrabajo";
+
 type DetalleTrabajoEscritorioProps = {
   trabajo: TrabajoParaMi | null;
+  publicado?: boolean;
 };
 
 /**
- * Detalle del trabajo seleccionado en vista de escritorio (maestro-detalle de LAB-27).
- * Si no hay trabajo seleccionado, muestra "Elegí un trabajo para ver el detalle."
+ * Detalle del trabajo seleccionado en vista de escritorio (maestro-detalle de LAB-27 y LAB-28).
+ * Coincide con Desk-Trabajos.dc.html:
+ * Permite ver las fotos, el presupuesto estimado y postularse directamente.
  */
-export function DetalleTrabajoEscritorio({ trabajo }: DetalleTrabajoEscritorioProps) {
+export function DetalleTrabajoEscritorio({
+  trabajo,
+  publicado = true,
+}: DetalleTrabajoEscritorioProps) {
   if (!trabajo) {
     return (
       <section
@@ -33,6 +40,7 @@ export function DetalleTrabajoEscritorio({ trabajo }: DetalleTrabajoEscritorioPr
   const clienteNombreVisible = trabajo.clienteNombre
     ? `${trabajo.clienteNombre}${trabajo.clienteApellidoInicial ? ` ${trabajo.clienteApellidoInicial}.` : ""}`
     : "Cliente de LabÍA";
+  const clienteNombreParaFormulario = trabajo.clienteNombre ?? "el cliente";
 
   return (
     <section
@@ -56,22 +64,13 @@ export function DetalleTrabajoEscritorio({ trabajo }: DetalleTrabajoEscritorioPr
       </p>
 
       {trabajo.fotos.length > 0 ? (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {trabajo.fotos.map((foto, idx) => (
-            <div
-              key={foto}
-              className="relative aspect-4/3 overflow-hidden rounded-xl border border-divisor bg-superficie-elevada"
-            >
-              <Image
-                src={foto}
-                alt={`Foto ${idx + 1} del trabajo`}
-                fill
-                sizes="(max-width: 1024px) 50vw, 200px"
-                className="object-cover"
-              />
-            </div>
-          ))}
-        </div>
+        <GaleriaFotosTrabajo fotos={trabajo.fotos} tituloTrabajo={trabajo.titulo} />
+      ) : null}
+
+      {trabajo.presupuestoEstimado !== null ? (
+        <p className="text-sm font-semibold text-texto-secundario">
+          El cliente estima {formatearPesos(trabajo.presupuestoEstimado)}
+        </p>
       ) : null}
 
       <div className="flex flex-wrap items-center gap-3 pt-2 text-sm text-texto-secundario">
@@ -95,18 +94,25 @@ export function DetalleTrabajoEscritorio({ trabajo }: DetalleTrabajoEscritorioPr
 
       <div className="mt-2 border-t border-divisor pt-4">
         {trabajo.yaMePostule ? (
-          <div className="flex items-center gap-2.5 rounded-[14px] bg-exito-suave p-4 text-[15px] font-semibold text-sobre-exito-suave">
-            <Check aria-hidden className="size-5 shrink-0" />
-            Postulación enviada. Si te elige, el cliente te escribe por WhatsApp.
+          <div className="flex flex-col gap-2 rounded-[14px] bg-exito-suave p-4 text-[15px] font-semibold text-sobre-exito-suave">
+            <div className="flex items-center gap-2.5">
+              <Check aria-hidden className="size-5 shrink-0" />
+              <span>Postulación enviada. Si te elige, el cliente te escribe por WhatsApp.</span>
+            </div>
+            <Link
+              href={`/trabajos/${trabajo.id}`}
+              className="self-start text-xs underline underline-offset-2 hover:opacity-80"
+            >
+              Ver detalle de mi postulación
+            </Link>
           </div>
         ) : (
-          <Boton
-            href={`/trabajos/${trabajo.id}`}
-            variante="profesional"
-            className="w-full sm:w-auto"
-          >
-            Ver detalle y postularme
-          </Boton>
+          <FormularioPostulacion
+            trabajoId={trabajo.id}
+            clienteNombre={clienteNombreParaFormulario}
+            trabajoEstado="abierto"
+            publicado={publicado}
+          />
         )}
       </div>
     </section>

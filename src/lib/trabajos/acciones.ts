@@ -11,6 +11,12 @@ import { registrarEventoServidor } from "@/lib/metricas-servidor";
 import { limitarIntentos } from "@/lib/rate-limit";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
+import { avisarNuevaPostulacion } from "@/lib/emails/avisos";
+import {
+  erroresDePostulacion,
+  esquemaPostulacion,
+  type ErroresPostulacion,
+} from "@/lib/validaciones/postulacion";
 import {
   MAX_TRABAJOS_ABIERTOS,
   rutaTrabajoPublicado,
@@ -180,5 +186,164 @@ export async function retirarPostulacion(
   }
 
   revalidatePath("/trabajos");
+  revalidatePath("/trabajos/[id]", "page");
+  revalidatePath("/mis-trabajos");
   return { ok: true };
+}
+
+export type EstadoPostulacion = EstadoFormulario & {
+  errores?: ErroresPostulacion;
+  ok?: boolean;
+  postulacionId?: string;
+};
+
+/**
+ * Envía una postulación de un profesional a un trabajo abierto (LAB-28).
+ * Se puede invocar directamente como Server Action o vinculada con `postularme.bind(null, trabajoId)`.
+ */
+export async function postularme(
+  trabajoIdOAnterior: string | EstadoPostulacion,
+  anteriorODatos: EstadoPostulacion | FormData,
+  posiblesDatos?: FormData,
+): Promise<EstadoPostulacion> {
+  const sesion = await obtenerSesion();
+  if (!sesion) {
+    return { mensaje: "Tu sesión venció. Ingresá de nuevo para postularte." };
+  }
+  if (sesion.rol !== "profesional") {
+    return { mensaje: "Solo las cuentas de profesional pueden postularse a trabajos." };
+  }
+
+  const trabajoIdDirecto = typeof trabajoIdOAnterior === "string" ? trabajoIdOAnterior : null;
+  const datos = (posiblesDatos ?? anteriorODatos) as FormData;
+  const trabajoId = trabajoIdDirecto ?? texto(datos, "trabajoId");
+  if (!/^[0-9a-f-]{36}$/.test(trabajoId)) {
+    return { mensaje: "Identificador de trabajo inválido." };
+  }
+
+  const valores = {
+    mensaje: texto(datos, "mensaje"),
+    precioEstimado: texto(datos, "precioEstimado"),
+    senaPropuesta: texto(datos, "senaPropuesta"),
+  };
+
+  const valid = esquemaPostulacion.safeParse(valores);
+  if (!valid.success) {
+    return {
+      errores: erroresDePostulacion(valid.error),
+      valores,
+    };
+  }
+
+  // Rate limit: 30 postulaciones por profesional por día
+  const limite = limitarIntentos(`postulacion:${sesion.usuario.id}`, {
+    maximo: 30,
+    ventanaMs: 24 * 60 * 60 * 1000,
+  });
+  if (!limite.permitido) {
+    return {
+      mensaje: "Alcanzaste el límite de 30 postulaciones por día. Intentá mañana.",
+      valores,
+    };
+  }
+
+  if (rolFalso()) {
+    revalidatePath("/trabajos");
+    revalidatePath(`/trabajos/${trabajoId}`);
+    return { ok: true, postulacionId: randomUUID() };
+  }
+
+  if (!supabaseConfigurado()) {
+    return { mensaje: "No pudimos conectar con el servidor.", valores };
+  }
+
+  const supabase = await crearClienteServidor();
+
+  // Validar perfil profesional publicado
+  const { data: perfil } = await supabase
+    .from("perfiles_profesionales")
+    .select("publicado, oficios")
+    .eq("usuario_id", sesion.usuario.id)
+    .maybeSingle();
+
+  if (!perfil || !perfil.publicado) {
+    return {
+      mensaje: "Vas a poder postularte cuando aprobemos tus documentos.",
+      valores,
+    };
+  }
+
+  // Validar que el trabajo esté abierto y pertenezca a sus oficios
+  const { data: trabajo } = await supabase
+    .from("trabajos")
+    .select("id, oficio, estado")
+    .eq("id", trabajoId)
+    .maybeSingle();
+
+  if (!trabajo || trabajo.estado !== "abierto") {
+    return {
+      mensaje: "Este trabajo ya no recibe postulaciones.",
+      valores,
+    };
+  }
+
+  const oficios = perfil.oficios ?? [];
+  if (!oficios.includes(trabajo.oficio)) {
+    return {
+      mensaje: "Solo podés postularte a trabajos de tus oficios.",
+      valores,
+    };
+  }
+
+  // Validar si ya se postuló
+  const { data: previa } = await supabase
+    .from("postulaciones")
+    .select("id, estado")
+    .eq("trabajo_id", trabajoId)
+    .eq("profesional_id", sesion.usuario.id)
+    .maybeSingle();
+
+  if (previa) {
+    return {
+      mensaje: "Ya te postulaste a este trabajo.",
+      valores,
+    };
+  }
+
+  const { data: nueva, error } = await supabase
+    .from("postulaciones")
+    .insert({
+      trabajo_id: trabajoId,
+      profesional_id: sesion.usuario.id,
+      mensaje: valid.data.mensaje,
+      precio_estimado: valid.data.precioEstimado ?? null,
+      sena_propuesta: valid.data.senaPropuesta ?? null,
+      estado: "enviada",
+    })
+    .select("id")
+    .single();
+
+  if (error || !nueva) {
+    if (error?.code === "23505") {
+      return { mensaje: "Ya te postulaste a este trabajo.", valores };
+    }
+    return {
+      mensaje: "No pudimos enviar tu postulación. Probá de nuevo en unos minutos.",
+      valores,
+    };
+  }
+
+  // Métricas
+  await registrarEventoServidor(sesion.usuario.id, "postulacion_enviada", {
+    oficio: trabajo.oficio,
+  });
+
+  // Aviso por email al cliente
+  await avisarNuevaPostulacion(nueva.id);
+
+  revalidatePath("/trabajos");
+  revalidatePath(`/trabajos/${trabajoId}`);
+  revalidatePath("/mis-trabajos");
+
+  return { ok: true, postulacionId: nueva.id };
 }
