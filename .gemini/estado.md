@@ -8,10 +8,10 @@ LAB-5, 6, 8 a 20, 22 a 26, 30, 33, 35 y 40. Lo último que entró: LAB-25 (conta
 
 ## PRs abiertos
 
-| Tarea | PR | Estado | Próximo paso |
-| --- | --- | --- | --- |
-| LAB-43 · Cabos de verificación (consentimiento, normas, enlaces de /cuenta) | #28 | Corregido tras un BLOQUEADO de seguridad; esperando la segunda revisión de seguridad | Seguridad, revisión, merge. Migración `20261014205000`. Va **antes** que LAB-21 |
-| LAB-21 · Panel de verificación para el equipo | #30 | Corregidos 2 ALTO de seguridad y el bug del visor; falta CI verde | Cuando LAB-43 esté en main: actualizar y recrear `documentos_subir_propios` con **consentimiento + cuota** (ver comentario 6178519406 del PR). Después seguridad, revisión y merge. Migración `20261014210000` |
+| Tarea                                                                       | PR  | Estado                                                                               | Próximo paso                                                                                                                                                                                                   |
+| --------------------------------------------------------------------------- | --- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| LAB-43 · Cabos de verificación (consentimiento, normas, enlaces de /cuenta) | #28 | Corregido tras un BLOQUEADO de seguridad; esperando la segunda revisión de seguridad | Seguridad, revisión, merge. Migración `20261014205000`. Va **antes** que LAB-21                                                                                                                                |
+| LAB-21 · Panel de verificación para el equipo                               | #30 | Corregidos 2 ALTO de seguridad y el bug del visor; falta CI verde                    | Cuando LAB-43 esté en main: actualizar y recrear `documentos_subir_propios` con **consentimiento + cuota** (ver comentario 6178519406 del PR). Después seguridad, revisión y merge. Migración `20261014210000` |
 
 ## Próximas tareas (Todo)
 
