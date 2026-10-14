@@ -11,6 +11,7 @@ import { DetalleTrabajoEscritorio } from "./DetalleTrabajoEscritorio";
 type MaestroDetalleTrabajosProps = {
   trabajos: TrabajoParaMi[];
   trabajoSeleccionadoId?: string | null;
+  publicado?: boolean;
 };
 
 /**
@@ -21,6 +22,7 @@ type MaestroDetalleTrabajosProps = {
 export function MaestroDetalleTrabajos({
   trabajos,
   trabajoSeleccionadoId,
+  publicado = true,
 }: MaestroDetalleTrabajosProps) {
   const searchParams = useSearchParams();
 
@@ -94,7 +96,7 @@ export function MaestroDetalleTrabajos({
 
       {/* Columna derecha de detalle (solo visible en escritorio lg+) */}
       <div className="hidden min-w-0 flex-1 lg:sticky lg:top-6 lg:block">
-        <DetalleTrabajoEscritorio trabajo={trabajoActivo} />
+        <DetalleTrabajoEscritorio trabajo={trabajoActivo} publicado={publicado} />
       </div>
     </div>
   );

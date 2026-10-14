@@ -109,7 +109,11 @@ export default async function Trabajos({ searchParams }: PaginaTrabajosProps) {
         />
       ) : null}
 
-      <MaestroDetalleTrabajos trabajos={trabajos} trabajoSeleccionadoId={params.trabajo} />
+      <MaestroDetalleTrabajos
+        trabajos={trabajos}
+        trabajoSeleccionadoId={params.trabajo}
+        publicado={perfil?.publicado ?? false}
+      />
     </div>
   );
 }
