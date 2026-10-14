@@ -15,7 +15,7 @@ import {
 import Link from "next/link";
 import { useState } from "react";
 
-import type { Barrio } from "@/lib/barrios";
+import type { Barrio } from "@/lib/barrios-busqueda";
 import { urlBusqueda } from "@/lib/busqueda-url";
 import { nombreOficio, OFICIOS_ORDENADOS, type Oficio } from "@/lib/oficios";
 

@@ -26,6 +26,8 @@ type PropsBase = {
 type PropsTexto = PropsBase & {
   /** "texto" (por defecto), "telefono" (`inputMode="tel"`) o "pesos" (prefijo `$`, numérico). */
   variante?: "texto" | "telefono" | "pesos";
+  /** Elemento al final del campo (por ejemplo el botón mostrar/ocultar de una contraseña). */
+  adorno?: ReactNode;
 } & Omit<InputHTMLAttributes<HTMLInputElement>, "className" | "children">;
 
 type PropsArea = PropsBase & {
@@ -146,6 +148,7 @@ export function Campo(props: CampoProps) {
       type,
       inputMode,
       autoComplete,
+      adorno,
       ...entrada
     } = props;
     void [_e, _a, _r, _c];
@@ -167,8 +170,11 @@ export function Campo(props: CampoProps) {
           type={type ?? (esTelefono ? "tel" : "text")}
           inputMode={inputMode ?? (esTelefono ? "tel" : esPesos ? "numeric" : undefined)}
           autoComplete={autoComplete ?? (esTelefono ? "tel" : undefined)}
-          className={cn(CONTROL, "h-[52px]", esPesos && "pl-8")}
+          className={cn(CONTROL, "h-[52px]", esPesos && "pl-8", adorno && "pr-12")}
         />
+        {adorno ? (
+          <div className="absolute top-1/2 right-0.5 -translate-y-1/2">{adorno}</div>
+        ) : null}
       </div>
     );
   }

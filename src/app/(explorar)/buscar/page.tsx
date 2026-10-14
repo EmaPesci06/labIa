@@ -8,7 +8,7 @@ import { TarjetaPublicar } from "@/components/busqueda/TarjetaPublicar";
 import { TarjetaProfesional } from "@/components/TarjetaProfesional";
 import { Boton } from "@/components/ui/Boton";
 import { Vacio } from "@/components/ui/Vacio";
-import { elegirBarrio, nombreDeBarrio } from "@/lib/barrios";
+import { elegirBarrio, nombreDeBarrio } from "@/lib/barrios-busqueda";
 import {
   buscarProfesionales,
   ErrorBusqueda,

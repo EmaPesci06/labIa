@@ -5,7 +5,7 @@ import { InicioBusqueda } from "@/components/inicio/InicioBusqueda";
 import { IrABuscarEnEscritorio } from "@/components/inicio/IrABuscarEnEscritorio";
 import { Avatar } from "@/components/ui/Avatar";
 import { Logo } from "@/components/ui/Logo";
-import { elegirBarrio } from "@/lib/barrios";
+import { elegirBarrio } from "@/lib/barrios-busqueda";
 import { barrioDeLaCuenta, obtenerBarrios } from "@/lib/busqueda-servidor";
 import { urlBusqueda } from "@/lib/busqueda-url";
 import { obtenerSesion } from "@/lib/sesion";

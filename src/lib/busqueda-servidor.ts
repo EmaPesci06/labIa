@@ -2,14 +2,14 @@ import "server-only";
 
 import { cache } from "react";
 
-import { listarBarrios, type Barrio } from "./barrios";
+import { listarBarriosBusqueda, type Barrio } from "./barrios-busqueda";
 import { crearClienteServidor, supabaseConfigurado } from "./supabase/servidor";
 import type { SesionActual } from "./sesion";
 
 /** Barrios (lectura pública), una sola consulta por pedido. Lista vacía si no hay Supabase. */
 export const obtenerBarrios = cache(async (): Promise<Barrio[]> => {
   if (!supabaseConfigurado()) return [];
-  return listarBarrios(await crearClienteServidor());
+  return listarBarriosBusqueda(await crearClienteServidor());
 });
 
 /**

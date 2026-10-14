@@ -10,7 +10,7 @@ import { Chip } from "@/components/ui/Chip";
 import { EtiquetaMono } from "@/components/ui/EtiquetaMono";
 import type { Oficio, OrdenBusqueda } from "@/lib/busqueda";
 import { urlBusqueda, type EstadoBusqueda } from "@/lib/busqueda-url";
-import type { Barrio } from "@/lib/barrios";
+import type { Barrio } from "@/lib/barrios-busqueda";
 import { cn } from "@/lib/cn";
 import { esMatriculable, nombreOficio, OFICIOS_ORDENADOS } from "@/lib/oficios";
 

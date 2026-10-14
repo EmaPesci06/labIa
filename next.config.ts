@@ -1,31 +1,27 @@
 import { withSentryConfig } from "@sentry/nextjs/config";
 import type { NextConfig } from "next";
 
-// Fotos de perfil: el bucket público `fotos` de Supabase Storage (next/image exige declarar el host).
-const hostSupabase = (() => {
-  try {
-    return process.env.NEXT_PUBLIC_SUPABASE_URL
-      ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
-      : null;
-  } catch {
-    return null;
-  }
-})();
+// Fotos del bucket público `fotos` de Supabase Storage (LAB-18): se muestran con next/image.
+const urlSupabase = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const hostSupabase = urlSupabase ? new URL(urlSupabase) : null;
 
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: hostSupabase
       ? [
           {
-            protocol: "https",
-            hostname: hostSupabase,
+            protocol: hostSupabase.protocol === "http:" ? "http" : "https",
+            hostname: hostSupabase.hostname,
+            port: hostSupabase.port,
             pathname: "/storage/v1/object/public/fotos/**",
             search: "",
           },
         ]
       : [],
+    // Supabase local (127.0.0.1) cuenta como IP privada para el optimizador de imágenes.
+    dangerouslyAllowLocalIP:
+      process.env.NODE_ENV !== "production" && hostSupabase?.hostname === "127.0.0.1",
   },
-  /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
   async headers() {
