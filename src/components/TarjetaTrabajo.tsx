@@ -23,6 +23,8 @@ export type TarjetaTrabajoProps = {
   postulantes: number;
   /** Distancia al profesional que mira; solo si hay un profesional mirando. */
   distanciaKm?: number | null;
+  /** Si el profesional ya se postuló a este trabajo (LAB-27). */
+  yaMePostule?: boolean;
   /** Si viene, la tarjeta entera es un enlace. */
   href?: string;
   className?: string;
@@ -47,6 +49,7 @@ export function TarjetaTrabajo({
   urgencia,
   postulantes,
   distanciaKm,
+  yaMePostule,
   href,
   className,
 }: TarjetaTrabajoProps) {
@@ -67,9 +70,12 @@ export function TarjetaTrabajo({
         <CintaDistancia km={distanciaKm} className="mt-3" />
       ) : null}
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-        <Insignia variante={urgencia === "lo_antes_posible" ? "urgencia" : "verificada"}>
-          {ETIQUETA_URGENCIA[urgencia]}
-        </Insignia>
+        <div className="flex flex-wrap items-center gap-1.5">
+          <Insignia variante={urgencia === "lo_antes_posible" ? "urgencia" : "verificada"}>
+            {ETIQUETA_URGENCIA[urgencia]}
+          </Insignia>
+          {yaMePostule ? <Insignia variante="verificada">Te postulaste</Insignia> : null}
+        </div>
         <span className="text-sm font-semibold text-texto-secundario">
           {textoPostulantes(postulantes)}
         </span>

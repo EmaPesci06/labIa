@@ -45,4 +45,19 @@ describe("TarjetaTrabajo", () => {
     expect(screen.getByText("recién")).toBeInTheDocument();
     expect(screen.queryByText(/ km$/)).toBeNull();
   });
+
+  it("muestra la insignia 'Te postulaste' si yaMePostule es true", () => {
+    render(
+      <TarjetaTrabajo
+        oficio="plomeria"
+        barrio="La Perla"
+        titulo="Cambiar canilla"
+        descripcion="Gotea"
+        urgencia="esta_semana"
+        postulantes={1}
+        yaMePostule
+      />,
+    );
+    expect(screen.getByText("Te postulaste")).toBeInTheDocument();
+  });
 });
