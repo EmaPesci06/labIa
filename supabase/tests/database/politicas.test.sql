@@ -347,7 +347,7 @@ select is_empty($$select * from public.verificaciones$$, 'verificaciones: el due
 select is_empty($$select storage_path from public.verificaciones where usuario_id = 'cccccccc-1200-4000-a000-000000000005'$$, 'verificaciones: el profesional no lee el storage_path de sus propias verificaciones');
 select is((select count(*) from public.mis_verificaciones), 2::bigint, 'mis_verificaciones: el dueño ve el estado de sus 2 documentos');
 select throws_ok($$select storage_path from public.mis_verificaciones$$, '42703', null, 'mis_verificaciones: la vista no expone storage_path');
-select is_empty($$update public.verificaciones set estado = 'aprobado' where usuario_id = 'cccccccc-1200-4000-a000-000000000005' returning 1$$, 'verificaciones: el dueño no se aprueba solo');
+select throws_ok($$update public.verificaciones set estado = 'aprobado' where usuario_id = 'cccccccc-1200-4000-a000-000000000005'$$, '42501', 'permission denied for table verificaciones', 'verificaciones: el dueño no se aprueba solo');
 select throws_ok($$delete from public.verificaciones where usuario_id = 'cccccccc-1200-4000-a000-000000000005'$$, '42501', null, 'verificaciones: nadie borra por la API (dueño)');
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000004');
