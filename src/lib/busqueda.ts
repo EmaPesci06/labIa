@@ -161,22 +161,28 @@ const MENSAJE_FALLA = "No pudimos buscar en este momento. Probá de nuevo.";
 export async function buscarProfesionales(
   supabase: SupabaseClient<Database>,
   entrada: URLSearchParams | Record<string, ValorUrl>,
+  /** Id del barrio ya resuelto por quien llama (varias páginas en un pedido): evita repetir la consulta. */
+  barrioId?: number,
 ): Promise<PaginaResultados> {
   const params = leerParametrosBusqueda(entrada);
 
-  const { data: barrio, error: errorBarrio } = await supabase
-    .from("barrios")
-    .select("id")
-    .eq("slug", params.barrio)
-    .maybeSingle();
-  if (errorBarrio) throw new ErrorBusqueda(MENSAJE_FALLA);
-  if (!barrio) {
-    throw new ErrorBusqueda("Ese barrio no existe.", { barrio: "Ese barrio no existe." });
+  let idBarrio = barrioId;
+  if (idBarrio === undefined) {
+    const { data: barrio, error: errorBarrio } = await supabase
+      .from("barrios")
+      .select("id")
+      .eq("slug", params.barrio)
+      .maybeSingle();
+    if (errorBarrio) throw new ErrorBusqueda(MENSAJE_FALLA);
+    if (!barrio) {
+      throw new ErrorBusqueda("Ese barrio no existe.", { barrio: "Ese barrio no existe." });
+    }
+    idBarrio = barrio.id;
   }
 
   const { data, error } = await supabase.rpc("buscar_profesionales", {
     p_oficio: params.oficio,
-    p_barrio: barrio.id,
+    p_barrio: idBarrio,
     p_solo_matriculados: params.matriculados,
     p_orden: params.orden,
     p_toda_la_ciudad: params.todaLaCiudad,
