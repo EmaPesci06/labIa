@@ -370,11 +370,11 @@ isOneToOne: true
               "anios_experiencia": number,"antecedentes_ok": boolean,"apellido_inicial": string,"cantidad_resenas": number,"distancia_km": number,"foto_path": string,"identidad_verificada": boolean,"matriculado": boolean,"nombre": string,"oficios": (Database["public"]['Enums']["oficio"])[],"promedio": number,"total": number,"usuario_id": string,"zonas_texto": string
             }[]
                            },
-"elegir_rol_inicial":
-{ Args: { "p_rol": Database["public"]['Enums']["rol"] }; Returns: undefined
-                           },
 "distancia_km":
 { Args: { "barrio_a": number,"barrio_b": number }; Returns: number
+                           },
+"elegir_rol_inicial":
+{ Args: { "p_rol": Database["public"]['Enums']["rol"] }; Returns: undefined
                            }
           }
           Enums: {
