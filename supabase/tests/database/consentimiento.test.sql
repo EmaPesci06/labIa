@@ -37,6 +37,18 @@ select is((select datos_sensibles_version from public.usuarios where id = 'ccccc
 select ok((select datos_sensibles_consentido_at is not null from public.usuarios where id = 'cccccccc-3500-4000-a000-000000000001'), 'consentimiento: quedó la fecha');
 select throws_ok($$select public.aceptar_consentimiento_datos_sensibles('')$$, '23514', null, 'consentimiento: rechaza una versión vacía');
 
+-- LAB-43: volver a darlo con la misma versión no pisa la fecha original (prueba de cuándo lo dio).
+reset role;
+update public.usuarios set datos_sensibles_consentido_at = '2026-01-01 10:00:00+00'
+where id = 'cccccccc-3500-4000-a000-000000000001';
+select tests_cons.como('cccccccc-3500-4000-a000-000000000001');
+select lives_ok($$select public.aceptar_consentimiento_datos_sensibles('2026-10')$$, 'consentimiento: volver a darlo con la misma versión no falla');
+select is(
+  (select datos_sensibles_consentido_at from public.usuarios where id = 'cccccccc-3500-4000-a000-000000000001'),
+  '2026-01-01 10:00:00+00'::timestamptz,
+  'consentimiento: con la misma versión se conserva la fecha original'
+);
+
 reset role; select tests_cons.como('cccccccc-3500-4000-a000-000000000002');
 select throws_ok($$select public.aceptar_consentimiento_datos_sensibles('2026-10')$$, '42501', null, 'consentimiento: un cliente no lo da');
 

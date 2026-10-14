@@ -86,7 +86,8 @@ $$;
 revoke execute on function privado.documento_cabe() from public, anon;
 grant execute on function privado.documento_cabe() to authenticated;
 
--- Misma regla de subida que LAB-12, con el tope de 12 archivos por cuenta.
+-- Misma regla de subida que LAB-43 (20261014205000: profesional activo, consentimiento vigente,
+-- carpeta y nombre), más el tope de 12 archivos por cuenta. Sin políticas de select, update ni delete.
 drop policy documentos_subir_propios on storage.objects;
 
 create policy documentos_subir_propios on storage.objects
@@ -95,6 +96,7 @@ create policy documentos_subir_propios on storage.objects
     bucket_id = 'documentos'
     and privado.rol_actual() = 'profesional'
     and privado.cuenta_activa()
+    and privado.consentimiento_datos_vigente()
     and privado.documento_cabe()
     and name ~ (
       '^' || (select auth.uid())::text

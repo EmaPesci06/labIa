@@ -32,6 +32,11 @@ values
 
 update public.usuarios set rol = 'admin' where id = 'dddddddd-2000-4000-a000-000000000002';
 
+-- P y P2 dieron el consentimiento vigente de datos sensibles (LAB-43): sin él no se sube ni se registra.
+update public.usuarios
+set datos_sensibles_version = '2026-10', datos_sensibles_consentido_at = now()
+where id in ('dddddddd-2000-4000-a000-000000000001', 'dddddddd-2000-4000-a000-000000000004');
+
 insert into public.perfiles_profesionales (usuario_id, oficios, toda_la_ciudad, zonas)
 values
   ('dddddddd-2000-4000-a000-000000000001', '{plomeria}', true, '{}'),
@@ -252,7 +257,20 @@ reset role;
 select tests.como('dddddddd-2000-4000-a000-000000000004');
 select lives_ok(
   $$insert into storage.objects (bucket_id, name) values ('documentos', 'dddddddd-2000-4000-a000-000000000004/dni_dorso-1791734400030.jpg')$$,
-  'cuota: una cuenta por debajo del tope sí puede subir'
+  'cuota: una cuenta con consentimiento y por debajo del tope sí puede subir'
+);
+
+reset role;
+insert into auth.users (instance_id, id, aud, role, email, raw_user_meta_data)
+values ('00000000-0000-0000-0000-000000000000', 'dddddddd-2000-4000-a000-000000000006', 'authenticated', 'authenticated', 'pan-p3@labia.test', '{"rol": "profesional", "nombre": "Pedro", "apellido": "Sinconsentimiento"}');
+
+reset role;
+select tests.como('dddddddd-2000-4000-a000-000000000006');
+select throws_ok(
+  $$insert into storage.objects (bucket_id, name) values ('documentos', 'dddddddd-2000-4000-a000-000000000006/dni_frente-1791734400040.jpg')$$,
+  '42501',
+  'new row violates row-level security policy for table "objects"',
+  'consentimiento: sin consentimiento vigente no se sube, aunque haya cupo'
 );
 
 -- ---------------------------------------------------------------------------
@@ -335,6 +353,12 @@ select throws_ok(
   '42501',
   'permission denied for table verificaciones',
   'verificaciones: nadie cambia el estado a mano, ni el admin (solo decidir_documento)'
+);
+
+select ok(
+  (select position('consentimiento_datos_vigente' in with_check) > 0
+   from pg_policies where schemaname = 'storage' and tablename = 'objects' and policyname = 'documentos_subir_propios'),
+  'consentimiento: la política de subida conserva la condición de LAB-43'
 );
 
 select * from finish();

@@ -16,8 +16,8 @@ const REGLA = { maximo: 10, ventanaMs: 60_000 } as const;
 /**
  * Guarda el consentimiento expreso para tratar DNI y antecedentes (RPC
  * `aceptar_consentimiento_datos_sensibles`: versión y fecha no se escriben directo). Valida
- * entrada, sesión y rol. Devuelve `exito` para que la carga de documentos siga.
- * TODO(LAB-19): la carga de documentos llama a esta acción antes de subir el primer archivo.
+ * entrada, sesión y rol. Devuelve `exito` para que la carga de documentos siga. La llama
+ * `subirDocumentos` antes del primer archivo (LAB-43).
  */
 export async function darConsentimientoDatosSensibles(
   _anterior: EstadoFormulario,

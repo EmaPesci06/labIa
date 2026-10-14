@@ -29,6 +29,12 @@ values
 -- El cuarto profesional (…0004) está suspendido.
 update public.usuarios set estado = 'suspendida' where id = 'cccccccc-1900-4000-a000-000000000004';
 
+-- Consentimiento para datos sensibles (LAB-43): el profesional …0001 lo dio en la versión vigente.
+-- …0003 todavía no lo dio, y se prueba más abajo.
+update public.usuarios
+set datos_sensibles_version = '2026-10', datos_sensibles_consentido_at = now()
+where id = 'cccccccc-1900-4000-a000-000000000001';
+
 -- Archivos ya subidos al bucket (como lo hace la URL firmada de subida).
 insert into storage.objects (bucket_id, name)
 values
@@ -129,6 +135,49 @@ select is(
   'registrar_documento: el viejo y el nuevo siguen en la tabla'
 );
 
+-- Consentimiento (LAB-43): sin consentimiento vigente no se sube al bucket ni se registra.
+-- …0003 es profesional activo pero todavía no dio el consentimiento.
+reset role; select tests.como('cccccccc-1900-4000-a000-000000000003');
+select throws_ok(
+  $$insert into storage.objects (bucket_id, name) values ('documentos', 'cccccccc-1900-4000-a000-000000000003/dni_frente-1791734400010.jpg')$$,
+  '42501', null, 'consentimiento: sin consentimiento no sube al bucket'
+);
+select throws_ok(
+  $$select public.registrar_documento('dni_dorso', 'cccccccc-1900-4000-a000-000000000003/dni_dorso-1791734400004.png')$$,
+  '42501', null, 'consentimiento: sin consentimiento no registra un documento'
+);
+
+-- Un consentimiento de una versión vieja de la política no vale.
+reset role;
+update public.usuarios
+set datos_sensibles_version = '2026-09', datos_sensibles_consentido_at = now()
+where id = 'cccccccc-1900-4000-a000-000000000003';
+select tests.como('cccccccc-1900-4000-a000-000000000003');
+select throws_ok(
+  $$insert into storage.objects (bucket_id, name) values ('documentos', 'cccccccc-1900-4000-a000-000000000003/dni_frente-1791734400011.jpg')$$,
+  '42501', null, 'consentimiento: una versión vieja no sirve para subir'
+);
+select throws_ok(
+  $$select public.registrar_documento('dni_dorso', 'cccccccc-1900-4000-a000-000000000003/dni_dorso-1791734400004.png')$$,
+  '42501', null, 'consentimiento: una versión vieja no sirve para registrar'
+);
+
+-- Con el consentimiento de la versión vigente, sí.
+reset role;
+update public.usuarios
+set datos_sensibles_version = '2026-10'
+where id = 'cccccccc-1900-4000-a000-000000000003';
+select tests.como('cccccccc-1900-4000-a000-000000000003');
+select lives_ok(
+  $$insert into storage.objects (bucket_id, name) values ('documentos', 'cccccccc-1900-4000-a000-000000000003/dni_frente-1791734400012.jpg')$$,
+  'consentimiento: con la versión vigente sube al bucket'
+);
+select lives_ok(
+  $$select public.registrar_documento('dni_frente', 'cccccccc-1900-4000-a000-000000000003/dni_frente-1791734400012.jpg')$$,
+  'consentimiento: con la versión vigente registra el documento'
+);
+
+reset role;
 select * from finish();
 
 rollback;

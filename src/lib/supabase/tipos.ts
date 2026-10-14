@@ -491,6 +491,9 @@ isOneToOne: true
               "anios_experiencia": number,"antecedentes_ok": boolean,"apellido_inicial": string,"cantidad_resenas": number,"distancia_km": number,"foto_path": string,"identidad_verificada": boolean,"matriculado": boolean,"nombre": string,"oficios": (Database["public"]['Enums']["oficio"])[],"promedio": number,"total": number,"usuario_id": string,"zonas_texto": string
             }[]
                            },
+"contactar_profesional":
+{ Args: { "p_origen": string,"p_profesional": string,"p_trabajo"?: string }; Returns: string
+                           },
 "decidir_documento":
 { Args: { "p_aprobar": boolean,"p_detalle"?: string,"p_motivo"?: string,"p_verificacion": string }; Returns: {
               "r_estado": Database["public"]['Enums']["estado_verificacion"],"r_tipo": Database["public"]['Enums']["tipo_documento"],"r_usuario_id": string

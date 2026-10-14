@@ -73,6 +73,7 @@ export default async function PerfilDelProfesional({ params }: Props) {
         perfil={perfil}
         resenas={resenas}
         distanciaKm={distanciaKm}
+        puedeContactar={sesion?.rol === "cliente"}
         hrefIngreso={
           sesion
             ? undefined

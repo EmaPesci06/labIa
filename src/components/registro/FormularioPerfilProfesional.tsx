@@ -22,6 +22,7 @@ import { registrarEvento } from "@/lib/metricas";
 import { guardarFotosPerfil, guardarPerfilProfesional } from "@/lib/registro/profesional";
 import { tiposVigentes } from "@/lib/registro/documentos-estado";
 import { subirDocumentos } from "@/lib/registro/subir-documentos";
+import { MENSAJE_CONSENTIMIENTO } from "@/lib/validaciones/consentimiento";
 import {
   documentosFaltantes,
   mensajeDocumentosFaltantes,
@@ -132,6 +133,8 @@ export function FormularioPerfilProfesional({
   const [documentosLocales, setDocumentosLocales] = useState<
     Partial<Record<TipoDocumento, File | null>>
   >({});
+  // Consentimiento expreso para datos sensibles (LAB-43): sin tildar, no se suben documentos.
+  const [consentido, setConsentido] = useState(false);
   const [subidosAhora, setSubidosAhora] = useState<Partial<Record<TipoDocumento, boolean>>>({});
   const [progreso, setProgreso] = useState<{ hechos: number; total: number } | null>(null);
   const [procesando, setProcesando] = useState(false);
@@ -232,8 +235,11 @@ export function FormularioPerfilProfesional({
     );
     if (entradas.length === 0) return null;
 
-    const resultado = await subirDocumentos(uid, entradas, (hechos, total) =>
-      setProgreso({ hechos, total }),
+    const resultado = await subirDocumentos(
+      uid,
+      entradas,
+      (hechos, total) => setProgreso({ hechos, total }),
+      consentido,
     );
     setProgreso(null);
     if (resultado.subidos.length > 0) {
@@ -259,6 +265,8 @@ export function FormularioPerfilProfesional({
     const documentos = faltantes().length > 0 ? mensajeDocumentosFaltantes(tieneGas) : undefined;
     if (conErrores) return { ...conErrores, documentos };
     if (documentos) return { documentos };
+    const hayArchivos = Object.values(documentosLocales).some(Boolean);
+    if (hayArchivos && !consentido) return { documentos: MENSAJE_CONSENTIMIENTO };
 
     const resultado = await guardarPerfilProfesional(anterior, datos);
     if (!resultado.guardado) return resultado;
@@ -591,6 +599,7 @@ export function FormularioPerfilProfesional({
             progreso={progreso}
             error={estado.documentos}
             ocupado={procesando || pendiente}
+            consentimiento={{ tildado: consentido, onCambio: setConsentido }}
           />
 
           {estado.mensaje ? (
@@ -619,6 +628,7 @@ export function FormularioPerfilProfesional({
           progreso={progreso}
           error={estado.documentos}
           ocupado={procesando || pendiente}
+          consentimiento={{ tildado: consentido, onCambio: setConsentido }}
         />
         {estado.mensaje ? (
           <p role="alert" className="text-sm font-semibold text-error">
