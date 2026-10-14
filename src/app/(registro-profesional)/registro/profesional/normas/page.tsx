@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { FormularioNormas } from "@/components/normas/FormularioNormas";
@@ -8,13 +9,14 @@ import { EstructuraRegistro } from "@/components/registro/EstructuraRegistro";
 import { VistaPreviaPerfil } from "@/components/registro/VistaPreviaPerfil";
 import { Boton } from "@/components/ui/Boton";
 import { inicioDelRol } from "@/lib/auth/rutas";
+import { faltantesRegistrados } from "@/lib/registro/documentos-estado";
 import { cargarDatosRegistro } from "@/lib/registro/borrador";
 import { OFICIOS } from "@/lib/validaciones/perfil-profesional";
 
 export const metadata: Metadata = { title: "Normas de seguridad · LabÍA" };
 
 async function Contenido() {
-  const { sesion, rol, borrador, barrios, urls } = await cargarDatosRegistro();
+  const { sesion, rol, borrador, barrios, urls, verificaciones } = await cargarDatosRegistro();
 
   if (sesion && rol && rol !== "profesional") {
     return (
@@ -28,6 +30,15 @@ async function Contenido() {
         </Boton>
       </div>
     );
+  }
+
+  // Sin DNI y antecedentes (y matrícula si es gasista) registrados no hay paso 2: se vuelve al 1.
+  if (
+    sesion &&
+    rol === "profesional" &&
+    faltantesRegistrados(verificaciones, borrador.oficios.includes("gas")).length > 0
+  ) {
+    redirect("/registro/profesional");
   }
 
   const oficios = OFICIOS.filter((o) => borrador.oficios.includes(o.valor))

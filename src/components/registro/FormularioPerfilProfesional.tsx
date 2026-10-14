@@ -20,10 +20,18 @@ import { GrupoChips } from "@/components/ui/Chip";
 import { comprimirImagen } from "@/lib/imagen";
 import { registrarEvento } from "@/lib/metricas";
 import { guardarFotosPerfil, guardarPerfilProfesional } from "@/lib/registro/profesional";
+import { tiposVigentes } from "@/lib/registro/documentos-estado";
+import { subirDocumentos } from "@/lib/registro/subir-documentos";
+import {
+  documentosFaltantes,
+  mensajeDocumentosFaltantes,
+  type TipoDocumento,
+} from "@/lib/validaciones/documentos";
 import type {
   BarrioOpcion,
   BorradorPerfil,
   EstadoPerfil,
+  ItemVerificacion,
   SesionRegistro,
 } from "@/lib/registro/tipos";
 import { crearClienteNavegador } from "@/lib/supabase/navegador";
@@ -52,6 +60,7 @@ type Props = {
   barrios: BarrioOpcion[];
   /** URLs públicas de las fotos ya subidas, por ruta. */
   urls: Record<string, string>;
+  verificaciones?: ItemVerificacion[];
 };
 
 function Seccion({ titulo, children }: { titulo: string; children: ReactNode }) {
@@ -99,7 +108,13 @@ const suscribirNada = () => () => undefined;
  * Paso 1 del registro de profesional: el perfil que van a ver los clientes. A la izquierda el
  * formulario; en escritorio, a la derecha, la vista previa en vivo, la verificación y el botón.
  */
-export function FormularioPerfilProfesional({ sesion, borrador, barrios, urls }: Props) {
+export function FormularioPerfilProfesional({
+  sesion,
+  borrador,
+  barrios,
+  urls,
+  verificaciones = [],
+}: Props) {
   const router = useRouter();
   const formulario = useRef<HTMLFormElement>(null);
   const [nombre, setNombre] = useState(borrador.nombreCompleto);
@@ -114,6 +129,11 @@ export function FormularioPerfilProfesional({ sesion, borrador, barrios, urls }:
   const [fotosTrabajos, setFotosTrabajos] = useState<FotoLocal[]>(() =>
     borrador.fotosTrabajos.flatMap((ruta) => fotoDeRuta(ruta, urls) ?? []),
   );
+  const [documentosLocales, setDocumentosLocales] = useState<
+    Partial<Record<TipoDocumento, File | null>>
+  >({});
+  const [subidosAhora, setSubidosAhora] = useState<Partial<Record<TipoDocumento, boolean>>>({});
+  const [progreso, setProgreso] = useState<{ hechos: number; total: number } | null>(null);
   const [procesando, setProcesando] = useState(false);
   const [errorFotos, setErrorFotos] = useState<{ perfil?: string; trabajos?: string }>({});
   // Fotos ya subidas que la persona quitó: se borran del bucket al guardar.
@@ -186,15 +206,68 @@ export function FormularioPerfilProfesional({ sesion, borrador, barrios, urls }:
     return null;
   }
 
+  const elegirDocumento = (tipo: TipoDocumento, archivo: File) => {
+    setDocumentosLocales((prev) => ({ ...prev, [tipo]: archivo }));
+  };
+
+  const quitarDocumento = (tipo: TipoDocumento) => {
+    setDocumentosLocales((prev) => ({ ...prev, [tipo]: null }));
+  };
+
+  /** Documentos obligatorios que no están ni elegidos, ni subidos, ni registrados sin rechazo. */
+  function faltantes(): TipoDocumento[] {
+    const presentes = tiposVigentes(verificaciones);
+    for (const tipo of Object.keys(subidosAhora) as TipoDocumento[]) {
+      if (subidosAhora[tipo]) presentes.add(tipo);
+    }
+    for (const tipo of Object.keys(documentosLocales) as TipoDocumento[]) {
+      if (documentosLocales[tipo]) presentes.add(tipo);
+    }
+    return documentosFaltantes(tieneGas, presentes);
+  }
+
+  async function subirDocumentosPendientes(uid: string): Promise<string | null> {
+    const entradas = (Object.entries(documentosLocales) as [TipoDocumento, File | null][]).filter(
+      (entrada): entrada is [TipoDocumento, File] => Boolean(entrada[1]),
+    );
+    if (entradas.length === 0) return null;
+
+    const resultado = await subirDocumentos(uid, entradas, (hechos, total) =>
+      setProgreso({ hechos, total }),
+    );
+    setProgreso(null);
+    if (resultado.subidos.length > 0) {
+      // Lo que ya quedó subido no se vuelve a subir en un reintento.
+      setSubidosAhora((previos) => ({
+        ...previos,
+        ...Object.fromEntries(resultado.subidos.map((tipo) => [tipo, true])),
+      }));
+      setDocumentosLocales((previos) => ({
+        ...previos,
+        ...Object.fromEntries(resultado.subidos.map((tipo) => [tipo, null])),
+      }));
+    }
+    if (!resultado.ok) return resultado.mensaje;
+    registrarEvento("documentos_enviados");
+    return null;
+  }
+
   async function accion(anterior: EstadoPerfil, datos: FormData): Promise<EstadoPerfil> {
     const conErrores = validarEnNavegador(datos, conCuenta);
-    if (conErrores) return conErrores;
+    // Sin DNI y antecedentes (y matrícula si es gasista) no se pasa al paso 2. El servidor lo
+    // vuelve a exigir en el paso 2.
+    const documentos = faltantes().length > 0 ? mensajeDocumentosFaltantes(tieneGas) : undefined;
+    if (conErrores) return { ...conErrores, documentos };
+    if (documentos) return { documentos };
 
     const resultado = await guardarPerfilProfesional(anterior, datos);
     if (!resultado.guardado) return resultado;
 
     const errorSubida = await subirFotosPendientes(resultado.guardado.uid);
     if (errorSubida) return { mensaje: errorSubida };
+
+    const errorDocs = await subirDocumentosPendientes(resultado.guardado.uid);
+    if (errorDocs) return { mensaje: errorDocs };
 
     router.push(DESTINO_SIGUIENTE);
     return resultado;
@@ -507,7 +580,18 @@ export function FormularioPerfilProfesional({ sesion, borrador, barrios, urls }:
             />
           </div>
 
-          <BloqueVerificacion className="lg:hidden" />
+          <BloqueVerificacion
+            className="lg:hidden"
+            tieneGas={tieneGas}
+            verificaciones={verificaciones}
+            documentosLocales={documentosLocales}
+            onElegirDocumento={elegirDocumento}
+            onQuitarDocumento={quitarDocumento}
+            subidosAhora={subidosAhora}
+            progreso={progreso}
+            error={estado.documentos}
+            ocupado={procesando || pendiente}
+          />
 
           {estado.mensaje ? (
             <p role="alert" className="text-sm font-semibold text-error lg:hidden">
@@ -525,7 +609,17 @@ export function FormularioPerfilProfesional({ sesion, borrador, barrios, urls }:
           zonas={zonasTexto}
           foto={fotoPerfil?.vista ?? null}
         />
-        <BloqueVerificacion />
+        <BloqueVerificacion
+          tieneGas={tieneGas}
+          verificaciones={verificaciones}
+          documentosLocales={documentosLocales}
+          onElegirDocumento={elegirDocumento}
+          onQuitarDocumento={quitarDocumento}
+          subidosAhora={subidosAhora}
+          progreso={progreso}
+          error={estado.documentos}
+          ocupado={procesando || pendiente}
+        />
         {estado.mensaje ? (
           <p role="alert" className="text-sm font-semibold text-error">
             {estado.mensaje}

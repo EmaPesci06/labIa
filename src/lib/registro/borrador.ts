@@ -6,8 +6,10 @@ import {
   BORRADOR_VACIO,
   type BarrioOpcion,
   type BorradorPerfil,
+  type ItemVerificacion,
   type SesionRegistro,
 } from "./tipos";
+import type { TipoDocumento } from "@/lib/validaciones/documentos";
 
 export type DatosRegistro = {
   sesion: SesionRegistro;
@@ -17,6 +19,7 @@ export type DatosRegistro = {
   barrios: BarrioOpcion[];
   /** URLs públicas de las fotos ya subidas, por ruta. */
   urls: Record<string, string>;
+  verificaciones: ItemVerificacion[];
 };
 
 const comoTexto = (valor: unknown): string => (typeof valor === "string" ? valor : "");
@@ -63,6 +66,7 @@ export async function cargarDatosRegistro(): Promise<DatosRegistro> {
     borrador: BORRADOR_VACIO,
     barrios: [],
     urls: {},
+    verificaciones: [],
   };
   if (!supabaseConfigurado()) return vacio;
 
@@ -76,25 +80,54 @@ export async function cargarDatosRegistro(): Promise<DatosRegistro> {
   if (!usuario) return { ...vacio, barrios: opciones };
 
   const sesion = { uid: usuario.id, email: usuario.email ?? null };
-  const [{ data: fila }, { data: perfil }, { data: matricula }] = await Promise.all([
-    supabase
-      .from("usuarios")
-      .select("rol, nombre, apellido, whatsapp, barrio_id, foto_path")
-      .eq("id", usuario.id)
-      .maybeSingle(),
-    supabase
-      .from("perfiles_profesionales")
-      .select(
-        "oficios, especialidades, descripcion, anios_experiencia, toda_la_ciudad, zonas, disponibilidad, fotos_trabajos",
-      )
-      .eq("usuario_id", usuario.id)
-      .maybeSingle(),
-    supabase
-      .from("matricula_propia")
-      .select("matricula_numero")
-      .eq("usuario_id", usuario.id)
-      .maybeSingle(),
-  ]);
+  const [{ data: fila }, { data: perfil }, { data: matricula }, { data: verificacionesData }] =
+    await Promise.all([
+      supabase
+        .from("usuarios")
+        .select("rol, nombre, apellido, whatsapp, barrio_id, foto_path")
+        .eq("id", usuario.id)
+        .maybeSingle(),
+      supabase
+        .from("perfiles_profesionales")
+        .select(
+          "oficios, especialidades, descripcion, anios_experiencia, toda_la_ciudad, zonas, disponibilidad, fotos_trabajos",
+        )
+        .eq("usuario_id", usuario.id)
+        .maybeSingle(),
+      supabase
+        .from("matricula_propia")
+        .select("matricula_numero")
+        .eq("usuario_id", usuario.id)
+        .maybeSingle(),
+      supabase
+        .from("mis_verificaciones")
+        .select("id, tipo, estado, motivo_rechazo, created_at")
+        .order("created_at", { ascending: false }),
+    ]);
+
+  const verificaciones: ItemVerificacion[] = (verificacionesData ?? [])
+    .filter(
+      (
+        v,
+      ): v is {
+        id: string;
+        tipo: TipoDocumento;
+        estado: "pendiente" | "aprobado" | "rechazado";
+        motivo_rechazo: string | null;
+        created_at: string;
+      } =>
+        typeof v.id === "string" &&
+        v.tipo !== null &&
+        v.estado !== null &&
+        typeof v.created_at === "string",
+    )
+    .map((v) => ({
+      id: v.id,
+      tipo: v.tipo,
+      estado: v.estado,
+      motivoRechazo: v.motivo_rechazo,
+      createdAt: v.created_at,
+    }));
 
   const meta = borradorDeMetadata(usuario.user_metadata?.perfil_borrador);
   const nombreGuardado = [fila?.nombre, fila?.apellido].filter(Boolean).join(" ");
@@ -127,5 +160,12 @@ export async function cargarDatosRegistro(): Promise<DatosRegistro> {
     rutas.map((ruta) => [ruta, supabase.storage.from("fotos").getPublicUrl(ruta).data.publicUrl]),
   );
 
-  return { sesion, rol: fila?.rol ?? null, borrador, barrios: opciones, urls };
+  return {
+    sesion,
+    rol: fila?.rol ?? null,
+    borrador,
+    barrios: opciones,
+    urls,
+    verificaciones,
+  };
 }

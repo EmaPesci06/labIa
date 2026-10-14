@@ -151,7 +151,7 @@ test.describe("registro de profesional · formulario completo", () => {
 
   test("foto de perfil: cargar y quitar", async ({ page }) => {
     await hidratada(page);
-    await page.locator('input[type="file"]:not([multiple])').setInputFiles(foto(1));
+    await page.getByLabel("Foto de perfil").setInputFiles(foto(1));
     await expect(page.getByRole("img", { name: "Tu foto de perfil" })).toBeVisible();
     await page.getByRole("button", { name: "Quitar foto de perfil" }).click();
     await expect(page.getByRole("img", { name: "Tu foto de perfil" })).toHaveCount(0);

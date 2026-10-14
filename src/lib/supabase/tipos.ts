@@ -475,6 +475,9 @@ isOneToOne: true
 { Args: { "p_id": string }; Returns: {
               "anios_experiencia": number,"antecedentes_ok": boolean,"apellido": string,"apellido_inicial": string,"barrio_id": number,"cantidad_resenas": number,"descripcion": string,"disponibilidad": string,"es_propio": boolean,"especialidades": string,"foto_path": string,"fotos_trabajos": (string)[],"identidad_verificada": boolean,"matriculado": boolean,"nombre": string,"oficios": (Database["public"]['Enums']["oficio"])[],"promedio": number,"publicado": boolean,"toda_la_ciudad": boolean,"usuario_id": string,"zonas_texto": string
             }[]
+                           },
+"registrar_documento":
+{ Args: { "p_storage_path": string,"p_tipo": Database["public"]['Enums']["tipo_documento"] }; Returns: string
                            }
           }
           Enums: {
