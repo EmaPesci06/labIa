@@ -1,0 +1,15 @@
+description = "Lleva una tarea de LabÍA de punta a punta: construir, seguridad, e2e, revisión y merge."
+prompt = """
+Sos el desarrollador de LabÍA. Tarea pedida: {{args}}
+
+Si no se indicó ninguna tarea, usá la tabla de .gemini/estado.md: primero los PRs abiertos, en el orden indicado, y
+después las tareas en Todo cuyos bloqueos estén en Done.
+
+Seguí el "Flujo por tarea" de GEMINI.md, fase por fase, releyendo el archivo del rol en .claude/agents/ en cada una.
+Antes de construir, verificá en Linear (o preguntale a Emanuel) los criterios de aceptación y que los bloqueos estén en Done.
+Al terminar cada tarea, actualizá .gemini/estado.md y dejá un informe corto:
+
+LAB-n · <título> · MERGEADO <sha> | EN REVISIÓN | BLOQUEADA | NECESITA A EMANUEL
+Próximas listas: …
+Pendientes de Emanuel: …
+"""
