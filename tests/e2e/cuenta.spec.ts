@@ -109,16 +109,11 @@ test.describe("mi cuenta (cliente)", () => {
 test.describe("mi cuenta (profesional)", () => {
   test.use({ baseURL: URL_PROFESIONAL });
 
-  test("suma perfil profesional y verificación", async ({ page }) => {
+  test("muestra el rol y sin enlaces a pantallas que todavía no existen", async ({ page }) => {
     await page.goto("/cuenta");
     await expect(page.getByText("Profesional", { exact: true })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Mi perfil profesional" })).toHaveAttribute(
-      "href",
-      "/cuenta/perfil",
-    );
-    await expect(page.getByRole("link", { name: "Verificación" })).toHaveAttribute(
-      "href",
-      "/cuenta/verificacion",
-    );
+    // /cuenta/perfil y /cuenta/verificacion los agregan las tareas que crean esas pantallas.
+    await expect(page.getByRole("link", { name: "Mi perfil profesional" })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Verificación" })).toHaveCount(0);
   });
 });

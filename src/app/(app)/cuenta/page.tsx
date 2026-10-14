@@ -1,14 +1,4 @@
-import {
-  BadgeCheck,
-  BriefcaseBusiness,
-  Download,
-  FileText,
-  Lock,
-  Mail,
-  ShieldCheck,
-  Trash2,
-  UserRound,
-} from "lucide-react";
+import { Download, FileText, Lock, Mail, ShieldCheck, Trash2, UserRound } from "lucide-react";
 import type { Metadata } from "next";
 
 import { BotonSalir } from "@/components/auth/BotonSalir";
@@ -68,22 +58,9 @@ export default async function Cuenta() {
         <FilaEnlace href="/cuenta/datos" icono={<UserRound aria-hidden className={ICONO} />}>
           Mis datos
         </FilaEnlace>
-        {esProfesional ? (
-          <>
-            <FilaEnlace
-              href="/cuenta/perfil"
-              icono={<BriefcaseBusiness aria-hidden className={ICONO} />}
-            >
-              Mi perfil profesional
-            </FilaEnlace>
-            <FilaEnlace
-              href="/cuenta/verificacion"
-              icono={<BadgeCheck aria-hidden className={ICONO} />}
-            >
-              Verificación
-            </FilaEnlace>
-          </>
-        ) : null}
+        {/* TODO: "Mi perfil profesional" (/cuenta/perfil) y "Verificación" (/cuenta/verificacion), solo
+            para profesionales, los agregan las tareas que crean esas pantallas (LAB-19 crea
+            /cuenta/verificacion); hoy darían 404. */}
         <FilaEnlace href="/cuenta/emails" icono={<Mail aria-hidden className={ICONO} />}>
           Emails
         </FilaEnlace>

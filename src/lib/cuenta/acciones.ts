@@ -16,6 +16,7 @@ import { erroresPorCampo, esquemaNuevaContrasena } from "@/lib/validaciones/auth
 import {
   esquemaBorrarCuenta,
   esquemaCambiarEmail,
+  esquemaContrasenaActual,
   esquemaDatosCuenta,
 } from "@/lib/validaciones/cuenta";
 import { esRutaFotoPerfil } from "@/lib/validaciones/perfil-profesional";
@@ -127,7 +128,7 @@ export async function cambiarEmail(
   datos: FormData,
 ): Promise<EstadoFormulario> {
   const entrada = { email: texto(datos, "email") };
-  const resultado = esquemaCambiarEmail.safeParse(entrada);
+  const resultado = esquemaCambiarEmail.safeParse({ ...entrada, actual: texto(datos, "actual") });
   if (!resultado.success) return { errores: erroresPorCampo(resultado.error), valores: entrada };
 
   const sesion = await sesionDeCuenta();
@@ -140,6 +141,9 @@ export async function cambiarEmail(
   }
   const limite = await superaElLimite("email", sesion.usuario.id);
   if (limite) return { mensaje: limite, valores: entrada };
+  if (!(await contrasenaActualValida(sesion.usuario.email, resultado.data.actual))) {
+    return { errores: { actual: "La contraseña actual no coincide." }, valores: entrada };
+  }
   if (resultado.data.email === sesion.usuario.email) {
     return { errores: { email: "Es el mismo email que ya tenés." }, valores: entrada };
   }
@@ -166,7 +170,15 @@ export async function cambiarContrasena(
     contrasena: texto(datos, "contrasena"),
     repetir: texto(datos, "repetir"),
   });
-  if (!resultado.success) return { errores: erroresPorCampo(resultado.error) };
+  const actual = esquemaContrasenaActual.safeParse({ actual: texto(datos, "actual") });
+  if (!resultado.success || !actual.success) {
+    return {
+      errores: {
+        ...(actual.success ? {} : erroresPorCampo(actual.error)),
+        ...(resultado.success ? {} : erroresPorCampo(resultado.error)),
+      },
+    };
+  }
 
   const sesion = await sesionDeCuenta();
   if ("error" in sesion) return { mensaje: sesion.error };
@@ -175,6 +187,10 @@ export async function cambiarContrasena(
   }
   const limite = await superaElLimite("contrasena", sesion.usuario.id);
   if (limite) return { mensaje: limite };
+
+  if (!(await contrasenaActualValida(sesion.usuario.email, actual.data.actual))) {
+    return { errores: { actual: "La contraseña actual no coincide." } };
+  }
 
   const { error } = await sesion.supabase.auth.updateUser({ password: resultado.data.contrasena });
   if (error) return { mensaje: mensajeDeAuth(error.code) };
@@ -216,6 +232,9 @@ export async function guardarFotoDePerfil(
   revalidatePath("/cuenta", "layout");
   return { ok: true };
 }
+
+const contrasenaActualValida = (email: string | undefined | null, contrasena: string) =>
+  email ? contrasenaCorrecta(email, contrasena) : Promise.resolve(false);
 
 /** ¿La contraseña es la de esta cuenta? Usa un cliente aparte: no toca la sesión del navegador. */
 async function contrasenaCorrecta(email: string, contrasena: string): Promise<boolean> {

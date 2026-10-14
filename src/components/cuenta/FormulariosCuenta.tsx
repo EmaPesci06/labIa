@@ -9,7 +9,11 @@ import { Campo } from "@/components/ui/Campo";
 import { ESTADO_INICIAL, type EstadoFormulario } from "@/lib/auth/estado";
 import { cambiarContrasena, cambiarEmail, guardarDatos } from "@/lib/cuenta/acciones";
 import { erroresPorCampo, esquemaNuevaContrasena } from "@/lib/validaciones/auth";
-import { esquemaCambiarEmail, esquemaDatosCuenta } from "@/lib/validaciones/cuenta";
+import {
+  esquemaCambiarEmail,
+  esquemaContrasenaActual,
+  esquemaDatosCuenta,
+} from "@/lib/validaciones/cuenta";
 import type { BarrioOpcion } from "@/lib/validaciones/registro-cliente";
 
 function Resultado({ estado }: { estado: EstadoFormulario }) {
@@ -119,7 +123,10 @@ export function FormularioDatos({ barrios, inicial }: PropsDatos) {
 export function FormularioEmail({ emailActual }: { emailActual: string }) {
   const [estado, accion, pendiente] = useActionState(cambiarEmail, ESTADO_INICIAL);
   const { locales, alEnviar, limpiar } = useValidacion((datos) => {
-    const r = esquemaCambiarEmail.safeParse({ email: valor(datos, "email") });
+    const r = esquemaCambiarEmail.safeParse({
+      email: valor(datos, "email"),
+      actual: valor(datos, "actual"),
+    });
     return r.success
       ? { success: true, data: r.data }
       : { success: false, errores: erroresPorCampo(r.error) };
@@ -130,7 +137,7 @@ export function FormularioEmail({ emailActual }: { emailActual: string }) {
     <form
       action={accion}
       onSubmit={alEnviar}
-      onChange={() => limpiar("email")}
+      onChange={(e) => e.target instanceof HTMLInputElement && limpiar(e.target.name)}
       noValidate
       className="flex flex-col gap-3.5"
     >
@@ -142,6 +149,13 @@ export function FormularioEmail({ emailActual }: { emailActual: string }) {
         defaultValue={estado.valores?.email ?? emailActual}
         ayuda="Te mandamos un mail a la dirección nueva para confirmar el cambio."
         error={errores.email}
+        required
+      />
+      <CampoContrasena
+        etiqueta="Tu contraseña actual"
+        name="actual"
+        autoComplete="current-password"
+        error={errores.actual}
         required
       />
       <Resultado estado={estado} />
@@ -160,9 +174,15 @@ export function FormularioContrasena() {
       contrasena: valor(datos, "contrasena"),
       repetir: valor(datos, "repetir"),
     });
-    return r.success
-      ? { success: true, data: r.data }
-      : { success: false, errores: erroresPorCampo(r.error) };
+    const actual = esquemaContrasenaActual.safeParse({ actual: valor(datos, "actual") });
+    if (r.success && actual.success) return { success: true, data: r.data };
+    return {
+      success: false,
+      errores: {
+        ...(actual.success ? {} : erroresPorCampo(actual.error)),
+        ...(r.success ? {} : erroresPorCampo(r.error)),
+      },
+    };
   });
   const errores = { ...estado.errores, ...locales };
 
@@ -174,6 +194,13 @@ export function FormularioContrasena() {
       noValidate
       className="flex flex-col gap-3.5"
     >
+      <CampoContrasena
+        etiqueta="Tu contraseña actual"
+        name="actual"
+        autoComplete="current-password"
+        error={errores.actual}
+        required
+      />
       <CampoContrasena
         etiqueta="Contraseña nueva"
         name="contrasena"
