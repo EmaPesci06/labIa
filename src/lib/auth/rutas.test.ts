@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   decidirAcceso,
   esRutaPublicaDeApp,
+  esRutaConSesion,
   inicioDelRol,
   necesitaSesion,
   rolExigido,
@@ -58,6 +59,16 @@ describe("decidirAcceso", () => {
 
   it("/admin deja pasar al admin", () => {
     expect(decidirAcceso("/admin/reportes", "", "admin")).toEqual({ tipo: "pasar" });
+  });
+
+  it("/trabajos/nuevo exige sesión de cliente y conserva el oficio al ingresar", () => {
+    expect(esRutaConSesion("/trabajos/nuevo")).toBe(true);
+    expect(rolExigido("/trabajos/nuevo")).toBe("cliente");
+    expect(decidirAcceso("/trabajos/nuevo", "?oficio=gas", null)).toEqual({
+      tipo: "redirigir",
+      destino: "/ingresar?volver=%2Ftrabajos%2Fnuevo%3Foficio%3Dgas",
+    });
+    expect(decidirAcceso("/trabajos/nuevo", "", "cliente")).toEqual({ tipo: "pasar" });
   });
 
   it("un profesional no entra a las rutas de cliente y viceversa", () => {
