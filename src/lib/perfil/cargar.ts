@@ -121,7 +121,7 @@ export async function obtenerResenas(
       .select("id, nombre, apellido_inicial")
       .in(
         "id",
-        filas.map((f) => f.autor_id),
+        filas.map((f) => f.autor_id).filter((id): id is string => id !== null),
       );
     for (const p of personas ?? []) {
       if (p.id) autores.set(p.id, { nombre: p.nombre, inicial: p.apellido_inicial });
@@ -130,7 +130,7 @@ export async function obtenerResenas(
 
   return {
     resenas: filas.map((fila) => {
-      const autor = autores.get(fila.autor_id);
+      const autor = fila.autor_id ? autores.get(fila.autor_id) : undefined;
       return {
         id: fila.id,
         autor: autorResena(autor?.nombre ?? null, autor?.inicial ?? null),

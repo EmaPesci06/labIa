@@ -46,7 +46,9 @@ export function nombreMostrado(
 
 /** "Laura F." para el autor de una reseña. */
 export function autorResena(nombre: string | null, apellidoInicial: string | null): string {
-  const pila = (nombre ?? "").trim() || "Cliente";
+  const pila = (nombre ?? "").trim();
+  // Autor borrado (autor_id null, LAB-33) o sin nombre público.
+  if (!pila) return "Cliente de LabÍA";
   const inicial = (apellidoInicial ?? "").trim();
   return inicial ? `${pila} ${inicial}.` : pila;
 }

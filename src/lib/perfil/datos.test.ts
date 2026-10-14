@@ -40,6 +40,7 @@ describe("textos del perfil", () => {
   });
   it("formatea reseñas y autores", () => {
     expect(autorResena("Laura", "F")).toBe("Laura F.");
+    expect(autorResena(null, null)).toBe("Cliente de LabÍA");
     expect(textoPuntaje(1)).toBe("1 estrella");
     expect(textoPuntaje(5)).toBe("5 estrellas");
     expect(textoCantidadResenas(1)).toBe("1 reseña");
