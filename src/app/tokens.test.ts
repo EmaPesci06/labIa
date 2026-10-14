@@ -163,6 +163,9 @@ describe("sin hex sueltos", () => {
   it("ningún .tsx ni .ts de src (salvo tests) tiene colores en hex", () => {
     const conHex = archivos(RAIZ_SRC)
       .filter((ruta) => /\.tsx?$/.test(ruta) && !/\.test\.tsx?$/.test(ruta))
+      // Los emails no pueden usar variables CSS (los clientes de correo no las soportan): sus
+      // colores de marca viven en un solo archivo.
+      .filter((ruta) => !/[\\/]lib[\\/]emails[\\/]Layout\.tsx$/.test(ruta))
       .filter((ruta) => /#[0-9A-Fa-f]{6}\b/.test(readFileSync(ruta, "utf8")));
     expect(conHex).toEqual([]);
   });

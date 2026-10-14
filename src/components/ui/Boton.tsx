@@ -96,7 +96,12 @@ export function Boton({
     );
   }
 
-  const { onClick, type = "button", ...boton } = resto as ButtonHTMLAttributes<HTMLButtonElement>;
+  const {
+    onClick,
+    type = "button",
+    "aria-disabled": ariaDisabledProp,
+    ...boton
+  } = resto as ButtonHTMLAttributes<HTMLButtonElement>;
   return (
     <button
       {...boton}
@@ -104,7 +109,7 @@ export function Boton({
       className={clases}
       // Cargando no usa `disabled` para no perder el foco del teclado: solo se bloquea el clic.
       aria-busy={cargando || undefined}
-      aria-disabled={cargando || undefined}
+      aria-disabled={cargando || ariaDisabledProp || undefined}
       onClick={(evento) => {
         if (cargando) {
           evento.preventDefault();
