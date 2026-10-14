@@ -1,11 +1,14 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 // LAB-33: Mi cuenta. Corre contra los servidores con sesión falsa (cliente y profesional); el
 // guardado, el borrado y la descarga necesitan Supabase y se prueban con pruebas de unidad y pgTAP.
 const PUERTO = Number(process.env.PUERTO_E2E ?? 3000);
 const URL_CLIENTE = `http://localhost:${PUERTO + 200}`;
 const URL_PROFESIONAL = `http://localhost:${PUERTO + 100}`;
+
+const esOscuro = (page: Page) =>
+  page.evaluate(() => document.documentElement.classList.contains("dark"));
 
 test.describe("mi cuenta (cliente)", () => {
   test.use({ baseURL: URL_CLIENTE });
@@ -64,6 +67,25 @@ test.describe("mi cuenta (cliente)", () => {
     await page.getByRole("button", { name: "Guardar cambios" }).click();
     await expect(page.getByText("Revisá el número. Ej.: 223 555 1234")).toBeVisible();
     await expect(page.getByText("Elegí tu barrio.")).toBeVisible();
+  });
+
+  test("el tema elegido se aplica y se recuerda al recargar", async ({ page }) => {
+    await page.goto("/cuenta");
+    await page.getByText("Oscuro", { exact: true }).click();
+    await expect.poll(() => esOscuro(page)).toBe(true);
+    await page.reload();
+    await expect.poll(() => esOscuro(page)).toBe(true);
+    await page.getByText("Claro", { exact: true }).click();
+    await expect.poll(() => esOscuro(page)).toBe(false);
+  });
+
+  test("la lista se recorre con el teclado hasta Salir", async ({ page }) => {
+    await page.goto("/cuenta");
+    await page.getByRole("link", { name: "Mis datos", exact: true }).focus();
+    await page.keyboard.press("Tab");
+    await expect(page.getByRole("link", { name: "Emails" })).toBeFocused();
+    await page.getByRole("button", { name: "Salir" }).focus();
+    await expect(page.getByRole("button", { name: "Salir" })).toBeFocused();
   });
 
   test("la pantalla de cuenta borrada es pública", async ({ page }) => {
