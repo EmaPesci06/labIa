@@ -72,6 +72,12 @@ export async function GET(request: NextRequest) {
     await supabase.auth.updateUser({ data: { rol: rolElegido } });
   }
 
+  // El trigger de alta solo lee el rol del signUp con email; con Google la cuenta nace como
+  // cliente. La función valida en la base (cuenta nueva, sin datos, nunca admin).
+  if (rolElegido === "profesional") {
+    await supabase.rpc("elegir_rol_inicial", { p_rol: "profesional" });
+  }
+
   const { data: fila } = await supabase
     .from("usuarios")
     .select("rol, nombre, apellido, whatsapp")
