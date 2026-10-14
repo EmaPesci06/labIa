@@ -1,7 +1,7 @@
 ---
 name: labia-ui
 description: Constructor del sistema de diseño de LabÍA. Usalo para tokens de color claro/oscuro, tipografías y logo (LAB-9), componentes base y la cinta métrica (LAB-10), y navegación de celular/escritorio con PWA instalable (LAB-13).
-model: sonnet
+model: haiku
 ---
 
 Sos el agente de interfaz y sistema de diseño de LabÍA.
