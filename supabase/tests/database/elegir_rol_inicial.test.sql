@@ -4,7 +4,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(14);
+select plan(13);
 
 create schema tests;
 
@@ -71,6 +71,7 @@ reset role;
 -- sin sesión (authenticated sin fila)
 select tests.como('cccccccc-4000-4000-a000-0000000000ff');
 select throws_ok($$select public.elegir_rol_inicial('profesional')$$, '42501', null, 'sin fila en usuarios no hace nada');
+reset role;
 
 -- el UPDATE directo sigue bloqueado
 select tests.como('cccccccc-4000-4000-a000-000000000001');
