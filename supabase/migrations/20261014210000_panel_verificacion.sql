@@ -76,12 +76,12 @@ language plpgsql
 volatile
 security definer
 set search_path = ''
-as $
+as $$
 begin
   perform pg_advisory_xact_lock(hashtext('documentos:' || (select auth.uid())::text));
   return privado.cantidad_documentos_propios() < 12;
 end;
-$;
+$$;
 
 revoke execute on function privado.documento_cabe() from public, anon;
 grant execute on function privado.documento_cabe() to authenticated;

@@ -369,8 +369,8 @@ select throws_ok($$select * from public.mis_verificaciones$$, '42501', null, 'mi
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000001');
 select is((select count(*) from public.verificaciones where usuario_id in ('cccccccc-1200-4000-a000-000000000004', 'cccccccc-1200-4000-a000-000000000005')), 3::bigint, 'verificaciones: el admin lee todo');
 select throws_ok(
-  $update public.verificaciones set estado = 'rechazado', motivo_rechazo = 'Foto borrosa', revisado_por = 'cccccccc-1200-4000-a000-000000000001', revisado_at = now()
-    where usuario_id = 'cccccccc-1200-4000-a000-000000000005' and tipo = 'dni_dorso'$,
+  $$update public.verificaciones set estado = 'rechazado', motivo_rechazo = 'Foto borrosa', revisado_por = 'cccccccc-1200-4000-a000-000000000001', revisado_at = now()
+    where usuario_id = 'cccccccc-1200-4000-a000-000000000005' and tipo = 'dni_dorso'$$,
   '42501', 'permission denied for table verificaciones',
   'verificaciones: el admin no rechaza por la API (solo decidir_documento)'
 );
