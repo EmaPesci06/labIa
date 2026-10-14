@@ -6,8 +6,11 @@ import { FilaEnlace, FilaLibre, GrupoCuenta } from "@/components/cuenta/FilaCuen
 import { FilasProfesional } from "@/components/cuenta/FilasProfesional";
 import { SelectorTema } from "@/components/SelectorTema";
 import { Avatar } from "@/components/ui/Avatar";
+import { BannerVerificacion } from "@/components/verificacion/BannerVerificacion";
+import { obtenerMisVerificaciones } from "@/lib/registro/documentos";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
+import { resumenBannerVerificacion } from "@/lib/verificacion/logica";
 
 export const metadata: Metadata = { title: "Mi cuenta · LabÍA" };
 
@@ -37,10 +40,15 @@ export default async function Cuenta() {
   const esProfesional = sesion.rol === "profesional";
   const { barrio, foto } = await datosDeEncabezado(sesion.usuario.id);
   const soporte = process.env.EMAIL_SOPORTE || null;
+  const resumen = esProfesional
+    ? resumenBannerVerificacion(await obtenerMisVerificaciones())
+    : null;
 
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
       <h1 className="sr-only">Mi cuenta</h1>
+
+      <BannerVerificacion resumen={resumen} />
 
       <header className="flex items-center gap-4">
         <Avatar nombre={sesion.perfil.nombreVisible} src={foto} tamano={84} />

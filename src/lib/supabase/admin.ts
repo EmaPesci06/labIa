@@ -30,16 +30,19 @@ export function crearClienteAdmin(): SupabaseClient<Database> {
   });
 }
 
-/** ¿La sesión de este cliente (con la clave anon y las cookies del usuario) es de un admin? */
-async function sesionEsAdmin(sesion: SupabaseClient<Database>): Promise<boolean> {
+/**
+ * Id del admin de la sesión (cliente con la clave anon y las cookies del usuario), o `null` si la
+ * sesión no es de un admin activo.
+ */
+async function idDeAdminDeLaSesion(sesion: SupabaseClient<Database>): Promise<string | null> {
   const { data: auth } = await sesion.auth.getUser();
-  if (!auth.user) return false;
+  if (!auth.user) return null;
   const { data } = await sesion
     .from("usuarios")
     .select("rol, estado")
     .eq("id", auth.user.id)
     .maybeSingle();
-  return data?.rol === "admin" && data.estado === "activa";
+  return data?.rol === "admin" && data.estado === "activa" ? auth.user.id : null;
 }
 
 /**
@@ -48,6 +51,9 @@ async function sesionEsAdmin(sesion: SupabaseClient<Database>): Promise<boolean>
  * Solo la puede pedir un admin: `sesion` es el cliente de la sesión actual (el de `@supabase/ssr`,
  * no el de la service role) y se verifica que su rol sea `admin` antes de firmar. La ruta tiene
  * que tener la forma `<usuario_id>/<tipo>-<timestamp>.<ext>`.
+ *
+ * Cada firma queda en `accesos_documentos` (quién y qué archivo). Si no se puede registrar el
+ * acceso, no se firma: falla cerrado.
  */
 export async function firmarDocumento(
   path: string,
@@ -57,8 +63,15 @@ export async function firmarDocumento(
   if (!RUTA_DOCUMENTO.test(path)) {
     throw new ErrorDocumento("La ruta del documento no es válida.");
   }
-  if (!(await sesionEsAdmin(sesion))) {
+  const adminId = await idDeAdminDeLaSesion(sesion);
+  if (!adminId) {
     throw new ErrorDocumento("Solo un admin puede ver documentos.");
+  }
+  const { error: errorAuditoria } = await clienteAdmin
+    .from("accesos_documentos")
+    .insert({ admin_id: adminId, storage_path: path });
+  if (errorAuditoria) {
+    throw new ErrorDocumento("No se pudo registrar el acceso al documento.");
   }
   const { data, error } = await clienteAdmin.storage
     .from(BUCKET_DOCUMENTOS)
