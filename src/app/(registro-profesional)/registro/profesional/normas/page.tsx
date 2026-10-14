@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Suspense } from "react";
 
 import { FormularioNormas } from "@/components/normas/FormularioNormas";
@@ -57,6 +58,25 @@ async function Contenido() {
         <p className="text-center text-[13px] leading-snug text-texto-terciario lg:text-left lg:text-sm">
           Tu perfil se publica cuando revisemos tu DNI y tu certificado de antecedentes. Te avisamos
           por email.
+        </p>
+        <p className="text-center text-[13px] leading-snug text-texto-terciario lg:text-left lg:text-sm">
+          Al continuar aceptás los{" "}
+          <Link
+            href="/terminos"
+            prefetch={false}
+            className="inline-block py-2 font-bold text-azul underline underline-offset-2"
+          >
+            Términos
+          </Link>{" "}
+          y la{" "}
+          <Link
+            href="/privacidad"
+            prefetch={false}
+            className="inline-block py-2 font-bold text-azul underline underline-offset-2"
+          >
+            Política de privacidad
+          </Link>
+          .
         </p>
       </div>
       <aside className="hidden flex-col gap-4 lg:sticky lg:top-6 lg:flex lg:self-start">
