@@ -4,20 +4,18 @@ Foto al momento de pasar de Claude Code a Gemini. Confirmá contra Linear y `gh 
 
 ## En main (Done)
 
-LAB-5, 6, 8 a 20, 22 a 26, 30, 33, 35 y 40. Lo último que entró: LAB-25 (contacto por WhatsApp, 6e39329).
+LAB-5, 6, 8 a 27, 30, 33, 35, 40 y 43. Lo último que entró: LAB-27 (lista de trabajos para profesionales, cc257e7).
 
 ## PRs abiertos
 
-| Tarea                                                                       | PR  | Estado                                                                               | Próximo paso                                                                                                                                                                                                   |
-| --------------------------------------------------------------------------- | --- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| LAB-43 · Cabos de verificación (consentimiento, normas, enlaces de /cuenta) | #28 | Corregido tras un BLOQUEADO de seguridad; esperando la segunda revisión de seguridad | Seguridad, revisión, merge. Migración `20261014205000`. Va **antes** que LAB-21                                                                                                                                |
-| LAB-21 · Panel de verificación para el equipo                               | #30 | Corregidos 2 ALTO de seguridad y el bug del visor; falta CI verde                    | Cuando LAB-43 esté en main: actualizar y recrear `documentos_subir_propios` con **consentimiento + cuota** (ver comentario 6178519406 del PR). Después seguridad, revisión y merge. Migración `20261014210000` |
+Ninguno. Todos los PRs previos (LAB-43 #28, LAB-21 #30, LAB-27 #32) fueron integrados en `main` con CI en verde.
 
 ## Próximas tareas (Todo)
 
-- LAB-27 (lista de trabajos para profesionales): se destraba con LAB-21.
-- LAB-32 (reportes y moderación): se destraba con LAB-21.
-- Después: LAB-28 → LAB-29 → LAB-31, LAB-42 (borrado de documentos a 30 días; revisar si LAB-21 ya lo cubre), LAB-34 (QA final).
+- LAB-28 (detalle del trabajo y postulación con precio y seña): destrabada por LAB-27.
+- LAB-29 (mis trabajos del cliente: ver postulantes y elegir a uno): se destraba tras LAB-28.
+- LAB-32 (reportes y moderación): destrabada por LAB-21.
+- Después: LAB-31 (reseñas de clientes a profesionales), LAB-42 (borrado de documentos a 30 días), LAB-34 (QA final).
 - LAB-41 (rate limit persistente y helpers de auth) está en Backlog: hacerlo antes de producción (LAB-37).
 
 ## Decisiones tomadas que no están en las tareas
