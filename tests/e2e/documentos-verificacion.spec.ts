@@ -28,9 +28,18 @@ const bloque = (page: Page) =>
 const entrada = (b: Locator, etiqueta: string) =>
   b.locator("label").filter({ hasText: etiqueta }).locator('input[type="file"]');
 
+// LAB-43: sin la casilla de consentimiento para datos sensibles no se puede subir nada.
+const casillaConsentimiento = (b: Locator) =>
+  b.getByRole("checkbox", { name: /Acepto que LabÍA trate mi DNI/ });
+
+async function consentir(page: Page) {
+  await casillaConsentimiento(bloque(page)).check();
+}
+
 async function abrir(page: Page) {
   await page.goto("/registro/profesional");
   await expect(siguiente(page)).toBeEnabled();
+  await consentir(page);
 }
 
 async function abrirDni(page: Page) {
@@ -40,6 +49,20 @@ async function abrirDni(page: Page) {
 }
 
 test.describe("documentos de verificación", () => {
+  test("sin consentimiento, las entradas de archivo están deshabilitadas", async ({ page }) => {
+    await page.goto("/registro/profesional");
+    await expect(siguiente(page)).toBeEnabled();
+    const b = bloque(page);
+    await expect(casillaConsentimiento(b)).not.toBeChecked();
+    await expect(entrada(b, "Certificado de antecedentes")).toBeDisabled();
+    await abrirDni(page);
+    await expect(entrada(b, "Frente del DNI")).toBeDisabled();
+
+    await consentir(page);
+    await expect(entrada(b, "Certificado de antecedentes")).toBeEnabled();
+    await expect(entrada(b, "Frente del DNI")).toBeEnabled();
+  });
+
   test("muestra el bloque con el texto y las filas obligatorias", async ({ page }) => {
     await abrir(page);
     const b = bloque(page);
@@ -48,7 +71,7 @@ test.describe("documentos de verificación", () => {
       b.getByText("La revisamos a mano. No se muestra en tu perfil: solo aparecen las insignias."),
     ).toBeVisible();
     await expect(b.getByRole("button", { name: /DNI, frente y dorso/ })).toBeVisible();
-    await expect(b.getByText("Certificado de antecedentes")).toBeVisible();
+    await expect(b.getByText("Certificado de antecedentes", { exact: true })).toBeVisible();
     await expect(b.getByText("Constancia de matrícula")).toHaveCount(0);
   });
 
@@ -188,9 +211,7 @@ test.describe("documentos de verificación", () => {
       return ids.filter((id, i) => ids.indexOf(id) !== i);
     });
     expect(repetidos).toEqual([]);
-    await expect(
-      bloque(page).getByLabel("Certificado de antecedentes", { exact: false }),
-    ).toBeAttached();
+    await expect(entrada(bloque(page), "Certificado de antecedentes")).toBeAttached();
   });
 
   test("muestra la ayuda con el link del Registro Nacional de Reincidencia", async ({ page }) => {
@@ -204,6 +225,16 @@ test.describe("documentos de verificación", () => {
       "https://www.argentina.gob.ar/justicia/reincidencia/antecedentespenales",
     );
     await expect(b.getByText("Falta subir").first()).toBeVisible();
+  });
+
+  // LAB-43: a 390 px el estado de la fila ("Falta subir" / "Subir PDF") no se parte en varias líneas.
+  test("la fila de antecedentes se lee en una línea de estado", async ({ page }) => {
+    await abrir(page);
+    const b = bloque(page);
+    const falta = await b.getByText("Falta subir").first().boundingBox();
+    const subir = await b.getByText("Subir PDF").first().boundingBox();
+    expect(falta?.height ?? 99).toBeLessThan(26);
+    expect(subir?.height ?? 99).toBeLessThan(26);
   });
 
   test("un archivo cuyo contenido no coincide con su extensión se rechaza", async ({ page }) => {
@@ -285,6 +316,7 @@ test.describe("documentos con cuenta real", () => {
     await page.getByRole("button", { name: "Plomería" }).click();
     await page.getByRole("button", { name: "Toda la ciudad" }).click();
     const b = bloque(page);
+    await consentir(page);
     await abrirDni(page);
     await entrada(b, "Frente del DNI").setInputFiles(imagen("frente.png"));
     await entrada(b, "Dorso del DNI").setInputFiles(imagen("dorso.png"));

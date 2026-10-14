@@ -22,7 +22,9 @@ async function ipDelPedido(): Promise<string> {
 }
 
 function mensajeDeError(codigo: string | undefined): string {
-  if (codigo === "42501") return "Tu cuenta no puede cargar documentos de verificación.";
+  // 42501 también sale cuando falta el consentimiento vigente (LAB-43): el mensaje cubre los dos casos.
+  if (codigo === "42501")
+    return "No podés cargar documentos ahora. Revisá el consentimiento de datos y recargá la página.";
   if (codigo === "23514") return "No encontramos el archivo subido. Probá de nuevo.";
   if (codigo === "23505") return "Ese documento ya estaba registrado.";
   return "No pudimos registrar el documento. Probá de nuevo.";

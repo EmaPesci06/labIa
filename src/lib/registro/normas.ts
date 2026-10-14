@@ -7,8 +7,13 @@ import type { EstadoFormulario } from "@/lib/auth/estado";
 import { registrarEventoServidor } from "@/lib/metricas-servidor";
 import { VERSION_NORMAS } from "@/lib/normas";
 import { limitarIntentos } from "@/lib/rate-limit";
+import { cargarDatosRegistro } from "@/lib/registro/borrador";
+import { faltantesRegistrados } from "@/lib/registro/documentos-estado";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import { esquemaAceptarNormas, leerAceptacionNormas } from "@/lib/validaciones/normas";
+
+const MENSAJE_DOCUMENTOS_NORMAS =
+  "Te faltan documentos de verificación. Subilos antes de aceptar las normas.";
 
 // Paso 2 del registro de profesional (LAB-20) y re-aceptación cuando cambia la versión.
 
@@ -54,6 +59,12 @@ export async function aceptarNormas(
     .eq("id", auth.user.id)
     .maybeSingle();
   if (fila?.rol !== "profesional") return { mensaje: "Esta cuenta no es de profesional." };
+
+  // El chequeo de la página no alcanza: la acción lo repite con lo que hay en la base (LAB-43).
+  const { verificaciones, borrador } = await cargarDatosRegistro();
+  if (faltantesRegistrados(verificaciones, borrador.oficios.includes("gas")).length > 0) {
+    return { mensaje: MENSAJE_DOCUMENTOS_NORMAS };
+  }
 
   const { error } = await supabase.rpc("aceptar_normas", { p_version: VERSION_NORMAS });
   if (error) return { mensaje: "No pudimos guardar tu aceptación. Probá de nuevo en un momento." };

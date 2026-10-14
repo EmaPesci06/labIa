@@ -1,3 +1,5 @@
+import { darConsentimientoDatosSensibles } from "@/lib/legales-acciones";
+import { VERSION_LEGALES } from "@/lib/legales";
 import { comprimirImagen } from "@/lib/imagen";
 import { registrarDocumentoAccion } from "@/lib/registro/documentos";
 import { crearClienteNavegador } from "@/lib/supabase/navegador";
@@ -31,8 +33,18 @@ export async function subirDocumentos(
   entradas: [TipoDocumento, File][],
   alProgreso: (hechos: number, total: number) => void,
 ): Promise<ResultadoSubida> {
-  const almacen = crearClienteNavegador().storage.from("documentos");
   const subidos: TipoDocumento[] = [];
+  if (entradas.length === 0) return { ok: true, subidos };
+
+  // Consentimiento expreso antes del primer archivo (LAB-43). La casilla es la que lo da; esta
+  // llamada lo guarda en el servidor, que después lo exige en la política de Storage y en la RPC.
+  const consentimiento = new FormData();
+  consentimiento.set("consiento", "on");
+  consentimiento.set("version", VERSION_LEGALES);
+  const consentido = await darConsentimientoDatosSensibles({}, consentimiento);
+  if (consentido.mensaje) return { ok: false, subidos, mensaje: consentido.mensaje };
+
+  const almacen = crearClienteNavegador().storage.from("documentos");
   alProgreso(0, entradas.length);
 
   for (const [tipo, archivo] of entradas) {

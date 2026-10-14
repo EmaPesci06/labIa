@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 
 import { BotonSalir } from "@/components/auth/BotonSalir";
 import { FilaEnlace, FilaLibre, GrupoCuenta } from "@/components/cuenta/FilaCuenta";
+import { FilasProfesional } from "@/components/cuenta/FilasProfesional";
 import { SelectorTema } from "@/components/SelectorTema";
 import { Avatar } from "@/components/ui/Avatar";
 import { obtenerSesion } from "@/lib/sesion";
@@ -58,9 +59,7 @@ export default async function Cuenta() {
         <FilaEnlace href="/cuenta/datos" icono={<UserRound aria-hidden className={ICONO} />}>
           Mis datos
         </FilaEnlace>
-        {/* TODO: "Mi perfil profesional" (/cuenta/perfil) y "Verificación" (/cuenta/verificacion), solo
-            para profesionales, los agregan las tareas que crean esas pantallas (LAB-19 crea
-            /cuenta/verificacion); hoy darían 404. */}
+        {esProfesional ? <FilasProfesional /> : null}
         <FilaEnlace href="/cuenta/emails" icono={<Mail aria-hidden className={ICONO} />}>
           Emails
         </FilaEnlace>

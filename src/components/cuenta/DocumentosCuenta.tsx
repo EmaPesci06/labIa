@@ -24,6 +24,7 @@ export function DocumentosCuenta({ uid, tieneGas, verificaciones }: Props) {
   const [progreso, setProgreso] = useState<{ hechos: number; total: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
+  const [consentido, setConsentido] = useState(false);
 
   const entradas = (Object.entries(locales) as [TipoDocumento, File | null][]).filter(
     (entrada): entrada is [TipoDocumento, File] => Boolean(entrada[1]),
@@ -67,13 +68,14 @@ export function DocumentosCuenta({ uid, tieneGas, verificaciones }: Props) {
         progreso={progreso}
         ocupado={enviando}
         error={error}
+        consentimiento={{ tildado: consentido, onCambio: setConsentido }}
       />
       <Boton
         variante="profesional"
         tamano="grande"
         bloque
         cargando={enviando}
-        disabled={entradas.length === 0}
+        disabled={entradas.length === 0 || !consentido}
         onClick={() => void enviar()}
       >
         Enviar documentos
