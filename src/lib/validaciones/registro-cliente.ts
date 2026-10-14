@@ -34,7 +34,7 @@ export function separarNombre(completo: string): { nombre: string; apellido: str
   return { nombre, apellido: resto.length ? resto.join(" ") : null };
 }
 
-const nombreCompleto = z
+export const nombreCompleto = z
   .string({ error: "Ingresá tu nombre y apellido." })
   .trim()
   .transform((valor) => valor.replace(/\s+/g, " "))
@@ -45,7 +45,7 @@ const nombreCompleto = z
       .max(60, "El nombre puede tener hasta 60 caracteres."),
   );
 
-const whatsapp = z
+export const whatsapp = z
   .string({ error: "Ingresá tu número de WhatsApp." })
   .trim()
   .min(1, "Ingresá tu número de WhatsApp.")
@@ -58,7 +58,7 @@ const whatsapp = z
     return e164;
   });
 
-const email = z
+export const email = z
   .string({ error: "Ingresá tu email." })
   .trim()
   .toLowerCase()
@@ -72,7 +72,7 @@ const contrasena = z
   .max(72, "La contraseña puede tener hasta 72 caracteres.");
 
 /** Id de barrio (smallint de la tabla `barrios`) que llega como texto del formulario. */
-const barrio = z
+export const barrio = z
   .string({ error: "Elegí tu barrio." })
   .trim()
   .regex(/^[1-9]\d{0,4}$/, "Elegí tu barrio.")

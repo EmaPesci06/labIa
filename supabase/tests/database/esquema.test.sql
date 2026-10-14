@@ -15,9 +15,9 @@ select tables_are(
   array[
     'barrios', 'usuarios', 'perfiles_profesionales', 'verificaciones', 'trabajos',
     'postulaciones', 'contactos', 'resenas', 'reportes',
-    'preferencias_email', 'emails_pendientes', 'emails_enviados'
+    'preferencias_email', 'emails_pendientes', 'emails_enviados', 'acciones_moderacion'
   ],
-  'public tiene exactamente las 12 tablas del MVP (9 del esquema + 3 de emails, LAB-30)'
+  'public tiene exactamente las tablas del MVP (esquema, emails de LAB-30 y acciones_moderacion de LAB-33)'
 );
 
 select is(
