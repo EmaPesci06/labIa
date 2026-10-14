@@ -17,7 +17,7 @@ import { MENSAJE_CONSENTIMIENTO } from "@/lib/validaciones/consentimiento";
 
 import { subirDocumentos } from "./subir-documentos";
 
-const entradas = (): ["antecedentes", File][] => [
+const entradas = (): [TipoDocumento, File][] => [
   ["antecedentes", new File(["%PDF-1.4"], "a.pdf", { type: "application/pdf" })],
 ];
 
