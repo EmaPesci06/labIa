@@ -30,6 +30,8 @@ type Props = {
   distanciaKm: number | null;
   /** Visitante sin sesión: el botón de contacto lleva a `/ingresar?volver=…`. */
   hrefIngreso?: string;
+  /** Cliente con sesión: el botón abre la hoja "Antes de contactar" (LAB-25). */
+  puedeContactar?: boolean;
 };
 
 function Insignias({ perfil, className }: { perfil: PerfilPublico; className?: string }) {
@@ -135,14 +137,23 @@ function BannerDuenio({ publicado }: { publicado: boolean }) {
  *
  * Nunca recibe ni muestra WhatsApp, email, DNI ni documentos: no están en `PerfilPublico`.
  */
-export function PerfilProfesional({ perfil, resenas, distanciaKm, hrefIngreso }: Props) {
+export function PerfilProfesional({
+  perfil,
+  resenas,
+  distanciaKm,
+  hrefIngreso,
+  puedeContactar = false,
+}: Props) {
   const { esPropio } = perfil;
+  // Los profesionales no contactan a otros: sin sesión de cliente no hay botón de contacto.
+  const hayContacto = !esPropio && (Boolean(hrefIngreso) || puedeContactar);
+  const idContacto = puedeContactar ? perfil.id : undefined;
   const profesion = profesionPrincipal(perfil.oficios);
   const especialidades = separarEspecialidades(perfil.especialidades);
   const hrefVolver = "/buscar";
 
   return (
-    <article className={cn("flex flex-col gap-5 lg:gap-6", !esPropio && "pb-36 lg:pb-0")}>
+    <article className={cn("flex flex-col gap-5 lg:gap-6", hayContacto && "pb-36 lg:pb-0")}>
       {esPropio ? <BannerDuenio publicado={perfil.publicado} /> : null}
 
       <EnlaceVolver href={hrefVolver} etiquetaEscritorio={`Volver a ${profesion.toLowerCase()}s`} />
@@ -250,7 +261,9 @@ export function PerfilProfesional({ perfil, resenas, distanciaKm, hrefIngreso }:
               </Boton>
             ) : (
               <>
-                <BotonContactar hrefIngreso={hrefIngreso} />
+                {hayContacto ? (
+                  <BotonContactar hrefIngreso={hrefIngreso} profesionalId={idContacto} />
+                ) : null}
                 <Link
                   href="#"
                   className="flex min-h-11 items-center justify-center text-sm text-texto-terciario underline"
@@ -276,11 +289,11 @@ export function PerfilProfesional({ perfil, resenas, distanciaKm, hrefIngreso }:
         >
           Editar perfil
         </Boton>
-      ) : (
+      ) : hayContacto ? (
         <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 border-t border-divisor bg-fondo px-5 py-3 lg:hidden">
-          <BotonContactar hrefIngreso={hrefIngreso} />
+          <BotonContactar hrefIngreso={hrefIngreso} profesionalId={idContacto} />
         </div>
-      )}
+      ) : null}
     </article>
   );
 }

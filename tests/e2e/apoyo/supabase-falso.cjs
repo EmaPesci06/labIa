@@ -38,6 +38,8 @@ const USUARIOS = {
 };
 
 const TOTAL_RESENAS = 25;
+// Número de prueba: solo debe aparecer en la respuesta de la acción, nunca en el HTML del perfil.
+const WHATSAPP_FALSO = "5492235550123";
 const ahora = Date.now();
 // Reseña 1 tiene el autor borrado (autor_id null); el resto es de Laura F.
 const resenas = Array.from({ length: TOTAL_RESENAS }, (_, i) => ({
@@ -125,6 +127,25 @@ const server = http.createServer((req, res) => {
     }
     if (ruta === "/rest/v1/rpc/distancia_km") return responder(res, 200, 1.2);
 
+    // LAB-25: registra el contacto y devuelve el WhatsApp (E.164 sin "+"). Solo cliente activo y
+    // solo profesionales publicados, como la función real.
+    if (ruta === "/rest/v1/rpc/contactar_profesional") {
+      const { p_profesional: id } = JSON.parse(cuerpo || "{}");
+      if (!yo || yo.rol !== "cliente") {
+        return responder(res, 403, {
+          code: "42501",
+          message: "Necesitás una cuenta de cliente activa para contactar",
+        });
+      }
+      if (id !== ID_PUBLICADO) {
+        return responder(res, 404, {
+          code: "P0002",
+          message: "Ese profesional no está disponible",
+        });
+      }
+      return responder(res, 200, WHATSAPP_FALSO);
+    }
+
     if (ruta === "/rest/v1/resenas") {
       const vacio = (url.searchParams.get("profesional_id") ?? "").includes(ID_EN_REVISION);
       const desde = Number(url.searchParams.get("offset") ?? 0);
@@ -164,11 +185,16 @@ const server = http.createServer((req, res) => {
       return responder(res, 200, unObjeto ? fila : [fila]);
     }
     if (ruta === "/rest/v1/barrios") {
-      return responder(res, 200, [
+      const lista = [
         { id: 1, nombre: "Centro" },
         { id: 2, nombre: "La Perla" },
         { id: 3, nombre: "Güemes" },
-      ]);
+      ];
+      // Con `id=eq.N` (maybeSingle) devuelve solo el barrio pedido: maybeSingle falla con más de una fila.
+      const pedido = Number((url.searchParams.get("id") ?? "").replace("eq.", ""));
+      const fila = lista.find((b) => b.id === pedido) ?? lista[0];
+      const filtrada = url.searchParams.has("id") ? [fila] : lista;
+      return responder(res, 200, unObjeto ? fila : filtrada);
     }
     // Cualquier otra cosa (vistas, métricas): vacío.
     return responder(res, 200, unObjeto ? {} : []);
