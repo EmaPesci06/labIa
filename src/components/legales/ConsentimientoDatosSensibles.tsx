@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useId } from "react";
 
 import { RUTA_PRIVACIDAD, VERSION_LEGALES } from "@/lib/legales";
 
@@ -6,7 +7,7 @@ import { RUTA_PRIVACIDAD, VERSION_LEGALES } from "@/lib/legales";
  * Casilla de consentimiento expreso para tratar DNI y certificado de antecedentes (LAB-35).
  * Va dentro del formulario de carga de documentos: manda `consiento` y `version`, que valida
  * `darConsentimientoDatosSensibles`. El botón de subir tiene que quedar deshabilitado hasta
- * que esté tildada (TODO(LAB-19): conectarla en `BloqueVerificacion`).
+ * que esté tildada: `BloqueVerificacion` la conecta (LAB-43).
  */
 export function ConsentimientoDatosSensibles({
   tildada,
@@ -17,6 +18,8 @@ export function ConsentimientoDatosSensibles({
   onCambio: (tildada: boolean) => void;
   error?: string | undefined;
 }) {
+  // El bloque de verificación se renderiza dos veces (celular y escritorio): el id tiene que ser único.
+  const idError = `${useId()}-consentimiento`;
   return (
     <div className="flex flex-col gap-1.5">
       <input type="hidden" name="version" value={VERSION_LEGALES} />
@@ -26,7 +29,7 @@ export function ConsentimientoDatosSensibles({
           name="consiento"
           checked={tildada}
           onChange={(e) => onCambio(e.target.checked)}
-          aria-describedby={error ? "error-consentimiento" : undefined}
+          aria-describedby={error ? idError : undefined}
           aria-invalid={error ? true : undefined}
           className="mt-0.5 size-[22px] flex-none accent-azul"
         />
@@ -44,11 +47,7 @@ export function ConsentimientoDatosSensibles({
           .
         </span>
       </label>
-      <p
-        id="error-consentimiento"
-        role="alert"
-        className="text-sm font-semibold text-error empty:hidden"
-      >
+      <p id={idError} role="alert" className="text-sm font-semibold text-error empty:hidden">
         {error}
       </p>
     </div>

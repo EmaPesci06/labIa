@@ -3,6 +3,7 @@
 import { Check, ChevronDown, ChevronUp, FileText, ShieldCheck, Upload, X } from "lucide-react";
 import { useId, useState } from "react";
 
+import { ConsentimientoDatosSensibles } from "@/components/legales/ConsentimientoDatosSensibles";
 import { cn } from "@/lib/cn";
 import type { ItemVerificacion } from "@/lib/registro/tipos";
 import {
@@ -44,6 +45,11 @@ type Props = {
   progreso?: { hechos: number; total: number } | null;
   ocupado?: boolean;
   error?: string | null;
+  /**
+   * Consentimiento expreso para tratar DNI y antecedentes (LAB-43). Con `consentimiento`, la casilla
+   * se muestra y las entradas de archivo quedan deshabilitadas hasta que esté tildada.
+   */
+  consentimiento?: { tildado: boolean; onCambio: (tildado: boolean) => void };
 };
 
 export function BloqueVerificacion({
@@ -57,7 +63,9 @@ export function BloqueVerificacion({
   progreso = null,
   ocupado = false,
   error,
+  consentimiento,
 }: Props) {
+  const sinConsentimiento = consentimiento ? !consentimiento.tildado : false;
   const [expandirDni, setExpandirDni] = useState(false);
   const [errorLocal, setErrorLocal] = useState<string | null>(null);
   // El bloque se renderiza dos veces (celular y escritorio): los id tienen que ser únicos.
@@ -141,8 +149,10 @@ export function BloqueVerificacion({
 
     return (
       <span className="flex flex-col items-end text-right">
-        <span className="text-xs font-semibold text-texto-secundario">Falta subir</span>
-        <span className="font-bold text-sobre-azul-suave">{etiquetaVacia}</span>
+        <span className="text-xs font-semibold whitespace-nowrap text-texto-secundario">
+          Falta subir
+        </span>
+        <span className="font-bold whitespace-nowrap text-sobre-azul-suave">{etiquetaVacia}</span>
       </span>
     );
   }
@@ -167,6 +177,13 @@ export function BloqueVerificacion({
           La revisamos a mano. No se muestra en tu perfil: solo aparecen las insignias.
         </p>
       </div>
+
+      {consentimiento ? (
+        <ConsentimientoDatosSensibles
+          tildada={consentimiento.tildado}
+          onCambio={consentimiento.onCambio}
+        />
+      ) : null}
 
       <div className="flex flex-col gap-2.5">
         {/* DNI: acordeón con frente y dorso */}
@@ -209,7 +226,7 @@ export function BloqueVerificacion({
                 estadoTexto={renderizarEstado("dni_frente", "Subir foto o PDF")}
                 tieneArchivo={Boolean(documentosLocales.dni_frente)}
                 camara
-                ocupado={ocupado}
+                ocupado={ocupado || sinConsentimiento}
                 describedBy={describedBy}
                 onSeleccionar={(arch) => void manejarArchivo("dni_frente", arch)}
                 onQuitar={() => onQuitarDocumento?.("dni_frente")}
@@ -220,7 +237,7 @@ export function BloqueVerificacion({
                 estadoTexto={renderizarEstado("dni_dorso", "Subir foto o PDF")}
                 tieneArchivo={Boolean(documentosLocales.dni_dorso)}
                 camara
-                ocupado={ocupado}
+                ocupado={ocupado || sinConsentimiento}
                 describedBy={describedBy}
                 onSeleccionar={(arch) => void manejarArchivo("dni_dorso", arch)}
                 onQuitar={() => onQuitarDocumento?.("dni_dorso")}
@@ -235,7 +252,7 @@ export function BloqueVerificacion({
           etiqueta="Certificado de antecedentes"
           estadoTexto={renderizarEstado("antecedentes", "Subir PDF")}
           tieneArchivo={Boolean(documentosLocales.antecedentes)}
-          ocupado={ocupado}
+          ocupado={ocupado || sinConsentimiento}
           describedBy={describedBy}
           envolturaBoton
           onSeleccionar={(arch) => void manejarArchivo("antecedentes", arch)}
@@ -262,7 +279,7 @@ export function BloqueVerificacion({
             estadoTexto={renderizarEstado("matricula", "Subir foto del carnet")}
             tieneArchivo={Boolean(documentosLocales.matricula)}
             camara
-            ocupado={ocupado}
+            ocupado={ocupado || sinConsentimiento}
             describedBy={describedBy}
             envolturaBoton
             onSeleccionar={(arch) => void manejarArchivo("matricula", arch)}
@@ -329,11 +346,12 @@ function FilaArchivo({
         htmlFor={id}
         className="flex flex-1 cursor-pointer items-center justify-between gap-2 py-3 text-[15px] font-semibold text-texto focus-within:outline-[3px] focus-within:outline-offset-2 focus-within:outline-foco"
       >
-        <span className="flex items-center gap-2">
+        <span className="flex min-w-0 items-center gap-2">
           <FileText aria-hidden className="size-4.5 shrink-0 text-azul" />
           {etiqueta}
         </span>
-        <div className="flex items-center gap-2">
+        {/* El estado no se parte: a 390 px la etiqueta es la que tiene que envolver (LAB-43). */}
+        <div className="flex shrink-0 items-center gap-2">
           {estadoTexto}
           {!tieneArchivo ? <Upload aria-hidden className="size-4 shrink-0 text-azul" /> : null}
         </div>
