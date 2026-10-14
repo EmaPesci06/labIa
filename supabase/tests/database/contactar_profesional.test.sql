@@ -8,7 +8,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select no_plan();
+select plan(17);
 
 create schema if not exists tests;
 
@@ -83,6 +83,17 @@ values
   ('cccccccc-1400-4000-b000-000000000001', 'cccccccc-1400-4000-a000-000000000005', 'Puedo ir', 'enviada'),
   ('cccccccc-1400-4000-b000-000000000002', 'cccccccc-1400-4000-a000-000000000004', 'Puedo ir', 'enviada');
 
+-- Trabajo de OTRO cliente (C3) donde P1 está elegido: para probar que C1 no puede usarlo (IDOR).
+insert into public.trabajos (id, cliente_id, oficio, titulo, descripcion, barrio_id, urgencia, estado, profesional_elegido_id)
+values (
+  'cccccccc-1400-4000-b000-000000000003', 'cccccccc-1400-4000-a000-000000000003', 'plomeria', 'Termotanque',
+  'Descripción de prueba', (select b.id from public.barrios b where b.slug = 'centro'), 'sin_apuro',
+  'asignado', 'cccccccc-1400-4000-a000-000000000004'
+);
+
+insert into public.postulaciones (trabajo_id, profesional_id, mensaje, estado)
+values ('cccccccc-1400-4000-b000-000000000003', 'cccccccc-1400-4000-a000-000000000004', 'Hecho', 'elegida');
+
 -- C3 ya tiene 19 contactos de hoy y uno de hace dos días: el de hace dos días no cuenta para el límite.
 insert into public.contactos (cliente_id, profesional_id, origen, created_at)
 select 'cccccccc-1400-4000-a000-000000000003', 'cccccccc-1400-4000-a000-000000000004', 'perfil', now()
@@ -155,6 +166,12 @@ select throws_ok(
 select throws_ok(
   $$select public.contactar_profesional('cccccccc-1400-4000-a000-000000000004', 'postulacion')$$,
   '42501', null, 'origen postulación sin trabajo: sin permiso'
+);
+
+-- IDOR: el profesional está elegido, pero en un trabajo de otro cliente.
+select throws_ok(
+  $$select public.contactar_profesional('cccccccc-1400-4000-a000-000000000004', 'postulacion', 'cccccccc-1400-4000-b000-000000000003')$$,
+  '42501', null, 'IDOR: postulación elegida en trabajo de otro cliente: sin permiso'
 );
 
 -- ===========================================================================
