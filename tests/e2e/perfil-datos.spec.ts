@@ -151,6 +151,66 @@ test.describe("perfil público: cliente con sesión", () => {
   });
 });
 
+// LAB-25: contacto por WhatsApp desde el perfil. El número del profesional (falso) no está en el HTML
+// del perfil: solo aparece cuando el cliente confirma "Abrir WhatsApp".
+const WHATSAPP_FALSO = "5492235550123";
+
+test.describe("contacto por WhatsApp: cliente con sesión", () => {
+  test.beforeEach(async ({ context, baseURL }) => {
+    await iniciarSesion(context, baseURL ?? "", "tok-cliente");
+  });
+
+  test("la hoja trae los consejos, Cancelar la cierra y Abrir WhatsApp abre wa.me con el mensaje", async ({
+    page,
+    context,
+  }) => {
+    await page.goto(`/profesionales/${ID_PUBLICADO}`);
+    expect(await page.content()).not.toContain(WHATSAPP_FALSO);
+
+    const abrirHoja = page
+      .getByRole("button", { name: "Contactar por WhatsApp" })
+      .filter({ visible: true })
+      .first();
+    await abrirHoja.click();
+
+    const hoja = page.getByRole("dialog", { name: "Antes de contactar" });
+    await expect(hoja).toBeVisible();
+    await expect(hoja.getByRole("listitem")).toHaveCount(4);
+    await expect(hoja.getByText("Pedí el presupuesto por escrito.")).toBeVisible();
+    await capturar(page, "contacto-hoja", "claro");
+    await sinViolacionesGraves(page);
+
+    await hoja.getByRole("button", { name: "Cancelar" }).click();
+    await expect(hoja).toBeHidden();
+
+    // Cancelar no abre nada. Interceptamos wa.me para no salir a internet al confirmar.
+    await context.route("https://wa.me/**", (ruta) =>
+      ruta.fulfill({ status: 200, contentType: "text/html", body: "<html></html>" }),
+    );
+    const pestana = context.waitForEvent("page");
+    await abrirHoja.click();
+    await hoja.getByRole("button", { name: "Abrir WhatsApp" }).click();
+    const wa = await pestana;
+    await expect(wa).toHaveURL(new RegExp(`^https://wa\\.me/${WHATSAPP_FALSO}\\?text=`));
+    const texto = decodeURIComponent(new URL(wa.url()).searchParams.get("text") ?? "");
+    expect(texto).toContain("Hola Martín Gómez, te encontré en LabÍA.");
+    expect(texto).toContain("Necesito un/a gasista en Centro.");
+  });
+
+  test("el profesional sin sesión de cliente no ve el botón de contacto en el perfil de otro", async ({
+    page,
+    context,
+    baseURL,
+  }) => {
+    await context.clearCookies();
+    await iniciarSesion(context, baseURL ?? "", "tok-dueno-revision");
+    await page.goto(`/profesionales/${ID_PUBLICADO}`);
+    await expect(page.getByRole("heading", { level: 1, name: "Martín Gómez" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Contactar por WhatsApp" })).toHaveCount(0);
+    expect(await page.content()).not.toContain(WHATSAPP_FALSO);
+  });
+});
+
 test.describe("perfil público: el dueño", () => {
   test("publicado: banner, Editar perfil y sin botón de contacto", async ({
     page,
@@ -220,6 +280,18 @@ for (const tema of ["light", "dark"] as const) {
       await expect(page.getByRole("heading", { level: 1, name: "Martín Gómez" })).toBeVisible();
       await capturar(page, "perfil-cliente", nombreTema);
       await sinViolacionesGraves(page);
+
+      // LAB-25: la hoja "Antes de contactar" abierta también tiene que pasar axe y verse en ambos temas.
+      await page
+        .getByRole("button", { name: "Contactar por WhatsApp" })
+        .filter({ visible: true })
+        .first()
+        .click();
+      await expect(page.getByRole("dialog", { name: "Antes de contactar" })).toBeVisible();
+      await capturar(page, "contacto-hoja", nombreTema);
+      await sinViolacionesGraves(page);
+      await page.keyboard.press("Escape");
+      await expect(page.getByRole("dialog", { name: "Antes de contactar" })).toBeHidden();
 
       await context.clearCookies();
       await iniciarSesion(context, baseURL ?? "", "tok-dueno");
