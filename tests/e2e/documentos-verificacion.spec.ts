@@ -246,6 +246,31 @@ test.describe("documentos de verificación", () => {
   }
 });
 
+test.describe("/cuenta/verificacion", () => {
+  // Servidor con la sesión falsa de profesional (sin Supabase no hay cuenta real: avisa).
+  test.use({
+    baseURL: `http://localhost:${Number(process.env.PUERTO_E2E ?? 3000) + 100}`,
+  });
+
+  for (const esquema of ["light", "dark"] as const) {
+    test(`sin cuenta de profesional avisa, ofrece volver y pasa axe (${esquema})`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ colorScheme: esquema });
+      await page.goto("/cuenta/verificacion");
+      await expect(page.getByRole("heading", { level: 1, name: "Verificación" })).toBeVisible();
+      await expect(
+        page.getByText("La verificación de documentos es para cuentas de profesional."),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("link", { name: "Volver a mi cuenta" }).locator("visible=true"),
+      ).toBeVisible();
+      const resultado = await new AxeBuilder({ page }).analyze();
+      expect(resultado.violations).toEqual([]);
+    });
+  }
+});
+
 test.describe("documentos con cuenta real", () => {
   test.skip(process.env.E2E_AUTH !== "1", "Necesita Supabase real (E2E_AUTH=1).");
 
