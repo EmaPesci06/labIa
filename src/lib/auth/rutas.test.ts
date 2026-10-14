@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   decidirAcceso,
+  esRutaPublicaDeApp,
   esRutaConSesion,
   inicioDelRol,
   necesitaSesion,
@@ -19,10 +20,35 @@ describe("inicioDelRol", () => {
 
 describe("decidirAcceso", () => {
   it("una ruta de (app) sin sesión redirige a /ingresar con volver", () => {
-    expect(decidirAcceso("/buscar", "?oficio=gas", null)).toEqual({
+    expect(decidirAcceso("/mis-trabajos", "?x=1", null)).toEqual({
       tipo: "redirigir",
-      destino: "/ingresar?volver=%2Fbuscar%3Foficio%3Dgas",
+      destino: "/ingresar?volver=%2Fmis-trabajos%3Fx%3D1",
     });
+  });
+
+  it("rutas con nombre parecido a las públicas no son públicas", () => {
+    for (const ruta of ["/buscarX", "/profesionalesX", "/inicio-viejo"]) {
+      expect(esRutaPublicaDeApp(ruta)).toBe(false);
+    }
+  });
+
+  it("/cuenta sin sesión redirige a ingresar", () => {
+    expect(decidirAcceso("/cuenta", "", null)).toEqual({
+      tipo: "redirigir",
+      destino: "/ingresar?volver=%2Fcuenta",
+    });
+  });
+
+  it("inicio, búsqueda y perfiles se ven sin sesión y con cualquier rol salvo admin", () => {
+    for (const ruta of ["/inicio", "/buscar", "/profesionales/abc"]) {
+      for (const rol of [null, "cliente", "profesional"] as const) {
+        expect(decidirAcceso(ruta, "?oficio=gas", rol)).toEqual({ tipo: "pasar" });
+      }
+      expect(decidirAcceso(ruta, "", "admin")).toEqual({
+        tipo: "redirigir",
+        destino: "/admin/verificaciones",
+      });
+    }
   });
 
   it("/admin responde 404 a un cliente, a un profesional y a quien no ingresó", () => {
