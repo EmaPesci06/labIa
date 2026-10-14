@@ -89,6 +89,46 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"emails_enviados": {
+                  Row: {
+                    "clave": string,"created_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "clave": string,"created_at"?: string
+                  }
+                  Update: {
+                    "clave"?: string,"created_at"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"emails_pendientes": {
+                  Row: {
+                    "created_at": string,"enviado_at": string | null,"id": string,"postulacion_id": string,"trabajo_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"enviado_at"?: string | null,"id"?: string,"postulacion_id": string,"trabajo_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"enviado_at"?: string | null,"id"?: string,"postulacion_id"?: string,"trabajo_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "emails_pendientes_postulacion_id_fkey"
+      columns: ["postulacion_id"]
+isOneToOne: true
+      referencedRelation: "postulaciones"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "emails_pendientes_trabajo_id_fkey"
+      columns: ["trabajo_id"]
+isOneToOne: false
+      referencedRelation: "trabajos"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"perfiles_profesionales": {
                   Row: {
                     "anios_experiencia": number | null,"antecedentes_ok": boolean,"cantidad_resenas": number,"created_at": string,"descripcion": string | null,"disponibilidad": string | null,"especialidades": string | null,"fotos_trabajos": (string)[],"identidad_verificada": boolean,"matricula_numero": string | null,"matriculado": boolean,"oficios": (Database["public"]['Enums']["oficio"])[],"prioridad": number,"promedio": number | null,"publicado": boolean,"toda_la_ciudad": boolean,"updated_at": string,"usuario_id": string,"zonas": (number)[]
@@ -144,6 +184,32 @@ isOneToOne: false
       columns: ["trabajo_id"]
 isOneToOne: false
       referencedRelation: "trabajos"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"preferencias_email": {
+                  Row: {
+                    "novedades": boolean,"trabajos_cerca": boolean,"updated_at": string,"usuario_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "novedades"?: boolean,"trabajos_cerca"?: boolean,"updated_at"?: string,"usuario_id": string
+                  }
+                  Update: {
+                    "novedades"?: boolean,"trabajos_cerca"?: boolean,"updated_at"?: string,"usuario_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "preferencias_email_usuario_id_fkey"
+      columns: ["usuario_id"]
+isOneToOne: true
+      referencedRelation: "usuarios"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "preferencias_email_usuario_id_fkey"
+      columns: ["usuario_id"]
+isOneToOne: true
+      referencedRelation: "usuarios_publicos"
       referencedColumns: ["id"]
     }
                   ]
