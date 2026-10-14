@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { elegirBarrio, type Barrio } from "./barrios";
+import { elegirBarrio, type Barrio } from "./barrios-busqueda";
 import { leerParametrosBusqueda } from "./busqueda";
 import { urlBusqueda } from "./busqueda-url";
 import { descripcionOficios, esMatriculable, pluralOficio } from "./oficios";
