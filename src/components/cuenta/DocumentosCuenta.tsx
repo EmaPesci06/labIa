@@ -33,8 +33,12 @@ export function DocumentosCuenta({ uid, tieneGas, verificaciones }: Props) {
   async function enviar() {
     setError(null);
     setEnviando(true);
-    const resultado = await subirDocumentos(uid, entradas, (hechos, total) =>
-      setProgreso({ hechos, total }),
+    // `subirDocumentos` no sube sin la casilla tildada y registra el consentimiento antes del primer archivo.
+    const resultado = await subirDocumentos(
+      uid,
+      entradas,
+      (hechos, total) => setProgreso({ hechos, total }),
+      consentido,
     );
     setProgreso(null);
     setEnviando(false);

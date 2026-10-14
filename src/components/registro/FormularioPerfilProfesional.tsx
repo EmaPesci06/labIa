@@ -235,8 +235,11 @@ export function FormularioPerfilProfesional({
     );
     if (entradas.length === 0) return null;
 
-    const resultado = await subirDocumentos(uid, entradas, (hechos, total) =>
-      setProgreso({ hechos, total }),
+    const resultado = await subirDocumentos(
+      uid,
+      entradas,
+      (hechos, total) => setProgreso({ hechos, total }),
+      consentido,
     );
     setProgreso(null);
     if (resultado.subidos.length > 0) {

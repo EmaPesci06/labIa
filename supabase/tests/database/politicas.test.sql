@@ -308,10 +308,21 @@ select is((select count(*) from public.matricula_propia where usuario_id in ('cc
 -- ===========================================================================
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000005');
-select lives_ok(
+-- LAB-43: el dueño no inserta directo. Solo lo hace registrar_documento (security definer).
+select throws_ok(
   $$insert into public.verificaciones (usuario_id, tipo, storage_path)
     values ('cccccccc-1200-4000-a000-000000000005', 'dni_frente', 'cccccccc-1200-4000-a000-000000000005/dni_frente-1791734400001.jpg')$$,
-  'verificaciones: el dueño sube su documento'
+  '42501', null, 'verificaciones: el dueño no inserta directo sin consentimiento'
+);
+reset role;
+update public.usuarios
+set datos_sensibles_version = '2026-10', datos_sensibles_consentido_at = now()
+where id = 'cccccccc-1200-4000-a000-000000000005';
+select tests.como('cccccccc-1200-4000-a000-000000000005');
+select throws_ok(
+  $$insert into public.verificaciones (usuario_id, tipo, storage_path)
+    values ('cccccccc-1200-4000-a000-000000000005', 'dni_frente', 'cccccccc-1200-4000-a000-000000000005/dni_frente-1791734400001.jpg')$$,
+  '42501', null, 'verificaciones: el dueño no inserta directo ni con consentimiento vigente'
 );
 select throws_ok(
   $$insert into public.verificaciones (usuario_id, tipo, storage_path)
@@ -323,6 +334,11 @@ select throws_ok(
     values ('cccccccc-1200-4000-a000-000000000005', 'antecedentes', 'cccccccc-1200-4000-a000-000000000005/antecedentes-1791734400001.pdf', 'aprobado')$$,
   '42501', null, 'verificaciones: el dueño no se auto-aprueba al insertar'
 );
+-- Las constraints (unicidad, formato de ruta) se prueban como superusuario: el insert directo ya
+-- queda denegado por privilegios, así que llegarían a la denegación y no a la constraint.
+reset role;
+insert into public.verificaciones (usuario_id, tipo, storage_path)
+values ('cccccccc-1200-4000-a000-000000000005', 'dni_frente', 'cccccccc-1200-4000-a000-000000000005/dni_frente-1791734400001.jpg');
 select throws_ok(
   $$insert into public.verificaciones (usuario_id, tipo, storage_path)
     values ('cccccccc-1200-4000-a000-000000000005', 'dni_frente', 'cccccccc-1200-4000-a000-000000000005/dni_frente-1791734400009.jpg')$$,
@@ -343,6 +359,7 @@ select throws_ok(
     values ('cccccccc-1200-4000-a000-000000000005', 'matricula', 'cccccccc-1200-4000-a000-000000000005/../cccccccc-1200-4000-a000-000000000004/matricula-1791734400009.pdf')$$,
   '23514', null, 'verificaciones: la ruta no admite recorridos de carpetas'
 );
+select tests.como('cccccccc-1200-4000-a000-000000000005');
 select is_empty($$select * from public.verificaciones$$, 'verificaciones: el dueño no puede leer la tabla');
 select is_empty($$select storage_path from public.verificaciones where usuario_id = 'cccccccc-1200-4000-a000-000000000005'$$, 'verificaciones: el profesional no lee el storage_path de sus propias verificaciones');
 select is((select count(*) from public.mis_verificaciones), 2::bigint, 'mis_verificaciones: el dueño ve el estado de sus 2 documentos');
@@ -781,6 +798,20 @@ cross join (values
   ('privado.usuarios_proteger_columnas()'),
   ('privado.perfiles_proteger_insignias()')
 ) as f (fn);
+
+-- LAB-43: las funciones de consentimiento solo las ejecuta authenticated (no public ni anon).
+select ok(
+  not has_function_privilege('anon', f.fn, 'execute') and has_function_privilege('authenticated', f.fn, 'execute'),
+  'privado: ' || f.fn || ' la ejecuta solo authenticated'
+)
+from (values ('privado.version_legales_vigente()'), ('privado.consentimiento_datos_vigente()')) as f (fn);
+
+-- LAB-43: el dueño no inserta directo en verificaciones (ni tabla ni columnas).
+select ok(
+  not has_table_privilege('authenticated', 'public.verificaciones', 'insert')
+  and not has_column_privilege('authenticated', 'public.verificaciones', 'storage_path', 'insert'),
+  'verificaciones: authenticated no tiene insert directo'
+);
 
 select hasnt_function('public', 'recalcular_resenas_de', array['uuid'], 'recalcular_resenas_de ya no está en public (no sale como RPC en los tipos)');
 select has_function('privado', 'recalcular_resenas_de', array['uuid'], 'recalcular_resenas_de quedó en el esquema privado');
