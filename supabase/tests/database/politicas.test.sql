@@ -894,6 +894,11 @@ select is(
 -- sin filas. Se habilita para esta transacción y así se prueba lo que decide RLS, no el trigger.
 select set_config('storage.allow_delete_query', 'true', true);
 
+-- Consentimiento vigente para datos sensibles (LAB-43): sin él no se sube a documentos.
+update public.usuarios
+set datos_sensibles_version = '2026-10', datos_sensibles_consentido_at = now()
+where id = 'cccccccc-1200-4000-a000-000000000004';
+
 select tests.como('cccccccc-1200-4000-a000-000000000004');
 select lives_ok(
   $$insert into storage.objects (bucket_id, name) values ('documentos', 'cccccccc-1200-4000-a000-000000000004/antecedentes-1791734400002.pdf')$$,
