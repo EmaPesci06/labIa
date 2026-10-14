@@ -1,6 +1,7 @@
 import { comprimirImagen } from "@/lib/imagen";
 import { registrarDocumentoAccion } from "@/lib/registro/documentos";
 import { crearClienteNavegador } from "@/lib/supabase/navegador";
+import { MAX_DOCUMENTOS_POR_CUENTA } from "@/lib/validaciones/verificacion";
 import {
   extensionDe,
   generarRutaDocumento,
@@ -48,11 +49,14 @@ export async function subirDocumentos(
       contentType: preparado.contentType,
     });
     if (error) {
+      // 403 de Storage: la política de subida rechazó el archivo (tope por cuenta, LAB-21).
       return {
         ok: false,
         subidos,
         mensaje:
-          "No pudimos subir los documentos. Revisá tu conexión y tocá de nuevo para reintentar.",
+          error.statusCode === "403"
+            ? `No pudimos subir el documento. Si ya cargaste ${MAX_DOCUMENTOS_POR_CUENTA} archivos, esperá la revisión para subir más.`
+            : "No pudimos subir los documentos. Revisá tu conexión y tocá de nuevo para reintentar.",
       };
     }
     const registro = await registrarDocumentoAccion({ tipo, storagePath: ruta });

@@ -115,7 +115,7 @@ export function avisarDocumentoRechazado(
         nombre: d.nombre,
         documento: etiquetaDocumento(tipoDocumento),
         motivo: motivo.trim().slice(0, 500),
-        urlSubir: `${sitio()}/cuenta`,
+        urlSubir: `${sitio()}/cuenta/verificacion`,
       })),
     );
   });

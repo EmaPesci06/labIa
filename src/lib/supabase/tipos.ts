@@ -5,6 +5,33 @@ export type Database = {
   
   "public": {
           Tables: {
+"accesos_documentos": {
+                  Row: {
+                    "admin_id": string | null,"created_at": string,"id": string,"storage_path": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "admin_id"?: string | null,"created_at"?: string,"id"?: string,"storage_path": string
+                  }
+                  Update: {
+                    "admin_id"?: string | null,"created_at"?: string,"id"?: string,"storage_path"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "accesos_documentos_admin_id_fkey"
+      columns: ["admin_id"]
+isOneToOne: false
+      referencedRelation: "usuarios"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "accesos_documentos_admin_id_fkey"
+      columns: ["admin_id"]
+isOneToOne: false
+      referencedRelation: "usuarios_publicos"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },
             "acciones_moderacion": {
                   Row: {
                     "accion": string,"admin_id": string | null,"created_at": string,"id": string,"motivo": string | null,"objetivo_id": string | null
@@ -361,14 +388,14 @@ isOneToOne: false
                   ]
                 },"verificaciones": {
                   Row: {
-                    "created_at": string,"estado": Database["public"]['Enums']["estado_verificacion"],"id": string,"motivo_rechazo": string | null,"revisado_at": string | null,"revisado_por": string | null,"storage_path": string,"tipo": Database["public"]['Enums']["tipo_documento"],"usuario_id": string
+                    "archivo_borrado_at": string | null,"borrar_despues_de": string | null,"created_at": string,"estado": Database["public"]['Enums']["estado_verificacion"],"id": string,"motivo_rechazo": string | null,"revisado_at": string | null,"revisado_por": string | null,"storage_path": string,"tipo": Database["public"]['Enums']["tipo_documento"],"usuario_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"estado"?: Database["public"]['Enums']["estado_verificacion"],"id"?: string,"motivo_rechazo"?: string | null,"revisado_at"?: string | null,"revisado_por"?: string | null,"storage_path": string,"tipo": Database["public"]['Enums']["tipo_documento"],"usuario_id": string
+                    "archivo_borrado_at"?: string | null,"borrar_despues_de"?: string | null,"created_at"?: string,"estado"?: Database["public"]['Enums']["estado_verificacion"],"id"?: string,"motivo_rechazo"?: string | null,"revisado_at"?: string | null,"revisado_por"?: string | null,"storage_path": string,"tipo": Database["public"]['Enums']["tipo_documento"],"usuario_id": string
                   }
                   Update: {
-                    "created_at"?: string,"estado"?: Database["public"]['Enums']["estado_verificacion"],"id"?: string,"motivo_rechazo"?: string | null,"revisado_at"?: string | null,"revisado_por"?: string | null,"storage_path"?: string,"tipo"?: Database["public"]['Enums']["tipo_documento"],"usuario_id"?: string
+                    "archivo_borrado_at"?: string | null,"borrar_despues_de"?: string | null,"created_at"?: string,"estado"?: Database["public"]['Enums']["estado_verificacion"],"id"?: string,"motivo_rechazo"?: string | null,"revisado_at"?: string | null,"revisado_por"?: string | null,"storage_path"?: string,"tipo"?: Database["public"]['Enums']["tipo_documento"],"usuario_id"?: string
                   }
                   Relationships: [
                     {
@@ -465,8 +492,16 @@ isOneToOne: true
               "anios_experiencia": number,"antecedentes_ok": boolean,"apellido_inicial": string,"cantidad_resenas": number,"distancia_km": number,"foto_path": string,"identidad_verificada": boolean,"matriculado": boolean,"nombre": string,"oficios": (Database["public"]['Enums']["oficio"])[],"promedio": number,"total": number,"usuario_id": string,"zonas_texto": string
             }[]
                            },
+"decidir_documento":
+{ Args: { "p_aprobar": boolean,"p_detalle"?: string,"p_motivo"?: string,"p_verificacion": string }; Returns: {
+              "r_estado": Database["public"]['Enums']["estado_verificacion"],"r_tipo": Database["public"]['Enums']["tipo_documento"],"r_usuario_id": string
+            }[]
+                           },
 "distancia_km":
 { Args: { "barrio_a": number,"barrio_b": number }; Returns: number
+                           },
+"documentos_huerfanos":
+{ Args: { "p_antes": string }; Returns: string[]
                            },
 "elegir_rol_inicial":
 { Args: { "p_rol": Database["public"]['Enums']["rol"] }; Returns: undefined

@@ -24,8 +24,12 @@ function sesionCon(
   } as unknown as SupabaseClient<Database>;
 }
 
-function adminCon(createSignedUrl: ReturnType<typeof vi.fn>): SupabaseClient<Database> {
+function adminCon(
+  createSignedUrl: ReturnType<typeof vi.fn>,
+  insert: ReturnType<typeof vi.fn> = vi.fn(async () => ({ error: null })),
+): SupabaseClient<Database> {
   return {
+    from: () => ({ insert }),
     storage: { from: () => ({ createSignedUrl }) },
   } as unknown as SupabaseClient<Database>;
 }
@@ -80,5 +84,27 @@ describe("firmarDocumento", () => {
     await expect(
       firmarDocumento(RUTA, sesionCon("admin"), adminCon(createSignedUrl)),
     ).rejects.toThrow("No se pudo generar el enlace del documento.");
+  });
+
+  it("registra el acceso (admin y ruta) antes de firmar", async () => {
+    const createSignedUrl = vi.fn(async () => ({
+      data: { signedUrl: "https://ejemplo.test/firmada" },
+      error: null,
+    }));
+    const insert = vi.fn(async () => ({ error: null }));
+    await firmarDocumento(RUTA, sesionCon("admin"), adminCon(createSignedUrl, insert));
+    expect(insert).toHaveBeenCalledWith({ admin_id: "u1", storage_path: RUTA });
+    expect(insert.mock.invocationCallOrder[0]).toBeLessThan(
+      createSignedUrl.mock.invocationCallOrder[0] ?? Infinity,
+    );
+  });
+
+  it("no firma si no se puede registrar el acceso (falla cerrado)", async () => {
+    const createSignedUrl = vi.fn();
+    const insert = vi.fn(async () => ({ error: { message: "boom" } }));
+    await expect(
+      firmarDocumento(RUTA, sesionCon("admin"), adminCon(createSignedUrl, insert)),
+    ).rejects.toThrow("No se pudo registrar el acceso al documento.");
+    expect(createSignedUrl).not.toHaveBeenCalled();
   });
 });

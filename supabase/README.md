@@ -113,3 +113,24 @@ cantidad_resenas desc, distancia_km asc`. Los dos empiezan con `prioridad desc` 
 - `p_limite` se acota a 1..100; `total` es la cantidad de toda la búsqueda (para paginar).
 - Medir con 2.000 perfiles falsos (solo local): `node scripts/generar-perfiles.ts --medir | docker exec -i supabase_db_labia psql -U postgres`
   (`--limpiar` los borra, `--solo-medir` mide sin recargar). Ver el encabezado del script.
+
+## Panel de verificación (LAB-21)
+
+- **Cómo se hace admin una cuenta.** Solo a mano, con la service role o el SQL editor del proyecto, nunca desde la app:
+  `update public.usuarios set rol = 'admin' where id = '<uuid de la cuenta>';`. Antes, la cuenta tiene que existir (se
+  registra como cualquier usuario). Para sacar el rol: volver a `cliente` con el mismo comando.
+- **Quién decide.** Solo se decide con `decidir_documento` (valida rol admin, que el documento esté pendiente, guarda
+  `revisado_por` y `revisado_at`, recalcula las insignias del perfil y deja una fila en `acciones_moderacion`).
+  La insignia vale según la última decisión de cada tipo: un rechazo nuevo la baja, y un aprobado que todavía no fue
+  reemplazado sigue valiendo.
+- **Auditoría de lectura.** Cada URL firmada que pide el panel queda en `accesos_documentos` (admin y ruta). Si no se
+  puede registrar el acceso, no se firma.
+- **Retención.** Al decidir un documento, el archivo se borra a los 30 días (`borrar_despues_de`). Un reemplazo
+  automático (cuando el profesional sube otro del mismo tipo mientras el anterior está pendiente) caduca a 1 día.
+  Los archivos del bucket sin fila en `verificaciones` (subidas que no se registraron) se borran después de 24 h.
+- **Job.** `/api/cron/limpiar-documentos` corre todos los días a las 06:00 UTC (03:00 en Argentina), con
+  `CRON_SECRET`. Lo que no se pudo borrar queda para la próxima corrida; `archivo_borrado_at` marca lo ya borrado.
+- **Cuota.** Cada cuenta puede tener hasta 12 archivos en el bucket `documentos` (política de subida; tope en
+  `MAX_DOCUMENTOS_POR_CUENTA`). Los reemplazados cuentan hasta que caducan.
+- **Tests.** `supabase/tests/database/panel_verificacion.test.sql`: permisos de la decisión, insignias, publicación,
+  reemplazo, cuota, huérfanos y privilegios de la auditoría.
