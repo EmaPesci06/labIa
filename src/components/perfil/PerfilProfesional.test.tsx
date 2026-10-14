@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import type { PerfilPublico } from "@/lib/perfil/cargar";
@@ -9,6 +10,7 @@ vi.mock("next/image", () => ({
   default: ({ alt, src }: { alt: string; src: string }) => <img alt={alt} src={src} />,
 }));
 vi.mock("@/lib/perfil/acciones", () => ({ cargarMasResenas: vi.fn() }));
+vi.mock("@/lib/contacto/acciones", () => ({ contactarProfesional: vi.fn() }));
 
 import { PerfilProfesional } from "./PerfilProfesional";
 
@@ -67,14 +69,33 @@ describe("PerfilProfesional", () => {
     expect(screen.getByText("Todavía no tiene reseñas.")).toBeInTheDocument();
   });
 
-  it("ofrece contactar a un tercero y nunca muestra teléfonos ni emails", () => {
+  it("al cliente le ofrece contactar y nunca muestra teléfonos ni emails", () => {
     const { container } = render(
-      <PerfilProfesional perfil={perfil} resenas={resenas} distanciaKm={null} />,
+      <PerfilProfesional perfil={perfil} resenas={resenas} distanciaKm={null} puedeContactar />,
     );
     expect(
       screen.getAllByRole("button", { name: /Contactar por WhatsApp/ }).length,
     ).toBeGreaterThan(0);
     expect(container.innerHTML).not.toMatch(/\+549|wa\.me|@/);
+  });
+
+  it("con sesión de profesional (sin ser el dueño) no muestra el botón de contacto", () => {
+    render(<PerfilProfesional perfil={perfil} resenas={resenas} distanciaKm={null} />);
+    expect(
+      screen.queryByRole("button", { name: /Contactar por WhatsApp/ }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Contactar por WhatsApp/ })).not.toBeInTheDocument();
+  });
+
+  it('el cliente abre la hoja "Antes de contactar" con los cuatro consejos', async () => {
+    render(
+      <PerfilProfesional perfil={perfil} resenas={resenas} distanciaKm={null} puedeContactar />,
+    );
+    await userEvent.click(screen.getAllByRole("button", { name: /Contactar por WhatsApp/ })[0]!);
+    const hoja = screen.getByRole("dialog", { name: "Antes de contactar" });
+    expect(hoja.querySelectorAll("li")).toHaveLength(4);
+    expect(screen.getByRole("button", { name: "Abrir WhatsApp" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Cancelar" })).toBeInTheDocument();
   });
 
   it("al dueño le muestra el banner y Editar perfil, sin WhatsApp", () => {

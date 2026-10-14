@@ -16,6 +16,13 @@ type Props = {
   descripcion?: string;
   children?: ReactNode;
   className?: string;
+  /**
+   * Elemento al que vuelve el foco al cerrar (LAB-25: el botón que abrió la hoja). Sin esta prop, Radix
+   * lo devuelve solo si hay un `Dialog.Trigger`, así que el foco quedaba en el body.
+   */
+  devolverFocoA?: { current: HTMLElement | null };
+  /** Esconde la X de cierre en escritorio (el prototipo de escritorio no la trae). Esc y el velo siguen cerrando. */
+  ocultarCierreEnEscritorio?: boolean;
 };
 
 /**
@@ -33,12 +40,20 @@ export function HojaInferior({
   descripcion,
   children,
   className,
+  devolverFocoA,
+  ocultarCierreEnEscritorio = false,
 }: Props) {
   return (
     <Dialog.Root open={abierta} onOpenChange={onCambioAbierta}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-40 bg-velo" />
         <Dialog.Content
+          onCloseAutoFocus={(evento) => {
+            const destino = devolverFocoA?.current;
+            if (!destino) return;
+            evento.preventDefault();
+            destino.focus();
+          }}
           // Sin descripción, se avisa a Radix que no hay `aria-describedby` a propósito.
           {...(descripcion ? {} : { "aria-describedby": undefined })}
           className={cn(
@@ -51,7 +66,10 @@ export function HojaInferior({
             <Dialog.Title className="font-titulo text-[22px] leading-tight">{titulo}</Dialog.Title>
             <Dialog.Close
               aria-label="Cerrar"
-              className="-mt-2 -mr-2 flex size-11 shrink-0 items-center justify-center rounded-campo text-texto-secundario hover:bg-azul-suave"
+              className={cn(
+                "-mt-2 -mr-2 flex size-11 shrink-0 items-center justify-center rounded-campo text-texto-secundario hover:bg-azul-suave",
+                ocultarCierreEnEscritorio && "lg:hidden",
+              )}
             >
               <X aria-hidden strokeWidth={2} className="size-5" />
             </Dialog.Close>
