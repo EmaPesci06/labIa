@@ -193,6 +193,11 @@ test.describe("PWA", () => {
 test.describe("teclado", () => {
   test('"Saltar al contenido" es el primer foco y lleva el foco a #contenido', async ({ page }) => {
     await page.goto("/inicio");
+    // En escritorio /inicio redirige a /buscar (LAB-23): esperar a la pantalla final antes de tabular.
+    if (!esCelular(page)) {
+      await expect(page).toHaveURL(/\/buscar/);
+      await expect(page.locator("main")).toHaveCount(1);
+    }
     await page.keyboard.press("Tab");
     const salto = page.getByRole("link", { name: "Saltar al contenido" });
     await expect(salto).toBeFocused();

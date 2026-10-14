@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
             hostname: hostSupabase.hostname,
             port: hostSupabase.port,
             pathname: "/storage/v1/object/public/fotos/**",
+            search: "",
           },
         ]
       : [],

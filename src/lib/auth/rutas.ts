@@ -8,17 +8,18 @@ export function inicioDelRol(rol: RolUsuario): string {
   return "/inicio";
 }
 
-const PREFIJOS_CON_SESION = [
-  "/inicio",
-  "/buscar",
-  "/profesionales",
-  "/trabajos",
-  "/mis-trabajos",
-  "/cuenta",
-] as const;
+// `/inicio`, `/buscar` y `/profesionales` son públicas (LAB-23): se puede buscar y ver perfiles sin
+// cuenta; para contactar hace falta cuenta de cliente (LAB-25).
+const PREFIJOS_CON_SESION = ["/trabajos", "/mis-trabajos", "/cuenta"] as const;
 
 const coincide = (ruta: string, prefijo: string) =>
   ruta === prefijo || ruta.startsWith(`${prefijo}/`);
+
+const PREFIJOS_PUBLICOS_DE_APP = ["/inicio", "/buscar", "/profesionales"] as const;
+
+/** Rutas de `(app)` que se ven sin cuenta (LAB-23): inicio, búsqueda y perfiles. */
+export const esRutaPublicaDeApp = (ruta: string) =>
+  PREFIJOS_PUBLICOS_DE_APP.some((prefijo) => coincide(ruta, prefijo));
 
 export const esRutaAdmin = (ruta: string) => coincide(ruta, "/admin");
 
@@ -38,14 +39,17 @@ export function rolExigido(ruta: string): "cliente" | "profesional" | null {
 
 /** ¿Hace falta conocer la sesión para decidir? Evita consultar a Supabase en rutas públicas. */
 export const necesitaSesion = (ruta: string) =>
-  esRutaAdmin(ruta) || esRutaConSesion(ruta) || esRutaSoloVisitantes(ruta);
+  esRutaAdmin(ruta) ||
+  esRutaConSesion(ruta) ||
+  esRutaPublicaDeApp(ruta) ||
+  esRutaSoloVisitantes(ruta);
 
 export type Decision =
   { tipo: "pasar" } | { tipo: "redirigir"; destino: string } | { tipo: "no-encontrada" };
 
 /**
  * Qué hacer con un pedido según la ruta y el rol de la sesión (`null` = sin sesión).
- * - `(app)` sin sesión: a `/ingresar?volver=<ruta>`.
+ * - `(app)` sin sesión: a `/ingresar?volver=<ruta>` (salvo inicio, búsqueda y perfiles, que son públicos).
  * - `/admin/*`: solo `admin`; a cualquier otro (o sin sesión) se le responde 404.
  * - Rutas de un rol: el otro rol vuelve a su inicio. Un admin en `(app)` va a su panel.
  * - `/` y `/ingresar` con sesión: al inicio del rol.
@@ -62,6 +66,13 @@ export function decidirAcceso(ruta: string, consulta: string, rol: RolUsuario | 
     const exigido = rolExigido(ruta);
     if (exigido && exigido !== rol) return { tipo: "redirigir", destino: inicioDelRol(rol) };
     return { tipo: "pasar" };
+  }
+
+  // Inicio, búsqueda y perfiles: abiertos a visitantes, clientes y profesionales. Un admin tiene su panel.
+  if (esRutaPublicaDeApp(ruta)) {
+    return rol === "admin"
+      ? { tipo: "redirigir", destino: inicioDelRol("admin") }
+      : { tipo: "pasar" };
   }
 
   if (esRutaSoloVisitantes(ruta) && rol) {

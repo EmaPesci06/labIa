@@ -91,7 +91,9 @@ Rutas en español sin acentos: `/`, `/ingresar`, `/registro`, `/registro/cliente
 5. `SUPABASE_SERVICE_ROLE_KEY` solo en servidor dentro de `/admin` y jobs. Única excepción: `src/lib/emails/*`
    (avisos por email), porque tiene que leer el email de Auth de otro usuario y mandarle un aviso, algo que la
    RLS no permite con la sesión del que dispara el evento. Sus funciones se llaman solo después de verificar
-   sesión y dueño, con ids leídos de la base, y nunca reciben emails del cliente.
+   sesión y dueño, con ids leídos de la base, y nunca reciben emails del cliente. También se usa en el job de
+   borrado de cuenta (`src/lib/cuenta/borrado.ts`, server-only), invocado solo tras validar sesión, rol y
+   reautenticación.
 6. Toda Server Action valida sesión, rol y entrada con Zod.
 7. Rate limit simple en registro, postulación y reporte.
 
