@@ -4,16 +4,15 @@ Foto al momento de pasar de Claude Code a Gemini. Confirmá contra Linear y `gh 
 
 ## En main (Done)
 
-LAB-5, 6, 8 a 27, 30, 33, 35, 40 y 43. Lo último que entró: LAB-27 (lista de trabajos para profesionales, cc257e7).
+LAB-5, 6, 8 a 28, 30, 33, 35, 40 y 43. Lo último que entró: LAB-28 (detalle del trabajo y postulación con precio y seña, 6be1f9c).
 
 ## PRs abiertos
 
-Ninguno. Todos los PRs previos (LAB-43 #28, LAB-21 #30, LAB-27 #32) fueron integrados en `main` con CI en verde.
+Ninguno. Todos los PRs previos (LAB-43 #28, LAB-21 #30, LAB-27 #32, LAB-28 #33) fueron integrados en `main` con CI en verde.
 
 ## Próximas tareas (Todo)
 
-- LAB-28 (detalle del trabajo y postulación con precio y seña): destrabada por LAB-27.
-- LAB-29 (mis trabajos del cliente: ver postulantes y elegir a uno): se destraba tras LAB-28.
+- LAB-29 (mis trabajos del cliente: ver postulantes y elegir a uno): destrabada tras LAB-28.
 - LAB-32 (reportes y moderación): destrabada por LAB-21.
 - Después: LAB-31 (reseñas de clientes a profesionales), LAB-42 (borrado de documentos a 30 días), LAB-34 (QA final).
 - LAB-41 (rate limit persistente y helpers de auth) está en Backlog: hacerlo antes de producción (LAB-37).
