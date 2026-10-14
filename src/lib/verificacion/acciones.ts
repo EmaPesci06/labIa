@@ -36,7 +36,7 @@ async function leerInicio(cuerpo: ReadableStream<Uint8Array>, bytes: number): Pr
       total += value.length;
     }
   } finally {
-    await lector.cancel().catch(() => undefined);
+    void lector.cancel().catch(() => undefined);
   }
   const unido = new Uint8Array(total);
   let posicion = 0;
