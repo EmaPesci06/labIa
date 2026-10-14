@@ -68,6 +68,24 @@ $$;
 revoke execute on function privado.cantidad_documentos_propios() from public, anon;
 grant execute on function privado.cantidad_documentos_propios() to authenticated;
 
+-- Lock por usuario + conteo: dos subidas simultáneas de la misma cuenta no pueden pasar el tope.
+-- Volatile porque toma un advisory lock; se libera al terminar la transacción.
+create function privado.documento_cabe()
+returns boolean
+language plpgsql
+volatile
+security definer
+set search_path = ''
+as $
+begin
+  perform pg_advisory_xact_lock(hashtext('documentos:' || (select auth.uid())::text));
+  return privado.cantidad_documentos_propios() < 12;
+end;
+$;
+
+revoke execute on function privado.documento_cabe() from public, anon;
+grant execute on function privado.documento_cabe() to authenticated;
+
 -- Misma regla de subida que LAB-12, con el tope de 12 archivos por cuenta.
 drop policy documentos_subir_propios on storage.objects;
 
@@ -77,7 +95,7 @@ create policy documentos_subir_propios on storage.objects
     bucket_id = 'documentos'
     and privado.rol_actual() = 'profesional'
     and privado.cuenta_activa()
-    and privado.cantidad_documentos_propios() < 12
+    and privado.documento_cabe()
     and name ~ (
       '^' || (select auth.uid())::text
       || '/(dni_frente|dni_dorso|antecedentes|matricula)-[0-9]+\.(jpg|jpeg|png|pdf)$'
@@ -249,3 +267,31 @@ grant select on public.accesos_documentos to authenticated;
 create policy accesos_documentos_admin_leer on public.accesos_documentos
   for select to authenticated
   using (privado.es_admin());
+
+-- ---------------------------------------------------------------------------
+-- 6. Correcciones de la revisión de seguridad (PR #30)
+-- ---------------------------------------------------------------------------
+
+-- Un admin suspendido con un JWT vigente deja de pasar los chequeos de la base (no solo de la app).
+create or replace function privado.es_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select coalesce(
+    (select u.rol = 'admin' and u.estado = 'activa' from public.usuarios u where u.id = (select auth.uid())),
+    false
+  )
+$$;
+
+-- El admin no lee el bucket con su JWT: las URLs firmadas las pide el servidor con la service role
+-- (firmarDocumento), que deja registro en accesos_documentos y firma 60 s.
+drop policy if exists documentos_admin_leer on storage.objects;
+
+-- La decisión es solo por decidir_documento (recalcula insignias, auditoría y avisos). Nadie
+-- cambia el estado de una verificación a mano desde la API.
+drop policy if exists verificaciones_admin_actualizar on public.verificaciones;
+revoke update on public.verificaciones from authenticated;
+revoke update (estado, motivo_rechazo, revisado_por, revisado_at) on public.verificaciones from authenticated;

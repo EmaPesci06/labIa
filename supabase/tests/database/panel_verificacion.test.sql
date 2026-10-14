@@ -64,17 +64,21 @@ values
 -- Solo un admin decide
 -- ---------------------------------------------------------------------------
 
+reset role;
 select tests.como('dddddddd-2000-4000-a000-000000000001');
 select throws_ok(
   $$select * from public.decidir_documento('eeeeeeee-2000-4000-a000-000000000001', true)$$,
   '42501',
+  'Solo un admin puede revisar documentos',
   'decidir_documento: un profesional no puede aprobar'
 );
 
+reset role;
 select tests.como('dddddddd-2000-4000-a000-000000000003');
 select throws_ok(
   $$select * from public.decidir_documento('eeeeeeee-2000-4000-a000-000000000001', true)$$,
   '42501',
+  'Solo un admin puede revisar documentos',
   'decidir_documento: un cliente no puede aprobar'
 );
 
@@ -82,6 +86,7 @@ select throws_ok(
 -- Aprobar: insignias, publicación y auditoría
 -- ---------------------------------------------------------------------------
 
+reset role;
 select tests.como('dddddddd-2000-4000-a000-000000000002');
 select lives_ok(
   $$select * from public.decidir_documento('eeeeeeee-2000-4000-a000-000000000001', true)$$,
@@ -114,6 +119,7 @@ select is(
   'insignias: con solo el frente aprobado la identidad todavía no está verificada'
 );
 
+reset role;
 select tests.como('dddddddd-2000-4000-a000-000000000002');
 select lives_ok(
   $$select * from public.decidir_documento('eeeeeeee-2000-4000-a000-000000000002', true)$$,
@@ -153,10 +159,12 @@ select is(
 insert into public.verificaciones (id, usuario_id, tipo, storage_path, estado)
 values ('eeeeeeee-2000-4000-a000-000000000004', 'dddddddd-2000-4000-a000-000000000001', 'dni_frente', 'dddddddd-2000-4000-a000-000000000001/dni_frente-1791734400010.jpg', 'pendiente');
 
+reset role;
 select tests.como('dddddddd-2000-4000-a000-000000000002');
 select throws_ok(
   $$select * from public.decidir_documento('eeeeeeee-2000-4000-a000-000000000004', false, null, null)$$,
   '23514',
+  'Falta el motivo del rechazo',
   'decidir_documento: rechazar sin motivo falla'
 );
 select lives_ok(
@@ -166,6 +174,7 @@ select lives_ok(
 select throws_ok(
   $$select * from public.decidir_documento('eeeeeeee-2000-4000-a000-000000000004', true)$$,
   '23514',
+  'La verificación ya fue revisada',
   'decidir_documento: no se puede decidir dos veces el mismo documento'
 );
 
@@ -195,6 +204,7 @@ values ('eeeeeeee-2000-4000-a000-000000000005', 'dddddddd-2000-4000-a000-0000000
 insert into storage.objects (bucket_id, name)
 values ('documentos', 'dddddddd-2000-4000-a000-000000000001/matricula-1791734400021.png');
 
+reset role;
 select tests.como('dddddddd-2000-4000-a000-000000000001');
 select lives_ok(
   $$select public.registrar_documento('matricula', 'dddddddd-2000-4000-a000-000000000001/matricula-1791734400021.png')$$,
@@ -224,6 +234,7 @@ select is(
   'cuota: P tiene 13 archivos en su carpeta (incluye el reemplazado que todavía no caducó)'
 );
 
+reset role;
 select tests.como('dddddddd-2000-4000-a000-000000000001');
 select is(
   privado.cantidad_documentos_propios(),
@@ -233,9 +244,11 @@ select is(
 select throws_ok(
   $$insert into storage.objects (bucket_id, name) values ('documentos', 'dddddddd-2000-4000-a000-000000000001/dni_dorso-1791734400099.jpg')$$,
   '42501',
+  'new row violates row-level security policy for table "objects"',
   'cuota: con 12 o más archivos no se puede subir otro'
 );
 
+reset role;
 select tests.como('dddddddd-2000-4000-a000-000000000004');
 select lives_ok(
   $$insert into storage.objects (bucket_id, name) values ('documentos', 'dddddddd-2000-4000-a000-000000000004/dni_dorso-1791734400030.jpg')$$,
@@ -286,9 +299,42 @@ select ok(
   'auditoría: anon no lee accesos_documentos'
 );
 select ok(
-  (select position('cantidad_documentos_propios' in with_check) > 0
+  (select position('documento_cabe' in with_check) > 0
    from pg_policies where schemaname = 'storage' and tablename = 'objects' and policyname = 'documentos_subir_propios'),
-  'cuota: la política de subida usa el tope por cuenta'
+  'cuota: la política de subida usa el tope por cuenta (con lock)'
+);
+
+-- ---------------------------------------------------------------------------
+-- Revisión de seguridad: admin suspendido, bucket y edición directa
+-- ---------------------------------------------------------------------------
+
+reset role;
+insert into auth.users (instance_id, id, aud, role, email, raw_user_meta_data)
+values ('00000000-0000-0000-0000-000000000000', 'dddddddd-2000-4000-a000-000000000005', 'authenticated', 'authenticated', 'pan-s@labia.test', '{"nombre": "Sara", "apellido": "Suspendida"}');
+update public.usuarios set rol = 'admin', estado = 'suspendida' where id = 'dddddddd-2000-4000-a000-000000000005';
+
+reset role;
+select tests.como('dddddddd-2000-4000-a000-000000000005');
+select throws_ok(
+  $$select * from public.decidir_documento('eeeeeeee-2000-4000-a000-000000000002', true)$$,
+  '42501',
+  'Solo un admin puede revisar documentos',
+  'admin suspendido: no puede decidir aunque su JWT siga vigente'
+);
+select is_empty($$select * from public.verificaciones$$, 'admin suspendido: no lee verificaciones');
+
+reset role;
+select tests.como('dddddddd-2000-4000-a000-000000000002');
+select is(
+  (select count(*) from storage.objects where bucket_id = 'documentos'),
+  0::bigint,
+  'bucket: el admin no lee documentos con su JWT (los firma el servidor)'
+);
+select throws_ok(
+  $$update public.verificaciones set estado = 'rechazado', motivo_rechazo = 'Otro' where id = 'eeeeeeee-2000-4000-a000-000000000002'$$,
+  '42501',
+  'permission denied for table verificaciones',
+  'verificaciones: nadie cambia el estado a mano, ni el admin (solo decidir_documento)'
 );
 
 select * from finish();

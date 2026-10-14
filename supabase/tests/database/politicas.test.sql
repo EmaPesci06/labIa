@@ -368,11 +368,11 @@ select throws_ok($$select * from public.mis_verificaciones$$, '42501', null, 'mi
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000001');
 select is((select count(*) from public.verificaciones where usuario_id in ('cccccccc-1200-4000-a000-000000000004', 'cccccccc-1200-4000-a000-000000000005')), 3::bigint, 'verificaciones: el admin lee todo');
-select results_eq(
-  $$update public.verificaciones set estado = 'rechazado', motivo_rechazo = 'Foto borrosa', revisado_por = 'cccccccc-1200-4000-a000-000000000001', revisado_at = now()
-    where usuario_id = 'cccccccc-1200-4000-a000-000000000005' and tipo = 'dni_dorso' returning estado::text$$,
-  $$values ('rechazado')$$,
-  'verificaciones: el admin revisa y rechaza con motivo'
+select throws_ok(
+  $update public.verificaciones set estado = 'rechazado', motivo_rechazo = 'Foto borrosa', revisado_por = 'cccccccc-1200-4000-a000-000000000001', revisado_at = now()
+    where usuario_id = 'cccccccc-1200-4000-a000-000000000005' and tipo = 'dni_dorso'$,
+  '42501', 'permission denied for table verificaciones',
+  'verificaciones: el admin no rechaza por la API (solo decidir_documento)'
 );
 select throws_ok(
   $$update public.verificaciones set revisado_por = 'cccccccc-1200-4000-a000-000000000002' where usuario_id = 'cccccccc-1200-4000-a000-000000000005' and tipo = 'dni_dorso'$$,
@@ -942,8 +942,8 @@ select is((select count(*) from storage.objects where bucket_id = 'documentos'),
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000001');
 select is(
   (select count(*) from storage.objects where bucket_id = 'documentos' and name like 'cccccccc-1200-4000-a000-000000000004/%'),
-  2::bigint,
-  'documentos: el admin lee los documentos'
+  0::bigint,
+  'documentos: el admin no lee el bucket con su JWT (lo firma el servidor)'
 );
 select throws_ok(
   $$insert into storage.objects (bucket_id, name) values ('documentos', 'cccccccc-1200-4000-a000-000000000001/dni_frente-1791734400003.jpg')$$,
