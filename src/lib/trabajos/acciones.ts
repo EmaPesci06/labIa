@@ -2,6 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { rolFalso } from "@/lib/auth/sesion-falsa";
@@ -135,4 +136,49 @@ export async function adjuntarFotos(trabajoId: string, rutas: string[]): Promise
     .select("id");
   // Si no se actualizó ninguna fila (no es suyo o no existe), no es un éxito.
   return { ok: !error && (data?.length ?? 0) > 0 };
+}
+
+/**
+ * Retira una postulación enviada por el profesional (LAB-27).
+ * Solo se puede retirar mientras su estado sea 'enviada'.
+ */
+export async function retirarPostulacion(
+  postulacionId: string,
+): Promise<{ ok: boolean; mensaje?: string }> {
+  const sesion = await obtenerSesion();
+  if (!sesion || sesion.rol !== "profesional") {
+    return { ok: false, mensaje: "Solo un profesional puede retirar su postulación." };
+  }
+
+  if (!/^[0-9a-f-]{36}$/.test(postulacionId)) {
+    return { ok: false, mensaje: "Identificador de postulación inválido." };
+  }
+
+  if (rolFalso()) {
+    revalidatePath("/trabajos");
+    return { ok: true };
+  }
+
+  if (!supabaseConfigurado()) {
+    return { ok: false, mensaje: "No pudimos conectar con el servidor." };
+  }
+
+  const supabase = await crearClienteServidor();
+  const { data, error } = await supabase
+    .from("postulaciones")
+    .update({ estado: "retirada" })
+    .eq("id", postulacionId)
+    .eq("profesional_id", sesion.usuario.id)
+    .eq("estado", "enviada")
+    .select("id");
+
+  if (error || !data || data.length === 0) {
+    return {
+      ok: false,
+      mensaje: "No se pudo retirar la postulación. Verificá que siga enviada.",
+    };
+  }
+
+  revalidatePath("/trabajos");
+  return { ok: true };
 }

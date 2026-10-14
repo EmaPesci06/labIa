@@ -249,6 +249,70 @@ const VERIFICACIONES = [
   },
 ];
 
+// Trabajos y postulaciones para LAB-27 (lista de trabajos del profesional).
+const TRABAJOS_MOCK = [
+  {
+    id: "88888888-8888-4888-8888-888888888881",
+    oficio: "gas",
+    titulo: "Olor a gas en la cocina",
+    descripcion: "Desde ayer hay olor cerca del horno. Ya cerré la llave de paso.",
+    urgencia: "lo_antes_posible",
+    presupuesto_estimado: null,
+    fotos: [],
+    barrio_id: 2,
+    barrio_nombre: "La Perla",
+    distancia_km: 0.8,
+    cantidad_postulaciones: 2,
+    ya_me_postule: false,
+    created_at: hace(20),
+    cliente_nombre: "Carlos",
+    cliente_apellido_inicial: "M",
+    total: 2,
+  },
+  {
+    id: "88888888-8888-4888-8888-888888888882",
+    oficio: "plomeria",
+    titulo: "Cambiar canilla del baño",
+    descripcion: "Gotea aunque esté cerrada. Tengo la canilla nueva.",
+    urgencia: "esta_semana",
+    presupuesto_estimado: 12000,
+    fotos: [],
+    barrio_id: 1,
+    barrio_nombre: "Centro",
+    distancia_km: 2.1,
+    cantidad_postulaciones: 1,
+    ya_me_postule: true,
+    created_at: hace(120),
+    cliente_nombre: "Lucía",
+    cliente_apellido_inicial: "P",
+    total: 2,
+  },
+];
+
+const POSTULACIONES_MOCK = [
+  {
+    id: "99999999-9999-4999-9999-999999999991",
+    trabajo_id: "88888888-8888-4888-8888-888888888882",
+    profesional_id: ID_PUBLICADO,
+    mensaje: "Puedo pasar hoy a la tarde a revisar.",
+    precio_estimado: 15000,
+    sena_propuesta: 3000,
+    estado: "enviada",
+    created_at: hace(90),
+    trabajos: {
+      id: "88888888-8888-4888-8888-888888888882",
+      titulo: "Cambiar canilla del baño",
+      descripcion: "Gotea aunque esté cerrada.",
+      oficio: "plomeria",
+      urgencia: "esta_semana",
+      barrio_id: 1,
+      estado: "abierto",
+      cliente_id: ID_CLIENTE,
+      barrios: { nombre: "Centro" },
+    },
+  },
+];
+
 // Lo que la prueba necesita leer después: decisiones y accesos (solo en memoria).
 const DECISIONES = [];
 const ACCESOS = [];
@@ -635,16 +699,47 @@ const server = http.createServer((req, res) => {
       };
       return responder(res, 200, unObjeto ? fila : [fila]);
     }
+    if (ruta === "/rest/v1/rpc/trabajos_para_mi") {
+      const { p_oficio } = JSON.parse(cuerpo || "{}");
+      let lista = TRABAJOS_MOCK;
+      if (p_oficio) {
+        lista = lista.filter((t) => t.oficio === p_oficio);
+      }
+      return responder(res, 200, lista);
+    }
+    if (ruta.startsWith("/rest/v1/postulaciones")) {
+      if (req.method === "PATCH") {
+        const id = (url.searchParams.get("id") ?? "").replace("eq.", "");
+        const post = POSTULACIONES_MOCK.find((p) => p.id === id);
+        if (post) post.estado = "retirada";
+        return responder(res, 200, post ? [post] : []);
+      }
+      return responder(res, 200, POSTULACIONES_MOCK);
+    }
+    if (ruta === "/rest/v1/mis_verificaciones") {
+      if (yo?.id === ID_EN_REVISION) {
+        return responder(res, 200, [
+          {
+            id: "v-rev-1",
+            tipo: "dni_frente",
+            estado: "pendiente",
+            motivo_rechazo: null,
+            created_at: hace(60),
+          },
+        ]);
+      }
+      return responder(res, 200, []);
+    }
     if (ruta === "/rest/v1/perfiles_profesionales") {
       if (req.method === "PATCH") return responder(res, 200, [{ usuario_id: yo?.id }]);
       const fila = {
-        oficios: ["gas"],
+        oficios: ["gas", "plomeria"],
         especialidades: "Instalaciones",
         descripcion: "Gasista matriculado.",
         anios_experiencia: 10,
         disponibilidad: "Lunes a viernes",
         toda_la_ciudad: false,
-        zonas: [1],
+        zonas: [1, 2],
       };
       return responder(res, 200, unObjeto ? fila : [fila]);
     }
@@ -654,6 +749,15 @@ const server = http.createServer((req, res) => {
         { id: 2, nombre: "La Perla" },
         { id: 3, nombre: "Güemes" },
       ];
+      const en = url.searchParams.get("id");
+      if (en && en.startsWith("in.")) {
+        const ids = en.replace("in.(", "").replace(")", "").split(",").map(Number);
+        return responder(
+          res,
+          200,
+          lista.filter((b) => ids.includes(b.id)),
+        );
+      }
       // Con `id=eq.N` (maybeSingle) devuelve solo el barrio pedido: maybeSingle falla con más de una fila.
       const pedido = Number((url.searchParams.get("id") ?? "").replace("eq.", ""));
       const fila = lista.find((b) => b.id === pedido) ?? lista[0];
