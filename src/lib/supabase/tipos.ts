@@ -441,6 +441,9 @@ isOneToOne: true
                            },
 "distancia_km":
 { Args: { "barrio_a": number,"barrio_b": number }; Returns: number
+                           },
+"elegir_rol_inicial":
+{ Args: { "p_rol": Database["public"]['Enums']["rol"] }; Returns: undefined
                            }
           }
           Enums: {
