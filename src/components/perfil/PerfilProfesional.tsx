@@ -55,9 +55,17 @@ function Insignias({ perfil, className }: { perfil: PerfilPublico; className?: s
   );
 }
 
-function Fila({ etiqueta, children }: { etiqueta: string; children: ReactNode }) {
+function Fila({
+  etiqueta,
+  children,
+  className,
+}: {
+  etiqueta: string;
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <div className="flex justify-between gap-4 text-[15px]">
+    <div className={cn("flex justify-between gap-4 text-[15px]", className)}>
       <dt className="text-texto-secundario">{etiqueta}</dt>
       <dd className="text-right font-semibold">{children}</dd>
     </div>
@@ -69,9 +77,9 @@ function DatosPerfil({ perfil, className }: { perfil: PerfilPublico; className?:
     <dl className={cn("flex flex-col gap-2 lg:gap-3.5", className)}>
       <Fila etiqueta="Oficios">{textoOficios(perfil.oficios)}</Fila>
       {perfil.especialidades ? (
-        <div className="lg:hidden">
-          <Fila etiqueta="Especialidades">{perfil.especialidades}</Fila>
-        </div>
+        <Fila etiqueta="Especialidades" className="lg:hidden">
+          {perfil.especialidades}
+        </Fila>
       ) : null}
       {perfil.zonasTexto ? <Fila etiqueta="Zonas">{perfil.zonasTexto}</Fila> : null}
       {perfil.disponibilidad ? (
