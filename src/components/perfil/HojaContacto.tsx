@@ -35,13 +35,15 @@ type Props = {
   abierta: boolean;
   onCambioAbierta: (abierta: boolean) => void;
   profesionalId: string;
+  /** Elemento al que vuelve el foco al cerrar. */
+  devolverFocoA?: { current: HTMLElement | null };
 };
 
 /**
  * Hoja "Antes de contactar" (prototipo "Perfil" y "Desk-Perfil"). Muestra los consejos y, al tocar
  * "Abrir WhatsApp", la Server Action registra el contacto y devuelve el link de `wa.me`.
  */
-export function HojaContacto({ abierta, onCambioAbierta, profesionalId }: Props) {
+export function HojaContacto({ abierta, onCambioAbierta, profesionalId, devolverFocoA }: Props) {
   const [estado, accion, pendiente] = useActionState(contactarProfesional, ESTADO_CONTACTO_INICIAL);
   const pestanaRef = useRef<Window | null>(null);
   const procesado = useRef<EstadoContacto | null>(null);
@@ -64,7 +66,13 @@ export function HojaContacto({ abierta, onCambioAbierta, profesionalId }: Props)
   }, [estado, onCambioAbierta]);
 
   return (
-    <HojaInferior abierta={abierta} onCambioAbierta={onCambioAbierta} titulo="Antes de contactar">
+    <HojaInferior
+      abierta={abierta}
+      onCambioAbierta={onCambioAbierta}
+      titulo="Antes de contactar"
+      devolverFocoA={devolverFocoA}
+      ocultarCierreEnEscritorio
+    >
       <ul className="flex list-disc flex-col gap-2 pl-5 text-[15px] leading-snug">
         {CONSEJOS.map((consejo) => (
           <li key={consejo}>{consejo}</li>
@@ -81,27 +89,35 @@ export function HojaContacto({ abierta, onCambioAbierta, profesionalId }: Props)
         <input type="hidden" name="profesionalId" value={profesionalId} />
         <input type="hidden" name="origen" value="perfil" />
 
-        <Boton
-          type="submit"
-          variante="exito"
-          tamano="grande"
-          bloque
-          cargando={pendiente}
-          disabled={pendiente}
-          aria-describedby={estado.mensaje ? "error-contacto" : undefined}
-        >
-          Abrir WhatsApp
-        </Boton>
-
         {estado.mensaje ? (
           <p id="error-contacto" role="alert" className="text-sm font-semibold text-error">
             {estado.mensaje}
           </p>
         ) : null}
 
-        <Boton type="button" variante="fantasma" bloque onClick={() => onCambioAbierta(false)}>
-          Cancelar
-        </Boton>
+        <div className="flex flex-col gap-3.5 lg:grid lg:grid-cols-2 lg:gap-2.5">
+          <Boton
+            type="submit"
+            variante="exito"
+            tamano="grande"
+            bloque
+            cargando={pendiente}
+            disabled={pendiente}
+            aria-describedby={estado.mensaje ? "error-contacto" : undefined}
+          >
+            Abrir WhatsApp
+          </Boton>
+
+          <Boton
+            type="button"
+            variante="fantasma"
+            bloque
+            onClick={() => onCambioAbierta(false)}
+            className="lg:border-[1.5px] lg:border-borde lg:bg-superficie lg:text-texto lg:hover:bg-azul-suave"
+          >
+            Cancelar
+          </Boton>
+        </div>
       </form>
     </HojaInferior>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { MessageCircle } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { Boton } from "@/components/ui/Boton";
 
@@ -22,6 +22,8 @@ export function BotonContactar({
   profesionalId?: string;
 }) {
   const [abierta, setAbierta] = useState(false);
+  // El botón que abrió la hoja: al cerrar, el foco vuelve acá (criterio de accesibilidad de LAB-25).
+  const botonAbridor = useRef<HTMLElement | null>(null);
   const contenido = (
     <>
       <MessageCircle aria-hidden strokeWidth={2} className="size-5" />
@@ -46,11 +48,19 @@ export function BotonContactar({
         bloque
         className={className}
         aria-haspopup="dialog"
-        onClick={() => setAbierta(true)}
+        onClick={(evento) => {
+          botonAbridor.current = evento.currentTarget;
+          setAbierta(true);
+        }}
       >
         {contenido}
       </Boton>
-      <HojaContacto abierta={abierta} onCambioAbierta={setAbierta} profesionalId={profesionalId} />
+      <HojaContacto
+        abierta={abierta}
+        onCambioAbierta={setAbierta}
+        profesionalId={profesionalId}
+        devolverFocoA={botonAbridor}
+      />
     </>
   );
 }
