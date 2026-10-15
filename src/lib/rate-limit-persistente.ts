@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import { createHash, createHmac } from "node:crypto";
 
 import * as Sentry from "@sentry/nextjs";
 
@@ -10,10 +10,18 @@ import { supabaseConfigurado } from "@/lib/supabase/servidor";
 /** Máximo de intentos dentro de una ventana de tiempo. */
 export type ReglaLimite = { maximo: number; ventanaMs: number };
 
+/** Clave que va a la tabla: HMAC-SHA256 con el secreto del servidor, o sha256 si no hay secreto. */
+export function claveDeLimite(clave: string): string {
+  const secreto = process.env.RATE_LIMIT_SECRET;
+  if (secreto) return createHmac("sha256", secreto).update(clave).digest("hex");
+  return createHash("sha256").update(clave).digest("hex");
+}
+
 /**
  * Cuenta un intento en Postgres (`public.consumir_cupo`, con la service role desde el servidor), así
- * que el límite se comparte entre todas las instancias de Vercel. La clave se guarda hasheada
- * (sha256) para que la tabla no tenga emails ni IPs en claro.
+ * que el límite se comparte entre todas las instancias de Vercel. La clave se guarda con HMAC-SHA256
+ * (secreto `RATE_LIMIT_SECRET`) para que la tabla no tenga emails ni IPs en claro y no se puedan
+ * recalcular desde fuera. Si falta el secreto, cae a sha256 sin clave.
  *
  * Si la base no responde se cae al limitador en memoria (así la acción sigue frenada) y el error
  * se reporta a Sentry sin la clave ni datos personales. Sin Supabase configurado va directo a memoria.
@@ -24,7 +32,7 @@ export async function limitarPersistente(
 ): Promise<ResultadoLimite> {
   if (!supabaseConfigurado()) return limitarIntentos(clave, regla);
 
-  const claveHasheada = createHash("sha256").update(clave).digest("hex");
+  const claveHasheada = claveDeLimite(clave);
   try {
     const cupo = await consumirCupoServicio(
       claveHasheada,
