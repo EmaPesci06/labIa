@@ -11,6 +11,7 @@ import {
   obtenerResenas,
 } from "@/lib/perfil/cargar";
 import { RESENAS_INICIALES, descripcionCorta, tituloPerfil } from "@/lib/perfil/datos";
+import { consultarElegibilidadResena } from "@/lib/resenas/acciones";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 
@@ -65,6 +66,7 @@ export default async function PerfilDelProfesional({ params }: Props) {
   }
 
   const resenas = await obtenerResenas(supabase, perfil.id, 0, RESENAS_INICIALES);
+  const elegibilidad = await consultarElegibilidadResena(perfil.id);
 
   return (
     <>
@@ -74,6 +76,8 @@ export default async function PerfilDelProfesional({ params }: Props) {
         resenas={resenas}
         distanciaKm={distanciaKm}
         puedeContactar={sesion?.rol === "cliente"}
+        puedeResenar={elegibilidad.puedeResenar}
+        resenaPropia={elegibilidad.resenaPropia}
         hrefIngreso={
           sesion
             ? undefined

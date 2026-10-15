@@ -1,9 +1,15 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { describe, expect, it, vi } from "vitest";
+import { NextRequest } from "next/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { GET } from "@/app/api/cron/limpiar-documentos/route";
+import * as adminModulo from "@/lib/supabase/admin";
 import type { Database } from "@/lib/supabase/tipos";
 
 vi.mock("server-only", () => ({}));
+vi.mock("@sentry/nextjs", () => ({ captureException: vi.fn() }));
+
+import * as Sentry from "@sentry/nextjs";
 
 import { limpiarDocumentos, vencidosParaBorrar, type FilaRetencion } from "./limpieza";
 
@@ -39,6 +45,20 @@ describe("vencidosParaBorrar", () => {
     ];
     expect(vencidosParaBorrar(filas, AHORA)).toEqual([]);
   });
+
+  it("un documento revisado sin borrar_despues_de no se borra (la base fija la fecha al decidir)", () => {
+    const filas = [fila({ id: "revisado-sin-fecha", borrar_despues_de: null })];
+    expect(vencidosParaBorrar(filas, AHORA)).toEqual([]);
+  });
+
+  it("un documento vence exactamente en su fecha de borrado, no antes", () => {
+    const manana = new Date(AHORA.getTime() + 24 * 60 * 60 * 1000);
+    const filas = [
+      fila({ id: "en-la-fecha", borrar_despues_de: AHORA.toISOString() }),
+      fila({ id: "manana", borrar_despues_de: manana.toISOString() }),
+    ];
+    expect(vencidosParaBorrar(filas, AHORA).map((f) => f.id)).toEqual(["en-la-fecha"]);
+  });
 });
 
 /** Cliente de Supabase simulado: registra qué borró el job y qué marcó. */
@@ -46,6 +66,7 @@ function adminFalso(opciones: {
   vencidas?: FilaRetencion[];
   huerfanos?: string[];
   errorStorage?: boolean;
+  errorHuerfanos?: boolean;
 }) {
   const remove = vi.fn(async (_rutas: string[]) =>
     opciones.errorStorage ? { data: null, error: { message: "boom" } } : { data: [], error: null },
@@ -57,7 +78,11 @@ function adminFalso(opciones: {
     lte: async () => ({ data: opciones.vencidas ?? [], error: null }),
   };
   const update = vi.fn(() => ({ in: async () => ({ error: null }) }));
-  const rpc = vi.fn(async () => ({ data: opciones.huerfanos ?? [], error: null }));
+  const rpc = vi.fn(async () =>
+    opciones.errorHuerfanos
+      ? { data: null, error: { message: "fallo al listar" } }
+      : { data: opciones.huerfanos ?? [], error: null },
+  );
   const admin = {
     from: (tabla: string) => {
       if (tabla !== "verificaciones") throw new Error(`tabla inesperada ${tabla}`);
@@ -110,11 +135,100 @@ describe("limpiarDocumentos", () => {
     expect(resultado).toEqual({ borrados: 0, huerfanos: 0, fallidos: 1 });
   });
 
+  it("si no se pueden listar los huérfanos, el error se propaga (no se traga)", async () => {
+    const { admin } = adminFalso({ errorHuerfanos: true });
+    await expect(limpiarDocumentos(admin, AHORA)).rejects.toThrow(
+      "No se pudieron listar los archivos huérfanos.",
+    );
+  });
+
+  it("si la consulta a la base falla, arroja un error controlado", async () => {
+    const admin = {
+      from: () => ({
+        select: () => ({
+          is: () => ({
+            not: () => ({ lte: async () => ({ data: null, error: { message: "x" } }) }),
+          }),
+        }),
+      }),
+    } as unknown as SupabaseClient<Database>;
+    await expect(limpiarDocumentos(admin, AHORA)).rejects.toThrow(
+      "No se pudieron leer las verificaciones para limpieza.",
+    );
+  });
+
   it("sin nada vencido ni huérfano no toca el bucket", async () => {
     const { admin, remove, update } = adminFalso({});
     const resultado = await limpiarDocumentos(admin, AHORA);
     expect(remove).not.toHaveBeenCalled();
     expect(update).not.toHaveBeenCalled();
     expect(resultado).toEqual({ borrados: 0, huerfanos: 0, fallidos: 0 });
+  });
+});
+
+describe("Route Handler /api/cron/limpiar-documentos", () => {
+  const secretoOriginal = process.env.CRON_SECRET;
+  const URL_CRON = "http://localhost:3000/api/cron/limpiar-documentos";
+
+  beforeEach(() => {
+    process.env.CRON_SECRET = "test-secret-123456";
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    if (secretoOriginal !== undefined) process.env.CRON_SECRET = secretoOriginal;
+    else delete process.env.CRON_SECRET;
+  });
+
+  it("rechaza peticiones sin autorización (401)", async () => {
+    const response = await GET(new NextRequest(URL_CRON));
+    expect(response.status).toBe(401);
+    expect(await response.json()).toEqual({ error: "No autorizado" });
+  });
+
+  it("rechaza peticiones con token inválido (401)", async () => {
+    const response = await GET(
+      new NextRequest(URL_CRON, { headers: { authorization: "Bearer token-invalido" } }),
+    );
+    expect(response.status).toBe(401);
+    expect(await response.json()).toEqual({ error: "No autorizado" });
+  });
+
+  it("con CRON_SECRET válido ejecuta la limpieza (200)", async () => {
+    const ayer = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { admin } = adminFalso({
+      vencidas: [
+        fila({
+          id: "vencida-cron",
+          storage_path: "user-1/dni_frente-cron.jpg",
+          borrar_despues_de: ayer,
+        }),
+      ],
+    });
+    vi.spyOn(adminModulo, "crearClienteAdmin").mockReturnValue(admin);
+
+    const response = await GET(
+      new NextRequest(URL_CRON, { headers: { authorization: "Bearer test-secret-123456" } }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ borrados: 1, huerfanos: 0, fallidos: 0 });
+    expect(Sentry.captureException).not.toHaveBeenCalled();
+  });
+
+  it("si la limpieza falla responde 500 y reporta el error a Sentry", async () => {
+    const error = new Error("Conexión perdida con la base");
+    vi.spyOn(adminModulo, "crearClienteAdmin").mockImplementation(() => {
+      throw error;
+    });
+
+    const response = await GET(
+      new NextRequest(URL_CRON, { headers: { authorization: "Bearer test-secret-123456" } }),
+    );
+
+    expect(response.status).toBe(500);
+    expect(await response.json()).toEqual({ error: "No se pudo limpiar los documentos" });
+    expect(Sentry.captureException).toHaveBeenCalledWith(error);
   });
 });

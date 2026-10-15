@@ -153,7 +153,6 @@ export function FormularioPostulacion({
       aria-describedby={estado.mensaje ? idError : undefined}
       className="flex flex-col gap-4 rounded-[18px] border border-borde bg-superficie p-5"
     >
-      <input type="hidden" name="trabajoId" value={trabajoId} />
       <h2 className="font-titulo text-lg font-bold text-texto">Postularme</h2>
 
       {estado.mensaje ? (

@@ -500,7 +500,7 @@ select is((select count(*) from public.postulaciones where trabajo_id in ('ccccc
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000003');
 select is((select count(*) from public.postulaciones where trabajo_id in ('cccccccc-1200-4000-b000-000000000001', 'cccccccc-1200-4000-b000-000000000002', 'cccccccc-1200-4000-b000-000000000005')), 0::bigint, 'postulaciones: otro cliente no ve las de un trabajo ajeno');
-select is_empty($$update public.postulaciones set estado = 'elegida' where trabajo_id = 'cccccccc-1200-4000-b000-000000000001' returning 1$$, 'postulaciones: otro cliente no elige en un trabajo ajeno');
+select throws_ok($$update public.postulaciones set estado = 'elegida' where trabajo_id = 'cccccccc-1200-4000-b000-000000000001' returning 1$$, '42501', null, 'postulaciones: otro cliente no elige en un trabajo ajeno (sin update directo de estado)');
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000005');
 select is((select count(*) from public.postulaciones where trabajo_id in ('cccccccc-1200-4000-b000-000000000001', 'cccccccc-1200-4000-b000-000000000002', 'cccccccc-1200-4000-b000-000000000005')), 0::bigint, 'postulaciones: otro profesional no ve las ajenas');
@@ -529,14 +529,13 @@ select throws_ok(
   $$insert into public.postulaciones (trabajo_id, profesional_id, mensaje) values ('cccccccc-1200-4000-b000-000000000003', 'cccccccc-1200-4000-a000-000000000004', 'Hola')$$,
   '42501', null, 'postulaciones: no se postula a nombre de otro'
 );
-select results_eq(
+select throws_ok(
   $$update public.postulaciones set estado = 'retirada' where trabajo_id = 'cccccccc-1200-4000-b000-000000000001' and profesional_id = 'cccccccc-1200-4000-a000-000000000008' returning estado::text$$,
-  $$values ('retirada')$$,
-  'postulaciones: el autor retira la suya mientras está enviada'
+  '42501', null, 'postulaciones: el autor no retira con update directo (se retira con retirar_postulacion)'
 );
-select is_empty(
+select throws_ok(
   $$update public.postulaciones set estado = 'retirada' where trabajo_id = 'cccccccc-1200-4000-b000-000000000001' and profesional_id = 'cccccccc-1200-4000-a000-000000000008' returning 1$$,
-  'postulaciones: una retirada no se vuelve a modificar'
+  '42501', null, 'postulaciones: una retirada no se vuelve a modificar (ni por update directo)'
 );
 select throws_ok($$delete from public.postulaciones where trabajo_id = 'cccccccc-1200-4000-b000-000000000005'$$, '42501', null, 'postulaciones: nadie las borra (autor)');
 
@@ -545,15 +544,15 @@ select throws_ok(
   $$insert into public.postulaciones (trabajo_id, profesional_id, mensaje) values ('cccccccc-1200-4000-b000-000000000001', 'cccccccc-1200-4000-a000-000000000007', 'Hola')$$,
   '42501', null, 'postulaciones: un usuario suspendido no puede postularse'
 );
-select is_empty(
+select throws_ok(
   $$update public.postulaciones set estado = 'retirada' where trabajo_id = 'cccccccc-1200-4000-b000-000000000006' and profesional_id = 'cccccccc-1200-4000-a000-000000000007' returning 1$$,
-  'postulaciones: un usuario suspendido no retira la suya'
+  '42501', null, 'postulaciones: un usuario suspendido no retira la suya'
 );
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000006');
-select is_empty(
+select throws_ok(
   $$update public.postulaciones set estado = 'elegida' where trabajo_id = 'cccccccc-1200-4000-b000-000000000006' and profesional_id = 'cccccccc-1200-4000-a000-000000000008' returning 1$$,
-  'postulaciones: un cliente suspendido no elige'
+  '42501', null, 'postulaciones: un cliente suspendido no elige'
 );
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000002');
@@ -567,21 +566,19 @@ select throws_ok(
   $$update public.postulaciones set estado = 'elegida' where trabajo_id = 'cccccccc-1200-4000-b000-000000000001' and profesional_id = 'cccccccc-1200-4000-a000-000000000004'$$,
   '42501', null, 'postulaciones: el autor no se elige a sí mismo'
 );
-select is_empty(
+select throws_ok(
   $$update public.postulaciones set estado = 'retirada' where trabajo_id = 'cccccccc-1200-4000-b000-000000000002' and profesional_id = 'cccccccc-1200-4000-a000-000000000004' returning 1$$,
-  'postulaciones: el autor no retira una que ya fue elegida'
+  '42501', null, 'postulaciones: el autor no retira una que ya fue elegida (ni por update directo)'
 );
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000002');
-select results_eq(
+select throws_ok(
   $$update public.postulaciones set estado = 'descartada' where trabajo_id = 'cccccccc-1200-4000-b000-000000000001' and profesional_id = 'cccccccc-1200-4000-a000-000000000004' returning estado::text$$,
-  $$values ('descartada')$$,
-  'postulaciones: el cliente dueño descarta'
+  '42501', null, 'postulaciones: el cliente dueño no descarta con update directo (lo hace elegir_postulante)'
 );
-select results_eq(
+select throws_ok(
   $$update public.postulaciones set estado = 'elegida' where trabajo_id = 'cccccccc-1200-4000-b000-000000000001' and profesional_id = 'cccccccc-1200-4000-a000-000000000004' returning estado::text$$,
-  $$values ('elegida')$$,
-  'postulaciones: el cliente dueño elige'
+  '42501', null, 'postulaciones: el cliente dueño no elige con update directo (lo hace elegir_postulante)'
 );
 select throws_ok(
   $$update public.postulaciones set estado = 'enviada' where trabajo_id = 'cccccccc-1200-4000-b000-000000000001' and profesional_id = 'cccccccc-1200-4000-a000-000000000004'$$,
@@ -677,7 +674,7 @@ select results_eq(
   'resenas: el autor edita la suya dentro de las 24 h'
 );
 select throws_ok($$update public.resenas set autor_id = 'cccccccc-1200-4000-a000-000000000003' where autor_id = 'cccccccc-1200-4000-a000-000000000002' and profesional_id = 'cccccccc-1200-4000-a000-000000000008'$$, '42501', null, 'resenas: no se cambia el autor');
-select is_empty($$delete from public.resenas where autor_id = 'cccccccc-1200-4000-a000-000000000003' returning 1$$, 'resenas: no se borra la de otro');
+select throws_ok($$delete from public.resenas where autor_id = 'cccccccc-1200-4000-a000-000000000003' returning 1$$, '42501', null, 'resenas: nadie borra reseñas por la API (LAB-31 endurecer)');
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000003');
 select lives_ok(
@@ -707,20 +704,91 @@ select throws_ok(
   $$insert into public.resenas (autor_id, profesional_id, puntaje) values ('cccccccc-1200-4000-a000-000000000004', 'cccccccc-1200-4000-a000-000000000008', 5)$$,
   '42501', null, 'resenas: un profesional no reseña'
 );
-select is_empty($$delete from public.resenas where profesional_id = 'cccccccc-1200-4000-a000-000000000004' returning 1$$, 'resenas: el profesional no borra las que recibió');
+select throws_ok($$delete from public.resenas where profesional_id = 'cccccccc-1200-4000-a000-000000000004' returning 1$$, '42501', null, 'resenas: el profesional no borra las que recibió');
 
+-- LAB-31 (endurecer): el autor no borra su reseña, ni dentro de las 24 h. Borrar y reinsertar
+-- cambiaba la calificación fuera de la ventana.
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000002');
-select results_eq(
+select throws_ok(
   $$delete from public.resenas where autor_id = 'cccccccc-1200-4000-a000-000000000002' and profesional_id = 'cccccccc-1200-4000-a000-000000000008' returning 1$$,
-  $$values (1)$$,
-  'resenas: el autor borra la suya'
+  '42501', null,
+  'resenas: el autor no borra su reseña, ni dentro de las 24 h'
 );
 
+-- Sin grant de delete para authenticated, el admin tampoco borra por la API. Si LAB-32 necesita
+-- borrar reseñas, lo resuelve con una vía explícita (service role) o un grant nuevo.
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000001');
-select results_eq(
+select throws_ok(
   $$delete from public.resenas where autor_id = 'cccccccc-1200-4000-a000-000000000003' and profesional_id = 'cccccccc-1200-4000-a000-000000000004' returning 1$$,
-  $$values (1)$$,
-  'resenas: el admin borra una ajena'
+  '42501', null,
+  'resenas: ni el admin borra por la API (sin grant de delete, LAB-31 endurecer)'
+);
+
+-- LAB-31 (endurecer): trigger de moderación, filtro de contacto y elegido del trabajo.
+-- Datos extra (como postgres): un trabajo de C1 asignado a P2, con postulación elegida. Y un
+-- contacto de C3 con P2 para que pueda reseñar.
+reset role;
+insert into public.trabajos (id, cliente_id, oficio, titulo, descripcion, barrio_id, urgencia, estado, profesional_elegido_id)
+values ('cccccccc-1200-4000-b000-000000000008', 'cccccccc-1200-4000-a000-000000000002', 'plomeria', 'T8 asignado a P2', 'Descripción de prueba',
+        (select b.id from public.barrios b where b.slug = 'centro'), 'sin_apuro', 'asignado', 'cccccccc-1200-4000-a000-000000000005');
+insert into public.postulaciones (trabajo_id, profesional_id, mensaje, estado)
+values ('cccccccc-1200-4000-b000-000000000008', 'cccccccc-1200-4000-a000-000000000005', 'Hecho', 'elegida');
+insert into public.contactos (cliente_id, profesional_id, origen)
+values ('cccccccc-1200-4000-a000-000000000009', 'cccccccc-1200-4000-a000-000000000005', 'perfil');
+
+-- Insert directo por PostgREST de 1 estrella: el trigger abre el reporte de moderación.
+reset role; select tests.como('cccccccc-1200-4000-a000-000000000009');
+select lives_ok(
+  $$insert into public.resenas (autor_id, profesional_id, puntaje, texto) values ('cccccccc-1200-4000-a000-000000000009', 'cccccccc-1200-4000-a000-000000000005', 1, 'Muy mal servicio')$$,
+  'resenas: un insert directo de 1 estrella se publica'
+);
+reset role;
+select is(
+  (select count(*) from public.reportes r
+   join public.resenas res on res.id = r.objetivo_id
+   where r.objetivo_tipo = 'resena' and res.autor_id = 'cccccccc-1200-4000-a000-000000000009' and res.profesional_id = 'cccccccc-1200-4000-a000-000000000005'),
+  1::bigint,
+  'resenas: un insert directo de 1 estrella genera el reporte de moderación'
+);
+
+-- Un update a 2 estrellas no duplica el reporte.
+reset role; select tests.como('cccccccc-1200-4000-a000-000000000009');
+select lives_ok(
+  $$update public.resenas set puntaje = 2 where autor_id = 'cccccccc-1200-4000-a000-000000000009' and profesional_id = 'cccccccc-1200-4000-a000-000000000005'$$,
+  'resenas: el autor edita a 2 estrellas dentro de las 24 h'
+);
+reset role;
+select is(
+  (select count(*) from public.reportes r
+   join public.resenas res on res.id = r.objetivo_id
+   where r.objetivo_tipo = 'resena' and res.autor_id = 'cccccccc-1200-4000-a000-000000000009' and res.profesional_id = 'cccccccc-1200-4000-a000-000000000005'),
+  1::bigint,
+  'resenas: editar a 2 estrellas no duplica el reporte'
+);
+
+-- Filtro de contacto en la base: teléfono o email en el texto no se guardan, ni al editar.
+reset role; select tests.como('cccccccc-1200-4000-a000-000000000009');
+select throws_ok(
+  $$update public.resenas set texto = 'Llamame al 2234567890' where autor_id = 'cccccccc-1200-4000-a000-000000000009' and profesional_id = 'cccccccc-1200-4000-a000-000000000005'$$,
+  '23514', null,
+  'resenas: el texto con un teléfono no se guarda'
+);
+select throws_ok(
+  $$update public.resenas set texto = 'Escribime a pedro@ejemplo.com' where autor_id = 'cccccccc-1200-4000-a000-000000000009' and profesional_id = 'cccccccc-1200-4000-a000-000000000005'$$,
+  '23514', null,
+  'resenas: el texto con un email no se guarda'
+);
+
+-- Si hay trabajo, el profesional reseñado tiene que ser el elegido de ese trabajo.
+reset role; select tests.como('cccccccc-1200-4000-a000-000000000002');
+select throws_ok(
+  $$insert into public.resenas (autor_id, profesional_id, puntaje, trabajo_id) values ('cccccccc-1200-4000-a000-000000000002', 'cccccccc-1200-4000-a000-000000000005', 4, 'cccccccc-1200-4000-b000-000000000002')$$,
+  '42501', null,
+  'resenas: con un trabajo de otro profesional elegido, no se reseña'
+);
+select lives_ok(
+  $$insert into public.resenas (autor_id, profesional_id, puntaje, trabajo_id) values ('cccccccc-1200-4000-a000-000000000002', 'cccccccc-1200-4000-a000-000000000005', 4, 'cccccccc-1200-4000-b000-000000000008')$$,
+  'resenas: con el trabajo del profesional elegido sí se reseña'
 );
 
 -- ===========================================================================
@@ -794,6 +862,8 @@ cross join (values
   ('public.usuarios_estado_cambiado()'),
   ('privado.recalcular_resenas_de(uuid)'),
   ('public.resenas_recalcular()'),
+  ('privado.resenas_validar_texto()'),
+  ('privado.resenas_moderar()'),
   ('public.al_crear_usuario()'),
   ('privado.usuarios_proteger_columnas()'),
   ('privado.perfiles_proteger_insignias()')

@@ -1,9 +1,10 @@
 /**
- * Límite de intentos por clave (por ejemplo la IP) en una ventana de tiempo.
+ * Límite de intentos por clave (por ejemplo la IP) en una ventana de tiempo, en la memoria de cada
+ * instancia. Sirve como respaldo y para los llamadores síncronos.
  *
- * TODO(LAB-16, producción): vive en la memoria de cada instancia, así que en Vercel (varias
- * instancias serverless) el límite real es mayor al configurado. Alcanza como freno básico del
- * MVP; si hay Vercel KV / Upstash, reemplazar el cuerpo por `@upstash/ratelimit` manteniendo la firma.
+ * Para límites compartidos entre instancias de Vercel usar `limitarPersistente` / `limitarPorIp`
+ * (src/lib/rate-limit-persistente.ts), que cuentan en Postgres (LAB-41). Esta firma no cambia
+ * porque otros módulos la usan de forma síncrona.
  */
 type Registro = { cuenta: number; vence: number };
 

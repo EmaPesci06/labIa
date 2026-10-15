@@ -23,6 +23,13 @@ const ID_RECHAZADO = "55555555-5555-4555-8555-555555555555";
 // no comparten estado (el límite diario se simula por token, no con un contador global).
 const ID_CLIENTE_LIMITE = "66666666-6666-4666-8666-666666666666";
 const ID_CLIENTE_DESPUBLICADO = "77777777-7777-4777-8777-777777777777";
+// LAB-31 (reseñas): clientes para el flujo de reseñas. Los tres primeros contactaron a ID_PUBLICADO
+// (contactos falsos); ID_RESENA_AJENA no contactó a nadie y no puede reseñar.
+const ID_RESENA_NUEVA = "aaaaaaa1-aaaa-4aaa-8aaa-aaaaaaaaaaa1";
+const ID_RESENA_EDITABLE = "aaaaaaa2-aaaa-4aaa-8aaa-aaaaaaaaaaa2";
+const ID_RESENA_VENCIDA = "aaaaaaa3-aaaa-4aaa-8aaa-aaaaaaaaaaa3";
+const ID_RESENA_AJENA = "aaaaaaa4-aaaa-4aaa-8aaa-aaaaaaaaaaa4";
+const CONTACTARON_A_PUBLICADO = new Set([ID_RESENA_NUEVA, ID_RESENA_EDITABLE, ID_RESENA_VENCIDA]);
 
 // token -> usuario
 const USUARIOS = {
@@ -45,6 +52,34 @@ const USUARIOS = {
     rol: "cliente",
     nombre: "Bruno",
     apellido: "Dávila",
+    barrio_id: 1,
+  },
+  "tok-resena-nueva": {
+    id: ID_RESENA_NUEVA,
+    rol: "cliente",
+    nombre: "Julia",
+    apellido: "Ruiz",
+    barrio_id: 1,
+  },
+  "tok-resena-editable": {
+    id: ID_RESENA_EDITABLE,
+    rol: "cliente",
+    nombre: "Diego",
+    apellido: "Soto",
+    barrio_id: 1,
+  },
+  "tok-resena-vencida": {
+    id: ID_RESENA_VENCIDA,
+    rol: "cliente",
+    nombre: "Mora",
+    apellido: "Vidal",
+    barrio_id: 1,
+  },
+  "tok-resena-ajena": {
+    id: ID_RESENA_AJENA,
+    rol: "cliente",
+    nombre: "Nico",
+    apellido: "Lago",
     barrio_id: 1,
   },
   "tok-dueno": {
@@ -83,6 +118,27 @@ const resenas = Array.from({ length: TOTAL_RESENAS }, (_, i) => ({
   texto: `Reseña número ${i + 1}`,
   created_at: new Date(ahora - (i + 1) * 3_600_000).toISOString(),
 }));
+// Reseñas previas de los clientes de prueba (LAB-31): una editable (hace 2 h) y una vencida (hace 30 h).
+resenas.unshift(
+  {
+    id: "bbbbbbb2-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
+    autor_id: ID_RESENA_EDITABLE,
+    profesional_id: ID_PUBLICADO,
+    puntaje: 3,
+    texto: "Llegó a horario, el resultado estuvo bien.",
+    created_at: hace(2),
+  },
+  {
+    id: "bbbbbbb3-bbbb-4bbb-8bbb-bbbbbbbbbbb3",
+    autor_id: ID_RESENA_VENCIDA,
+    profesional_id: ID_PUBLICADO,
+    puntaje: 4,
+    texto: "Buen trabajo.",
+    created_at: hace(30),
+  },
+);
+
+const RESENAS_INICIALES = resenas.map((r) => ({ ...r }));
 
 // ---------------------------------------------------------------------------------------------
 // Panel de verificación (LAB-21): datos del admin.
@@ -292,6 +348,29 @@ const TRABAJOS_MOCK = [
     cliente_nombre: "Lucía",
     cliente_apellido_inicial: "P",
     total: 2,
+  },
+  // LAB-31: trabajo terminado de la clienta de prueba que ya contrató a ID_PUBLICADO (solo lo ve ella).
+  {
+    id: "88888888-8888-4888-8888-888888888891",
+    oficio: "pintura",
+    titulo: "Pintar el living",
+    descripcion: "Living y pasillo, dos manos de látex.",
+    urgencia: "esta_semana",
+    presupuesto_estimado: 85000,
+    fotos: [],
+    barrio_id: 1,
+    barrio_nombre: "Centro",
+    distancia_km: 1.1,
+    cantidad_postulaciones: 1,
+    ya_me_postule: false,
+    estado: "cerrado",
+    cliente_id: ID_RESENA_NUEVA,
+    profesional_elegido_id: ID_PUBLICADO,
+    created_at: hace(200),
+    cliente_nombre: "Julia",
+    cliente_apellido_inicial: "R",
+    total: 1,
+    soloPara: ID_RESENA_NUEVA,
   },
 ];
 
@@ -612,6 +691,11 @@ const server = http.createServer((req, res) => {
 
     if (ruta === "/__decisiones") return responder(res, 200, DECISIONES);
     if (ruta === "/__accesos") return responder(res, 200, ACCESOS);
+    // Vuelve las reseñas al estado inicial (las altas y ediciones de LAB-31 quedan en memoria).
+    if (ruta === "/__reiniciar") {
+      resenas.splice(0, resenas.length, ...RESENAS_INICIALES.map((r) => ({ ...r })));
+      return responder(res, 200, { ok: true });
+    }
 
     if (ruta === "/auth/v1/user") {
       if (!yo) return responder(res, 401, { message: "sin sesión" });
@@ -707,6 +791,21 @@ const server = http.createServer((req, res) => {
       }
       return responder(res, 200, post.profesional_id);
     }
+    // LAB-44: el profesional retira su postulación solo por la función (ya no por PATCH directo).
+    if (ruta === "/rest/v1/rpc/retirar_postulacion") {
+      const { p_postulacion_id } = JSON.parse(cuerpo || "{}");
+      const post = POSTULACIONES_MOCK.find((p) => p.id === p_postulacion_id);
+      if (!post)
+        return responder(res, 400, { code: "P0002", message: "Postulación no encontrada" });
+      if (post.estado !== "enviada") {
+        return responder(res, 400, {
+          code: "22023",
+          message: "Solo podés retirar una postulación que sigue enviada",
+        });
+      }
+      post.estado = "retirada";
+      return responder(res, 200, true);
+    }
     if (ruta === "/rest/v1/rpc/cambiar_profesional") {
       const { p_trabajo_id } = JSON.parse(cuerpo || "{}");
       const trab = TRABAJOS_MOCK.find((t) => t.id === p_trabajo_id);
@@ -772,13 +871,57 @@ const server = http.createServer((req, res) => {
     }
 
     if (ruta === "/rest/v1/resenas") {
+      // Las altas, ediciones y la reseña propia se guardan en memoria (se pierden al reiniciar el falso).
+      if (req.method === "POST") {
+        const datos = JSON.parse(cuerpo || "{}");
+        const nueva = {
+          id: `res-nueva-${Date.now()}`,
+          autor_id: yo?.id ?? ID_CLIENTE,
+          profesional_id: datos.profesional_id,
+          trabajo_id: datos.trabajo_id || null,
+          puntaje: datos.puntaje,
+          texto: datos.texto || null,
+          created_at: new Date().toISOString(),
+        };
+        resenas.unshift(nueva);
+        return responder(res, 201, unObjeto ? nueva : [nueva]);
+      }
+      if (req.method === "PATCH") {
+        const datos = JSON.parse(cuerpo || "{}");
+        const idParam = (url.searchParams.get("id") ?? "").replace("eq.", "");
+        const fila = resenas.find((r) => r.id === idParam);
+        if (fila) Object.assign(fila, datos);
+        return responder(res, 200, unObjeto ? datos : [datos]);
+      }
+      const autorParam = (url.searchParams.get("autor_id") ?? "").replace("eq.", "");
+      if (autorParam) {
+        const propia = resenas.find(
+          (r) => r.autor_id === autorParam && (r.profesional_id ?? ID_PUBLICADO) === ID_PUBLICADO,
+        );
+        if (!propia) {
+          return unObjeto ? responder(res, 406, { message: "sin filas" }) : responder(res, 200, []);
+        }
+        return responder(res, 200, unObjeto ? propia : [propia]);
+      }
       const vacio = (url.searchParams.get("profesional_id") ?? "").includes(ID_EN_REVISION);
       const desde = Number(url.searchParams.get("offset") ?? 0);
-      const limite = Number(url.searchParams.get("limit") ?? TOTAL_RESENAS);
+      const limite = Number(url.searchParams.get("limit") ?? resenas.length);
       const pagina = vacio ? [] : resenas.slice(desde, desde + limite);
       return responder(res, 200, pagina, {
-        "content-range": `${pagina.length ? desde : "*"}${pagina.length ? `-${desde + pagina.length - 1}` : ""}/${vacio ? 0 : TOTAL_RESENAS}`,
+        "content-range": `${pagina.length ? desde : "*"}${pagina.length ? `-${desde + pagina.length - 1}` : ""}/${vacio ? 0 : resenas.length}`,
       });
+    }
+
+    // Contactos registrados (LAB-31): solo los clientes de prueba que contactaron a ID_PUBLICADO.
+    if (ruta === "/rest/v1/contactos") {
+      const contacto =
+        yo &&
+        CONTACTARON_A_PUBLICADO.has(yo.id) &&
+        (url.searchParams.get("profesional_id") ?? "").includes(ID_PUBLICADO);
+      if (!contacto)
+        return unObjeto ? responder(res, 406, { message: "sin filas" }) : responder(res, 200, []);
+      const fila = { id: `contacto-${yo.id.slice(0, 8)}` };
+      return responder(res, 200, unObjeto ? fila : [fila]);
     }
     if (ruta === "/rest/v1/usuarios_publicos") {
       const idParam = url.searchParams.get("id");
@@ -869,7 +1012,12 @@ const server = http.createServer((req, res) => {
         return responder(res, 200, unObjeto ? fila : [fila]);
       }
 
-      let lista = TRABAJOS_MOCK;
+      // Consulta de elegibilidad para reseñar (postulaciones!inner con estado elegida): el falso no
+      // modela postulaciones elegidas, así que nadie queda elegible por esta vía.
+      if (url.searchParams.has("postulaciones.estado")) {
+        return unObjeto ? responder(res, 406, { message: "sin filas" }) : responder(res, 200, []);
+      }
+      let lista = TRABAJOS_MOCK.filter((t) => !t.soloPara || t.soloPara === yo?.id);
       const estadoParam = url.searchParams.get("estado");
       if (estadoParam) {
         if (estadoParam.startsWith("eq.")) {
@@ -904,7 +1052,7 @@ const server = http.createServer((req, res) => {
     }
     if (ruta === "/rest/v1/rpc/trabajos_para_mi") {
       const { p_oficio } = JSON.parse(cuerpo || "{}");
-      let lista = TRABAJOS_MOCK;
+      let lista = TRABAJOS_MOCK.filter((t) => !t.soloPara || t.soloPara === yo?.id);
       if (p_oficio) {
         lista = lista.filter((t) => t.oficio === p_oficio);
       }
@@ -931,12 +1079,6 @@ const server = http.createServer((req, res) => {
           targetTrabajo.cantidad_postulaciones = (targetTrabajo.cantidad_postulaciones || 0) + 1;
         }
         return responder(res, 201, unObjeto ? nueva : [nueva]);
-      }
-      if (req.method === "PATCH") {
-        const id = (url.searchParams.get("id") ?? "").replace("eq.", "");
-        const post = POSTULACIONES_MOCK.find((p) => p.id === id);
-        if (post) post.estado = "retirada";
-        return responder(res, 200, post ? [post] : []);
       }
       let lista = POSTULACIONES_MOCK;
       const tid = url.searchParams.get("trabajo_id");

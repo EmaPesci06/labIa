@@ -20,9 +20,17 @@ type Props = {
  * (Server Action `cargarMasResenas`). Sin reseñas dice "Todavía no tiene reseñas.".
  */
 export function ListaResenas({ profesionalId, iniciales, total }: Props) {
-  const [resenas, setResenas] = useState<readonly ResenaPerfil[]>(iniciales);
+  // Las iniciales vienen de props (cambian con router.refresh tras publicar). Solo guardamos las que
+  // se piden con "Ver más"; la lista que se muestra se deriva en cada render.
+  const [desplegadas, setDesplegadas] = useState<readonly ResenaPerfil[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [pendiente, empezar] = useTransition();
+
+  const idsIniciales = new Set(iniciales.map((r) => r.id));
+  const resenas: readonly ResenaPerfil[] = [
+    ...iniciales,
+    ...desplegadas.filter((r) => !idsIniciales.has(r.id)),
+  ];
 
   const faltan = Math.max(0, total - resenas.length);
   const yaDesplego = resenas.length > iniciales.length;
@@ -39,8 +47,8 @@ export function ListaResenas({ profesionalId, iniciales, total }: Props) {
         setError(respuesta.mensaje);
         return;
       }
-      setResenas((actuales) => {
-        const vistas = new Set(actuales.map((r) => r.id));
+      setDesplegadas((actuales) => {
+        const vistas = new Set([...idsIniciales, ...actuales.map((r) => r.id)]);
         return [...actuales, ...respuesta.resenas.filter((r) => !vistas.has(r.id))];
       });
     });
@@ -54,11 +62,13 @@ export function ListaResenas({ profesionalId, iniciales, total }: Props) {
             key={resena.id}
             className="flex flex-col gap-1.5 rounded-[14px] bg-superficie p-3.5 lg:rounded-2xl lg:p-[18px]"
           >
-            <div className="flex flex-wrap items-baseline justify-between gap-x-3 text-sm font-bold lg:text-[15px]">
+            <div className="flex flex-wrap items-baseline gap-x-1.5 text-sm font-bold lg:text-[15px]">
               <span>
                 {resena.autor} · {textoPuntaje(resena.puntaje)}
               </span>
-              <span className="text-[13px] font-normal text-texto-terciario">{resena.cuando}</span>
+              <span className="text-[13px] font-normal text-texto-terciario">
+                · {resena.cuando}
+              </span>
             </div>
             {resena.texto ? (
               <p className="text-[15px] leading-snug text-texto lg:text-base lg:leading-normal">

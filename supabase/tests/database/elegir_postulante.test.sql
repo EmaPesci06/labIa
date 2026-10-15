@@ -8,7 +8,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(15);
+select plan(17);
 
 create schema if not exists tests;
 
@@ -193,6 +193,56 @@ select is(
   public.marcar_trabajo_terminado('29000000-0000-4000-b000-000000000001'),
   true,
   'marcar_trabajo_terminado pasa el trabajo a cerrado'
+);
+
+-- ---------------------------------------------------------------------------
+-- 5. El elegido tiene que seguir activo y con perfil publicado (LAB-44)
+-- ---------------------------------------------------------------------------
+
+reset role;
+insert into public.trabajos (id, cliente_id, oficio, titulo, descripcion, barrio_id, urgencia, estado)
+values (
+  '29000000-0000-4000-b000-000000000002',
+  '29000000-0000-4000-a000-000000000001',
+  'plomeria',
+  'Destapar desagüe',
+  'El desagüe del baño no traga.',
+  (select id from public.barrios where slug = 'centro'),
+  'sin_apuro',
+  'abierto'
+);
+insert into public.postulaciones (id, trabajo_id, profesional_id, mensaje, precio_estimado, estado)
+values (
+  '29000000-0000-4000-c000-000000000003',
+  '29000000-0000-4000-b000-000000000002',
+  '29000000-0000-4000-a000-000000000004',
+  'Puedo mañana a la mañana.',
+  15000,
+  'enviada'
+);
+
+-- P2 queda suspendido después de postularse
+update public.usuarios set estado = 'suspendida' where id = '29000000-0000-4000-a000-000000000004';
+
+reset role; select tests.como('29000000-0000-4000-a000-000000000001'); -- C1 dueño
+select throws_ok(
+  $$select public.elegir_postulante('29000000-0000-4000-c000-000000000003')$$,
+  '22023',
+  'El profesional ya no está disponible para este trabajo',
+  'no se puede elegir a un profesional con cuenta suspendida'
+);
+
+-- P2 vuelve a tener cuenta activa pero sin perfil publicado
+reset role;
+update public.usuarios set estado = 'activa' where id = '29000000-0000-4000-a000-000000000004';
+update public.perfiles_profesionales set identidad_verificada = false where usuario_id = '29000000-0000-4000-a000-000000000004';
+
+reset role; select tests.como('29000000-0000-4000-a000-000000000001'); -- C1 dueño
+select throws_ok(
+  $$select public.elegir_postulante('29000000-0000-4000-c000-000000000003')$$,
+  '22023',
+  'El profesional ya no está disponible para este trabajo',
+  'no se puede elegir a un profesional cuyo perfil no está publicado'
 );
 
 rollback;
