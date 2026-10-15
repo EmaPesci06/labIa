@@ -153,6 +153,10 @@ falta activar `pg_cron` salvo que se agregue un job dentro de la base.
    `"estado":"ok"` (así también detecta un 503 con cuerpo de error).
 3. Alerta por email a Emanuel cuando el monitor esté caído por más de dos chequeos seguidos.
 4. Probar la alerta con una URL inexistente en un monitor de prueba.
+5. **Rate limit en el firewall de Vercel para `/api/salud`** (recomendado al activar el dominio): Vercel →
+   proyecto `labia` → Firewall → Rules → Rate limiting. Regla sobre la ruta `/api/salud`, límite por IP
+   (p. ej. 60 pedidos por minuto) y acción `deny` o `challenge`. El monitor hace un pedido cada 5 minutos, así
+   que no se ve afectado. El límite evita que alguien use el endpoint para consumir conexiones a la base.
 
 ---
 
