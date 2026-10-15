@@ -35,6 +35,8 @@ type Props = {
   abierta: boolean;
   onCambioAbierta: (abierta: boolean) => void;
   profesionalId: string;
+  origen?: "perfil" | "postulacion";
+  trabajoId?: string;
   /** Elemento al que vuelve el foco al cerrar. */
   devolverFocoA?: { current: HTMLElement | null };
 };
@@ -43,7 +45,14 @@ type Props = {
  * Hoja "Antes de contactar" (prototipo "Perfil" y "Desk-Perfil"). Muestra los consejos y, al tocar
  * "Abrir WhatsApp", la Server Action registra el contacto y devuelve el link de `wa.me`.
  */
-export function HojaContacto({ abierta, onCambioAbierta, profesionalId, devolverFocoA }: Props) {
+export function HojaContacto({
+  abierta,
+  onCambioAbierta,
+  profesionalId,
+  origen = "perfil",
+  trabajoId,
+  devolverFocoA,
+}: Props) {
   const [estado, accion, pendiente] = useActionState(contactarProfesional, ESTADO_CONTACTO_INICIAL);
   const pestanaRef = useRef<Window | null>(null);
   const procesado = useRef<EstadoContacto | null>(null);
@@ -56,14 +65,14 @@ export function HojaContacto({ abierta, onCambioAbierta, profesionalId, devolver
     pestanaRef.current = null;
 
     if (estado.url) {
-      registrarEvento("whatsapp_abierto", { origen: "perfil" });
+      registrarEvento("whatsapp_abierto", { origen });
       if (pestana && !pestana.closed) pestana.location.href = estado.url;
       else window.location.href = estado.url;
       onCambioAbierta(false);
     } else if (pestana && !pestana.closed) {
       pestana.close();
     }
-  }, [estado, onCambioAbierta]);
+  }, [estado, onCambioAbierta, origen]);
 
   return (
     <HojaInferior
@@ -87,7 +96,8 @@ export function HojaContacto({ abierta, onCambioAbierta, profesionalId, devolver
         className="flex flex-col gap-3.5"
       >
         <input type="hidden" name="profesionalId" value={profesionalId} />
-        <input type="hidden" name="origen" value="perfil" />
+        <input type="hidden" name="origen" value={origen} />
+        {trabajoId ? <input type="hidden" name="trabajoId" value={trabajoId} /> : null}
 
         {estado.mensaje ? (
           <p id="error-contacto" role="alert" className="text-sm font-semibold text-error">

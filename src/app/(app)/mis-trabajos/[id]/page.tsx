@@ -1,64 +1,55 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
-import { TarjetaTrabajo } from "@/components/TarjetaTrabajo";
-import { Aviso } from "@/components/ui/Aviso";
-import type { Oficio } from "@/lib/busqueda";
-import { rolFalso } from "@/lib/auth/sesion-falsa";
+import { DetalleMiTrabajo } from "@/components/mis-trabajos/DetalleMiTrabajo";
+import { EnlaceVolver } from "@/components/perfil/EnlaceVolver";
 import { obtenerSesion } from "@/lib/sesion";
-import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
-
-export const metadata: Metadata = { title: "Tu trabajo · LabÍA" };
+import { obtenerDetalleMiTrabajoCliente } from "@/lib/trabajos/consulta";
 
 type Props = {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ publicado?: string }>;
+  searchParams?: Promise<{ publicado?: string }>;
 };
 
-// TODO(LAB-29): reemplazar por el detalle completo con postulantes. Hoy solo confirma la
-// publicación de LAB-26 y muestra la tarjeta del trabajo.
-export default async function DetalleMiTrabajo({ params, searchParams }: Props) {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const { publicado } = await searchParams;
-  if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
-
   const sesion = await obtenerSesion();
-  if (!sesion) notFound();
+  if (!sesion) return { title: "Detalle del trabajo · LabÍA" };
 
-  const aviso = publicado === "1" && (
-    <Aviso>¡Publicado! Te avisamos por email cuando alguien se postule.</Aviso>
-  );
+  const trabajo = await obtenerDetalleMiTrabajoCliente(id, sesion.usuario.id);
+  if (!trabajo) return { title: "Trabajo no encontrado · LabÍA" };
 
-  if (rolFalso() || !supabaseConfigurado()) {
-    return (
-      <div className="flex max-w-xl flex-col gap-4">
-        <h1 className="font-titulo text-[26px] lg:text-4xl">Tu trabajo</h1>
-        {aviso}
-      </div>
-    );
+  return {
+    title: `${trabajo.titulo} · Mis trabajos · LabÍA`,
+    description: trabajo.descripcion.slice(0, 160),
+  };
+}
+
+export default async function DetalleMiTrabajoPage({ params, searchParams }: Props) {
+  const sesion = await obtenerSesion();
+  if (!sesion) {
+    const { id } = await params;
+    redirect(`/ingresar?volver=/mis-trabajos/${id}`);
+  }
+  if (sesion.rol === "profesional") {
+    redirect("/trabajos");
   }
 
-  const supabase = await crearClienteServidor();
-  const { data } = await supabase
-    .from("trabajos")
-    .select("oficio, titulo, descripcion, urgencia, created_at, barrios(nombre)")
-    .eq("id", id)
-    .eq("cliente_id", sesion.usuario.id)
-    .maybeSingle();
-  if (!data) notFound();
+  const { id } = await params;
+  const { publicado } = (await searchParams) ?? {};
+  const trabajo = await obtenerDetalleMiTrabajoCliente(id, sesion.usuario.id);
+
+  if (!trabajo) {
+    notFound();
+  }
 
   return (
-    <div className="flex max-w-xl flex-col gap-4">
-      <h1 className="font-titulo text-[26px] lg:text-4xl">Tu trabajo</h1>
-      {aviso}
-      <TarjetaTrabajo
-        oficio={data.oficio as Oficio}
-        barrio={data.barrios?.nombre ?? ""}
-        creadoEn={data.created_at}
-        titulo={data.titulo}
-        descripcion={data.descripcion}
-        urgencia={data.urgencia}
-        postulantes={0}
+    <div className="mx-auto flex w-full max-w-[680px] flex-col gap-4 py-2 lg:py-6">
+      <EnlaceVolver href="/mis-trabajos" etiquetaEscritorio="Volver a mis trabajos" />
+      <DetalleMiTrabajo
+        trabajo={trabajo}
+        mostrarTituloCompleto={true}
+        publicado={publicado === "1"}
       />
     </div>
   );

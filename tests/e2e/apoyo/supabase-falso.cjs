@@ -249,7 +249,7 @@ const VERIFICACIONES = [
   },
 ];
 
-// Trabajos y postulaciones para LAB-27 (lista de trabajos del profesional).
+// Trabajos y postulaciones para LAB-27 y LAB-29.
 const TRABAJOS_MOCK = [
   {
     id: "88888888-8888-4888-8888-888888888881",
@@ -264,6 +264,9 @@ const TRABAJOS_MOCK = [
     distancia_km: 0.8,
     cantidad_postulaciones: 2,
     ya_me_postule: false,
+    estado: "abierto",
+    cliente_id: ID_CLIENTE,
+    profesional_elegido_id: null,
     created_at: hace(20),
     cliente_nombre: "Carlos",
     cliente_apellido_inicial: "M",
@@ -282,6 +285,9 @@ const TRABAJOS_MOCK = [
     distancia_km: 2.1,
     cantidad_postulaciones: 1,
     ya_me_postule: true,
+    estado: "abierto",
+    cliente_id: ID_CLIENTE,
+    profesional_elegido_id: null,
     created_at: hace(120),
     cliente_nombre: "Lucía",
     cliente_apellido_inicial: "P",
@@ -309,6 +315,48 @@ const POSTULACIONES_MOCK = [
       estado: "abierto",
       cliente_id: ID_CLIENTE,
       barrios: { nombre: "Centro" },
+    },
+  },
+  {
+    id: "99999999-9999-4999-9999-999999999992",
+    trabajo_id: "88888888-8888-4888-8888-888888888881",
+    profesional_id: ID_PUBLICADO,
+    mensaje: "Puedo ir hoy a las 17 h. Reviso la pérdida y te paso presupuesto en el momento.",
+    precio_estimado: 40000,
+    sena_propuesta: 10000,
+    estado: "enviada",
+    created_at: hace(15),
+    trabajos: {
+      id: "88888888-8888-4888-8888-888888888881",
+      titulo: "Olor a gas en la cocina",
+      descripcion: "Desde ayer hay olor cerca del horno.",
+      oficio: "gas",
+      urgencia: "lo_antes_posible",
+      barrio_id: 2,
+      estado: "abierto",
+      cliente_id: ID_CLIENTE,
+      barrios: { nombre: "La Perla" },
+    },
+  },
+  {
+    id: "99999999-9999-4999-9999-999999999993",
+    trabajo_id: "88888888-8888-4888-8888-888888888881",
+    profesional_id: ID_RECHAZADO,
+    mensaje: "Mañana a primera hora estoy por La Perla. Llevo detector de pérdidas.",
+    precio_estimado: 38000,
+    sena_propuesta: null,
+    estado: "enviada",
+    created_at: hace(10),
+    trabajos: {
+      id: "88888888-8888-4888-8888-888888888881",
+      titulo: "Olor a gas en la cocina",
+      descripcion: "Desde ayer hay olor cerca del horno.",
+      oficio: "gas",
+      urgencia: "lo_antes_posible",
+      barrio_id: 2,
+      estado: "abierto",
+      cliente_id: ID_CLIENTE,
+      barrios: { nombre: "La Perla" },
     },
   },
 ];
@@ -641,10 +689,56 @@ const server = http.createServer((req, res) => {
     }
     if (ruta === "/rest/v1/rpc/distancia_km") return responder(res, 200, 1.2);
 
-    // LAB-25: registra el contacto y devuelve el WhatsApp (E.164 sin "+"). Solo cliente activo y
-    // solo profesionales publicados, como la función real.
+    // LAB-29: RPCs de elección, cambio y estado de trabajos del cliente.
+    if (ruta === "/rest/v1/rpc/elegir_postulante") {
+      const { p_postulacion_id } = JSON.parse(cuerpo || "{}");
+      const post = POSTULACIONES_MOCK.find((p) => p.id === p_postulacion_id);
+      if (!post) return responder(res, 404, { message: "postulacion no encontrada" });
+      const trab = TRABAJOS_MOCK.find((t) => t.id === post.trabajo_id);
+      if (!trab || trab.estado !== "abierto") {
+        return responder(res, 400, { code: "22023", message: "El trabajo ya no está abierto" });
+      }
+      trab.estado = "asignado";
+      trab.profesional_elegido_id = post.profesional_id;
+      for (const p of POSTULACIONES_MOCK) {
+        if (p.trabajo_id === trab.id) {
+          p.estado = p.id === post.id ? "elegida" : "descartada";
+        }
+      }
+      return responder(res, 200, post.profesional_id);
+    }
+    if (ruta === "/rest/v1/rpc/cambiar_profesional") {
+      const { p_trabajo_id } = JSON.parse(cuerpo || "{}");
+      const trab = TRABAJOS_MOCK.find((t) => t.id === p_trabajo_id);
+      if (!trab) return responder(res, 404, { message: "trabajo no encontrado" });
+      trab.estado = "abierto";
+      trab.profesional_elegido_id = null;
+      for (const p of POSTULACIONES_MOCK) {
+        if (p.trabajo_id === trab.id) {
+          if (p.estado === "elegida") p.estado = "descartada";
+          else if (p.estado === "descartada") p.estado = "enviada";
+        }
+      }
+      return responder(res, 200, true);
+    }
+    if (ruta === "/rest/v1/rpc/marcar_trabajo_terminado") {
+      const { p_trabajo_id } = JSON.parse(cuerpo || "{}");
+      const trab = TRABAJOS_MOCK.find((t) => t.id === p_trabajo_id);
+      if (!trab) return responder(res, 404, { message: "trabajo no encontrado" });
+      trab.estado = "cerrado";
+      return responder(res, 200, true);
+    }
+    if (ruta === "/rest/v1/rpc/cancelar_trabajo") {
+      const { p_trabajo_id } = JSON.parse(cuerpo || "{}");
+      const trab = TRABAJOS_MOCK.find((t) => t.id === p_trabajo_id);
+      if (!trab) return responder(res, 404, { message: "trabajo no encontrado" });
+      trab.estado = "cancelado";
+      return responder(res, 200, true);
+    }
+
+    // LAB-25 y LAB-29: registra el contacto y devuelve el WhatsApp (E.164 sin "+").
     if (ruta === "/rest/v1/rpc/contactar_profesional") {
-      const { p_profesional: id } = JSON.parse(cuerpo || "{}");
+      const { p_profesional: id, origen } = JSON.parse(cuerpo || "{}");
       if (!yo || yo.rol !== "cliente") {
         return responder(res, 403, {
           code: "42501",
@@ -657,6 +751,9 @@ const server = http.createServer((req, res) => {
           code: "53400",
           message: "Llegaste al máximo de contactos por hoy. Probá mañana.",
         });
+      }
+      if (origen === "postulacion") {
+        return responder(res, 200, WHATSAPP_FALSO);
       }
       // Profesional que dejó de estar disponible entre que se abrió la hoja y se confirmó.
       if (yo.id === ID_CLIENTE_DESPUBLICADO) {
@@ -684,7 +781,25 @@ const server = http.createServer((req, res) => {
       });
     }
     if (ruta === "/rest/v1/usuarios_publicos") {
-      const cli = { id: ID_CLIENTE, nombre: "Laura", apellido_inicial: "F" };
+      const idParam = url.searchParams.get("id");
+      if (idParam && idParam.startsWith("in.")) {
+        const ids = idParam.replace("in.(", "").replace(")", "").split(",");
+        const encontrados = USUARIOS_ADMIN.filter((u) => ids.includes(u.id)).map((u) => ({
+          id: u.id,
+          nombre: u.nombre,
+          apellido_inicial: u.apellido ? u.apellido[0] : "",
+          foto_path: null,
+          barrio_id: u.barrio_id,
+        }));
+        return responder(res, 200, encontrados);
+      }
+      const cli = {
+        id: ID_CLIENTE,
+        nombre: "Laura",
+        apellido_inicial: "F",
+        foto_path: null,
+        barrio_id: 1,
+      };
       return responder(res, 200, unObjeto ? cli : [cli]);
     }
     if (ruta === "/rest/v1/rpc/distancia_km") {
@@ -704,11 +819,69 @@ const server = http.createServer((req, res) => {
       return responder(res, 200, unObjeto ? fila : [fila]);
     }
     if (ruta.startsWith("/rest/v1/trabajos")) {
+      if (req.method === "POST") {
+        const datos = JSON.parse(cuerpo || "{}");
+        const id = "88888888-8888-4888-8888-88888888888" + (TRABAJOS_MOCK.length + 1);
+        const nuevo = {
+          id,
+          oficio: datos.oficio,
+          titulo: datos.titulo,
+          descripcion: datos.descripcion,
+          urgencia: datos.urgencia,
+          presupuesto_estimado: datos.presupuesto_estimado ?? null,
+          fotos: datos.fotos ?? [],
+          barrio_id: datos.barrio_id,
+          barrio_nombre: "Centro",
+          distancia_km: 1.0,
+          cantidad_postulaciones: 0,
+          ya_me_postule: false,
+          estado: "abierto",
+          cliente_id: yo?.id ?? ID_CLIENTE,
+          profesional_elegido_id: null,
+          created_at: new Date().toISOString(),
+          cliente_nombre: yo?.nombre ?? "Cliente",
+          cliente_apellido_inicial: yo?.apellido ? yo.apellido[0] : "C",
+          total: TRABAJOS_MOCK.length + 1,
+        };
+        TRABAJOS_MOCK.unshift(nuevo);
+        return responder(res, 201, unObjeto ? nuevo : [nuevo]);
+      }
       const tid = url.searchParams.get("id");
-      const idBuscado = tid ? tid.replace("eq.", "") : null;
-      const t = TRABAJOS_MOCK.find((x) => x.id === idBuscado) ?? TRABAJOS_MOCK[0];
-      if (!t) return responder(res, 404, { message: "sin filas" });
-      const fila = {
+      if (tid && tid.startsWith("eq.")) {
+        const idBuscado = tid.replace("eq.", "");
+        const t = TRABAJOS_MOCK.find((x) => x.id === idBuscado);
+        if (!t) return responder(res, 404, { message: "sin filas" });
+        const fila = {
+          id: t.id,
+          oficio: t.oficio,
+          titulo: t.titulo,
+          descripcion: t.descripcion,
+          urgencia: t.urgencia,
+          presupuesto_estimado: t.presupuesto_estimado,
+          fotos: t.fotos ?? [],
+          barrio_id: t.barrio_id,
+          estado: t.estado || "abierto",
+          profesional_elegido_id: t.profesional_elegido_id || null,
+          created_at: t.created_at,
+          cliente_id: t.cliente_id || ID_CLIENTE,
+          barrios: { nombre: t.barrio_nombre },
+        };
+        return responder(res, 200, unObjeto ? fila : [fila]);
+      }
+
+      let lista = TRABAJOS_MOCK;
+      const estadoParam = url.searchParams.get("estado");
+      if (estadoParam) {
+        if (estadoParam.startsWith("eq.")) {
+          const est = estadoParam.replace("eq.", "");
+          lista = lista.filter((t) => (t.estado || "abierto") === est);
+        } else if (estadoParam.startsWith("in.")) {
+          const estados = estadoParam.replace("in.(", "").replace(")", "").split(",");
+          lista = lista.filter((t) => estados.includes(t.estado || "abierto"));
+        }
+      }
+
+      const filas = lista.map((t) => ({
         id: t.id,
         oficio: t.oficio,
         titulo: t.titulo,
@@ -717,12 +890,17 @@ const server = http.createServer((req, res) => {
         presupuesto_estimado: t.presupuesto_estimado,
         fotos: t.fotos ?? [],
         barrio_id: t.barrio_id,
-        estado: "abierto",
+        estado: t.estado || "abierto",
+        profesional_elegido_id: t.profesional_elegido_id || null,
+        cantidad_postulaciones: POSTULACIONES_MOCK.filter(
+          (p) => p.trabajo_id === t.id && p.estado !== "retirada",
+        ).length,
         created_at: t.created_at,
-        cliente_id: ID_CLIENTE,
+        cliente_id: t.cliente_id || ID_CLIENTE,
         barrios: { nombre: t.barrio_nombre },
-      };
-      return responder(res, 200, unObjeto ? fila : [fila]);
+      }));
+
+      return responder(res, 200, unObjeto ? filas[0] : filas);
     }
     if (ruta === "/rest/v1/rpc/trabajos_para_mi") {
       const { p_oficio } = JSON.parse(cuerpo || "{}");
@@ -794,6 +972,19 @@ const server = http.createServer((req, res) => {
     }
     if (ruta === "/rest/v1/perfiles_profesionales") {
       if (req.method === "PATCH") return responder(res, 200, [{ usuario_id: yo?.id }]);
+      const uidsParam = url.searchParams.get("usuario_id");
+      if (uidsParam && uidsParam.startsWith("in.")) {
+        const ids = uidsParam.replace("in.(", "").replace(")", "").split(",");
+        const filtrados = PERFILES_ADMIN.filter((p) => ids.includes(p.usuario_id)).map((p) => ({
+          usuario_id: p.usuario_id,
+          especialidades: "Instalaciones",
+          promedio: 4.8,
+          cantidad_resenas: 10,
+          matriculado: p.matriculado,
+          oficios: p.oficios,
+        }));
+        return responder(res, 200, filtrados);
+      }
       const fila = {
         oficios: ["gas", "plomeria"],
         especialidades: "Instalaciones",
