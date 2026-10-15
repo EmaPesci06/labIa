@@ -11,15 +11,18 @@ type Props = {
   titulo: string;
   descripcion?: string;
   textoConfirmar: string;
-  varianteConfirmar?: VarianteBoton | "peligro";
+  varianteConfirmar?: VarianteBoton;
   pendiente?: boolean;
   onConfirmar: () => void;
   devolverFocoA?: { current: HTMLElement | null };
+  /** Error de la última acción, dentro del diálogo para que no quede tapado por el velo. */
+  error?: string | null;
   children?: ReactNode;
 };
 
 /**
  * Modal accesible de confirmación para acciones críticas en Mis Trabajos (LAB-29).
+ * El botón de confirmar usa `Boton` (variante `peligro` para lo destructivo).
  */
 export function ModalConfirmacion({
   abierta,
@@ -31,10 +34,9 @@ export function ModalConfirmacion({
   pendiente = false,
   onConfirmar,
   devolverFocoA,
+  error = null,
   children,
 }: Props) {
-  const esPeligro = varianteConfirmar === "peligro";
-
   return (
     <HojaInferior
       abierta={abierta}
@@ -44,28 +46,24 @@ export function ModalConfirmacion({
       devolverFocoA={devolverFocoA}
     >
       {children}
+      {error ? (
+        <p
+          role="alert"
+          className="rounded-[12px] border border-error/20 bg-error/10 p-3 text-sm font-semibold text-error"
+        >
+          {error}
+        </p>
+      ) : null}
       <div className="mt-2 flex flex-col gap-2.5 sm:flex-row-reverse sm:justify-start">
-        {esPeligro ? (
-          <button
-            type="button"
-            disabled={pendiente}
-            aria-busy={pendiente || undefined}
-            onClick={onConfirmar}
-            className="inline-flex min-h-[52px] cursor-pointer items-center justify-center rounded-boton bg-error px-5 text-base font-bold text-sobre-azul transition-opacity hover:opacity-90 active:opacity-80 disabled:opacity-50 sm:w-auto"
-          >
-            {pendiente ? "Procesando…" : textoConfirmar}
-          </button>
-        ) : (
-          <Boton
-            variante={varianteConfirmar}
-            tamano="grande"
-            cargando={pendiente}
-            onClick={onConfirmar}
-            className="sm:w-auto"
-          >
-            {textoConfirmar}
-          </Boton>
-        )}
+        <Boton
+          variante={varianteConfirmar}
+          tamano="grande"
+          cargando={pendiente}
+          onClick={onConfirmar}
+          className="sm:w-auto"
+        >
+          {textoConfirmar}
+        </Boton>
         <Boton
           variante="secundario"
           tamano="grande"

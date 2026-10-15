@@ -30,10 +30,11 @@ export default async function MisTrabajosPage({ searchParams }: Props) {
 
   const trabajos = await obtenerMisTrabajosCliente(sesion.usuario.id, tabActiva);
 
+  // El detalle solo se consulta si la URL trae un trabajo elegido (?id=). Sin id no se carga:
+  // en celular no se muestra, y en escritorio el cliente agrega el primero (SeleccionInicialEscritorio).
   let trabajoSeleccionado = null;
-  const idParaBuscar = id ?? trabajos[0]?.id;
-  if (idParaBuscar) {
-    trabajoSeleccionado = await obtenerDetalleMiTrabajoCliente(idParaBuscar, sesion.usuario.id);
+  if (id) {
+    trabajoSeleccionado = await obtenerDetalleMiTrabajoCliente(id, sesion.usuario.id);
   }
 
   return (

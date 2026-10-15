@@ -17,12 +17,16 @@ type Props = {
   trabajoEstado: "abierto" | "asignado" | "cerrado" | "cancelado";
   esElegido: boolean;
   hayElegido: boolean;
-  onElegir: (postulacionId: string) => void | Promise<void>;
+  /** Devuelve `true` si la elección salió bien (la hoja se cierra) y `false` si falló (queda abierta con el error). */
+  onElegir: (postulacionId: string) => Promise<boolean>;
   pendiente: boolean;
+  /** Error de la última elección; se muestra solo en la hoja de este postulante. */
+  errorElegir?: string | null;
+  onLimpiarErrorElegir?: () => void;
 };
 
 /**
- * Tarjeta de un postulante en la vista del cliente (LAB-29).
+ * Tarjeta de un postulante en la vista del cliente (LAB-29, LAB-48).
  * Muestra avatar, nombre, oficio/calificación, distancia, mensaje presupuestario,
  * link al perfil público y botón para elegirlo con confirmación atómica.
  */
@@ -33,6 +37,8 @@ export function TarjetaPostulante({
   hayElegido,
   onElegir,
   pendiente,
+  errorElegir = null,
+  onLimpiarErrorElegir,
 }: Props) {
   const [modalAbierto, setModalAbierto] = useState(false);
   const botonAbridorRef = useRef<HTMLButtonElement | null>(null);
@@ -63,44 +69,54 @@ export function TarjetaPostulante({
   const textoPresupuesto = partesPresupuesto.join(" · ");
 
   async function handleConfirmarEleccion() {
-    await onElegir(postulante.id);
-    setModalAbierto(false);
+    const salio = await onElegir(postulante.id);
+    if (salio) {
+      setModalAbierto(false);
+    }
+  }
+
+  function handleCambioModal(abierta: boolean) {
+    setModalAbierto(abierta);
+    if (!abierta) onLimpiarErrorElegir?.();
   }
 
   return (
     <article
       aria-label={`Postulación de ${nombreCompleto}`}
-      className="flex flex-col gap-3 rounded-[18px] border border-divisor bg-superficie p-4 text-texto lg:p-5"
+      className="flex flex-col gap-3 rounded-[18px] border border-divisor bg-superficie p-4 text-texto lg:flex-row lg:items-center lg:gap-6 lg:p-5"
     >
-      <div className="flex items-start gap-3">
-        <Avatar
-          nombre={nombreCompleto}
-          src={postulante.profesional.fotoPath}
-          tamano={44}
-          className="shrink-0"
-        />
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span className="font-titulo text-base font-bold tracking-tight text-texto lg:text-[17px]">
-            {nombreCompleto}
-          </span>
-          <span className="text-[13px] text-texto-secundario lg:text-sm">{subtitulo}</span>
-          {postulante.profesional.distanciaKm !== null ? (
-            <div className="mt-1">
-              <CintaDistancia km={postulante.profesional.distanciaKm} />
-            </div>
-          ) : null}
+      {/* En escritorio, datos del postulante a la izquierda y acciones a la derecha (prototipo Desk). */}
+      <div className="flex min-w-0 flex-1 flex-col gap-3">
+        <div className="flex items-start gap-3">
+          <Avatar
+            nombre={nombreCompleto}
+            src={postulante.profesional.fotoPath}
+            tamano={44}
+            className="shrink-0"
+          />
+          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <span className="font-titulo text-base font-bold tracking-tight text-texto lg:text-[17px]">
+              {nombreCompleto}
+            </span>
+            <span className="text-[13px] text-texto-secundario lg:text-sm">{subtitulo}</span>
+            {postulante.profesional.distanciaKm !== null ? (
+              <div className="mt-1">
+                <CintaDistancia km={postulante.profesional.distanciaKm} />
+              </div>
+            ) : null}
+          </div>
         </div>
+
+        <div className="rounded-[12px] bg-fondo p-3 text-[15px] leading-relaxed text-texto italic">
+          “{postulante.mensaje}”
+        </div>
+
+        {textoPresupuesto ? (
+          <div className="text-sm font-semibold text-texto-secundario">{textoPresupuesto}</div>
+        ) : null}
       </div>
 
-      <div className="rounded-[12px] bg-fondo p-3 text-[15px] leading-relaxed text-texto italic">
-        “{postulante.mensaje}”
-      </div>
-
-      {textoPresupuesto ? (
-        <div className="text-sm font-semibold text-texto-secundario">{textoPresupuesto}</div>
-      ) : null}
-
-      <div className="mt-1 grid grid-cols-2 gap-2 pt-1 sm:flex sm:justify-end">
+      <div className="mt-1 grid grid-cols-2 gap-2 pt-1 sm:flex sm:justify-end lg:mt-0 lg:shrink-0 lg:pt-0">
         <Link
           href={`/profesionales/${postulante.profesionalId}`}
           className="inline-flex min-h-[44px] items-center justify-center rounded-boton border-[1.5px] border-azul px-4 text-center text-sm font-bold text-azul transition-colors hover:bg-azul-suave focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco sm:w-auto"
@@ -125,7 +141,7 @@ export function TarjetaPostulante({
             </button>
             <ModalConfirmacion
               abierta={modalAbierto}
-              onCambioAbierta={setModalAbierto}
+              onCambioAbierta={handleCambioModal}
               titulo={`¿Elegís a ${postulante.profesional.nombre}?`}
               descripcion="Los demás postulantes van a ver que elegiste a otra persona. Podrás contactarlo directamente por WhatsApp."
               textoConfirmar="Elegir profesional"
@@ -133,6 +149,7 @@ export function TarjetaPostulante({
               pendiente={pendiente}
               onConfirmar={handleConfirmarEleccion}
               devolverFocoA={botonAbridorRef}
+              error={errorElegir}
             />
           </>
         ) : (

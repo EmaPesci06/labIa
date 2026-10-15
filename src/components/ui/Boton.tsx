@@ -1,10 +1,11 @@
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from "react";
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode, Ref } from "react";
 
 import { cn } from "@/lib/cn";
 
-export type VarianteBoton = "cliente" | "profesional" | "exito" | "secundario" | "fantasma";
+export type VarianteBoton =
+  "cliente" | "profesional" | "exito" | "secundario" | "fantasma" | "peligro";
 export type TamanoBoton = "grande" | "normal";
 
 const VARIANTES: Record<VarianteBoton, string> = {
@@ -15,6 +16,8 @@ const VARIANTES: Record<VarianteBoton, string> = {
   secundario:
     "border-[1.5px] border-borde bg-superficie text-texto hover:bg-azul-suave active:bg-azul-suave",
   fantasma: "bg-transparent text-azul hover:bg-azul-suave active:bg-azul-suave",
+  // Acciones destructivas (cancelar trabajo). Usa el token de error, igual que el texto de error.
+  peligro: "bg-error text-sobre-azul hover:opacity-90 active:opacity-80",
 };
 
 const TAMANOS: Record<TamanoBoton, string> = {
@@ -31,6 +34,8 @@ type PropsComunes = {
   cargando?: boolean;
   /** Ocupa todo el ancho disponible. */
   bloque?: boolean;
+  /** Para devolver el foco (p. ej. al cerrar una hoja). Solo llega al `<button>`. */
+  ref?: Ref<HTMLButtonElement>;
   children?: ReactNode;
   className?: string;
 };
@@ -60,6 +65,7 @@ export function Boton({
   children,
   className,
   href,
+  ref,
   ...resto
 }: BotonProps) {
   const clases = cn(
@@ -105,6 +111,7 @@ export function Boton({
   return (
     <button
       {...boton}
+      ref={ref}
       type={type}
       className={clases}
       // Cargando no usa `disabled` para no perder el foco del teclado: solo se bloquea el clic.
