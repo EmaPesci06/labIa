@@ -129,17 +129,17 @@ begin
     raise exception 'Solo podés cambiar de profesional en trabajos contratados' using errcode = '22023';
   end if;
 
-  -- 1. La elegida pasa a descartada
-  update public.postulaciones
-  set estado = 'descartada'
-  where trabajo_id = p_trabajo_id
-    and estado = 'elegida';
-
-  -- 2. Las descartadas vuelven a enviada (para que vuelvan a competir, salvo que hayan sido retiradas)
+  -- 1. Las descartadas vuelven a enviada (para que vuelvan a competir, salvo que hayan sido retiradas)
   update public.postulaciones
   set estado = 'enviada'
   where trabajo_id = p_trabajo_id
     and estado = 'descartada';
+
+  -- 2. La que estaba elegida pasa a descartada
+  update public.postulaciones
+  set estado = 'descartada'
+  where trabajo_id = p_trabajo_id
+    and estado = 'elegida';
 
   -- 3. El trabajo vuelve a abierto
   update public.trabajos
