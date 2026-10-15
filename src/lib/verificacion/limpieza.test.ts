@@ -3,6 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { Database } from "@/lib/supabase/tipos";
 
+vi.mock("server-only", () => ({}));
+
 import { limpiarDocumentos, vencidosParaBorrar, type FilaRetencion } from "./limpieza";
 
 // Hoy de la prueba: 14 de noviembre de 2026. Todas las fechas son falsas, para no depender del reloj.
