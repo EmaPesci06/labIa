@@ -3,6 +3,7 @@
 import type { EstadoFormulario } from "@/lib/auth/estado";
 import { ipDelPedido } from "@/lib/ip-del-pedido";
 import { limitarPersistente } from "@/lib/rate-limit-persistente";
+import { rolDeLaSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import { VERSION_LEGALES } from "@/lib/legales";
 import {
@@ -42,12 +43,9 @@ export async function darConsentimientoDatosSensibles(
     };
   }
 
-  const { data: fila } = await supabase
-    .from("usuarios")
-    .select("rol")
-    .eq("id", auth.user.id)
-    .maybeSingle();
-  if (fila?.rol !== "profesional") return { mensaje: "Esta cuenta no es de profesional." };
+  if ((await rolDeLaSesion(supabase, auth.user.id)) !== "profesional") {
+    return { mensaje: "Esta cuenta no es de profesional." };
+  }
 
   const { error } = await supabase.rpc("aceptar_consentimiento_datos_sensibles", {
     p_version: VERSION_LEGALES,

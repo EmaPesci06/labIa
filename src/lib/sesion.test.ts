@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { nombreVisible, obtenerSesion } from "./sesion";
+import { nombreVisible, obtenerSesion, rolDeLaSesion } from "./sesion";
 
 vi.mock("next/server", () => ({ connection: async () => {} }));
 vi.mock("server-only", () => ({}));
@@ -29,6 +29,29 @@ describe("nombreVisible", () => {
   });
   it("sin nada usa un texto neutro", () => {
     expect(nombreVisible(null, null, null)).toBe("Tu cuenta");
+  });
+});
+
+describe("rolDeLaSesion (LAB-47)", () => {
+  /** Cliente de Supabase con la fila de `usuarios` que devuelve `maybeSingle`. */
+  function clienteCon(fila: { rol: string } | null) {
+    const maybeSingle = vi.fn(async () => ({ data: fila, error: null }));
+    const eq = vi.fn(() => ({ maybeSingle }));
+    const select = vi.fn(() => ({ eq }));
+    const from = vi.fn(() => ({ select }));
+    return { cliente: { from } as never, from, eq };
+  }
+
+  it("devuelve el rol de la fila del usuario", async () => {
+    const { cliente, from, eq } = clienteCon({ rol: "profesional" });
+    expect(await rolDeLaSesion(cliente, "u-1")).toBe("profesional");
+    expect(from).toHaveBeenCalledWith("usuarios");
+    expect(eq).toHaveBeenCalledWith("id", "u-1");
+  });
+
+  it("sin fila devuelve cliente", async () => {
+    const { cliente } = clienteCon(null);
+    expect(await rolDeLaSesion(cliente, "u-1")).toBe("cliente");
   });
 });
 

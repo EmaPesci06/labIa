@@ -5,7 +5,7 @@ import {
   nombreArchivoExportacion,
   type EntradaExportacion,
 } from "@/lib/cuenta/exportar";
-import { limitarIntentos } from "@/lib/rate-limit";
+import { limitarPersistente } from "@/lib/rate-limit-persistente";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 
 // "Descargar mis datos" (Ley 25.326). Se lee todo con la sesión de la persona: la RLS limita cada
@@ -29,7 +29,10 @@ export async function GET() {
   }
   const uid = usuario.id;
 
-  const limite = limitarIntentos(`cuenta-exportar:${uid}`, { maximo: 5, ventanaMs: 60_000 });
+  const limite = await limitarPersistente(`cuenta-exportar:${uid}`, {
+    maximo: 5,
+    ventanaMs: 60_000,
+  });
   if (!limite.permitido) {
     return NextResponse.json(
       { error: `Esperá ${limite.segundosParaReintentar} segundos y probá de nuevo.` },

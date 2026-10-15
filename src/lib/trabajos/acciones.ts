@@ -8,7 +8,7 @@ import { redirect } from "next/navigation";
 import { rolFalso } from "@/lib/auth/sesion-falsa";
 import type { EstadoFormulario } from "@/lib/auth/estado";
 import { registrarEventoServidor } from "@/lib/metricas-servidor";
-import { limitarIntentos } from "@/lib/rate-limit";
+import { limitarPersistente } from "@/lib/rate-limit-persistente";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import { avisarEleccion, avisarNuevaPostulacion } from "@/lib/emails/avisos";
@@ -64,7 +64,7 @@ export async function publicarTrabajo(
   if (!resultado.success) return { errores: erroresDeTrabajo(resultado.error), valores };
   const trabajo = resultado.data;
 
-  const limite = limitarIntentos(`publicar-trabajo:${sesion.usuario.id}`, REGLA_PUBLICAR);
+  const limite = await limitarPersistente(`publicar-trabajo:${sesion.usuario.id}`, REGLA_PUBLICAR);
   if (!limite.permitido) {
     return {
       mensaje: `Hiciste demasiados intentos. Esperá ${limite.segundosParaReintentar} segundos y probá de nuevo.`,
@@ -200,8 +200,8 @@ const MENSAJE_LIMITE_POSTULAR = "Alcanzaste el límite de 30 postulaciones por d
 const MENSAJE_NO_ENVIADA = "No pudimos enviar tu postulación. Probá de nuevo en unos minutos.";
 
 /** Cuenta un intento de postulación del profesional (30 por día). Devuelve si todavía puede. */
-function puedePostular(usuarioId: string): boolean {
-  return limitarIntentos(`postulacion:${usuarioId}`, REGLA_POSTULAR).permitido;
+async function puedePostular(usuarioId: string): Promise<boolean> {
+  return (await limitarPersistente(`postulacion:${usuarioId}`, REGLA_POSTULAR)).permitido;
 }
 
 /**
@@ -241,7 +241,9 @@ export async function postularme(
   }
 
   if (rolFalso()) {
-    if (!puedePostular(sesion.usuario.id)) return { mensaje: MENSAJE_LIMITE_POSTULAR, valores };
+    if (!(await puedePostular(sesion.usuario.id))) {
+      return { mensaje: MENSAJE_LIMITE_POSTULAR, valores };
+    }
     revalidarPostulacion(trabajoId);
     return { ok: true, postulacionId: randomUUID() };
   }
@@ -285,7 +287,9 @@ export async function postularme(
     return { mensaje: "Ya te postulaste a este trabajo.", valores };
   }
 
-  if (!puedePostular(sesion.usuario.id)) return { mensaje: MENSAJE_LIMITE_POSTULAR, valores };
+  if (!(await puedePostular(sesion.usuario.id))) {
+    return { mensaje: MENSAJE_LIMITE_POSTULAR, valores };
+  }
 
   let postulacionId: string;
   if (previa) {
