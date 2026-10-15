@@ -4,18 +4,21 @@ Foto al momento de pasar de Claude Code a Gemini. Confirmá contra Linear y `gh 
 
 ## En main (Done)
 
-LAB-5, 6, 8 a 30, 33, 35, 40 y 43. Lo último que entró: LAB-29 (mis trabajos del cliente: ver postulantes y elegir a uno, PR #34, commit 70c52a2).
+LAB-5, 6, 8 a 30, 33, 35, 40, 42 y 43. Lo último que entró:
+- LAB-29 (mis trabajos del cliente: ver postulantes y elegir a uno, PR #34, commit 70c52a2).
+- LAB-42 (borrar documentos de verificación a los 30 días, PR #35, commit d4221a7).
 
-## Tareas en desarrollo activo en paralelo (Subagentes)
+## PRs abiertos
 
-- LAB-42: Borrar documentos de verificación 30 días después de revisados (subagente Backend Security Dev).
-- LAB-31: Reseñas de clientes a profesionales (subagente Fullstack Dev).
-- LAB-32: Reportes y moderación: reportar perfiles, trabajos y reseñas, y suspender cuentas (subagente Fullstack Dev).
+- PR #36 (LAB-31: Reseñas de clientes a profesionales): CI en verde, listo para merge.
+- PR #37 (LAB-32: Reportes y moderación): abierto, CI falló en pgTAP de Base de Datos (grants por columna en reportes).
 
 ## Próximas tareas pendientes
 
-- LAB-34 (QA final, accesibilidad y rendimiento).
-- LAB-41 (rate limit persistente y helpers de auth) antes de producción (LAB-37).
+- LAB-41 (rate limit persistente y helpers de auth) antes de producción (LAB-37). Rama `lab-41-endurecer-auth`.
+- LAB-34 (QA final): DESCARTADA por instrucción expresa de Emanuel ("quiero que lab-34 no lo lleves a cabo"). No tocar.
+- LAB-37 (puesta en producción).
+- Documento maestro completo para traspaso: `docs/traspaso-agentes.md`.
 
 ## Decisiones tomadas que no están en las tareas
 
