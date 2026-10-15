@@ -1211,6 +1211,18 @@ const server = http.createServer((req, res) => {
       };
     };
 
+    // La vista es de solo lectura (LAB-56): las escrituras responden 405 como PostgREST.
+    if (ruta === "/rest/v1/resenas_publicas" && req.method !== "GET") {
+      return responder(res, 405, {
+        code: "PGRST105",
+        message: "Método no permitido sobre la vista",
+      });
+    }
+    // anon no lee la tabla resenas (LAB-56): solo la vista resenas_publicas.
+    if (ruta === "/rest/v1/resenas" && req.method === "GET" && !yo) {
+      return responder(res, 401, { code: "42501", message: "permission denied for table resenas" });
+    }
+
     if (ruta === "/rest/v1/resenas" || ruta === "/rest/v1/resenas_publicas") {
       // Las altas, ediciones y la reseña propia se guardan en memoria (se pierden al reiniciar el falso).
       if (req.method === "POST") {

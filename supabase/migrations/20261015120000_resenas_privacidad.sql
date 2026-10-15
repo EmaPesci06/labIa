@@ -28,7 +28,11 @@ select
   u.nombre as autor_nombre,
   u.apellido_inicial as autor_inicial
 from public.resenas r
-left join public.usuarios_publicos u on u.id = r.autor_id;
+left join public.usuarios_publicos u on u.id = r.autor_id
+-- Misma regla que el perfil público (perfil_profesional): solo reseñas de profesionales publicados
+-- y con cuenta activa. Si no, la reseña no se ve por la vista.
+where privado.perfil_publicado(r.profesional_id)
+  and privado.usuario_activo(r.profesional_id);
 
 -- Supabase da privilegios por defecto a anon y authenticated sobre objetos nuevos: se quitan todos
 -- y se deja solo select.

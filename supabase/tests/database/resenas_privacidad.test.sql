@@ -4,7 +4,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(19);
+select plan(21);
 
 create schema tests;
 grant usage on schema tests to authenticated;
@@ -50,6 +50,24 @@ insert into public.resenas (id, autor_id, profesional_id, puntaje, texto)
 values
   ('dddddddd-5600-4000-a000-0000000000a1', 'dddddddd-5600-4000-a000-000000000001', 'dddddddd-5600-4000-a000-000000000003', 5, 'Muy buen trabajo'),
   ('dddddddd-5600-4000-a000-0000000000a2', 'dddddddd-5600-4000-a000-000000000002', 'dddddddd-5600-4000-a000-000000000003', 4, 'Puntual');
+
+-- Profesional U sin publicar (con reseña) y profesional X con cuenta suspendida (con reseña).
+insert into auth.users (instance_id, id, aud, role, email, raw_user_meta_data)
+values
+  ('00000000-0000-0000-0000-000000000000', 'dddddddd-5600-4000-a000-000000000004', 'authenticated', 'authenticated', 'rp-u.test', '{"rol": "profesional", "nombre": "Ubaldo", "apellido": "Sin"}'),
+  ('00000000-0000-0000-0000-000000000000', 'dddddddd-5600-4000-a000-000000000005', 'authenticated', 'authenticated', 'rp-x.test', '{"rol": "profesional", "nombre": "Xavier", "apellido": "Baja"}');
+
+update public.usuarios set estado = 'suspendida' where id = 'dddddddd-5600-4000-a000-000000000005';
+
+insert into public.perfiles_profesionales (usuario_id, oficios, toda_la_ciudad, identidad_verificada, antecedentes_ok, publicado)
+values
+  ('dddddddd-5600-4000-a000-000000000004', '{plomeria}', true, false, false, false),
+  ('dddddddd-5600-4000-a000-000000000005', '{plomeria}', true, true, true, true);
+
+insert into public.resenas (id, autor_id, profesional_id, puntaje, texto)
+values
+  ('dddddddd-5600-4000-a000-0000000000a3', 'dddddddd-5600-4000-a000-000000000001', 'dddddddd-5600-4000-a000-000000000004', 5, 'Perfil sin publicar'),
+  ('dddddddd-5600-4000-a000-0000000000a4', 'dddddddd-5600-4000-a000-000000000001', 'dddddddd-5600-4000-a000-000000000005', 4, 'Cuenta suspendida');
 
 -- ---------------------------------------------------------------------------
 -- 1. Privilegios y columnas (como dueño de la base)
@@ -99,6 +117,18 @@ select is(
   (select count(*)::int from public.resenas_publicas where profesional_id = 'dddddddd-5600-4000-a000-000000000003'),
   2,
   'anon lee las reseñas del profesional por la vista'
+);
+
+select is(
+  (select count(*)::int from public.resenas_publicas where profesional_id = 'dddddddd-5600-4000-a000-000000000004'),
+  0,
+  'anon no ve reseñas de un profesional no publicado'
+);
+
+select is(
+  (select count(*)::int from public.resenas_publicas where profesional_id = 'dddddddd-5600-4000-a000-000000000005'),
+  0,
+  'anon no ve reseñas de un profesional con cuenta suspendida'
 );
 
 select is(
