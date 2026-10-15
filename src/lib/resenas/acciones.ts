@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 
 import { rolFalso } from "@/lib/auth/sesion-falsa";
 import { registrarEventoServidor } from "@/lib/metricas-servidor";
-import { limitarIntentos } from "@/lib/rate-limit";
+import { limitarPersistente } from "@/lib/rate-limit-persistente";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import { esquemaGuardarResena, type EntradaGuardarResena } from "@/lib/validaciones/resenas";
@@ -147,7 +147,7 @@ export async function guardarResena(
     return { ok: false, error: "No podés dejarte una reseña a vos mismo." };
   }
 
-  const limite = limitarIntentos(`resena:${sesion.usuario.id}`, {
+  const limite = await limitarPersistente(`resena:${sesion.usuario.id}`, {
     maximo: 5,
     ventanaMs: 60_000,
   });

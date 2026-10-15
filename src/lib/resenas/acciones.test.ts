@@ -1,13 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { mockObtenerSesion, mockRolFalso, mockRegistrarEvento, mockRevalidatePath, mockFrom } =
-  vi.hoisted(() => ({
-    mockObtenerSesion: vi.fn(),
-    mockRolFalso: vi.fn(() => null),
-    mockRegistrarEvento: vi.fn(),
-    mockRevalidatePath: vi.fn(),
-    mockFrom: vi.fn(),
-  }));
+const {
+  mockObtenerSesion,
+  mockRolFalso,
+  mockRegistrarEvento,
+  mockRevalidatePath,
+  mockFrom,
+  mockLimitarPersistente,
+} = vi.hoisted(() => ({
+  mockObtenerSesion: vi.fn(),
+  mockRolFalso: vi.fn(() => null),
+  mockRegistrarEvento: vi.fn(),
+  mockRevalidatePath: vi.fn(),
+  mockFrom: vi.fn(),
+  mockLimitarPersistente: vi.fn(),
+}));
 
 vi.mock("next/cache", () => ({
   revalidatePath: mockRevalidatePath,
@@ -21,8 +28,8 @@ vi.mock("@/lib/metricas-servidor", () => ({
   registrarEventoServidor: mockRegistrarEvento,
 }));
 
-vi.mock("@/lib/rate-limit", () => ({
-  limitarIntentos: () => ({ permitido: true, segundosParaReintentar: 0 }),
+vi.mock("@/lib/rate-limit-persistente", () => ({
+  limitarPersistente: mockLimitarPersistente,
 }));
 
 vi.mock("@/lib/sesion", () => ({
@@ -46,10 +53,45 @@ describe("guardarResena", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockRolFalso.mockReturnValue(null);
+    mockLimitarPersistente.mockResolvedValue({ permitido: true, segundosParaReintentar: 0 });
     mockObtenerSesion.mockResolvedValue({
       usuario: { id: CLIENTE_ID },
       rol: "cliente",
     });
+  });
+
+  it("limita con limitarPersistente, la misma clave y regla de siempre (resena:<usuario>, 5 por minuto)", async () => {
+    mockFrom.mockImplementation((tabla: string) => {
+      if (tabla === "usuarios") {
+        return {
+          select: () => ({
+            eq: () => ({
+              maybeSingle: async () => ({ data: { estado: "suspendida" } }),
+            }),
+          }),
+        };
+      }
+      return {};
+    });
+
+    await guardarResena({ profesionalId: PROFESIONAL_ID, puntaje: 5 });
+
+    expect(mockLimitarPersistente).toHaveBeenCalledWith(`resena:${CLIENTE_ID}`, {
+      maximo: 5,
+      ventanaMs: 60_000,
+    });
+  });
+
+  it("si el límite persistente bloquea, responde con el mensaje de siempre y no toca la base", async () => {
+    mockLimitarPersistente.mockResolvedValueOnce({ permitido: false, segundosParaReintentar: 30 });
+
+    const res = await guardarResena({ profesionalId: PROFESIONAL_ID, puntaje: 5 });
+
+    expect(res).toEqual({
+      ok: false,
+      error: "Hiciste demasiados intentos. Esperá 30 segundos y probá de nuevo.",
+    });
+    expect(mockFrom).not.toHaveBeenCalled();
   });
 
   it("falla si no hay sesión iniciada", async () => {
