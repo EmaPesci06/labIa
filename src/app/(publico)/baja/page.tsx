@@ -37,7 +37,7 @@ function EnlaceInvalido() {
 async function Contenido({ searchParams }: { searchParams: Promise<Params> }) {
   const { t, listo, error } = await searchParams;
 
-  if (listo && listo in TEXTO_CATEGORIA) {
+  if (listo && Object.hasOwn(TEXTO_CATEGORIA, listo)) {
     return (
       <>
         <p

@@ -21,6 +21,13 @@ describe("limpiarTexto", () => {
     expect(limpiarTexto("dni 30123456")).toBe(`dni ${TEXTO_FILTRADO}`);
   });
 
+  it.each(["30.123.456", "7654321", "9.876.543"])(
+    "reemplaza el DNI %s, con o sin puntos",
+    (dni) => {
+      expect(limpiarTexto(`mi dni ${dni} listo`)).toBe(`mi dni ${TEXTO_FILTRADO} listo`);
+    },
+  );
+
   it("deja los UUID, aunque terminen en muchos dígitos", () => {
     const ruta = "/profesionales/550e8400-e29b-41d4-a716-446655440000";
     expect(limpiarTexto(ruta)).toBe(ruta);
@@ -84,11 +91,52 @@ describe("limpiarEvento (beforeSend)", () => {
       message: `Falló el registro de ${TEXTO_FILTRADO}`,
       exception: { values: [{ type: "Error", value: `Teléfono inválido: ${TEXTO_FILTRADO}` }] },
       request: {
-        url: `https://labia.app/buscar?tel=${TEXTO_FILTRADO}`,
+        url: "https://labia.app/buscar",
         headers: { "User-Agent": "Mozilla" },
       },
       breadcrumbs: [{ message: `click en ${TEXTO_FILTRADO}`, category: "ui.click" }],
     });
+  });
+
+  it("corta la query y el fragmento de request.url, aunque traiga un token", () => {
+    const evento = {
+      request: { url: "https://labia.app/baja?t=abc.def&x=1#t=ghi.jkl" },
+    };
+    expect(limpiarEvento(evento).request.url).toBe("https://labia.app/baja");
+  });
+
+  it("corta la query y el fragmento de from y to en las migas de navegación", () => {
+    const evento = {
+      breadcrumbs: [
+        {
+          category: "navigation",
+          data: { from: "/baja#t=abc.def", to: "/baja?t=abc.def" },
+        },
+      ],
+    };
+    expect(limpiarEvento(evento).breadcrumbs[0]?.data).toEqual({
+      from: "/baja",
+      to: "/baja",
+    });
+  });
+
+  it("corta la query de href", () => {
+    expect(limpiarEvento({ extra: { href: "/buscar?dni=30123456#x" } }).extra).toEqual({
+      href: "/buscar",
+    });
+  });
+
+  it("borra por prefijo los campos de DNI, matrícula y antecedentes, con cualquier mayúscula", () => {
+    const evento = {
+      extra: {
+        dni_frente: "frente.jpg",
+        DNI_DORSO: "dorso.jpg",
+        matricula_foto: "m.jpg",
+        antecedentes_pdf: "a.pdf",
+        oficio: "gas",
+      },
+    };
+    expect(limpiarEvento(evento)).toEqual({ extra: { oficio: "gas" } });
   });
 
   it("deja del usuario solo el id", () => {

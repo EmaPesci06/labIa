@@ -37,9 +37,18 @@ export function BajaDesdeFragmento({
   conError: boolean;
   alNoValido: ReactNode;
 }) {
-  // Antes de montar no hay nada que mostrar: el servidor no ve el fragmento.
+  // Antes de montar no hay nada que mostrar: el servidor no ve el fragmento. Sin JavaScript, el
+  // <noscript> dice qué hacer (los navegadores con JavaScript no muestran su contenido).
   const montado = useMontado();
-  if (!montado) return null;
+  if (!montado) {
+    return (
+      <noscript>
+        <p className="text-texto-secundario">
+          Activá JavaScript o ingresá a Mi cuenta para administrar los avisos.
+        </p>
+      </noscript>
+    );
+  }
   return <FormularioDesdeEnlace conError={conError} alNoValido={alNoValido} />;
 }
 
@@ -55,7 +64,11 @@ function FormularioDesdeEnlace({
 
   useEffect(() => {
     if (window.location.hash) {
-      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+      window.history.replaceState(
+        window.history.state,
+        "",
+        window.location.pathname + window.location.search,
+      );
     }
   }, []);
 
