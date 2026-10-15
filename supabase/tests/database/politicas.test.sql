@@ -1110,9 +1110,10 @@ select is((select count(*) from storage.objects where bucket_id = 'fotos'), 0::b
 select is_empty($$delete from storage.objects where bucket_id = 'fotos' returning 1$$, 'fotos: no borra archivos ajenos');
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000002');
-select lives_ok(
+-- LAB-52: las fotos de trabajos ya no van al bucket público; viven en `fotos-trabajos` (privado).
+select throws_ok(
   $$insert into storage.objects (bucket_id, name) values ('fotos', 'trabajos/cccccccc-1200-4000-b000-000000000001/foto.jpg')$$,
-  'fotos: el cliente sube fotos de su trabajo'
+  '42501', null, 'fotos: el cliente ya no sube fotos de trabajo al bucket público'
 );
 select throws_ok(
   $$insert into storage.objects (bucket_id, name) values ('fotos', 'trabajos/cccccccc-1200-4000-b000-000000000003/foto.jpg')$$,

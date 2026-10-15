@@ -26,6 +26,21 @@ vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
 
+// LAB-52: al cerrar un trabajo, las fotos se quitan con la service role (desde /admin).
+const { mockFotosDelTrabajo, mockRemoveFotos } = vi.hoisted(() => ({
+  mockFotosDelTrabajo: vi.fn().mockResolvedValue({ data: { fotos: [] }, error: null }),
+  mockRemoveFotos: vi.fn().mockResolvedValue({ error: null }),
+}));
+
+vi.mock("@/lib/supabase/admin", () => ({
+  crearClienteAdmin: () => ({
+    from: () => ({ select: () => ({ eq: () => ({ maybeSingle: mockFotosDelTrabajo }) }) }),
+    storage: { from: () => ({ remove: mockRemoveFotos }) },
+  }),
+}));
+
+vi.mock("@/lib/trabajos/fotos-firmadas", () => ({ BUCKET_FOTOS_TRABAJOS: "fotos-trabajos" }));
+
 import { sesionAdmin } from "@/lib/admin/sesion";
 import { revocarSesionesUsuario } from "@/lib/admin/sesiones";
 import { avisarCuentaSuspendida } from "@/lib/emails/avisos";
@@ -187,6 +202,36 @@ describe("reportes-acciones (admin)", () => {
       expect(mockRpc).toHaveBeenCalledWith("marcar_reporte_en_revision", {
         p_reporte_id: UUID_1,
       });
+    });
+  });
+
+  describe("cerrarTrabajoAccion y las fotos del trabajo (LAB-52)", () => {
+    beforeEach(() => {
+      vi.mocked(sesionAdmin).mockResolvedValue({
+        usuario: { id: "admin-1", email: "admin@labia.ar" },
+        rol: "admin",
+        normasVersion: "1.0",
+        perfil: { nombre: "Admin", apellido: null, nombreVisible: "Admin", completo: true },
+      } as Awaited<ReturnType<typeof sesionAdmin>>);
+      mockRpc.mockResolvedValue({ error: null });
+    });
+
+    it("quita del bucket privado las fotos del trabajo cerrado", async () => {
+      const ruta = `${UUID_1}/${UUID_1}/0-1.jpg`;
+      mockFotosDelTrabajo.mockResolvedValueOnce({ data: { fotos: [ruta] }, error: null });
+
+      const res = await cerrarTrabajoAccion(UUID_1, "Contenido inapropiado");
+
+      expect(res.ok).toBe(true);
+      expect(mockRemoveFotos).toHaveBeenCalledWith([ruta]);
+    });
+
+    it("sin fotos no toca Storage", async () => {
+      mockFotosDelTrabajo.mockResolvedValueOnce({ data: { fotos: [] }, error: null });
+
+      await cerrarTrabajoAccion(UUID_1);
+
+      expect(mockRemoveFotos).not.toHaveBeenCalled();
     });
   });
 });

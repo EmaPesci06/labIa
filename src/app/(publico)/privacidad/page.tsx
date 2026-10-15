@@ -46,7 +46,9 @@ const secciones: readonly SeccionLegal[] = [
           </li>
           <li>
             <strong>Tus trabajos, postulaciones y reseñas:</strong> lo que publicás o escribís en la
-            app.
+            app. Las fotos de tus trabajos son privadas: las ven solo vos y los profesionales que
+            pueden ver ese trabajo, con enlaces que vencen a los 10 minutos. Las borramos al
+            cancelar o cerrar el trabajo, y a los 30 días de terminado.
           </li>
           <li>
             <strong>Datos sensibles de profesionales:</strong> imagen de tu DNI (frente y dorso) y

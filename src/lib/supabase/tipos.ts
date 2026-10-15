@@ -335,14 +335,14 @@ isOneToOne: false
                   ]
                 },"trabajos": {
                   Row: {
-                    "barrio_id": number,"cantidad_postulaciones": number,"cliente_id": string,"created_at": string,"descripcion": string,"estado": Database["public"]['Enums']["estado_trabajo"],"fotos": (string)[],"id": string,"oficio": Database["public"]['Enums']["oficio"],"presupuesto_estimado": number | null,"profesional_elegido_id": string | null,"titulo": string,"updated_at": string,"urgencia": Database["public"]['Enums']["urgencia"]
+                    "barrio_id": number,"cantidad_postulaciones": number,"cliente_id": string,"created_at": string,"descripcion": string,"estado": Database["public"]['Enums']["estado_trabajo"],"fotos": (string)[],"fotos_borrar_despues_de": string | null,"id": string,"oficio": Database["public"]['Enums']["oficio"],"presupuesto_estimado": number | null,"profesional_elegido_id": string | null,"titulo": string,"updated_at": string,"urgencia": Database["public"]['Enums']["urgencia"]
                   }
                   ComputedFields: never
                   Insert: {
-                    "barrio_id": number,"cantidad_postulaciones"?: number,"cliente_id": string,"created_at"?: string,"descripcion": string,"estado"?: Database["public"]['Enums']["estado_trabajo"],"fotos"?: (string)[],"id"?: string,"oficio": Database["public"]['Enums']["oficio"],"presupuesto_estimado"?: number | null,"profesional_elegido_id"?: string | null,"titulo": string,"updated_at"?: string,"urgencia": Database["public"]['Enums']["urgencia"]
+                    "barrio_id": number,"cantidad_postulaciones"?: number,"cliente_id": string,"created_at"?: string,"descripcion": string,"estado"?: Database["public"]['Enums']["estado_trabajo"],"fotos"?: (string)[],"fotos_borrar_despues_de"?: string | null,"id"?: string,"oficio": Database["public"]['Enums']["oficio"],"presupuesto_estimado"?: number | null,"profesional_elegido_id"?: string | null,"titulo": string,"updated_at"?: string,"urgencia": Database["public"]['Enums']["urgencia"]
                   }
                   Update: {
-                    "barrio_id"?: number,"cantidad_postulaciones"?: number,"cliente_id"?: string,"created_at"?: string,"descripcion"?: string,"estado"?: Database["public"]['Enums']["estado_trabajo"],"fotos"?: (string)[],"id"?: string,"oficio"?: Database["public"]['Enums']["oficio"],"presupuesto_estimado"?: number | null,"profesional_elegido_id"?: string | null,"titulo"?: string,"updated_at"?: string,"urgencia"?: Database["public"]['Enums']["urgencia"]
+                    "barrio_id"?: number,"cantidad_postulaciones"?: number,"cliente_id"?: string,"created_at"?: string,"descripcion"?: string,"estado"?: Database["public"]['Enums']["estado_trabajo"],"fotos"?: (string)[],"fotos_borrar_despues_de"?: string | null,"id"?: string,"oficio"?: Database["public"]['Enums']["oficio"],"presupuesto_estimado"?: number | null,"profesional_elegido_id"?: string | null,"titulo"?: string,"updated_at"?: string,"urgencia"?: Database["public"]['Enums']["urgencia"]
                   }
                   Relationships: [
                     {

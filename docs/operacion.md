@@ -330,13 +330,24 @@ Los documentos (DNI, antecedentes) se borran con la cuenta. Los documentos ya re
 
 Configurados en `vercel.json`. Cada uno exige `Authorization: Bearer $CRON_SECRET`:
 
-| Ruta                           | Horario (UTC) | Qué hace                                                                                   |
-| ------------------------------ | ------------- | ------------------------------------------------------------------------------------------ |
-| `/api/cron/trabajos-cerca`     | 11:00 diario  | Avisos de trabajos cerca a profesionales (ver la ruta)                                     |
-| `/api/cron/pedir-resena`       | 12:00 diario  | Pide reseñas 24 h después de terminar un trabajo y manda avisos de postulaciones agrupados |
-| `/api/cron/limpiar-documentos` | 06:00 diario  | Borra documentos vencidos y huérfanos del bucket `documentos` (LAB-21)                     |
-| `/api/cron/borrar-documentos`  | 06:00 diario  | Borra documentos revisados hace más de 30 días y huérfanos de más de 24 h (LAB-42)         |
+| Ruta                               | Horario (UTC) | Qué hace                                                                                   |
+| ---------------------------------- | ------------- | ------------------------------------------------------------------------------------------ |
+| `/api/cron/trabajos-cerca`         | 11:00 diario  | Avisos de trabajos cerca a profesionales (ver la ruta)                                     |
+| `/api/cron/pedir-resena`           | 12:00 diario  | Pide reseñas 24 h después de terminar un trabajo y manda avisos de postulaciones agrupados |
+| `/api/cron/limpiar-documentos`     | 06:00 diario  | Borra documentos vencidos y huérfanos del bucket `documentos` (LAB-21)                     |
+| `/api/cron/borrar-documentos`      | 06:00 diario  | Borra documentos revisados hace más de 30 días y huérfanos de más de 24 h (LAB-42)         |
+| `/api/cron/limpiar-fotos-trabajos` | 06:30 diario  | Quita del bucket `fotos-trabajos` las fotos de trabajos cuyo borrado venció (LAB-52)       |
 
 Ver ejecuciones: Vercel → proyecto `labia` → Cron Jobs y Logs. Si un cron falla, revisar el log y el estado de `CRON_SECRET` (sección 15). **[PENDIENTE LAB-7]** para ver ejecuciones reales de producción.
 
 Nota: `pg_cron` no se usa. El borrado de documentos corre con Vercel Cron.
+
+### 17.1 Fotos de trabajos (LAB-52)
+
+Las fotos de los trabajos (interior o fachada de la casa del cliente) están en el bucket privado `fotos-trabajos`, en `<cliente_id>/<trabajo_id>/<archivo>`. Nunca tienen URL pública: se muestran con URL firmada de 10 minutos generada en el servidor.
+
+- **Cuándo se borran:** al cancelar el trabajo o cerrarlo por moderación, la acción quita las fotos de inmediato (con la sesión del cliente, o con la service role desde `/admin`). Al terminar, se borran 30 días después. Un trigger de `trabajos` fija `fotos_borrar_despues_de` según el estado, y el cron `limpiar-fotos-trabajos` borra lo que quedó pendiente (si Storage falló en el momento).
+- **Fotos del bucket público `fotos` (anteriores a LAB-52):** en producción no hay fotos de trabajos todavía, así que no hay nada que migrar. Si existen en un entorno de desarrollo, quitarlas así:
+  1. Borrar los archivos `trabajos/<id>/…` del bucket `fotos` (panel de Storage o API con la service role).
+  2. Vaciar las filas que apuntan a esas rutas: `update public.trabajos set fotos = '{}' where cardinality(fotos) > 0 and not privado.rutas_fotos_de_trabajo(fotos, cliente_id, id);`. La constraint `trabajos_fotos_propias` es `NOT VALID`, así que esas filas se revalidan recién al escribirlas.
+- **Antes de producción:** correr `pnpm db:test` en un proyecto aislado (ver sección 0), que incluye `fotos_trabajos_privadas.test.sql`.

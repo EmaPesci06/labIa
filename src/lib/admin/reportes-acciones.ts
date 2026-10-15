@@ -5,7 +5,9 @@ import { revalidatePath } from "next/cache";
 import { sesionAdmin } from "@/lib/admin/sesion";
 import { revocarSesionesUsuario } from "@/lib/admin/sesiones";
 import { avisarCuentaSuspendida } from "@/lib/emails/avisos";
+import { crearClienteAdmin } from "@/lib/supabase/admin";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
+import { BUCKET_FOTOS_TRABAJOS } from "@/lib/trabajos/fotos-firmadas";
 import {
   esquemaCerrarTrabajo,
   esquemaMarcarEnRevision,
@@ -113,6 +115,13 @@ export async function cerrarTrabajoAccion(
   }
 
   const supabase = await crearClienteServidor();
+  const admin = crearClienteAdmin();
+  const { data: delTrabajo } = await admin
+    .from("trabajos")
+    .select("fotos")
+    .eq("id", parseo.data.trabajoId)
+    .maybeSingle();
+
   const { error } = await supabase.rpc("cerrar_trabajo_admin", {
     p_trabajo_id: parseo.data.trabajoId,
     p_motivo: parseo.data.motivo || undefined,
@@ -120,6 +129,13 @@ export async function cerrarTrabajoAccion(
 
   if (error) {
     return { ok: false, error: "No se pudo cerrar el trabajo." };
+  }
+
+  // Al cerrar por moderación se quitan las fotos del trabajo (LAB-52). Si esto falla, el job diario
+  // de /api/cron/limpiar-fotos-trabajos las borra: la base ya dejó el borrado programado.
+  const fotos = delTrabajo?.fotos ?? [];
+  if (fotos.length > 0) {
+    await admin.storage.from(BUCKET_FOTOS_TRABAJOS).remove([...fotos]);
   }
 
   revalidatePath("/admin/reportes");

@@ -30,8 +30,8 @@ async function vaciarCarpeta(admin: Admin, bucket: string, carpeta: string): Pro
  * haber validado sesión, confirmación y reautenticación de la persona.
  *
  * 1. Borra sus archivos: `fotos/perfiles/<uid>`, `fotos/trabajos-hechos/<uid>`, `fotos/trabajos/<id>`
- *    de cada trabajo suyo y `documentos/<uid>`. Si algo falla, corta antes de tocar la cuenta
- *    (se puede reintentar).
+ *    (fotos de trabajos anteriores a LAB-52), `fotos-trabajos/<uid>/<id>` de cada trabajo suyo
+ *    (LAB-52) y `documentos/<uid>`. Si algo falla, corta antes de tocar la cuenta (se puede reintentar).
  * 2. Borra `auth.users`. La cascada borra `usuarios` y todo lo que cuelga; las reseñas escritas
  *    quedan anónimas y los trabajos asignados a un profesional se cancelan (migración
  *    `borrado_de_cuenta`).
@@ -44,9 +44,11 @@ export async function borrarCuentaDeUsuario(admin: Admin, uid: string): Promise<
   const carpetasFotos = [
     `perfiles/${uid}`,
     `trabajos-hechos/${uid}`,
+    // Fotos de trabajos subidas al bucket público antes de LAB-52.
     ...(trabajos ?? []).map((t) => `trabajos/${t.id}`),
   ];
   for (const carpeta of carpetasFotos) await vaciarCarpeta(admin, "fotos", carpeta);
+  for (const t of trabajos ?? []) await vaciarCarpeta(admin, "fotos-trabajos", `${uid}/${t.id}`);
   await vaciarCarpeta(admin, "documentos", uid);
 
   const { error: errorUsuario } = await admin.auth.admin.deleteUser(uid);
