@@ -63,11 +63,12 @@ begin
     end
   returning c.cuenta, c.vence into v_cuenta, v_vence;
 
+  -- `return query` no corta la función: con else se devuelve una sola fila.
   if v_cuenta > p_maximo then
     return query select false, greatest(1, ceil(extract(epoch from (v_vence - v_ahora)))::integer);
+  else
+    return query select true, 0;
   end if;
-
-  return query select true, 0;
 end;
 $$;
 
