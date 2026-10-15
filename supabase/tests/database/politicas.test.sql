@@ -220,7 +220,7 @@ select ok((select barrio_id is not null from public.usuarios_publicos where id =
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000006');
 select throws_ok($$select public.actualizar_whatsapp('+5492235558888')$$, '42501', null, 'usuarios: una cuenta suspendida no ejecuta actualizar_whatsapp');
 select throws_ok($$select public.aceptar_normas('v1')$$, '42501', null, 'usuarios: una cuenta suspendida no ejecuta aceptar_normas');
-select is_empty($$update public.usuarios set estado = 'activa' where id = 'cccccccc-1200-4000-a000-000000000006' returning 1$$, 'usuarios: una cuenta suspendida no se reactiva sola');
+select throws_ok($$update public.usuarios set estado = 'activa' where id = 'cccccccc-1200-4000-a000-000000000006' returning 1$$, '42501', null, 'usuarios: una cuenta suspendida no se reactiva sola (LAB-50: sin privilegio de update sobre estado)');
 select is_empty($$update public.usuarios set nombre = 'Hack' where id = 'cccccccc-1200-4000-a000-000000000006' returning 1$$, 'usuarios: una cuenta suspendida no edita su perfil');
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000001');
