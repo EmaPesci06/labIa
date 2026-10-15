@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext } from "@playwright/test";
+import { reiniciarFalso } from "./apoyo/reiniciar-falso";
 
 // LAB-29: flujo completo de Mis Trabajos del cliente:
 // ver postulantes, comparar, elegir a uno atómicamente, flujo de WhatsApp con origen 'postulacion',
@@ -16,12 +17,6 @@ test.skip(!ACTIVO, "Necesita el Supabase falso: LABIA_E2E_SUPABASE_FALSO=1");
 // Se corre con `--workers=1`.
 const TRABAJO_ABIERTO = "88888888-8888-4888-8888-888888888881";
 const TRABAJO_PARA_TERMINAR = "88888888-8888-4888-8888-888888888882";
-const PUERTO_FALSO = process.env.LABIA_SUPABASE_FALSO_PUERTO ?? "54399";
-
-async function reiniciarFalso(): Promise<void> {
-  const respuesta = await fetch(`http://localhost:${PUERTO_FALSO}/__reiniciar`);
-  if (!respuesta.ok) throw new Error(`No se pudo reiniciar el Supabase falso: ${respuesta.status}`);
-}
 
 async function iniciarSesion(contexto: BrowserContext, baseURL: string, token: string) {
   const exp = Math.floor(Date.now() / 1000) + 3600;

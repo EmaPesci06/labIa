@@ -1492,6 +1492,6 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PUERTO, () => {
+server.listen(PUERTO, "127.0.0.1", () => {
   process.stdout.write(`Supabase falso en http://localhost:${PUERTO}\n`);
 });
