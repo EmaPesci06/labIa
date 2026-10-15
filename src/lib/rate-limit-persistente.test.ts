@@ -99,6 +99,22 @@ describe("limitarPersistente", () => {
     expect(consumir).not.toHaveBeenCalled();
   });
 
+  it("en preview sin RATE_LIMIT_SECRET lanza y no cuenta ni guarda una clave sin llave", async () => {
+    vi.stubEnv("VERCEL_ENV", "preview");
+
+    await expect(limitarPersistente("ingreso:1.2.3.4", regla)).rejects.toThrow(
+      /RATE_LIMIT_SECRET es obligatorio en producción y preview/,
+    );
+    expect(consumir).not.toHaveBeenCalled();
+  });
+
+  it("con NODE_ENV=production fuera de Vercel sin secreto también lanza", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+
+    await expect(limitarPersistente("ingreso:1.2.3.4", regla)).rejects.toThrow(/RATE_LIMIT_SECRET/);
+    expect(consumir).not.toHaveBeenCalled();
+  });
+
   it("en producción con RATE_LIMIT_SECRET cuenta normalmente con HMAC", async () => {
     vi.stubEnv("VERCEL_ENV", "production");
     vi.stubEnv("RATE_LIMIT_SECRET", "secreto-de-prueba");
@@ -109,8 +125,18 @@ describe("limitarPersistente", () => {
     expect(consumir).toHaveBeenCalledWith(hmac("ingreso:1.2.3.4", "secreto-de-prueba"), 5, 60);
   });
 
-  it("en preview o e2e sin secreto se mantiene sha256 (la CI no se rompe)", async () => {
+  it("en preview con RATE_LIMIT_SECRET cuenta normalmente con HMAC", async () => {
     vi.stubEnv("VERCEL_ENV", "preview");
+    vi.stubEnv("RATE_LIMIT_SECRET", "secreto-de-prueba");
+    consumir.mockResolvedValue({ permitido: true, segundosParaReintentar: 0 });
+
+    await limitarPersistente("ingreso:1.2.3.4", regla);
+
+    expect(consumir).toHaveBeenCalledWith(hmac("ingreso:1.2.3.4", "secreto-de-prueba"), 5, 60);
+  });
+
+  it("en desarrollo (NODE_ENV=development, sin VERCEL_ENV) sin secreto se mantiene sha256", async () => {
+    vi.stubEnv("NODE_ENV", "development");
     consumir.mockResolvedValue({ permitido: true, segundosParaReintentar: 0 });
 
     await limitarPersistente("ingreso:1.2.3.4", regla);
@@ -170,6 +196,21 @@ describe("claveDeLimite", () => {
   it("en producción sin secreto lanza en vez de devolver sha256", () => {
     vi.stubEnv("VERCEL_ENV", "production");
     expect(() => claveDeLimite("ingreso:1.2.3.4")).toThrow(/RATE_LIMIT_SECRET/);
+  });
+
+  it("en preview sin secreto lanza en vez de devolver sha256", () => {
+    vi.stubEnv("VERCEL_ENV", "preview");
+    expect(() => claveDeLimite("ingreso:1.2.3.4")).toThrow(/RATE_LIMIT_SECRET/);
+  });
+
+  it("con NODE_ENV=production fuera de Vercel sin secreto lanza", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    expect(() => claveDeLimite("ingreso:1.2.3.4")).toThrow(/RATE_LIMIT_SECRET/);
+  });
+
+  it("en test (vitest) sin secreto y sin VERCEL_ENV usa sha256", () => {
+    vi.stubEnv("NODE_ENV", "test");
+    expect(claveDeLimite("ingreso:1.2.3.4")).toBe(sha256("ingreso:1.2.3.4"));
   });
 
   it("dos secretos distintos dan claves distintas", () => {

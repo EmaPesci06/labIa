@@ -11,16 +11,31 @@ import { supabaseConfigurado } from "@/lib/supabase/servidor";
 export type ReglaLimite = { maximo: number; ventanaMs: number };
 
 /**
- * Clave que va a la tabla: HMAC-SHA256 con el secreto del servidor. Sin secreto, en dev, test, e2e
- * o preview se usa sha256 (comportamiento de siempre). En producción falla cerrado: lanza, para que
- * nunca se guarde una clave sin llave que se pueda revertir por fuerza bruta (LAB-49).
+ * Dice si este proceso tiene que exigir `RATE_LIMIT_SECRET`. Lo exige cualquier build o servidor de
+ * producción (`NODE_ENV=production`: `pnpm start` local, la CI de e2e y los deploys de Vercel, también
+ * los de Preview) y, por si el flag se pierde, los entornos de Vercel Production y Preview. No lo exigen
+ * `next dev` ni vitest (`NODE_ENV` development o test sin `VERCEL_ENV`).
+ */
+export function exigeSecretoDeLimite(): boolean {
+  const entornoVercel = process.env.VERCEL_ENV;
+  return (
+    process.env.NODE_ENV === "production" ||
+    entornoVercel === "production" ||
+    entornoVercel === "preview"
+  );
+}
+
+/**
+ * Clave que va a la tabla: HMAC-SHA256 con el secreto del servidor. Si el entorno lo exige y falta,
+ * lanza: nunca se guarda una clave sin llave que se pueda revertir por fuerza bruta (LAB-49). Solo en
+ * desarrollo y tests, sin secreto, se usa sha256.
  */
 export function claveDeLimite(clave: string): string {
   const secreto = process.env.RATE_LIMIT_SECRET;
   if (secreto) return createHmac("sha256", secreto).update(clave).digest("hex");
-  if (process.env.VERCEL_ENV === "production") {
+  if (exigeSecretoDeLimite()) {
     throw new Error(
-      "RATE_LIMIT_SECRET es obligatorio en producción: no se guardan claves sin llave.",
+      "RATE_LIMIT_SECRET es obligatorio en producción y preview: no se guardan claves sin llave.",
     );
   }
   return createHash("sha256").update(clave).digest("hex");
@@ -30,7 +45,8 @@ export function claveDeLimite(clave: string): string {
  * Cuenta un intento en Postgres (`public.consumir_cupo`, con la service role desde el servidor), así
  * que el límite se comparte entre todas las instancias de Vercel. La clave se guarda con HMAC-SHA256
  * (secreto `RATE_LIMIT_SECRET`) para que la tabla no tenga emails ni IPs en claro y no se puedan
- * recalcular desde fuera. Si falta el secreto fuera de producción, cae a sha256; en producción lanza.
+ * recalcular desde fuera. Si falta el secreto en producción o preview, lanza (la acción muestra la
+ * página de error); solo en dev y test cae a sha256.
  *
  * Si la base no responde se cae al limitador en memoria (así la acción sigue frenada) y el error
  * se reporta a Sentry sin la clave ni datos personales. Sin Supabase configurado va directo a memoria.
