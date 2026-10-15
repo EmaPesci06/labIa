@@ -26,8 +26,22 @@ values
 -- El trigger solo acepta cliente o profesional; el admin se asigna como superusuario de la prueba.
 update public.usuarios set rol = 'admin' where id = 'cccccccc-4100-4000-a000-000000000001';
 
--- Cupos: se cuentan los intentos y se rechaza el que pasa del máximo.
-set local role anon;
+-- Privilegios de la función: solo service_role la ejecuta.
+select ok(
+  not has_function_privilege('anon', 'public.consumir_cupo(text, integer, integer)', 'EXECUTE'),
+  'consumir_cupo: anon no la ejecuta'
+);
+select ok(
+  not has_function_privilege('authenticated', 'public.consumir_cupo(text, integer, integer)', 'EXECUTE'),
+  'consumir_cupo: authenticated no la ejecuta'
+);
+select ok(
+  has_function_privilege('service_role', 'public.consumir_cupo(text, integer, integer)', 'EXECUTE'),
+  'consumir_cupo: service_role la ejecuta'
+);
+
+-- Cupos: se cuentan los intentos y se rechaza el que pasa del máximo (servidor = service_role).
+set local role service_role;
 
 select results_eq(
   $$select permitido from public.consumir_cupo('test:ip-1', 2, 60)$$,
@@ -55,7 +69,7 @@ select results_eq(
 -- Ventana vencida: el cupo se libera (se simula vencimiento como superusuario).
 reset role;
 update privado.cupos_limite set vence = now() - interval '1 second' where clave = 'test:ip-1';
-set local role anon;
+set local role service_role;
 select results_eq(
   $$select permitido from public.consumir_cupo('test:ip-1', 2, 60)$$,
   $$values (true)$$,
@@ -76,14 +90,42 @@ select throws_ok(
   '22023', null, 'consumir_cupo: ventana 0 se rechaza'
 );
 
--- La tabla no se puede leer ni escribir con la API.
+-- La tabla no se puede leer, insertar ni modificar con la API, por ningún rol.
+reset role;
+set local role anon;
 select throws_ok(
   $$select count(*) from privado.cupos_limite$$,
   '42501', null, 'cupos_limite: anon no la lee'
 );
 select throws_ok(
-  $$delete from privado.cupos_limite$$,
-  '42501', null, 'cupos_limite: anon no la borra'
+  $$insert into privado.cupos_limite (clave, cuenta, vence) values ('x', 1, now())$$,
+  '42501', null, 'cupos_limite: anon no inserta'
+);
+select throws_ok(
+  $$update privado.cupos_limite set cuenta = 0$$,
+  '42501', null, 'cupos_limite: anon no modifica'
+);
+
+reset role;
+set local role authenticated;
+select throws_ok(
+  $$insert into privado.cupos_limite (clave, cuenta, vence) values ('x', 1, now())$$,
+  '42501', null, 'cupos_limite: authenticated no inserta'
+);
+select throws_ok(
+  $$update privado.cupos_limite set cuenta = 0$$,
+  '42501', null, 'cupos_limite: authenticated no modifica'
+);
+
+reset role;
+set local role service_role;
+select throws_ok(
+  $$insert into privado.cupos_limite (clave, cuenta, vence) values ('x', 1, now())$$,
+  '42501', null, 'cupos_limite: service_role no inserta directo (solo la función)'
+);
+select throws_ok(
+  $$update privado.cupos_limite set cuenta = 0$$,
+  '42501', null, 'cupos_limite: service_role no modifica directo (solo la función)'
 );
 
 -- Admin activo: privado.es_admin() es verdadero. Suspendido: deja de serlo (LAB-41).

@@ -5,7 +5,6 @@ Foto al momento de pasar de Claude Code a Gemini. Confirmá contra Linear y `gh 
 ## En main (Done)
 
 LAB-5, 6, 8 a 30, 33, 35, 40, 42 y 43. Lo último que entró:
-
 - LAB-29 (mis trabajos del cliente: ver postulantes y elegir a uno, PR #34, commit 70c52a2).
 - LAB-42 (borrar documentos de verificación a los 30 días, PR #35, commit d4221a7).
 

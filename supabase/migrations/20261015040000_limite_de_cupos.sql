@@ -5,8 +5,9 @@
 -- `insert ... on conflict do update` (la fila queda bloqueada durante el upsert, así que dos
 -- pedidos simultáneos no pueden leer el mismo conteo).
 --
--- La tabla vive en `privado` y no tiene políticas RLS: ni anon ni authenticated la leen ni la
--- escriben directamente. Solo la función `public.consumir_cupo` (security definer) la toca.
+-- La tabla vive en `privado` sin políticas RLS y sin grants: ni anon, ni authenticated, ni
+-- service_role la leen ni escriben directamente. Solo la función `public.consumir_cupo`
+-- (security definer) la toca.
 
 create table privado.cupos_limite (
   clave text primary key,
@@ -19,7 +20,8 @@ create index cupos_limite_vence_idx on privado.cupos_limite (vence);
 alter table privado.cupos_limite enable row level security;
 revoke all on privado.cupos_limite from public, anon, authenticated, service_role;
 
--- Cuenta un intento para `p_clave` dentro de una ventana de `p_ventana_segundos` que arranca en el
+-- Las claves llegan ya armadas y hasheadas desde el servidor (sha256 hex, 64 caracteres), así que
+-- la tabla no guarda emails ni IPs en claro. Cuenta un intento para `p_clave` dentro de una ventana de `p_ventana_segundos` que arranca en el
 -- primer intento. Devuelve si el intento entra en el límite y, si no, cuántos segundos faltan para
 -- que se libere la ventana. Como en `limitarIntentos`, los intentos rechazados también cuentan.
 create function public.consumir_cupo(
@@ -72,6 +74,7 @@ begin
 end;
 $$;
 
--- Anon (registro e ingreso antes de tener sesión) y authenticated la llaman; nadie más.
-revoke execute on function public.consumir_cupo(text, integer, integer) from public;
-grant execute on function public.consumir_cupo(text, integer, integer) to anon, authenticated;
+-- Solo service role: la llama el servidor (src/lib/rate-limit-servicio.ts, server-only) con claves
+-- armadas en el servidor. Anon y authenticated no pueden llamarla directo para agotar cupos ajenos.
+revoke execute on function public.consumir_cupo(text, integer, integer) from public, anon, authenticated;
+grant execute on function public.consumir_cupo(text, integer, integer) to service_role;

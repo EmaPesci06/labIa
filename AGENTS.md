@@ -93,9 +93,14 @@ Rutas en español sin acentos: `/`, `/ingresar`, `/registro`, `/registro/cliente
    RLS no permite con la sesión del que dispara el evento. Sus funciones se llaman solo después de verificar
    sesión y dueño, con ids leídos de la base, y nunca reciben emails del cliente. También se usa en el job de
    borrado de cuenta (`src/lib/cuenta/borrado.ts`, server-only), invocado solo tras validar sesión, rol y
-   reautenticación.
+   reautenticación. Y el limitador de intentos (`src/lib/rate-limit-servicio.ts`, `server-only`): llama a
+   `public.consumir_cupo` con la service role solo con claves armadas en el servidor (hasheadas, IP o
+   email), porque anon y authenticated no pueden ejecutar esa función.
 6. Toda Server Action valida sesión, rol y entrada con Zod.
-7. Rate limit simple en registro, postulación y reporte.
+7. Rate limit persistente (`src/lib/rate-limit-persistente.ts`, `limitarPorIp`) en registro, ingreso, Google,
+   restablecer, reenvío de confirmación, documentos, normas y cuenta; postulación y reporte cuando lleguen.
+   La IP sale solo de `x-vercel-forwarded-for`: el despliegue es solo en Vercel, sin proxy delante. Si la
+   cabecera falta, el pedido cae en el balde `desconocida` (un límite más estricto, no un bypass).
 
 ## Ramas, PR y Linear
 

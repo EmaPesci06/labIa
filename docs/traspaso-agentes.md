@@ -10,7 +10,6 @@
 ## 1. Visión y Reglas del Producto
 
 LabÍA es un marketplace de oficios exclusivo para Mar del Plata (solo esa ciudad en el MVP).
-
 - **Roles:** `cliente`, `profesional`, `admin` (interno). Una cuenta tiene un único rol.
 - **Oficios:** carpintería, plomería, cerrajería, gas, pintura, mecánica, electricidad.
 - **Contacto:** Siempre por WhatsApp (`https://wa.me/<numero>?text=<mensaje>`), sin chat interno ni cobros dentro de la app.
@@ -78,7 +77,6 @@ LabÍA es un marketplace de oficios exclusivo para Mar del Plata (solo esa ciuda
 ### B. Pull Requests Abiertos (En Revisión)
 
 #### 1. PR #36: `LAB-31: Reseñas de clientes a profesionales`
-
 - **Rama:** `lab-31-resenas-clientes-profesionales`
 - **Estado de CI:** **100% VERDE** (Base de datos: 2m53s, Calidad: 1m50s, E2E: 5m23s, Vercel: OK).
 - **Alcance implementado:**
@@ -90,7 +88,6 @@ LabÍA es un marketplace de oficios exclusivo para Mar del Plata (solo esa ciuda
 - **Siguiente acción:** Revisión de seguridad/código y merge squash a `main`.
 
 #### 2. PR #37: `LAB-32: Reportes y moderación: reportar perfiles, trabajos y reseñas, y suspender cuentas`
-
 - **Rama:** `lab-32-reportes-y-moderacion`
 - **Estado de CI:** `Calidad` y `Vercel` en verde; **`Base de datos` falló en pgTAP**.
 - **Causa del fallo en pgTAP:**
@@ -145,7 +142,7 @@ LabÍA es un marketplace de oficios exclusivo para Mar del Plata (solo esa ciuda
    pnpm lint
    pnpm test
    ```
-   _Nota:_ En PowerShell en Windows, no usar `&&`; separar con punto y coma `;`.
+   *Nota:* En PowerShell en Windows, no usar `&&`; separar con punto y coma `;`.
 6. **Formato de Commits:**
    Mensajes en español describiendo el cambio y finalizados obligatoriamente con:
    ```
