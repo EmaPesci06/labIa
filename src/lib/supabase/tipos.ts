@@ -484,7 +484,15 @@ isOneToOne: true
                   }
                   ComputedFields: never
                   Relationships: [
-                    
+
+                  ]
+                },"resenas_publicas": {
+                  Row: {
+                    "autor_inicial": string | null,"autor_nombre": string | null,"created_at": string | null,"id": string | null,"profesional_id": string | null,"puntaje": number | null,"texto": string | null
+                  }
+                  ComputedFields: never
+                  Relationships: [
+
                   ]
                 }
           }

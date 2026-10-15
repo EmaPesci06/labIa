@@ -1197,7 +1197,21 @@ const server = http.createServer((req, res) => {
       return responder(res, 200, WHATSAPP_FALSO);
     }
 
-    if (ruta === "/rest/v1/resenas") {
+    // Vista pública de reseñas (LAB-56): sin autor_id ni trabajo_id; el autor sale como nombre e inicial.
+    const resenaPublica = (r) => {
+      const u = USUARIOS_ADMIN.find((x) => x.id === r.autor_id);
+      return {
+        id: r.id,
+        profesional_id: r.profesional_id,
+        puntaje: r.puntaje,
+        texto: r.texto,
+        created_at: r.created_at,
+        autor_nombre: u ? u.nombre : null,
+        autor_inicial: u && u.apellido ? u.apellido[0] : null,
+      };
+    };
+
+    if (ruta === "/rest/v1/resenas" || ruta === "/rest/v1/resenas_publicas") {
       // Las altas, ediciones y la reseña propia se guardan en memoria (se pierden al reiniciar el falso).
       if (req.method === "POST") {
         const datos = JSON.parse(cuerpo || "{}");
@@ -1234,7 +1248,8 @@ const server = http.createServer((req, res) => {
       const desde = Number(url.searchParams.get("offset") ?? 0);
       const limite = Number(url.searchParams.get("limit") ?? resenas.length);
       const pagina = vacio ? [] : resenas.slice(desde, desde + limite);
-      return responder(res, 200, pagina, {
+      const salida = ruta === "/rest/v1/resenas_publicas" ? pagina.map(resenaPublica) : pagina;
+      return responder(res, 200, salida, {
         "content-range": `${pagina.length ? desde : "*"}${pagina.length ? `-${desde + pagina.length - 1}` : ""}/${vacio ? 0 : resenas.length}`,
       });
     }
