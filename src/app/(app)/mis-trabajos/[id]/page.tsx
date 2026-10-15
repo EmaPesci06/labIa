@@ -8,6 +8,7 @@ import { obtenerDetalleMiTrabajoCliente } from "@/lib/trabajos/consulta";
 
 type Props = {
   params: Promise<{ id: string }>;
+  searchParams?: Promise<{ publicado?: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -24,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function DetalleMiTrabajoPage({ params }: Props) {
+export default async function DetalleMiTrabajoPage({ params, searchParams }: Props) {
   const sesion = await obtenerSesion();
   if (!sesion) {
     const { id } = await params;
@@ -35,6 +36,7 @@ export default async function DetalleMiTrabajoPage({ params }: Props) {
   }
 
   const { id } = await params;
+  const { publicado } = (await searchParams) ?? {};
   const trabajo = await obtenerDetalleMiTrabajoCliente(id, sesion.usuario.id);
 
   if (!trabajo) {
@@ -44,7 +46,11 @@ export default async function DetalleMiTrabajoPage({ params }: Props) {
   return (
     <div className="mx-auto flex w-full max-w-[680px] flex-col gap-4 py-2 lg:py-6">
       <EnlaceVolver href="/mis-trabajos" etiquetaEscritorio="Volver a mis trabajos" />
-      <DetalleMiTrabajo trabajo={trabajo} mostrarTituloCompleto={true} />
+      <DetalleMiTrabajo
+        trabajo={trabajo}
+        mostrarTituloCompleto={true}
+        publicado={publicado === "1"}
+      />
     </div>
   );
 }

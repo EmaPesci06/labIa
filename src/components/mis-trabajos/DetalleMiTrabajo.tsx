@@ -25,9 +25,14 @@ import { TarjetaPostulante } from "./TarjetaPostulante";
 type Props = {
   trabajo: DetalleMiTrabajoCliente;
   mostrarTituloCompleto?: boolean;
+  publicado?: boolean;
 };
 
-export function DetalleMiTrabajo({ trabajo, mostrarTituloCompleto = false }: Props) {
+export function DetalleMiTrabajo({
+  trabajo,
+  mostrarTituloCompleto = false,
+  publicado = false,
+}: Props) {
   const router = useRouter();
   const [pendiente, startTransition] = useTransition();
   const [mensajeError, setMensajeError] = useState<string | null>(null);
@@ -118,6 +123,16 @@ export function DetalleMiTrabajo({ trabajo, mostrarTituloCompleto = false }: Pro
 
   return (
     <div className="flex flex-col gap-5">
+      {publicado ? (
+        <div
+          role="status"
+          className="flex items-center gap-2.5 rounded-[14px] bg-exito-suave p-4 text-[15px] font-semibold text-sobre-exito-suave"
+        >
+          <CheckCircle aria-hidden className="size-5 shrink-0" />
+          <span>¡Publicado! Te avisamos por email cuando alguien se postule.</span>
+        </div>
+      ) : null}
+
       {mensajeError ? (
         <div
           role="alert"

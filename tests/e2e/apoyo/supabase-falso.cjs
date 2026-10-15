@@ -819,6 +819,33 @@ const server = http.createServer((req, res) => {
       return responder(res, 200, unObjeto ? fila : [fila]);
     }
     if (ruta.startsWith("/rest/v1/trabajos")) {
+      if (req.method === "POST") {
+        const datos = JSON.parse(cuerpo || "{}");
+        const id = "88888888-8888-4888-8888-88888888888" + (TRABAJOS_MOCK.length + 1);
+        const nuevo = {
+          id,
+          oficio: datos.oficio,
+          titulo: datos.titulo,
+          descripcion: datos.descripcion,
+          urgencia: datos.urgencia,
+          presupuesto_estimado: datos.presupuesto_estimado ?? null,
+          fotos: datos.fotos ?? [],
+          barrio_id: datos.barrio_id,
+          barrio_nombre: "Centro",
+          distancia_km: 1.0,
+          cantidad_postulaciones: 0,
+          ya_me_postule: false,
+          estado: "abierto",
+          cliente_id: yo?.id ?? ID_CLIENTE,
+          profesional_elegido_id: null,
+          created_at: new Date().toISOString(),
+          cliente_nombre: yo?.nombre ?? "Cliente",
+          cliente_apellido_inicial: yo?.apellido ? yo.apellido[0] : "C",
+          total: TRABAJOS_MOCK.length + 1,
+        };
+        TRABAJOS_MOCK.unshift(nuevo);
+        return responder(res, 201, unObjeto ? nuevo : [nuevo]);
+      }
       const tid = url.searchParams.get("id");
       if (tid && tid.startsWith("eq.")) {
         const idBuscado = tid.replace("eq.", "");
