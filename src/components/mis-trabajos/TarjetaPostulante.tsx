@@ -83,37 +83,40 @@ export function TarjetaPostulante({
   return (
     <article
       aria-label={`Postulación de ${nombreCompleto}`}
-      className="flex flex-col gap-3 rounded-[18px] border border-divisor bg-superficie p-4 text-texto lg:p-5"
+      className="flex flex-col gap-3 rounded-[18px] border border-divisor bg-superficie p-4 text-texto lg:flex-row lg:items-center lg:gap-6 lg:p-5"
     >
-      <div className="flex items-start gap-3">
-        <Avatar
-          nombre={nombreCompleto}
-          src={postulante.profesional.fotoPath}
-          tamano={44}
-          className="shrink-0"
-        />
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span className="font-titulo text-base font-bold tracking-tight text-texto lg:text-[17px]">
-            {nombreCompleto}
-          </span>
-          <span className="text-[13px] text-texto-secundario lg:text-sm">{subtitulo}</span>
-          {postulante.profesional.distanciaKm !== null ? (
-            <div className="mt-1">
-              <CintaDistancia km={postulante.profesional.distanciaKm} />
-            </div>
-          ) : null}
+      {/* En escritorio, datos del postulante a la izquierda y acciones a la derecha (prototipo Desk). */}
+      <div className="flex min-w-0 flex-1 flex-col gap-3">
+        <div className="flex items-start gap-3">
+          <Avatar
+            nombre={nombreCompleto}
+            src={postulante.profesional.fotoPath}
+            tamano={44}
+            className="shrink-0"
+          />
+          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <span className="font-titulo text-base font-bold tracking-tight text-texto lg:text-[17px]">
+              {nombreCompleto}
+            </span>
+            <span className="text-[13px] text-texto-secundario lg:text-sm">{subtitulo}</span>
+            {postulante.profesional.distanciaKm !== null ? (
+              <div className="mt-1">
+                <CintaDistancia km={postulante.profesional.distanciaKm} />
+              </div>
+            ) : null}
+          </div>
         </div>
+
+        <div className="rounded-[12px] bg-fondo p-3 text-[15px] leading-relaxed text-texto italic">
+          “{postulante.mensaje}”
+        </div>
+
+        {textoPresupuesto ? (
+          <div className="text-sm font-semibold text-texto-secundario">{textoPresupuesto}</div>
+        ) : null}
       </div>
 
-      <div className="rounded-[12px] bg-fondo p-3 text-[15px] leading-relaxed text-texto italic">
-        “{postulante.mensaje}”
-      </div>
-
-      {textoPresupuesto ? (
-        <div className="text-sm font-semibold text-texto-secundario">{textoPresupuesto}</div>
-      ) : null}
-
-      <div className="mt-1 grid grid-cols-2 gap-2 pt-1 sm:flex sm:justify-end">
+      <div className="mt-1 grid grid-cols-2 gap-2 pt-1 sm:flex sm:justify-end lg:mt-0 lg:shrink-0 lg:pt-0">
         <Link
           href={`/profesionales/${postulante.profesionalId}`}
           className="inline-flex min-h-[44px] items-center justify-center rounded-boton border-[1.5px] border-azul px-4 text-center text-sm font-bold text-azul transition-colors hover:bg-azul-suave focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco sm:w-auto"
