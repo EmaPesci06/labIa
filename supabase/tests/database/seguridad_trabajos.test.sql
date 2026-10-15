@@ -230,4 +230,6 @@ select is(
 
 reset role;
 
+select * from finish();
+
 rollback;
