@@ -4,7 +4,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(33);
+select plan(36);
 
 create schema tests;
 grant usage on schema tests to authenticated;
@@ -105,8 +105,9 @@ select throws_ok(
   'P0002', null, 'no se puede reportar una reseña que no existe'
 );
 
--- Un trigger security definer (como resenas_moderar de LAB-31) abre el reporte de la reseña de 1
--- estrella de su propio autor: no cuenta como autoreporte y no gasta el cupo diario del autor.
+-- El trigger resenas_moderar de LAB-31 ya abrió el reporte de la reseña de 1 estrella al insertarla
+-- (origen 'sistema', autor = su propio autor): no cuenta como autoreporte y no gasta el cupo diario.
+-- El helper imita el mismo guard para comprobar que no se duplica.
 reset role;
 create function tests.reporte_sistema_resena(p_autor uuid, p_resena uuid) returns void
 language plpgsql security definer set search_path = ''
@@ -212,6 +213,31 @@ select is(
   0::bigint,
   'la reseña fue borrada'
 );
+
+-- Lo oculto no aparece en el perfil: ni en la lista de reseñas ni en el contador (trigger de recálculo).
+select is(
+  (select count(*) from public.resenas where profesional_id = 'eeeeeeee-3200-4000-a000-000000000004'),
+  0::bigint,
+  'la reseña oculta no aparece en las reseñas del perfil'
+);
+
+select is(
+  (select cantidad_resenas from public.perfil_profesional('eeeeeeee-3200-4000-a000-000000000004')),
+  0,
+  'la reseña oculta no cuenta en el perfil'
+);
+
+-- Las reglas de elegibilidad de LAB-31 siguen vigentes: el autor de la reseña ocultada no tiene
+-- contacto con P, así que no puede volver a reseñarlo.
+reset role;
+select tests.como('eeeeeeee-3200-4000-a000-000000000003');
+select throws_ok(
+  $$insert into public.resenas (autor_id, profesional_id, puntaje) values ('eeeeeeee-3200-4000-a000-000000000003', 'eeeeeeee-3200-4000-a000-000000000004', 5)$$,
+  '42501', null,
+  'tras ocultar, sin contacto con P no puede volver a reseñar (LAB-31)'
+);
+reset role;
+select tests.como('eeeeeeee-3200-4000-a000-000000000001');
 
 -- Cerrar trabajo
 select is(

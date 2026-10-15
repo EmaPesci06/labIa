@@ -13,6 +13,8 @@ import {
 // /admin/reportes (lista, marcar en revisión, ocultar reseña, suspender con motivo, reactivar) y
 // /suspendida, donde la persona suspendida ve el motivo.
 // Para correr: ver perfil-datos.spec.ts (mismo servidor falso y mismos puertos).
+// Hace falta además SUPABASE_SERVICE_ROLE_KEY en el entorno, con cualquier valor (falso): el build
+// de la app la lee para /admin y la suspensión. El falso no la valida; no es una clave real.
 // Sin LABIA_E2E_SUPABASE_FALSO=1 se saltean: no pueden correr contra el Supabase real del CI.
 //
 // El estado se reinicia en globalSetup (apoyo/reiniciar-falso.ts), antes de todos los proyectos.

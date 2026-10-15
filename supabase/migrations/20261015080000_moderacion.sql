@@ -20,6 +20,13 @@
 --    - revocar_sesiones_admin: borra sesiones y refresh tokens de una cuenta (solo service_role).
 -- 4. reportes.origen: 'usuario' o 'sistema' (triggers security definer). El límite diario y el
 --    no autoreporte aplican solo a 'usuario'; el objetivo debe existir en todos los casos.
+--
+-- Orden: esta migración va después de 20261015070000_resenas_endurecer.sql (LAB-31). No redefine
+-- ninguna función ni política de reseñas de LAB-31 (resenas_crear, resenas_validar_texto,
+-- resenas_moderar, trabajo_mio_con_elegido, revoke delete). Lo único que se cruza es el trigger
+-- resenas_moderar, que inserta en reportes: ese insert pasa por los triggers de este archivo con
+-- origen 'sistema' (no cuenta para el límite ni para el autoreporte). ocultar_resena_admin borra
+-- con privilegios del dueño, por la vía de moderación que LAB-31 deja reservada.
 
 -- ---------------------------------------------------------------------------
 -- 1. acciones_moderacion
