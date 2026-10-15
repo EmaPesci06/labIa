@@ -2,17 +2,18 @@
 
 import { Check } from "lucide-react";
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useId, type ReactNode } from "react";
 
 import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
+import { cn } from "@/lib/cn";
 import { formatearPesos } from "@/lib/formato";
 import { postularme } from "@/lib/trabajos/acciones";
 import type { EstadoPostulacion as TipoEstadoPostulacion } from "@/lib/trabajos/consulta";
 
 import { BotonRetirarPostulacion } from "./BotonRetirarPostulacion";
 
-type MiPostulacionInfo = {
+export type MiPostulacionInfo = {
   id: string;
   mensaje: string;
   precioEstimado: number | null;
@@ -29,12 +30,55 @@ type FormularioPostulacionProps = {
   miPostulacion?: MiPostulacionInfo | null;
 };
 
+type TonoEstado = "azul" | "exito" | "neutro";
+
+/** Título y detalle de cada estado de la postulación, desde el punto de vista del profesional. */
+const TEXTO_ESTADO: Record<
+  TipoEstadoPostulacion,
+  { titulo: string; detalle: (cliente: string) => string; tono: TonoEstado; icono: boolean }
+> = {
+  enviada: {
+    titulo: "Postulación enviada",
+    detalle: (cliente) => `${cliente} ve tu mensaje y, si te elige, te escribe por WhatsApp.`,
+    tono: "azul",
+    icono: true,
+  },
+  elegida: {
+    titulo: "¡Te eligieron!",
+    detalle: () => "El cliente te va a escribir por WhatsApp.",
+    tono: "exito",
+    icono: true,
+  },
+  descartada: {
+    titulo: "Eligieron a otro profesional",
+    detalle: () =>
+      "Esta vez el cliente eligió a otra persona. Seguí postulándote a otros trabajos.",
+    tono: "neutro",
+    icono: false,
+  },
+  retirada: {
+    titulo: "Retiraste tu postulación",
+    detalle: () => "El cliente ya no la tiene en cuenta.",
+    tono: "neutro",
+    icono: false,
+  },
+};
+
+const COLOR_TONO: Record<TonoEstado, string> = {
+  azul: "bg-azul-suave text-sobre-azul-suave",
+  exito: "bg-exito-suave text-sobre-exito-suave",
+  neutro: "border border-divisor bg-superficie-elevada text-texto",
+};
+
+const CLASE_VER_MAS =
+  "mt-2 flex min-h-[48px] items-center justify-center rounded-xl bg-superficie text-[15px] font-bold text-texto transition-colors hover:bg-superficie-elevada focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco";
+
 /**
- * Formulario para que el profesional se postule a un trabajo.
- * Contempla:
+ * Formulario para que el profesional se postule a un trabajo, y el resumen de su postulación
+ * según el estado (enviada, elegida, descartada, retirada). Contempla:
  * - Trabajo cerrado: "Este trabajo ya no recibe postulaciones."
  * - Profesional en revisión: tarjeta deshabilitada con "Vas a poder postularte cuando aprobemos tus documentos."
- * - Ya postulado / postulación recién enviada: tarjeta verde de éxito, detalle y botón para retirar.
+ * - Ya postulado o recién enviado: resumen con el texto de su estado y, si está enviada, "Retirar".
  * - Formulario con validación de mensaje, precio estimado y seña propuesta.
  */
 export function FormularioPostulacion({
@@ -45,6 +89,7 @@ export function FormularioPostulacion({
   miPostulacion: postulacionInicial = null,
 }: FormularioPostulacionProps) {
   const [estado, accion, isPending] = useActionState(postularme.bind(null, trabajoId), {});
+  const idError = useId();
 
   // 1. Trabajo no abierto
   if (trabajoEstado !== "abierto") {
@@ -54,33 +99,7 @@ export function FormularioPostulacion({
           Este trabajo ya no recibe postulaciones.
         </p>
         {postulacionInicial ? (
-          <div className="rounded-xl border border-divisor bg-superficie-elevada p-4 text-texto">
-            <p className="text-xs font-semibold tracking-wider text-texto-secundario uppercase">
-              Tu postulación previa
-            </p>
-            <p className="mt-1 text-sm whitespace-pre-line">{postulacionInicial.mensaje}</p>
-            {postulacionInicial.precioEstimado !== null ||
-            postulacionInicial.senaPropuesta !== null ? (
-              <div className="mt-3 flex flex-wrap gap-4 border-t border-divisor pt-2 text-xs">
-                {postulacionInicial.precioEstimado !== null ? (
-                  <div>
-                    <span className="text-texto-secundario">Precio estimado: </span>
-                    <span className="font-bold text-texto">
-                      {formatearPesos(postulacionInicial.precioEstimado)}
-                    </span>
-                  </div>
-                ) : null}
-                {postulacionInicial.senaPropuesta !== null ? (
-                  <div>
-                    <span className="text-texto-secundario">Seña propuesta: </span>
-                    <span className="font-bold text-texto">
-                      {formatearPesos(postulacionInicial.senaPropuesta)}
-                    </span>
-                  </div>
-                ) : null}
-              </div>
-            ) : null}
-          </div>
+          <DatosPostulacion postulacion={postulacionInicial} titulo="Tu postulación previa" />
         ) : null}
       </div>
     );
@@ -98,82 +117,31 @@ export function FormularioPostulacion({
     );
   }
 
-  // 3. Postulación ya enviada previamente
+  // 3. Postulación ya hecha: resumen según su estado
   if (postulacionInicial) {
     return (
-      <div className="flex flex-col gap-3 rounded-[18px] bg-exito-suave p-5 text-sobre-exito-suave">
-        <div className="flex items-center gap-2 text-lg font-bold">
-          <Check aria-hidden strokeWidth={2.5} className="size-5 shrink-0" />
-          <span>Postulación enviada</span>
-        </div>
-        <p className="text-[15px] leading-relaxed">
-          {clienteNombre} ve tu mensaje y, si te elige, te escribe por WhatsApp.
-        </p>
-
-        <div className="mt-1 rounded-xl border border-borde/50 bg-superficie p-4 text-texto">
-          <p className="text-xs font-semibold tracking-wider text-texto-secundario uppercase">
-            Tu postulación
-          </p>
-          <p className="mt-1.5 text-sm whitespace-pre-line text-texto">
-            {postulacionInicial.mensaje}
-          </p>
-          {postulacionInicial.precioEstimado !== null ||
-          postulacionInicial.senaPropuesta !== null ? (
-            <div className="mt-3 flex flex-wrap gap-4 border-t border-divisor pt-2 text-xs">
-              {postulacionInicial.precioEstimado !== null ? (
-                <div>
-                  <span className="text-texto-secundario">Precio estimado: </span>
-                  <span className="font-bold text-texto">
-                    {formatearPesos(postulacionInicial.precioEstimado)}
-                  </span>
-                </div>
-              ) : null}
-              {postulacionInicial.senaPropuesta !== null ? (
-                <div>
-                  <span className="text-texto-secundario">Seña propuesta: </span>
-                  <span className="font-bold text-texto">
-                    {formatearPesos(postulacionInicial.senaPropuesta)}
-                  </span>
-                </div>
-              ) : null}
-            </div>
-          ) : null}
-        </div>
-
+      <CajaEstado estado={postulacionInicial.estado} clienteNombre={clienteNombre}>
+        <DatosPostulacion postulacion={postulacionInicial} titulo="Tu postulación" />
         {postulacionInicial.estado === "enviada" ? (
           <div className="pt-1">
             <BotonRetirarPostulacion postulacionId={postulacionInicial.id} />
           </div>
         ) : null}
-
-        <Link
-          href="/trabajos"
-          className="mt-2 flex min-h-[48px] items-center justify-center rounded-xl bg-superficie text-[15px] font-bold text-sobre-exito-suave transition-colors hover:bg-superficie-elevada focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
-        >
+        <Link href="/trabajos" className={CLASE_VER_MAS}>
           Ver más trabajos
         </Link>
-      </div>
+      </CajaEstado>
     );
   }
 
   // 4. Postulación recién enviada con éxito en esta sesión
   if (estado.ok) {
     return (
-      <div className="flex flex-col gap-3 rounded-[18px] bg-exito-suave p-5 text-sobre-exito-suave">
-        <div className="flex items-center gap-2 text-lg font-bold">
-          <Check aria-hidden strokeWidth={2.5} className="size-5 shrink-0" />
-          <span>Postulación enviada</span>
-        </div>
-        <p className="text-[15px] leading-relaxed">
-          {clienteNombre} ve tu mensaje y, si te elige, te escribe por WhatsApp.
-        </p>
-        <Link
-          href="/trabajos"
-          className="mt-2 flex min-h-[48px] items-center justify-center rounded-xl bg-superficie text-[15px] font-bold text-sobre-exito-suave transition-colors hover:bg-superficie-elevada focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
-        >
+      <CajaEstado estado="enviada" clienteNombre={clienteNombre}>
+        <Link href="/trabajos" className={CLASE_VER_MAS}>
           Ver más trabajos
         </Link>
-      </div>
+      </CajaEstado>
     );
   }
 
@@ -182,12 +150,17 @@ export function FormularioPostulacion({
     <form
       action={accion}
       noValidate
+      aria-describedby={estado.mensaje ? idError : undefined}
       className="flex flex-col gap-4 rounded-[18px] border border-borde bg-superficie p-5"
     >
       <h2 className="font-titulo text-lg font-bold text-texto">Postularme</h2>
 
       {estado.mensaje ? (
-        <p className="rounded-lg bg-naranja-suave p-3 text-sm font-semibold text-sobre-naranja-suave">
+        <p
+          id={idError}
+          role="alert"
+          className="rounded-lg bg-naranja-suave p-3 text-sm font-semibold text-sobre-naranja-suave"
+        >
           {estado.mensaje}
         </p>
       ) : null}
@@ -237,5 +210,68 @@ export function FormularioPostulacion({
         Enviar postulación
       </Boton>
     </form>
+  );
+}
+
+/** Tarjeta con el título y el detalle del estado de la postulación. */
+function CajaEstado({
+  estado,
+  clienteNombre,
+  children,
+}: {
+  estado: TipoEstadoPostulacion;
+  clienteNombre: string;
+  children: ReactNode;
+}) {
+  const texto = TEXTO_ESTADO[estado];
+  return (
+    <div className={cn("flex flex-col gap-3 rounded-[18px] p-5", COLOR_TONO[texto.tono])}>
+      <div className="flex items-center gap-2 text-lg font-bold">
+        {texto.icono ? <Check aria-hidden strokeWidth={2.5} className="size-5 shrink-0" /> : null}
+        <span>{texto.titulo}</span>
+      </div>
+      <p className="text-[15px] leading-relaxed">{texto.detalle(clienteNombre)}</p>
+      {children}
+    </div>
+  );
+}
+
+/** Mensaje, precio estimado y seña propuesta de una postulación. */
+function DatosPostulacion({
+  postulacion,
+  titulo,
+}: {
+  postulacion: MiPostulacionInfo;
+  titulo: string;
+}) {
+  const tienePrecio = postulacion.precioEstimado !== null;
+  const tieneSena = postulacion.senaPropuesta !== null;
+  return (
+    <div className="rounded-xl border border-borde/50 bg-superficie p-4 text-texto">
+      <p className="text-xs font-semibold tracking-wider text-texto-secundario uppercase">
+        {titulo}
+      </p>
+      <p className="mt-1.5 text-sm whitespace-pre-line text-texto">{postulacion.mensaje}</p>
+      {tienePrecio || tieneSena ? (
+        <div className="mt-3 flex flex-wrap gap-4 border-t border-divisor pt-2 text-xs">
+          {postulacion.precioEstimado !== null ? (
+            <div>
+              <span className="text-texto-secundario">Precio estimado: </span>
+              <span className="font-bold text-texto">
+                {formatearPesos(postulacion.precioEstimado)}
+              </span>
+            </div>
+          ) : null}
+          {postulacion.senaPropuesta !== null ? (
+            <div>
+              <span className="text-texto-secundario">Seña propuesta: </span>
+              <span className="font-bold text-texto">
+                {formatearPesos(postulacion.senaPropuesta)}
+              </span>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
   );
 }
