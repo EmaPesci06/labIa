@@ -1,7 +1,7 @@
 "use server";
 
 import { registrarEventoServidor } from "@/lib/metricas-servidor";
-import { limitarIntentos } from "@/lib/rate-limit";
+import { limitarPersistente } from "@/lib/rate-limit-persistente";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import { esquemaReporte, type DatosReporte } from "@/lib/validaciones/reportes";
@@ -41,8 +41,8 @@ export async function enviarReporte(
     };
   }
 
-  // Rate limit en memoria
-  const limite = limitarIntentos(`reporte:${sesion.usuario.id}`, REGLA_RATE_LIMIT);
+  // Rate limit persistente (LAB-47): cuenta en Postgres, compartido entre instancias.
+  const limite = await limitarPersistente(`reporte:${sesion.usuario.id}`, REGLA_RATE_LIMIT);
   if (!limite.permitido) {
     return {
       mensaje: "Alcanzaste el límite de 10 reportes por día. Probá de nuevo mañana.",

@@ -952,7 +952,7 @@ select ok(
   not has_column_privilege('authenticated', 'public.usuarios', c.col, 'update'),
   'authenticated no puede actualizar usuarios.' || c.col
 )
-from (values ('id'), ('rol'), ('whatsapp'), ('normas_version'), ('normas_aceptadas_at')) as c (col);
+from (values ('id'), ('rol'), ('whatsapp'), ('normas_version'), ('normas_aceptadas_at'), ('estado')) as c (col);
 
 select ok(
   not has_column_privilege('authenticated', 'public.perfiles_profesionales', c.col, 'update')
