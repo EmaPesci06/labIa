@@ -917,8 +917,8 @@ select is(
   (select array_agg(c.relname::text order by c.relname)
    from pg_class c join pg_namespace n on n.oid = c.relnamespace
    where n.nspname = 'public' and c.relkind in ('r', 'v', 'p') and has_any_column_privilege('anon', c.oid, 'select')),
-  array['barrios', 'perfiles_profesionales', 'resenas', 'usuarios_publicos'],
-  'anon solo puede leer barrios, perfiles_profesionales, resenas y usuarios_publicos'
+  array['barrios', 'perfiles_profesionales', 'resenas_publicas', 'usuarios_publicos'],
+  'anon solo puede leer barrios, perfiles_profesionales, resenas_publicas y usuarios_publicos'
 );
 
 select is(

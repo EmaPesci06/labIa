@@ -30,6 +30,9 @@ select
 from public.resenas r
 left join public.usuarios_publicos u on u.id = r.autor_id;
 
+-- Supabase da privilegios por defecto a anon y authenticated sobre objetos nuevos: se quitan todos
+-- y se deja solo select.
+revoke all on public.resenas_publicas from public, anon, authenticated;
 grant select on public.resenas_publicas to anon, authenticated;
 
 -- anon no lee la tabla (ni siquiera con la política). La política pasa a ser solo de authenticated.

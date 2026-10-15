@@ -4,7 +4,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(18);
+select plan(19);
 
 create schema tests;
 grant usage on schema tests to authenticated;
@@ -63,6 +63,14 @@ select ok(
 select ok(
   has_table_privilege('anon', 'public.resenas_publicas', 'select'),
   'anon tiene select sobre la vista resenas_publicas'
+);
+
+select ok(
+  not has_table_privilege('anon', 'public.resenas_publicas', 'insert')
+  and not has_table_privilege('authenticated', 'public.resenas_publicas', 'insert')
+  and not has_table_privilege('authenticated', 'public.resenas_publicas', 'update')
+  and not has_table_privilege('authenticated', 'public.resenas_publicas', 'delete'),
+  'la vista resenas_publicas es solo lectura'
 );
 
 select hasnt_column('public', 'resenas_publicas', 'autor_id', 'la vista resenas_publicas no tiene autor_id');
