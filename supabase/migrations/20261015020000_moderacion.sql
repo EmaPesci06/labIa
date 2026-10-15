@@ -16,7 +16,10 @@
 --    - ocultar_resena_admin: borra la reseña (trigger recalcula promedio) y registra.
 --    - marcar_reporte_en_revision: reportes.estado = 'en_revision' y registra.
 --    - resolver_reporte: reportes.estado = 'resuelto', resuelto_por = admin y registra.
---    - mi_motivo_suspension: permite al usuario suspendido consultar su motivo de suspensión.
+--    - mi_motivo_suspension: el usuario suspendido consulta su propio motivo (sin parámetro).
+--    - revocar_sesiones_admin: borra sesiones y refresh tokens de una cuenta (solo service_role).
+-- 4. reportes.origen: 'usuario' o 'sistema' (triggers security definer). El límite diario y el
+--    no autoreporte aplican solo a 'usuario'; el objetivo debe existir en todos los casos.
 
 -- ---------------------------------------------------------------------------
 -- 1. acciones_moderacion
@@ -54,6 +57,30 @@ create unique index if not exists reportes_autor_objetivo_unique
   on public.reportes (autor_id, objetivo_tipo, objetivo_id)
   where autor_id is not null;
 
+-- Origen: 'usuario' si lo insertó anon/authenticated por PostgREST; 'sistema' si lo abrió un
+-- trigger security definer (corre como dueño, p. ej. resenas_moderar de LAB-31). Las reglas de
+-- usuario (límite diario y no autoreportarse) solo aplican a 'usuario'. Nadie puede escribir la
+-- columna por la API: el insert de usuarios no la incluye en sus grants.
+alter table public.reportes
+  add column if not exists origen text not null default 'usuario'
+  check (origen in ('usuario', 'sistema'));
+
+create or replace function privado.reportes_fijar_origen()
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
+begin
+  new.origen := case when current_user in ('anon', 'authenticated') then 'usuario' else 'sistema' end;
+  return new;
+end;
+$$;
+
+drop trigger if exists reportes_fijar_origen_trigger on public.reportes;
+create trigger reportes_fijar_origen_trigger
+before insert on public.reportes
+for each row execute function privado.reportes_fijar_origen();
+
 create or replace function privado.reportes_limite_diario()
 returns trigger
 language plpgsql
@@ -62,10 +89,11 @@ as $$
 declare
   v_cuenta integer;
 begin
-  if new.autor_id is not null then
+  if new.origen = 'usuario' and new.autor_id is not null then
     select count(*) into v_cuenta
     from public.reportes
     where autor_id = new.autor_id
+      and origen = 'usuario'
       and created_at > now() - interval '24 hours';
     if v_cuenta >= 10 then
       raise exception 'Alcanzaste el límite de 10 reportes por día' using errcode = '23514';
@@ -80,13 +108,40 @@ create trigger reportes_limite_diario_trigger
 before insert on public.reportes
 for each row execute function privado.reportes_limite_diario();
 
+-- Reglas de contenido. El objetivo tiene que existir (a la vista de quien inserta) y, si lo
+-- reporta un usuario, no puede ser propio. Los reportes del sistema sobre una reseña de su autor
+-- (1-2 estrellas, LAB-31) no pasan por la regla de autoreporte.
+-- Solo devuelve true/false: no expone datos del objetivo, así que se evita que el filtro de RLS
+-- (perfiles sin publicar, por ejemplo) decida si un objetivo "existe" para quien reporta.
+create or replace function privado.objetivo_existe(p_tipo text, p_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select case p_tipo
+    when 'perfil' then exists (select 1 from public.perfiles_profesionales where usuario_id = p_id)
+    when 'trabajo' then exists (select 1 from public.trabajos where id = p_id)
+    when 'resena' then exists (select 1 from public.resenas where id = p_id)
+    else false
+  end;
+$$;
+
+revoke execute on function privado.objetivo_existe(text, uuid) from public, anon;
+grant execute on function privado.objetivo_existe(text, uuid) to authenticated;
+
 create or replace function privado.reportes_validar_objetivo()
 returns trigger
 language plpgsql
 set search_path = ''
 as $$
 begin
-  if new.autor_id is not null then
+  if not privado.objetivo_existe(new.objetivo_tipo::text, new.objetivo_id) then
+    raise exception 'El contenido reportado no existe' using errcode = 'P0002';
+  end if;
+
+  if new.origen = 'usuario' and new.autor_id is not null then
     if new.objetivo_tipo = 'perfil' and new.objetivo_id = new.autor_id then
       raise exception 'No podés reportar tu propio perfil' using errcode = '23514';
     elsif new.objetivo_tipo = 'trabajo' and exists (
@@ -112,24 +167,45 @@ for each row execute function privado.reportes_validar_objetivo();
 -- 3. Funciones RPC de moderación
 -- ---------------------------------------------------------------------------
 
--- Motivo de suspensión para el usuario suspendido
-create or replace function public.mi_motivo_suspension(p_usuario_id uuid default null)
+-- Motivo de suspensión para el usuario suspendido. Solo lee la cuenta de quien llama (auth.uid())
+-- y solo si está suspendida: nunca el de otro usuario.
+drop function if exists public.mi_motivo_suspension(uuid);
+
+create or replace function public.mi_motivo_suspension()
 returns text
 language sql
 stable
 security definer
 set search_path = ''
 as $$
-  select motivo
-  from public.acciones_moderacion
-  where objetivo_id = coalesce(p_usuario_id, (select auth.uid()))
-    and accion = 'cuenta_suspendida'
-  order by created_at desc
+  select am.motivo
+  from public.acciones_moderacion am
+  join public.usuarios u on u.id = am.usuario_id
+  where am.usuario_id = (select auth.uid())
+    and am.accion = 'cuenta_suspendida'
+    and u.estado = 'suspendida'
+  order by am.created_at desc
   limit 1;
 $$;
 
-revoke execute on function public.mi_motivo_suspension(uuid) from public, anon;
-grant execute on function public.mi_motivo_suspension(uuid) to authenticated;
+revoke execute on function public.mi_motivo_suspension() from public, anon;
+grant execute on function public.mi_motivo_suspension() to authenticated;
+
+-- Revocar sesiones de una cuenta (la usa el servidor de /admin tras suspenderla). El SDK de Auth
+-- solo cierra sesiones con el JWT del propio usuario, así que se borran las filas de auth.
+-- Solo service_role puede ejecutarla.
+create or replace function public.revocar_sesiones_admin(p_usuario_id uuid)
+returns void
+language sql
+security definer
+set search_path = ''
+as $$
+  delete from auth.refresh_tokens where user_id = p_usuario_id::text;
+  delete from auth.sessions where user_id = p_usuario_id;
+$$;
+
+revoke execute on function public.revocar_sesiones_admin(uuid) from public, anon, authenticated;
+grant execute on function public.revocar_sesiones_admin(uuid) to service_role;
 
 -- Suspender cuenta
 create or replace function public.suspender_cuenta_admin(

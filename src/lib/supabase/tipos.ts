@@ -253,14 +253,14 @@ isOneToOne: true
                   ]
                 },"reportes": {
                   Row: {
-                    "autor_id": string | null,"created_at": string,"detalle": string | null,"estado": Database["public"]['Enums']["estado_reporte"],"id": string,"motivo": Database["public"]['Enums']["motivo_reporte"],"objetivo_id": string,"objetivo_tipo": string,"resuelto_por": string | null,"updated_at": string
+                    "autor_id": string | null,"created_at": string,"detalle": string | null,"estado": Database["public"]['Enums']["estado_reporte"],"id": string,"motivo": Database["public"]['Enums']["motivo_reporte"],"objetivo_id": string,"objetivo_tipo": string,"origen": string,"resuelto_por": string | null,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "autor_id"?: string | null,"created_at"?: string,"detalle"?: string | null,"estado"?: Database["public"]['Enums']["estado_reporte"],"id"?: string,"motivo": Database["public"]['Enums']["motivo_reporte"],"objetivo_id": string,"objetivo_tipo": string,"resuelto_por"?: string | null,"updated_at"?: string
+                    "autor_id"?: string | null,"created_at"?: string,"detalle"?: string | null,"estado"?: Database["public"]['Enums']["estado_reporte"],"id"?: string,"motivo": Database["public"]['Enums']["motivo_reporte"],"objetivo_id": string,"objetivo_tipo": string,"origen"?: string,"resuelto_por"?: string | null,"updated_at"?: string
                   }
                   Update: {
-                    "autor_id"?: string | null,"created_at"?: string,"detalle"?: string | null,"estado"?: Database["public"]['Enums']["estado_reporte"],"id"?: string,"motivo"?: Database["public"]['Enums']["motivo_reporte"],"objetivo_id"?: string,"objetivo_tipo"?: string,"resuelto_por"?: string | null,"updated_at"?: string
+                    "autor_id"?: string | null,"created_at"?: string,"detalle"?: string | null,"estado"?: Database["public"]['Enums']["estado_reporte"],"id"?: string,"motivo"?: Database["public"]['Enums']["motivo_reporte"],"objetivo_id"?: string,"objetivo_tipo"?: string,"origen"?: string,"resuelto_por"?: string | null,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -539,7 +539,7 @@ isOneToOne: true
 { Args: { "p_trabajo_id": string }; Returns: boolean
                            },
 "mi_motivo_suspension":
-{ Args: { "p_usuario_id"?: string }; Returns: string
+{ Args: Record<PropertyKey, never>; Returns: string
                            },
 "ocultar_resena_admin":
 { Args: { "p_motivo"?: string,"p_resena_id": string }; Returns: boolean
@@ -557,6 +557,9 @@ isOneToOne: true
                            },
 "resolver_reporte":
 { Args: { "p_con_accion": boolean,"p_motivo"?: string,"p_reporte_id": string }; Returns: boolean
+                           },
+"revocar_sesiones_admin":
+{ Args: { "p_usuario_id": string }; Returns: undefined
                            },
 "suspender_cuenta_admin":
 { Args: { "p_motivo": string,"p_usuario_id": string }; Returns: boolean

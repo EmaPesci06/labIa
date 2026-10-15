@@ -4,7 +4,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(22);
+select plan(32);
 
 create schema tests;
 grant usage on schema tests to authenticated;
@@ -87,6 +87,56 @@ select throws_ok(
   null,
   'no se puede reportar el propio trabajo'
 );
+
+-- El objetivo tiene que existir
+select throws_ok(
+  $$insert into public.reportes (autor_id, objetivo_tipo, objetivo_id, motivo)
+    values ('eeeeeeee-3200-4000-a000-000000000002', 'perfil', 'eeeeeeee-3200-4000-a000-00000000ffff', 'otro')$$,
+  'P0002', null, 'no se puede reportar un perfil que no existe'
+);
+select throws_ok(
+  $$insert into public.reportes (autor_id, objetivo_tipo, objetivo_id, motivo)
+    values ('eeeeeeee-3200-4000-a000-000000000002', 'trabajo', 'ffffffff-3200-4000-a000-00000000ffff', 'otro')$$,
+  'P0002', null, 'no se puede reportar un trabajo que no existe'
+);
+select throws_ok(
+  $$insert into public.reportes (autor_id, objetivo_tipo, objetivo_id, motivo)
+    values ('eeeeeeee-3200-4000-a000-000000000002', 'resena', '11111111-3200-4000-a000-00000000ffff', 'otro')$$,
+  'P0002', null, 'no se puede reportar una reseña que no existe'
+);
+
+-- Un trigger security definer (como resenas_moderar de LAB-31) abre el reporte de la reseña de 1
+-- estrella de su propio autor: no cuenta como autoreporte y no gasta el cupo diario del autor.
+reset role;
+create function tests.reporte_sistema_resena(p_autor uuid, p_resena uuid) returns void
+language plpgsql security definer set search_path = ''
+as $$
+begin
+  -- Mismo guard que resenas_moderar: si ya hay un reporte para la reseña, no abre otro.
+  if not exists (select 1 from public.reportes where objetivo_tipo = 'resena' and objetivo_id = p_resena) then
+    insert into public.reportes (autor_id, objetivo_tipo, objetivo_id, motivo, detalle, estado)
+    values (p_autor, 'resena', p_resena, 'otro', 'Calificación baja (1 estrella)', 'abierto');
+  end if;
+end;
+$$;
+
+select lives_ok(
+  $$select tests.reporte_sistema_resena('eeeeeeee-3200-4000-a000-000000000003', '11111111-3200-4000-a000-000000000001')$$,
+  'un reporte del sistema sobre la propia reseña no falla'
+);
+select is(
+  (select origen from public.reportes where autor_id = 'eeeeeeee-3200-4000-a000-000000000003' and objetivo_id = '11111111-3200-4000-a000-000000000001'),
+  'sistema',
+  'el reporte del sistema queda con origen sistema'
+);
+select is(
+  (select count(*) from public.reportes where autor_id = 'eeeeeeee-3200-4000-a000-000000000003' and origen = 'usuario'),
+  0::bigint,
+  'el reporte del sistema no cuenta como reporte del usuario'
+);
+
+reset role;
+select tests.como('eeeeeeee-3200-4000-a000-000000000002');
 
 -- C1 no puede llamar funciones de admin
 select throws_ok(
@@ -211,6 +261,41 @@ select is(
   public.mi_motivo_suspension(),
   'Comportamiento indebido en domicilio',
   'el usuario suspendido puede leer su motivo de suspensión'
+);
+
+-- Un cliente (no suspendido) no obtiene el motivo de otro: la función ya no acepta un id ajeno
+reset role;
+select tests.como('eeeeeeee-3200-4000-a000-000000000002');
+
+select is(
+  public.mi_motivo_suspension(),
+  null::text,
+  'un cliente no obtiene el motivo de la suspensión de otro'
+);
+
+select throws_ok(
+  $$select public.mi_motivo_suspension('eeeeeeee-3200-4000-a000-000000000004')$$,
+  '42883',
+  null,
+  'mi_motivo_suspension no acepta el id de otra cuenta'
+);
+
+-- Revocar sesiones: solo service_role
+select ok(
+  has_function_privilege('service_role', 'public.revocar_sesiones_admin(uuid)', 'execute')
+  and not has_function_privilege('authenticated', 'public.revocar_sesiones_admin(uuid)', 'execute')
+  and not has_function_privilege('anon', 'public.revocar_sesiones_admin(uuid)', 'execute'),
+  'revocar_sesiones_admin: solo service_role la ejecuta'
+);
+
+reset role;
+insert into auth.sessions (id, user_id)
+values ('dddddddd-3200-4000-a000-000000000001', 'eeeeeeee-3200-4000-a000-000000000004');
+select public.revocar_sesiones_admin('eeeeeeee-3200-4000-a000-000000000004');
+select is(
+  (select count(*) from auth.sessions where user_id = 'eeeeeeee-3200-4000-a000-000000000004'),
+  0::bigint,
+  'revocar_sesiones_admin borra las sesiones de la cuenta'
 );
 
 -- Reactivar cuenta

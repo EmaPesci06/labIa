@@ -56,6 +56,7 @@ vi.mock("@/lib/supabase/servidor", () => ({
 }));
 
 import { obtenerSesion } from "@/lib/sesion";
+import { supabaseConfigurado } from "@/lib/supabase/servidor";
 import { enviarReporte } from "./acciones";
 import { ESTADO_REPORTE_INICIAL } from "./estado";
 
@@ -170,5 +171,25 @@ describe("enviarReporte", () => {
     expect(mockRegistrarEventoServidor).toHaveBeenCalledWith(UUID_USUARIO, "reporte_enviado", {
       motivo: "estafa",
     });
+  });
+
+  it("sin Supabase configurado, fuera de desarrollo no informa un envío exitoso", async () => {
+    vi.mocked(obtenerSesion).mockResolvedValue({
+      usuario: { id: UUID_USUARIO, email: "test@example.com" },
+      rol: "cliente",
+      normasVersion: "1.0",
+      perfil: { nombre: "Test", apellido: null, nombreVisible: "Test", completo: true },
+    });
+    vi.mocked(supabaseConfigurado).mockReturnValueOnce(false);
+
+    const formData = new FormData();
+    formData.set("objetivoTipo", "perfil");
+    formData.set("objetivoId", UUID_OBJETIVO);
+    formData.set("motivo", "estafa");
+
+    const res = await enviarReporte(ESTADO_REPORTE_INICIAL, formData);
+    expect(res.exito).toBeFalsy();
+    expect(res.mensaje).toBeTruthy();
+    expect(mockInsert).not.toHaveBeenCalled();
   });
 });

@@ -70,6 +70,10 @@ export function ModalSuspender({ abierta, onCambioAbierta, usuarioId, nombreUsua
           required
           error={error ?? undefined}
         />
+        <p className="-mt-2 text-xs text-texto-secundario">
+          La persona suspendida ve este motivo. No incluyas datos personales de otras personas
+          (nombres, teléfonos ni direcciones).
+        </p>
 
         <div className="mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <Boton

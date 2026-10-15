@@ -50,8 +50,11 @@ export async function enviarReporte(
   }
 
   if (!supabaseConfigurado()) {
-    // Modo local / sin supabase configurado
-    return { exito: true, motivoEnviado: datos.motivo };
+    // Solo en desarrollo local sin base se simula el envío. Fuera de ahí no hay éxito falso.
+    if (process.env.NODE_ENV === "development") {
+      return { exito: true, motivoEnviado: datos.motivo };
+    }
+    return { mensaje: "No pudimos enviar el reporte. Probá de nuevo más tarde." };
   }
 
   const supabase = await crearClienteServidor();

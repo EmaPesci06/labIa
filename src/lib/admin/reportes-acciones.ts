@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { sesionAdmin } from "@/lib/admin/sesion";
+import { revocarSesionesUsuario } from "@/lib/admin/sesiones";
 import { avisarCuentaSuspendida } from "@/lib/emails/avisos";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
 import {
@@ -149,6 +150,15 @@ export async function suspenderCuentaAccion(
 
   if (error) {
     return { ok: false, error: "No se pudo suspender la cuenta del usuario." };
+  }
+
+  // Sin sesiones abiertas: la cuenta no vuelve a operar aunque tenga un token guardado.
+  const sesionesCerradas = await revocarSesionesUsuario(parseo.data.usuarioId);
+  if (!sesionesCerradas) {
+    return {
+      ok: false,
+      error: "La cuenta quedó suspendida, pero no pudimos cerrar sus sesiones. Volvé a intentarlo.",
+    };
   }
 
   // Notificar al usuario por email de forma asíncrona y segura

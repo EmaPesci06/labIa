@@ -4,6 +4,10 @@ vi.mock("@/lib/admin/sesion", () => ({
   sesionAdmin: vi.fn(),
 }));
 
+vi.mock("@/lib/admin/sesiones", () => ({
+  revocarSesionesUsuario: vi.fn().mockResolvedValue(true),
+}));
+
 vi.mock("@/lib/emails/avisos", () => ({
   avisarCuentaSuspendida: vi.fn().mockResolvedValue(undefined),
 }));
@@ -23,6 +27,7 @@ vi.mock("next/cache", () => ({
 }));
 
 import { sesionAdmin } from "@/lib/admin/sesion";
+import { revocarSesionesUsuario } from "@/lib/admin/sesiones";
 import { avisarCuentaSuspendida } from "@/lib/emails/avisos";
 import {
   cerrarTrabajoAccion,
@@ -107,7 +112,18 @@ describe("reportes-acciones (admin)", () => {
         p_usuario_id: UUID_1,
         p_motivo: "Incumplimiento grave",
       });
+      expect(revocarSesionesUsuario).toHaveBeenCalledWith(UUID_1);
       expect(avisarCuentaSuspendida).toHaveBeenCalledWith(UUID_1, "Incumplimiento grave");
+    });
+
+    it("si no se pueden cerrar las sesiones, no informa éxito ni manda el aviso", async () => {
+      mockRpc.mockResolvedValue({ error: null });
+      vi.mocked(revocarSesionesUsuario).mockResolvedValueOnce(false);
+
+      const res = await suspenderCuentaAccion(UUID_1, "Incumplimiento grave");
+      expect(res.ok).toBe(false);
+      expect(res.error).toContain("no pudimos cerrar sus sesiones");
+      expect(avisarCuentaSuspendida).not.toHaveBeenCalled();
     });
   });
 
