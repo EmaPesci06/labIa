@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { cronAutorizado } from "@/lib/emails/cron";
@@ -15,7 +16,9 @@ export async function GET(request: NextRequest) {
   try {
     const resultado = await limpiarDocumentos(crearClienteAdmin());
     return NextResponse.json(resultado);
-  } catch {
+  } catch (error) {
+    // Sin datos personales: el error solo describe la falla (la base de Sentry limpia el resto).
+    Sentry.captureException(error);
     return NextResponse.json({ error: "No se pudo limpiar los documentos" }, { status: 500 });
   }
 }

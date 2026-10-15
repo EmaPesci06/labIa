@@ -1,9 +1,8 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { limitarIntentos } from "@/lib/rate-limit";
+import { limitarPorIp, mensajeDeLimite } from "@/lib/rate-limit-persistente";
 import { urlDelSitio } from "@/lib/sitio";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import {
@@ -23,19 +22,10 @@ const REGLA_INGRESO = { maximo: 5, ventanaMs: 60_000 } as const;
 const MENSAJE_SIN_SUPABASE = "El ingreso todavía no está disponible. Probá de nuevo más tarde.";
 const MENSAJE_ERROR_GENERAL = "No pudimos completar la operación. Probá de nuevo en unos minutos.";
 
-async function ipDelPedido(): Promise<string> {
-  const encabezados = await headers();
-  const reenviado = encabezados.get("x-forwarded-for")?.split(",")[0]?.trim();
-  return reenviado || encabezados.get("x-real-ip") || "desconocida";
-}
-
-/** Máximo 5 intentos por minuto por IP y tipo de acción (Guía §7.7). */
+/** Máximo 5 intentos por minuto por IP y tipo de acción (Guía §7.7), compartido entre instancias. */
 async function superaElLimite(accion: string): Promise<EstadoFormulario | null> {
-  const resultado = limitarIntentos(`${accion}:${await ipDelPedido()}`, REGLA_INGRESO);
-  if (resultado.permitido) return null;
-  return {
-    mensaje: `Hiciste demasiados intentos. Esperá ${resultado.segundosParaReintentar} segundos y probá de nuevo.`,
-  };
+  const mensaje = mensajeDeLimite(await limitarPorIp(accion, REGLA_INGRESO));
+  return mensaje ? { mensaje } : null;
 }
 
 const texto = (datos: FormData, clave: string): string => {

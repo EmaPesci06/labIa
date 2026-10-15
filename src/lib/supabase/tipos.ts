@@ -512,6 +512,11 @@ isOneToOne: true
 "cerrar_trabajo_admin":
 { Args: { "p_motivo"?: string,"p_trabajo_id": string }; Returns: boolean
                            },
+"consumir_cupo":
+{ Args: { "p_clave": string,"p_maximo": number,"p_ventana_segundos": number }; Returns: {
+              "permitido": boolean,"segundos_para_reintentar": number
+            }[]
+                           },
 "contactar_profesional":
 { Args: { "p_origen": string,"p_profesional": string,"p_trabajo"?: string }; Returns: string
                            },
@@ -552,11 +557,17 @@ isOneToOne: true
 "reactivar_cuenta_admin":
 { Args: { "p_motivo"?: string,"p_usuario_id": string }; Returns: boolean
                            },
+"reactivar_postulacion":
+{ Args: { "p_mensaje": string,"p_precio_estimado"?: number,"p_sena_propuesta"?: number,"p_trabajo_id": string }; Returns: string
+                           },
 "registrar_documento":
 { Args: { "p_storage_path": string,"p_tipo": Database["public"]['Enums']["tipo_documento"] }; Returns: string
                            },
 "resolver_reporte":
 { Args: { "p_con_accion": boolean,"p_motivo"?: string,"p_reporte_id": string }; Returns: boolean
+                           },
+"retirar_postulacion":
+{ Args: { "p_postulacion_id": string }; Returns: boolean
                            },
 "revocar_sesiones_admin":
 { Args: { "p_usuario_id": string }; Returns: undefined

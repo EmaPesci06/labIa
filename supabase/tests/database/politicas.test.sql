@@ -500,7 +500,7 @@ select is((select count(*) from public.postulaciones where trabajo_id in ('ccccc
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000003');
 select is((select count(*) from public.postulaciones where trabajo_id in ('cccccccc-1200-4000-b000-000000000001', 'cccccccc-1200-4000-b000-000000000002', 'cccccccc-1200-4000-b000-000000000005')), 0::bigint, 'postulaciones: otro cliente no ve las de un trabajo ajeno');
-select is_empty($$update public.postulaciones set estado = 'elegida' where trabajo_id = 'cccccccc-1200-4000-b000-000000000001' returning 1$$, 'postulaciones: otro cliente no elige en un trabajo ajeno');
+select throws_ok($$update public.postulaciones set estado = 'elegida' where trabajo_id = 'cccccccc-1200-4000-b000-000000000001' returning 1$$, '42501', null, 'postulaciones: otro cliente no elige en un trabajo ajeno (sin update directo de estado)');
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000005');
 select is((select count(*) from public.postulaciones where trabajo_id in ('cccccccc-1200-4000-b000-000000000001', 'cccccccc-1200-4000-b000-000000000002', 'cccccccc-1200-4000-b000-000000000005')), 0::bigint, 'postulaciones: otro profesional no ve las ajenas');
@@ -529,14 +529,13 @@ select throws_ok(
   $$insert into public.postulaciones (trabajo_id, profesional_id, mensaje) values ('cccccccc-1200-4000-b000-000000000003', 'cccccccc-1200-4000-a000-000000000004', 'Hola')$$,
   '42501', null, 'postulaciones: no se postula a nombre de otro'
 );
-select results_eq(
+select throws_ok(
   $$update public.postulaciones set estado = 'retirada' where trabajo_id = 'cccccccc-1200-4000-b000-000000000001' and profesional_id = 'cccccccc-1200-4000-a000-000000000008' returning estado::text$$,
-  $$values ('retirada')$$,
-  'postulaciones: el autor retira la suya mientras está enviada'
+  '42501', null, 'postulaciones: el autor no retira con update directo (se retira con retirar_postulacion)'
 );
-select is_empty(
+select throws_ok(
   $$update public.postulaciones set estado = 'retirada' where trabajo_id = 'cccccccc-1200-4000-b000-000000000001' and profesional_id = 'cccccccc-1200-4000-a000-000000000008' returning 1$$,
-  'postulaciones: una retirada no se vuelve a modificar'
+  '42501', null, 'postulaciones: una retirada no se vuelve a modificar (ni por update directo)'
 );
 select throws_ok($$delete from public.postulaciones where trabajo_id = 'cccccccc-1200-4000-b000-000000000005'$$, '42501', null, 'postulaciones: nadie las borra (autor)');
 
@@ -545,15 +544,15 @@ select throws_ok(
   $$insert into public.postulaciones (trabajo_id, profesional_id, mensaje) values ('cccccccc-1200-4000-b000-000000000001', 'cccccccc-1200-4000-a000-000000000007', 'Hola')$$,
   '42501', null, 'postulaciones: un usuario suspendido no puede postularse'
 );
-select is_empty(
+select throws_ok(
   $$update public.postulaciones set estado = 'retirada' where trabajo_id = 'cccccccc-1200-4000-b000-000000000006' and profesional_id = 'cccccccc-1200-4000-a000-000000000007' returning 1$$,
-  'postulaciones: un usuario suspendido no retira la suya'
+  '42501', null, 'postulaciones: un usuario suspendido no retira la suya'
 );
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000006');
-select is_empty(
+select throws_ok(
   $$update public.postulaciones set estado = 'elegida' where trabajo_id = 'cccccccc-1200-4000-b000-000000000006' and profesional_id = 'cccccccc-1200-4000-a000-000000000008' returning 1$$,
-  'postulaciones: un cliente suspendido no elige'
+  '42501', null, 'postulaciones: un cliente suspendido no elige'
 );
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000002');
@@ -567,21 +566,19 @@ select throws_ok(
   $$update public.postulaciones set estado = 'elegida' where trabajo_id = 'cccccccc-1200-4000-b000-000000000001' and profesional_id = 'cccccccc-1200-4000-a000-000000000004'$$,
   '42501', null, 'postulaciones: el autor no se elige a sí mismo'
 );
-select is_empty(
+select throws_ok(
   $$update public.postulaciones set estado = 'retirada' where trabajo_id = 'cccccccc-1200-4000-b000-000000000002' and profesional_id = 'cccccccc-1200-4000-a000-000000000004' returning 1$$,
-  'postulaciones: el autor no retira una que ya fue elegida'
+  '42501', null, 'postulaciones: el autor no retira una que ya fue elegida (ni por update directo)'
 );
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000002');
-select results_eq(
+select throws_ok(
   $$update public.postulaciones set estado = 'descartada' where trabajo_id = 'cccccccc-1200-4000-b000-000000000001' and profesional_id = 'cccccccc-1200-4000-a000-000000000004' returning estado::text$$,
-  $$values ('descartada')$$,
-  'postulaciones: el cliente dueño descarta'
+  '42501', null, 'postulaciones: el cliente dueño no descarta con update directo (lo hace elegir_postulante)'
 );
-select results_eq(
+select throws_ok(
   $$update public.postulaciones set estado = 'elegida' where trabajo_id = 'cccccccc-1200-4000-b000-000000000001' and profesional_id = 'cccccccc-1200-4000-a000-000000000004' returning estado::text$$,
-  $$values ('elegida')$$,
-  'postulaciones: el cliente dueño elige'
+  '42501', null, 'postulaciones: el cliente dueño no elige con update directo (lo hace elegir_postulante)'
 );
 select throws_ok(
   $$update public.postulaciones set estado = 'enviada' where trabajo_id = 'cccccccc-1200-4000-b000-000000000001' and profesional_id = 'cccccccc-1200-4000-a000-000000000004'$$,
