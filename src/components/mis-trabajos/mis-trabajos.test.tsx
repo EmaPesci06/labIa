@@ -1,22 +1,83 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { MaestroDetalleMisTrabajos } from "./MaestroDetalleMisTrabajos";
 import { PestanasMisTrabajos } from "./PestanasMisTrabajos";
+import { SeleccionInicialEscritorio } from "./SeleccionInicialEscritorio";
 import { TarjetaMiTrabajo } from "./TarjetaMiTrabajo";
 import { TarjetaPostulante } from "./TarjetaPostulante";
 
+vi.mock("server-only", () => ({}));
+
+const reemplazar = vi.fn();
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ replace: reemplazar, push: vi.fn(), refresh: vi.fn() }),
+}));
+
 describe("PestanasMisTrabajos", () => {
-  it("renderiza las tres pestañas y marca aria-selected en la activa", () => {
+  it("son links de navegación: la activa lleva aria-current=page y no usa roles de pestaña", () => {
+    render(<PestanasMisTrabajos tabActiva="contratados" />);
+
+    const activa = screen.getByRole("link", { name: "Contratados" });
+    expect(activa).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "Abiertos" })).not.toHaveAttribute("aria-current");
+    expect(screen.getByRole("link", { name: "Terminados" })).toHaveAttribute(
+      "href",
+      "/mis-trabajos?tab=terminados",
+    );
+    expect(screen.queryByRole("tablist")).toBeNull();
+    expect(screen.queryByRole("tab")).toBeNull();
+  });
+
+  it("se recorre con Tab, sin flechas ni paneles", async () => {
+    const user = userEvent.setup();
     render(<PestanasMisTrabajos tabActiva="abiertos" />);
 
-    const tabAbiertos = screen.getByRole("tab", { name: "Abiertos" });
-    const tabContratados = screen.getByRole("tab", { name: "Contratados" });
-    const tabTerminados = screen.getByRole("tab", { name: "Terminados" });
+    await user.tab();
+    expect(screen.getByRole("link", { name: "Abiertos" })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("link", { name: "Contratados" })).toHaveFocus();
+  });
+});
 
-    expect(tabAbiertos).toHaveAttribute("aria-selected", "true");
-    expect(tabContratados).toHaveAttribute("aria-selected", "false");
-    expect(tabTerminados).toHaveAttribute("aria-selected", "false");
+describe("SeleccionInicialEscritorio", () => {
+  beforeEach(() => {
+    reemplazar.mockClear();
+  });
+
+  it("en escritorio agrega el primer trabajo a la URL con replace", async () => {
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn().mockReturnValue({
+        matches: true,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      }),
+    );
+    render(<SeleccionInicialEscritorio tabActiva="terminados" primerTrabajoId="t-9" />);
+
+    await waitFor(() =>
+      expect(reemplazar).toHaveBeenCalledWith("/mis-trabajos?tab=terminados&id=t-9", {
+        scroll: false,
+      }),
+    );
+    vi.unstubAllGlobals();
+  });
+
+  it("en celular no cambia la URL: no hace falta el detalle", () => {
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn().mockReturnValue({
+        matches: false,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      }),
+    );
+    render(<SeleccionInicialEscritorio tabActiva="abiertos" primerTrabajoId="t-9" />);
+
+    expect(reemplazar).not.toHaveBeenCalled();
+    vi.unstubAllGlobals();
   });
 });
 
@@ -148,5 +209,81 @@ describe("TarjetaPostulante", () => {
 
     expect(screen.getByRole("dialog")).toBeInTheDocument();
     expect(screen.getByText("¿Elegís a Martín?")).toBeInTheDocument();
+  });
+
+  it("cierra la hoja cuando onElegir devuelve true", async () => {
+    const onElegir = vi.fn().mockResolvedValue(true);
+    const user = userEvent.setup();
+    render(
+      <TarjetaPostulante
+        postulante={postulanteBase}
+        trabajoId="t-1"
+        trabajoEstado="abierto"
+        esElegido={false}
+        hayElegido={false}
+        onElegir={onElegir}
+        pendiente={false}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Elegir" }));
+    await user.click(screen.getByRole("button", { name: "Elegir profesional" }));
+
+    expect(onElegir).toHaveBeenCalledWith("post-1");
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+  });
+
+  it("deja la hoja abierta y muestra el error cuando onElegir devuelve false", async () => {
+    const onElegir = vi.fn().mockResolvedValue(false);
+    const user = userEvent.setup();
+    render(
+      <TarjetaPostulante
+        postulante={postulanteBase}
+        trabajoId="t-1"
+        trabajoEstado="abierto"
+        esElegido={false}
+        hayElegido={false}
+        onElegir={onElegir}
+        pendiente={false}
+        errorElegir="El trabajo ya no está abierto."
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Elegir" }));
+    await act(async () => {
+      await user.click(screen.getByRole("button", { name: "Elegir profesional" }));
+    });
+
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent("El trabajo ya no está abierto.");
+  });
+});
+
+describe("MaestroDetalleMisTrabajos: lista vacía por pestaña", () => {
+  it("cada pestaña vacía muestra su propio texto; el de publicar solo en Abiertos", () => {
+    const { unmount } = render(
+      <MaestroDetalleMisTrabajos
+        trabajos={[]}
+        trabajoSeleccionado={null}
+        tabActiva="contratados"
+      />,
+    );
+    expect(screen.getByText("Todavía no contrataste a nadie.")).toBeInTheDocument();
+    expect(screen.queryByText("Todavía no publicaste trabajos.")).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Publicar un trabajo" })).not.toBeInTheDocument();
+    unmount();
+
+    const { unmount: desmontarTerminados } = render(
+      <MaestroDetalleMisTrabajos trabajos={[]} trabajoSeleccionado={null} tabActiva="terminados" />,
+    );
+    expect(screen.getByText("Todavía no tenés trabajos terminados.")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Publicar un trabajo" })).not.toBeInTheDocument();
+    desmontarTerminados();
+
+    render(
+      <MaestroDetalleMisTrabajos trabajos={[]} trabajoSeleccionado={null} tabActiva="abiertos" />,
+    );
+    expect(screen.getByText("Todavía no publicaste trabajos.")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Publicar un trabajo" })).toBeInTheDocument();
   });
 });

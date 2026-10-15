@@ -33,14 +33,14 @@ isOneToOne: false
                   ]
                 },"acciones_moderacion": {
                   Row: {
-                    "accion": string,"admin_id": string | null,"created_at": string,"id": string,"motivo": string | null,"objetivo_id": string | null
+                    "accion": string,"admin_id": string | null,"created_at": string,"id": string,"motivo": string | null,"objetivo_id": string | null,"usuario_id": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "accion": string,"admin_id"?: string | null,"created_at"?: string,"id"?: string,"motivo"?: string | null,"objetivo_id"?: string | null
+                    "accion": string,"admin_id"?: string | null,"created_at"?: string,"id"?: string,"motivo"?: string | null,"objetivo_id"?: string | null,"usuario_id"?: string | null
                   }
                   Update: {
-                    "accion"?: string,"admin_id"?: string | null,"created_at"?: string,"id"?: string,"motivo"?: string | null,"objetivo_id"?: string | null
+                    "accion"?: string,"admin_id"?: string | null,"created_at"?: string,"id"?: string,"motivo"?: string | null,"objetivo_id"?: string | null,"usuario_id"?: string | null
                   }
                   Relationships: [
                     {
@@ -52,6 +52,18 @@ isOneToOne: false
     },{
       foreignKeyName: "acciones_moderacion_admin_id_fkey"
       columns: ["admin_id"]
+isOneToOne: false
+      referencedRelation: "usuarios_publicos"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "acciones_moderacion_usuario_id_fkey"
+      columns: ["usuario_id"]
+isOneToOne: false
+      referencedRelation: "usuarios"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "acciones_moderacion_usuario_id_fkey"
+      columns: ["usuario_id"]
 isOneToOne: false
       referencedRelation: "usuarios_publicos"
       referencedColumns: ["id"]
@@ -241,14 +253,14 @@ isOneToOne: true
                   ]
                 },"reportes": {
                   Row: {
-                    "autor_id": string | null,"created_at": string,"detalle": string | null,"estado": Database["public"]['Enums']["estado_reporte"],"id": string,"motivo": Database["public"]['Enums']["motivo_reporte"],"objetivo_id": string,"objetivo_tipo": string,"resuelto_por": string | null,"updated_at": string
+                    "autor_id": string | null,"created_at": string,"detalle": string | null,"estado": Database["public"]['Enums']["estado_reporte"],"id": string,"motivo": Database["public"]['Enums']["motivo_reporte"],"objetivo_id": string,"objetivo_tipo": string,"origen": string,"resuelto_por": string | null,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "autor_id"?: string | null,"created_at"?: string,"detalle"?: string | null,"estado"?: Database["public"]['Enums']["estado_reporte"],"id"?: string,"motivo": Database["public"]['Enums']["motivo_reporte"],"objetivo_id": string,"objetivo_tipo": string,"resuelto_por"?: string | null,"updated_at"?: string
+                    "autor_id"?: string | null,"created_at"?: string,"detalle"?: string | null,"estado"?: Database["public"]['Enums']["estado_reporte"],"id"?: string,"motivo": Database["public"]['Enums']["motivo_reporte"],"objetivo_id": string,"objetivo_tipo": string,"origen"?: string,"resuelto_por"?: string | null,"updated_at"?: string
                   }
                   Update: {
-                    "autor_id"?: string | null,"created_at"?: string,"detalle"?: string | null,"estado"?: Database["public"]['Enums']["estado_reporte"],"id"?: string,"motivo"?: Database["public"]['Enums']["motivo_reporte"],"objetivo_id"?: string,"objetivo_tipo"?: string,"resuelto_por"?: string | null,"updated_at"?: string
+                    "autor_id"?: string | null,"created_at"?: string,"detalle"?: string | null,"estado"?: Database["public"]['Enums']["estado_reporte"],"id"?: string,"motivo"?: Database["public"]['Enums']["motivo_reporte"],"objetivo_id"?: string,"objetivo_tipo"?: string,"origen"?: string,"resuelto_por"?: string | null,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -497,6 +509,9 @@ isOneToOne: true
 "cancelar_trabajo":
 { Args: { "p_trabajo_id": string }; Returns: boolean
                            },
+"cerrar_trabajo_admin":
+{ Args: { "p_motivo"?: string,"p_trabajo_id": string }; Returns: boolean
+                           },
 "consumir_cupo":
 { Args: { "p_clave": string,"p_maximo": number,"p_ventana_segundos": number }; Returns: {
               "permitido": boolean,"segundos_para_reintentar": number
@@ -522,13 +537,25 @@ isOneToOne: true
 "elegir_rol_inicial":
 { Args: { "p_rol": Database["public"]['Enums']["rol"] }; Returns: undefined
                            },
+"marcar_reporte_en_revision":
+{ Args: { "p_reporte_id": string }; Returns: boolean
+                           },
 "marcar_trabajo_terminado":
 { Args: { "p_trabajo_id": string }; Returns: boolean
+                           },
+"mi_motivo_suspension":
+{ Args: Record<PropertyKey, never>; Returns: string
+                           },
+"ocultar_resena_admin":
+{ Args: { "p_motivo"?: string,"p_resena_id": string }; Returns: boolean
                            },
 "perfil_profesional":
 { Args: { "p_id": string }; Returns: {
               "anios_experiencia": number,"antecedentes_ok": boolean,"apellido": string,"apellido_inicial": string,"barrio_id": number,"cantidad_resenas": number,"descripcion": string,"disponibilidad": string,"es_propio": boolean,"especialidades": string,"foto_path": string,"fotos_trabajos": (string)[],"identidad_verificada": boolean,"matriculado": boolean,"nombre": string,"oficios": (Database["public"]['Enums']["oficio"])[],"promedio": number,"publicado": boolean,"toda_la_ciudad": boolean,"usuario_id": string,"zonas_texto": string
             }[]
+                           },
+"reactivar_cuenta_admin":
+{ Args: { "p_motivo"?: string,"p_usuario_id": string }; Returns: boolean
                            },
 "reactivar_postulacion":
 { Args: { "p_mensaje": string,"p_precio_estimado"?: number,"p_sena_propuesta"?: number,"p_trabajo_id": string }; Returns: string
@@ -536,8 +563,17 @@ isOneToOne: true
 "registrar_documento":
 { Args: { "p_storage_path": string,"p_tipo": Database["public"]['Enums']["tipo_documento"] }; Returns: string
                            },
+"resolver_reporte":
+{ Args: { "p_con_accion": boolean,"p_motivo"?: string,"p_reporte_id": string }; Returns: boolean
+                           },
 "retirar_postulacion":
 { Args: { "p_postulacion_id": string }; Returns: boolean
+                           },
+"revocar_sesiones_admin":
+{ Args: { "p_usuario_id": string }; Returns: undefined
+                           },
+"suspender_cuenta_admin":
+{ Args: { "p_motivo": string,"p_usuario_id": string }; Returns: boolean
                            },
 "trabajos_para_mi":
 { Args: { "p_desde"?: number,"p_limite"?: number,"p_oficio"?: Database["public"]['Enums']["oficio"],"p_solo_mis_zonas"?: boolean }; Returns: {

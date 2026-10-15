@@ -10,6 +10,8 @@ const SECRETO_LIMITE_E2E = process.env.RATE_LIMIT_SECRET ?? "secreto-falso-solo-
 
 export default defineConfig({
   testDir: "./tests/e2e",
+  // Reinicia el estado del Supabase falso (LAB-32). No hace nada sin LABIA_E2E_SUPABASE_FALSO=1.
+  globalSetup: "./tests/e2e/apoyo/reiniciar-falso.ts",
   fullyParallel: true,
   forbidOnly: enCI,
   retries: enCI ? 2 : 0,
