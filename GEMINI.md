@@ -11,7 +11,7 @@ Este archivo agrega **cómo trabajar** y **dónde quedó todo**.
 2. `.claude/labia/protocolo.md`: protocolo común (estados de Linear, ramas, PR, HANDOFF, trabajo en paralelo).
 3. `.claude/agents/labia-*.md`: instrucciones de cada rol. Usalas como checklist de cada fase (ver abajo).
 4. `docs/prototipo/` (empezá por su `README.md`): toda pantalla se construye igual al prototipo, con tokens, nunca hex sueltos.
-5. Estado del proyecto al momento del traspaso: @.gemini/estado.md
+5. Estado, contexto y decisiones del proyecto (documento único de traspaso): @docs/traspaso-agentes.md
 
 ## Flujo por tarea (sin subagentes: hacés las fases vos, en orden)
 
