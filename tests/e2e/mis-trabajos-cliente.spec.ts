@@ -8,14 +8,20 @@ const ACTIVO = process.env.LABIA_E2E_SUPABASE_FALSO === "1";
 
 test.skip(!ACTIVO, "Necesita el Supabase falso: LABIA_E2E_SUPABASE_FALSO=1");
 
-// Elegir y terminar cambian los trabajos del falso: cada prueba arranca con los datos iniciales.
-// El falso guarda los cambios de trabajos en memoria y su `/__reiniciar` no los vuelve atrás. Por eso:
+// Elegir y terminar cambian los trabajos del falso. Su `/__reiniciar` vuelve trabajos, postulaciones y
+// reseñas al estado inicial (LAB-50), así que cada prueba que cambia estado lo reinicia antes:
+// - marcar como terminado usa el trabajo 882 y corre en celular y en escritorio;
 // - el flujo de elegir a un postulante termina en "cambiar de profesional", que deja el trabajo 881
-//   abierto de nuevo; así las pruebas que siguen (en ambos proyectos) lo encuentran igual;
-// - marcar como terminado usa el trabajo 882 y corre una sola vez por corrida (en celular).
+//   abierto, y las pruebas que siguen lo encuentran igual.
 // Se corre con `--workers=1`.
 const TRABAJO_ABIERTO = "88888888-8888-4888-8888-888888888881";
 const TRABAJO_PARA_TERMINAR = "88888888-8888-4888-8888-888888888882";
+const PUERTO_FALSO = process.env.LABIA_SUPABASE_FALSO_PUERTO ?? "54399";
+
+async function reiniciarFalso(): Promise<void> {
+  const respuesta = await fetch(`http://localhost:${PUERTO_FALSO}/__reiniciar`);
+  if (!respuesta.ok) throw new Error(`No se pudo reiniciar el Supabase falso: ${respuesta.status}`);
+}
 
 async function iniciarSesion(contexto: BrowserContext, baseURL: string, token: string) {
   const exp = Math.floor(Date.now() / 1000) + 3600;
@@ -121,12 +127,9 @@ test.describe("Mis trabajos del cliente (LAB-29)", () => {
     await expect(botonElegir).toBeVisible();
   });
 
-  test("marcar como terminado y dejar reseña (solo celular: cambia el trabajo del falso)", async ({
-    page,
-    context,
-  }, testInfo) => {
-    // Terminar deja el trabajo cerrado y el falso no lo reabre: esta prueba corre una vez por corrida.
-    test.skip(testInfo.project.name !== "celular", "El falso no reabre trabajos terminados");
+  test("marcar como terminado y dejar reseña", async ({ page, context }) => {
+    // Terminar cierra el trabajo 882 en el falso: se reinicia antes para que corra en ambos proyectos.
+    await reiniciarFalso();
     await iniciarSesion(context, "http://localhost:3000", "tok-cliente");
     await page.goto(`/mis-trabajos/${TRABAJO_PARA_TERMINAR}`);
 

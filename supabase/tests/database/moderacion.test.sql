@@ -4,7 +4,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(45);
+select plan(46);
 
 create schema tests;
 grant usage on schema tests to authenticated;
@@ -205,7 +205,7 @@ select throws_ok(
   'no admin no puede ocultar resena'
 );
 
--- Un cliente no cambia su propio estado: el trigger lo rechaza aunque la policy de su fila lo deje pasar.
+-- Un cliente no cambia su propio estado: el privilegio de columna (LAB-50) lo rechaza antes de llegar al trigger.
 reset role;
 select tests.como('eeeeeeee-3200-4000-a000-000000000003');
 select throws_ok(
@@ -254,11 +254,11 @@ select tests.como('eeeeeeee-3200-4000-a000-000000000005');
 select throws_ok(
   $$select public.ocultar_resena_admin('11111111-3200-4000-a000-000000000001')$$,
   '42501',
-  null,
+  'Solo un admin puede ocultar reseñas',
   'un admin suspendido no puede ocultar reseñas'
 );
 
--- Un admin no cambia el estado de otro admin por update directo: el trigger lo rechaza.
+-- Un admin no cambia el estado de otro admin por update directo: el privilegio de columna lo rechaza (LAB-50).
 reset role;
 select tests.como('eeeeeeee-3200-4000-a000-000000000001');
 select throws_ok(
@@ -277,6 +277,12 @@ reset role;
 select tests.como('eeeeeeee-3200-4000-a000-000000000001');
 
 -- Ocultar reseña
+select is(
+  (select estado from public.reportes where objetivo_tipo = 'resena' and objetivo_id = '11111111-3200-4000-a000-000000000001'),
+  'abierto'::public.estado_reporte,
+  'antes de ocultar, el reporte de la reseña está abierto'
+);
+
 select is(
   public.ocultar_resena_admin('11111111-3200-4000-a000-000000000001', 'Lenguaje inapropiado'),
   true,

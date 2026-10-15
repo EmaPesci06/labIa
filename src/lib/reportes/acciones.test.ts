@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { mockInsert, mockSelect, mockLimitarIntentos, mockRegistrarEventoServidor } = vi.hoisted(
+const { mockInsert, mockSelect, mockLimitarPersistente, mockRegistrarEventoServidor } = vi.hoisted(
   () => ({
     mockInsert: vi.fn(),
     mockSelect: vi.fn(),
-    mockLimitarIntentos: vi.fn(),
+    mockLimitarPersistente: vi.fn(),
     mockRegistrarEventoServidor: vi.fn(),
   }),
 );
@@ -13,8 +13,8 @@ vi.mock("@/lib/sesion", () => ({
   obtenerSesion: vi.fn(),
 }));
 
-vi.mock("@/lib/rate-limit", () => ({
-  limitarIntentos: mockLimitarIntentos,
+vi.mock("@/lib/rate-limit-persistente", () => ({
+  limitarPersistente: mockLimitarPersistente,
 }));
 
 vi.mock("@/lib/metricas-servidor", () => ({
@@ -66,7 +66,7 @@ const UUID_USUARIO = "11111111-1111-4111-8111-111111111111";
 describe("enviarReporte", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockLimitarIntentos.mockReturnValue({ permitido: true });
+    mockLimitarPersistente.mockResolvedValue({ permitido: true, segundosParaReintentar: 0 });
     mockSelect.mockResolvedValue({ data: null });
     mockInsert.mockResolvedValue({ error: null });
   });
@@ -97,7 +97,7 @@ describe("enviarReporte", () => {
       normasVersion: "1.0",
       perfil: { nombre: "Test", apellido: null, nombreVisible: "Test", completo: true },
     });
-    mockLimitarIntentos.mockReturnValue({ permitido: false, segundosParaReintentar: 3600 });
+    mockLimitarPersistente.mockResolvedValue({ permitido: false, segundosParaReintentar: 3600 });
 
     const formData = new FormData();
     formData.set("objetivoTipo", "perfil");
@@ -106,6 +106,27 @@ describe("enviarReporte", () => {
 
     const res = await enviarReporte(ESTADO_REPORTE_INICIAL, formData);
     expect(res.mensaje).toContain("Alcanzaste el límite de 10 reportes por día");
+    expect(mockInsert).not.toHaveBeenCalled();
+  });
+
+  it("cuenta el intento con la clave y la regla persistentes de reportes", async () => {
+    vi.mocked(obtenerSesion).mockResolvedValue({
+      usuario: { id: UUID_USUARIO, email: "test@example.com" },
+      rol: "cliente",
+      normasVersion: "1.0",
+      perfil: { nombre: "Test", apellido: null, nombreVisible: "Test", completo: true },
+    });
+
+    const formData = new FormData();
+    formData.set("objetivoTipo", "perfil");
+    formData.set("objetivoId", UUID_OBJETIVO);
+    formData.set("motivo", "estafa");
+
+    await enviarReporte(ESTADO_REPORTE_INICIAL, formData);
+    expect(mockLimitarPersistente).toHaveBeenCalledWith(`reporte:${UUID_USUARIO}`, {
+      maximo: 10,
+      ventanaMs: 24 * 60 * 60 * 1000,
+    });
   });
 
   it("rechaza el autorreporte de un perfil propio", async () => {
