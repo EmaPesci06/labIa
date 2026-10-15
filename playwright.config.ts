@@ -3,6 +3,10 @@ import { defineConfig, devices } from "@playwright/test";
 const PUERTO = Number(process.env.PUERTO_E2E ?? 3000);
 const URL_BASE = `http://localhost:${PUERTO}`;
 const enCI = Boolean(process.env.CI);
+// Los servidores de e2e corren con `NODE_ENV=production`, así que el limitador exige `RATE_LIMIT_SECRET`
+// (LAB-49). Acá va un valor de prueba, público y solo para la base local o la de la CI; si el que corre
+// la prueba tiene uno propio, se respeta.
+const SECRETO_LIMITE_E2E = process.env.RATE_LIMIT_SECRET ?? "secreto-falso-solo-para-e2e";
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -45,7 +49,11 @@ export default defineConfig({
       reuseExistingServer: !enCI,
       timeout: 300_000,
       // Habilita /dev/ui en el build de producción para correr axe contra la biblioteca de componentes.
-      env: { MOSTRAR_DEV_UI: "1", EMAILS_SECRET: "secreto-solo-para-e2e-de-32-caracteres-o-mas" },
+      env: {
+        MOSTRAR_DEV_UI: "1",
+        EMAILS_SECRET: "secreto-solo-para-e2e-de-32-caracteres-o-mas",
+        RATE_LIMIT_SECRET: SECRETO_LIMITE_E2E,
+      },
     },
     {
       // Mismo build, otro puerto y la sesión falsa (LAB-13) con rol profesional: se lee en cada
@@ -59,6 +67,7 @@ export default defineConfig({
         LABIA_ID_DEV: "demo",
         // En producción la sesión falsa ignora el rol de desarrollo salvo con esta bandera.
         LABIA_PERMITIR_ROL_DEV: "1",
+        RATE_LIMIT_SECRET: SECRETO_LIMITE_E2E,
       },
     },
     {
@@ -71,6 +80,7 @@ export default defineConfig({
       env: {
         LABIA_ROL_DEV: "cliente",
         LABIA_PERMITIR_ROL_DEV: "1",
+        RATE_LIMIT_SECRET: SECRETO_LIMITE_E2E,
       },
     },
   ],
