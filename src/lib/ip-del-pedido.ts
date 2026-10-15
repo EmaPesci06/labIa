@@ -43,7 +43,13 @@ function expandirIPv6(ip: string): string[] | null {
 export function claveDeIp(ip: string): string {
   if (!ip.includes(":")) return ip;
   const grupos = expandirIPv6(ip);
-  return grupos ? `${grupos.slice(0, 4).join(":")}::/64` : ip;
+  if (!grupos) return ip;
+  // IPv4 mapeada (::ffff:a.b.c.d): es una IPv4, así que la clave es la IPv4 misma.
+  if (grupos.slice(0, 5).every((g) => g === "0000") && grupos[5] === "ffff") {
+    const [alta, baja] = [grupos[6], grupos[7]].map((g) => parseInt(g ?? "0", 16));
+    return [(alta ?? 0) >> 8, (alta ?? 0) & 255, (baja ?? 0) >> 8, (baja ?? 0) & 255].join(".");
+  }
+  return `${grupos.slice(0, 4).join(":")}::/64`;
 }
 
 /**

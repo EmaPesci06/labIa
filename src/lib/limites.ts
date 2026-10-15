@@ -2,6 +2,7 @@ import { cache } from "react";
 
 import { IP_DESCONOCIDA, ipDelPedido } from "@/lib/ip-del-pedido";
 import type { ResultadoLimite } from "@/lib/rate-limit";
+import { cupoDisponible } from "@/lib/rate-limit-consulta";
 import {
   limitarPersistente,
   limitarPorIp,
@@ -50,15 +51,18 @@ const REGLA_LECTURA: Record<LecturaPublica, ReglaLimite> = {
 const ENTRA: ResultadoLimite = { permitido: true, segundosParaReintentar: 0 };
 
 /**
- * Tope por IP que no aplica al balde `desconocida`: ese balde junta a todos los pedidos sin IP
- * identificable (en local, los e2e), así que un tope por IP ahí cortaría a todos a la vez. Los topes
- * por cuenta siguen vigentes. El resto de los topes por IP (salud, ingreso, registro) no cambia.
+ * Tope por IP para las lecturas públicas, contacto y reportes. Con la IP `desconocida`:
+ * - Fuera de Vercel (local, tests, e2e de la CI) no hay IP real, así que no se aplica el tope por IP.
+ *   Los topes por cuenta siguen vigentes.
+ * - En Vercel (`VERCEL_ENV` presente) el balde `desconocida` usa el tope estricto, como pide AGENTS.md
+ *   §7: los pedidos sin IP identificable no se libran del límite.
  */
 async function limitePorIpSiIdentificable(
   accion: string,
   regla: ReglaLimite,
 ): Promise<ResultadoLimite> {
-  if ((await ipDelPedido()) === IP_DESCONOCIDA) return ENTRA;
+  const ip = await ipDelPedido();
+  if (ip === IP_DESCONOCIDA && !process.env.VERCEL_ENV) return ENTRA;
   return limitarPorIp(accion, regla);
 }
 
@@ -85,23 +89,41 @@ export function limiteReportePorIp() {
 }
 
 /**
+ * Claves de los fallos de ingreso (B-11): por email+IP y por email global. La consulta previa y el
+ * conteo de fallos usan exactamente estas claves, así que leen y escriben el mismo cupo.
+ */
+async function clavesDeFalloDeIngreso(email: string) {
+  const cuenta = email.trim().toLowerCase();
+  const ip = await ipDelPedido();
+  return [
+    { clave: `ingreso-fallo:${cuenta}:${ip}`, regla: REGLAS_LIMITE.ingresoFallosPorCuentaIp },
+    { clave: `ingreso-fallo-cuenta:${cuenta}`, regla: REGLAS_LIMITE.ingresoFallosPorCuenta },
+  ] as const;
+}
+
+/**
+ * Lectura sin consumo antes de llamar a Supabase (B-11, LAB-54): si alguno de los dos topes de
+ * fallos ya está agotado, el ingreso no se intenta, aunque la contraseña sea correcta. No cuenta nada.
+ */
+export async function cupoIngresoAgotado(email: string): Promise<ResultadoLimite> {
+  for (const { clave, regla } of await clavesDeFalloDeIngreso(email)) {
+    const cupo = await cupoDisponible(clave, regla);
+    if (!cupo.permitido) return cupo;
+  }
+  return ENTRA;
+}
+
+/**
  * Registra un ingreso fallido (B-11). Llamar solo después de que Supabase rechace la contraseña:
  * el ingreso correcto no consume cupo. Cuenta por email+IP y por email global; si cualquiera de los
  * dos se pasa, devuelve ese resultado. Los emails sin cuenta también cuentan, así que el mensaje no
  * revela si el email existe.
  */
 export async function registrarFalloDeIngreso(email: string): Promise<ResultadoLimite> {
-  const cuenta = email.trim().toLowerCase();
-  const ip = await ipDelPedido();
-  const porCuentaIp = await limitarPersistente(
-    `ingreso-fallo:${cuenta}:${ip}`,
-    REGLAS_LIMITE.ingresoFallosPorCuentaIp,
-  );
-  const porCuenta = await limitarPersistente(
-    `ingreso-fallo-cuenta:${cuenta}`,
-    REGLAS_LIMITE.ingresoFallosPorCuenta,
-  );
-  return porCuentaIp.permitido ? porCuenta : porCuentaIp;
+  const [porCuentaIp, porCuenta] = await clavesDeFalloDeIngreso(email);
+  const resultadoIp = await limitarPersistente(porCuentaIp.clave, porCuentaIp.regla);
+  const resultadoCuenta = await limitarPersistente(porCuenta.clave, porCuenta.regla);
+  return resultadoIp.permitido ? resultadoCuenta : resultadoIp;
 }
 
 /** Tope por IP para el chequeo de salud (B-13). */

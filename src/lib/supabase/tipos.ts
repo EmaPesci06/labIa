@@ -512,6 +512,11 @@ isOneToOne: true
 "cerrar_trabajo_admin":
 { Args: { "p_motivo"?: string,"p_trabajo_id": string }; Returns: boolean
                            },
+"consultar_cupo":
+{ Args: { "p_clave": string,"p_maximo": number,"p_ventana_segundos": number }; Returns: {
+              "permitido": boolean,"segundos_para_reintentar": number
+            }[]
+                           },
 "consumir_cupo":
 { Args: { "p_clave": string,"p_maximo": number,"p_ventana_segundos": number }; Returns: {
               "permitido": boolean,"segundos_para_reintentar": number

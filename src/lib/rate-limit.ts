@@ -54,6 +54,25 @@ function desalojar(ahora: number): void {
   }
 }
 
+/**
+ * Lectura sin consumo: dice si el próximo intento entraría, sin contarlo. Mismo criterio que
+ * `limitarIntentos`: entra si no hay ventana activa o si el conteo está por debajo del máximo.
+ */
+export function consultarIntentos(
+  clave: string,
+  { maximo }: { maximo: number; ventanaMs: number },
+  ahora: number = Date.now(),
+): ResultadoLimite {
+  const actual = registros.get(claveSegura(clave));
+  if (!actual || actual.vence <= ahora || actual.cuenta < maximo) {
+    return { permitido: true, segundosParaReintentar: 0 };
+  }
+  return {
+    permitido: false,
+    segundosParaReintentar: Math.max(1, Math.ceil((actual.vence - ahora) / 1000)),
+  };
+}
+
 /** Solo para tests. */
 export function reiniciarLimites(): void {
   registros.clear();

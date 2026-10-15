@@ -55,8 +55,13 @@ describe("claveDeIp (IPv6 por /64)", () => {
     expect(claveDeIp("fe80::")).toBe("fe80:0000:0000:0000::/64");
   });
 
-  it("IPv6 con cola IPv4 (mapeada) usa los grupos expandidos", () => {
-    expect(claveDeIp("::ffff:190.1.2.3")).toBe("0000:0000:0000:0000::/64");
+  it("IPv4 mapeada (::ffff:a.b.c.d) da la IPv4 misma, en comprimida, expandida y hex", () => {
+    expect(claveDeIp("::ffff:190.1.2.3")).toBe("190.1.2.3");
+    expect(claveDeIp("0:0:0:0:0:ffff:190.1.2.3")).toBe("190.1.2.3");
+    expect(claveDeIp("::ffff:c0a8:0101")).toBe("192.168.1.1");
+  });
+
+  it("IPv6 con cola IPv4 que no es mapeada usa los grupos expandidos", () => {
     expect(claveDeIp("2001:db8:1:2:0:0:190.1.2.3")).toBe("2001:0db8:0001:0002::/64");
   });
 

@@ -17,6 +17,9 @@ const {
 vi.mock("@/lib/sesion", () => ({
   obtenerSesion: vi.fn(),
 }));
+vi.mock("@/lib/rate-limit-consulta", () => ({
+  cupoDisponible: vi.fn(async () => ({ permitido: true, segundosParaReintentar: 0 })),
+}));
 
 vi.mock("@/lib/ip-del-pedido", () => ({
   IP_DESCONOCIDA: "desconocida",
