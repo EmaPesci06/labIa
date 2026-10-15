@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 
-import { limiteIngresoPorCuenta } from "@/lib/limites";
+import { registrarFalloDeIngreso } from "@/lib/limites";
 import { limitarPorIp, mensajeDeLimite } from "@/lib/rate-limit-persistente";
 import { rolDeLaSesion } from "@/lib/sesion";
 import { urlDelSitio } from "@/lib/sitio";
@@ -76,10 +76,6 @@ export async function ingresar(
   const bloqueado = await superaElLimite("ingreso");
   if (bloqueado) return { ...bloqueado, valores };
 
-  // Tope por cuenta además del de IP (B-11): el mensaje no revela si el email tiene cuenta.
-  const porCuenta = mensajeDeLimite(await limiteIngresoPorCuenta(resultado.data.email));
-  if (porCuenta) return { mensaje: porCuenta, valores };
-
   if (!supabaseConfigurado()) return { mensaje: MENSAJE_SIN_SUPABASE, valores };
   const supabase = await crearClienteServidor();
   const { data, error } = await supabase.auth.signInWithPassword({
@@ -87,6 +83,9 @@ export async function ingresar(
     password: resultado.data.contrasena,
   });
   if (error || !data.user) {
+    // Solo los fallos cuentan para el tope por cuenta (B-11): el ingreso correcto no consume cupo.
+    const bloqueoPorCuenta = mensajeDeLimite(await registrarFalloDeIngreso(resultado.data.email));
+    if (bloqueoPorCuenta) return { mensaje: bloqueoPorCuenta, valores };
     return { mensaje: mensajeDeAuth(error?.code, error?.status), valores };
   }
 

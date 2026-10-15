@@ -2,15 +2,27 @@ import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
 import { limiteSaludPorIp } from "@/lib/limites";
-import { chequearBase, respuestaSalud, type ResultadoBase } from "@/lib/salud";
+import {
+  chequearBase,
+  guardarSaludCacheada,
+  leerSaludCacheada,
+  respuestaSalud,
+  type ResultadoBase,
+} from "@/lib/salud";
 import type { Database } from "@/lib/supabase/tipos";
 
 /**
  * Chequeo de disponibilidad para el monitor externo (LAB-37). Usa la clave anon, sin sesión, y
  * lee solo la cantidad de barrios (tabla de lectura pública). 200 si la base responde, 503 si no.
- * Tope por IP (B-13): por encima del límite responde 429 sin consultar la base.
+ *
+ * Amplificación (B-13, LAB-54): la respuesta de la base se cachea 15 segundos en memoria del proceso,
+ * antes del limitador, así que un flujo de pedidos no escribe en la base en cada uno. Por encima del
+ * tope por IP responde 429 sin consultar la base.
  */
 export async function GET() {
+  const cacheada = leerSaludCacheada();
+  if (cacheada) return respuesta(cacheada.cuerpo, cacheada.status);
+
   const limite = await limiteSaludPorIp();
   if (!limite.permitido) {
     return NextResponse.json(
@@ -39,8 +51,14 @@ export async function GET() {
   }
 
   const cuerpo = respuestaSalud(base);
+  const status = cuerpo.estado === "ok" ? 200 : 503;
+  guardarSaludCacheada(cuerpo, status);
+  return respuesta(cuerpo, status);
+}
+
+function respuesta(cuerpo: ReturnType<typeof respuestaSalud>, status: number) {
   return NextResponse.json(cuerpo, {
-    status: cuerpo.estado === "ok" ? 200 : 503,
+    status,
     headers: { "cache-control": "no-store" },
   });
 }

@@ -24,3 +24,16 @@ describe("limitarIntentos", () => {
     expect(limitarIntentos("ip", regla, 1000 + 60_001).permitido).toBe(true);
   });
 });
+
+describe("limitarIntentos: memoria acotada", () => {
+  it("al llenarse desaloja las entradas más viejas sin olvidar las recientes", () => {
+    const ventana = { maximo: 1, ventanaMs: 60_000_000 };
+    limitarIntentos("vieja", ventana, 1000);
+    limitarIntentos("vieja", ventana, 1000); // bloqueada
+    for (let i = 0; i < 5000; i++) limitarIntentos(`ip-${i}`, ventana, 1000);
+    // "vieja" fue la más antigua: salió del mapa y vuelve a entrar.
+    expect(limitarIntentos("vieja", ventana, 1000).permitido).toBe(true);
+    limitarIntentos("reciente", ventana, 1000);
+    expect(limitarIntentos("reciente", ventana, 1000).permitido).toBe(false);
+  });
+});

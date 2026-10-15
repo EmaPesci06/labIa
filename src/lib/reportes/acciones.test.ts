@@ -18,6 +18,11 @@ vi.mock("@/lib/sesion", () => ({
   obtenerSesion: vi.fn(),
 }));
 
+vi.mock("@/lib/ip-del-pedido", () => ({
+  IP_DESCONOCIDA: "desconocida",
+  ipDelPedido: vi.fn(async () => "190.1.2.3"),
+}));
+
 vi.mock("@/lib/rate-limit-persistente", () => ({
   limitarPersistente: mockLimitarPersistente,
   limitarPorIp: mockLimitarPorIp,

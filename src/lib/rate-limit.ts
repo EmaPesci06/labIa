@@ -5,11 +5,19 @@
  * Para límites compartidos entre instancias de Vercel usar `limitarPersistente` / `limitarPorIp`
  * (src/lib/rate-limit-persistente.ts), que cuentan en Postgres (LAB-41). Esta firma no cambia
  * porque otros módulos la usan de forma síncrona.
+ *
+ * Las claves se guardan con sha256 (no en claro: pueden ser emails o IPs). Si el mapa llega a
+ * `MAX_CLAVES`, primero se descartan las ventanas vencidas y después las entradas más viejas; nunca
+ * se vacía todo de golpe, que dejaría sin límite a todas las claves a la vez.
  */
+import { createHash } from "node:crypto";
+
 type Registro = { cuenta: number; vence: number };
 
 const registros = new Map<string, Registro>();
 const MAX_CLAVES = 5000;
+
+const claveSegura = (clave: string): string => createHash("sha256").update(clave).digest("hex");
 
 export type ResultadoLimite = { permitido: boolean; segundosParaReintentar: number };
 
@@ -18,14 +26,13 @@ export function limitarIntentos(
   { maximo, ventanaMs }: { maximo: number; ventanaMs: number },
   ahora: number = Date.now(),
 ): ResultadoLimite {
-  if (registros.size > MAX_CLAVES) {
-    for (const [k, r] of registros) if (r.vence <= ahora) registros.delete(k);
-    // Si sigue lleno (ataque con muchas IP) se vacía para no crecer sin límite.
-    if (registros.size > MAX_CLAVES) registros.clear();
-  }
-  const actual = registros.get(clave);
+  const k = claveSegura(clave);
+  const actual = registros.get(k);
   if (!actual || actual.vence <= ahora) {
-    registros.set(clave, { cuenta: 1, vence: ahora + ventanaMs });
+    // Reinicia la ventana moviendo la clave al final: el orden del mapa es de más viejo a más nuevo.
+    registros.delete(k);
+    if (registros.size >= MAX_CLAVES) desalojar(ahora);
+    registros.set(k, { cuenta: 1, vence: ahora + ventanaMs });
     return { permitido: true, segundosParaReintentar: 0 };
   }
   actual.cuenta += 1;
@@ -36,6 +43,15 @@ export function limitarIntentos(
     };
   }
   return { permitido: true, segundosParaReintentar: 0 };
+}
+
+/** Libera espacio: primero las ventanas vencidas y, si no alcanza, las entradas más viejas. */
+function desalojar(ahora: number): void {
+  for (const [k, r] of registros) if (r.vence <= ahora) registros.delete(k);
+  for (const k of registros.keys()) {
+    if (registros.size < MAX_CLAVES) break;
+    registros.delete(k);
+  }
 }
 
 /** Solo para tests. */

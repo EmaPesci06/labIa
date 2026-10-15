@@ -53,7 +53,9 @@ function leer(crudo: ParametrosUrl, slug: string): ParametrosBusqueda | ErrorBus
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   // Primero el acceso a searchParams (lo hace dinámico en el build); después el tope por IP (M-03).
   const crudo = await searchParams;
-  if (await bloqueoLecturaPublica("busqueda")) return { title: "Buscar · LabÍA" };
+  if (await bloqueoLecturaPublica("busqueda")) {
+    return { title: "Buscar · LabÍA", robots: { index: false } };
+  }
   const { barrios, slug } = await resolverBarrio(crudo);
   const params = leer(crudo, slug);
   const oficio = params instanceof ErrorBusqueda ? undefined : params.oficio;

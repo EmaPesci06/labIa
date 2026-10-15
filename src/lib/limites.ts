@@ -1,5 +1,7 @@
 import { cache } from "react";
 
+import { IP_DESCONOCIDA, ipDelPedido } from "@/lib/ip-del-pedido";
+import type { ResultadoLimite } from "@/lib/rate-limit";
 import {
   limitarPersistente,
   limitarPorIp,
@@ -9,11 +11,10 @@ import {
 
 const MINUTO = 60_000;
 const HORA = 60 * MINUTO;
-const DIA = 24 * HORA;
 
 /**
- * Umbrales de los topes por IP y por cuenta de LAB-54 (informe de seguridad de LAB-34: M-03, M-05,
- * B-11 y B-13). Todos pasan por el limitador persistente (`limitarPorIp` / `limitarPersistente`).
+ * Umbrales de los topes de LAB-54 (informe de seguridad de LAB-34: M-03, M-05, B-11 y B-13). Todos
+ * pasan por el limitador persistente (`limitarPorIp` / `limitarPersistente`).
  *
  * Criterio: son topes para frenar abuso masivo, no para ordenar el uso normal. Por eso son generosos.
  * Una IP móvil con CGNAT puede compartir la conexión con todo un barrio, así que el tope por IP tiene
@@ -26,15 +27,15 @@ export const REGLAS_LIMITE = {
   perfilPublico: { maximo: 120, ventanaMs: MINUTO },
   /** Contacto por WhatsApp desde una IP: además del tope por cuenta (10/min y 20/día). */
   contactoPorIp: { maximo: 30, ventanaMs: HORA },
-  /**
-   * Contactos por día que recibe un mismo profesional, sumando a todos los clientes. Limita cuánto
-   * número se puede cosechar de un profesional aunque se usen muchas cuentas.
-   */
-  contactoPorProfesionalDia: { maximo: 50, ventanaMs: DIA },
   /** Reportes desde una IP: además del tope por cuenta (10 por día). */
-  reportePorIp: { maximo: 30, ventanaMs: DIA },
-  /** Ingreso por cuenta (email hasheado), además del tope por IP de 5 por minuto (B-11). */
-  ingresoPorCuenta: { maximo: 10, ventanaMs: 15 * MINUTO },
+  reportePorIp: { maximo: 30, ventanaMs: 24 * HORA },
+  /**
+   * Fallos de ingreso por cuenta y IP (B-11). Solo cuentan los intentos fallidos: el ingreso correcto
+   * nunca consume cupo, así que nadie puede bloquear la cuenta de otro con intentos ajenos sin aciertos.
+   */
+  ingresoFallosPorCuentaIp: { maximo: 10, ventanaMs: 15 * MINUTO },
+  /** Fallos de ingreso por email desde cualquier IP: tope alto contra la fuerza bruta distribuida. */
+  ingresoFallosPorCuenta: { maximo: 50, ventanaMs: HORA },
   /** Chequeo de salud: el monitor pide cada pocos minutos; 60 por minuto deja margen de sobra. */
   salud: { maximo: 60, ventanaMs: MINUTO },
 } satisfies Record<string, ReglaLimite>;
@@ -46,6 +47,21 @@ const REGLA_LECTURA: Record<LecturaPublica, ReglaLimite> = {
   perfil: REGLAS_LIMITE.perfilPublico,
 };
 
+const ENTRA: ResultadoLimite = { permitido: true, segundosParaReintentar: 0 };
+
+/**
+ * Tope por IP que no aplica al balde `desconocida`: ese balde junta a todos los pedidos sin IP
+ * identificable (en local, los e2e), así que un tope por IP ahí cortaría a todos a la vez. Los topes
+ * por cuenta siguen vigentes. El resto de los topes por IP (salud, ingreso, registro) no cambia.
+ */
+async function limitePorIpSiIdentificable(
+  accion: string,
+  regla: ReglaLimite,
+): Promise<ResultadoLimite> {
+  if ((await ipDelPedido()) === IP_DESCONOCIDA) return ENTRA;
+  return limitarPorIp(accion, regla);
+}
+
 /**
  * Tope por IP para las lecturas públicas que exponen perfiles (M-03). Devuelve el mensaje si la IP
  * superó el límite, o `null` si entra. Va envuelto en `cache`: si la página y su `generateMetadata`
@@ -53,36 +69,39 @@ const REGLA_LECTURA: Record<LecturaPublica, ReglaLimite> = {
  */
 export const bloqueoLecturaPublica = cache(
   async (lectura: LecturaPublica): Promise<string | null> =>
-    mensajeDeLimite(await limitarPorIp(`lectura-publica-${lectura}`, REGLA_LECTURA[lectura])),
+    mensajeDeLimite(
+      await limitePorIpSiIdentificable(`lectura-publica-${lectura}`, REGLA_LECTURA[lectura]),
+    ),
 );
 
 /** Tope por IP para contactar profesionales (M-03, escenario B). */
 export function limiteContactoPorIp() {
-  return limitarPorIp("contacto", REGLAS_LIMITE.contactoPorIp);
-}
-
-/** Tope diario de contactos por profesional, sumando a todos los clientes (M-03, escenario B). */
-export function limiteContactosDelProfesional(profesionalId: string) {
-  return limitarPersistente(
-    `contacto-profesional:${profesionalId}`,
-    REGLAS_LIMITE.contactoPorProfesionalDia,
-  );
+  return limitePorIpSiIdentificable("contacto", REGLAS_LIMITE.contactoPorIp);
 }
 
 /** Tope por IP para reportes (M-05). */
 export function limiteReportePorIp() {
-  return limitarPorIp("reporte", REGLAS_LIMITE.reportePorIp);
+  return limitePorIpSiIdentificable("reporte", REGLAS_LIMITE.reportePorIp);
 }
 
 /**
- * Tope de ingreso por cuenta (B-11). La clave lleva el email normalizado; `claveDeLimite` ya lo
- * guarda hasheado (HMAC), así que el email nunca queda en claro en la tabla de cupos.
+ * Registra un ingreso fallido (B-11). Llamar solo después de que Supabase rechace la contraseña:
+ * el ingreso correcto no consume cupo. Cuenta por email+IP y por email global; si cualquiera de los
+ * dos se pasa, devuelve ese resultado. Los emails sin cuenta también cuentan, así que el mensaje no
+ * revela si el email existe.
  */
-export function limiteIngresoPorCuenta(email: string) {
-  return limitarPersistente(
-    `ingreso-cuenta:${email.trim().toLowerCase()}`,
-    REGLAS_LIMITE.ingresoPorCuenta,
+export async function registrarFalloDeIngreso(email: string): Promise<ResultadoLimite> {
+  const cuenta = email.trim().toLowerCase();
+  const ip = await ipDelPedido();
+  const porCuentaIp = await limitarPersistente(
+    `ingreso-fallo:${cuenta}:${ip}`,
+    REGLAS_LIMITE.ingresoFallosPorCuentaIp,
   );
+  const porCuenta = await limitarPersistente(
+    `ingreso-fallo-cuenta:${cuenta}`,
+    REGLAS_LIMITE.ingresoFallosPorCuenta,
+  );
+  return porCuentaIp.permitido ? porCuenta : porCuentaIp;
 }
 
 /** Tope por IP para el chequeo de salud (B-13). */

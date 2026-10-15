@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { porIp, persistente } = vi.hoisted(() => ({
+const { porIp, persistente, ip } = vi.hoisted(() => ({
   porIp: vi.fn(),
   persistente: vi.fn(),
+  ip: { valor: "190.1.2.3" },
 }));
 
 vi.mock("@/lib/rate-limit-persistente", () => ({
@@ -13,15 +14,18 @@ vi.mock("@/lib/rate-limit-persistente", () => ({
       ? null
       : `Hiciste demasiados intentos. Esperá ${resultado.segundosParaReintentar} segundos y probá de nuevo.`,
 }));
+vi.mock("@/lib/ip-del-pedido", () => ({
+  IP_DESCONOCIDA: "desconocida",
+  ipDelPedido: async () => ip.valor,
+}));
 
 import {
   bloqueoLecturaPublica,
   limiteContactoPorIp,
-  limiteContactosDelProfesional,
-  limiteIngresoPorCuenta,
   limiteReportePorIp,
   limiteSaludPorIp,
   REGLAS_LIMITE,
+  registrarFalloDeIngreso,
 } from "./limites";
 
 const MINUTO = 60_000;
@@ -33,6 +37,7 @@ const BLOQUEA = { permitido: false, segundosParaReintentar: 27 };
 beforeEach(() => {
   porIp.mockReset().mockResolvedValue(ENTRA);
   persistente.mockReset().mockResolvedValue(ENTRA);
+  ip.valor = "190.1.2.3";
 });
 
 describe("lecturas públicas por IP (M-03)", () => {
@@ -59,82 +64,89 @@ describe("lecturas públicas por IP (M-03)", () => {
       "Hiciste demasiados intentos. Esperá 27 segundos y probá de nuevo.",
     );
   });
+
+  it("con la IP desconocida no aplica el tope por IP", async () => {
+    ip.valor = "desconocida";
+    expect(await bloqueoLecturaPublica("busqueda")).toBeNull();
+    expect(porIp).not.toHaveBeenCalled();
+  });
 });
 
-describe("contacto por IP y tope diario por profesional (M-03)", () => {
-  it("contacto por IP: clave 'contacto' por IP, 30 por hora", async () => {
+describe("contacto y reportes por IP", () => {
+  it("contacto: clave 'contacto' por IP, 30 por hora", async () => {
     await limiteContactoPorIp();
     expect(porIp).toHaveBeenCalledWith("contacto", { maximo: 30, ventanaMs: HORA });
   });
 
-  it("contacto por IP: bloquea cuando la IP supera el tope", async () => {
+  it("contacto: bloquea cuando la IP supera el tope", async () => {
     porIp.mockResolvedValueOnce(BLOQUEA);
     expect((await limiteContactoPorIp()).permitido).toBe(false);
   });
 
-  it("tope diario por profesional: clave con su id, 50 por día, sumando a todos los clientes", async () => {
-    await limiteContactosDelProfesional("prof-1");
-    expect(persistente).toHaveBeenCalledWith("contacto-profesional:prof-1", {
-      maximo: 50,
-      ventanaMs: DIA,
-    });
+  it("contacto con IP desconocida no aplica el tope por IP", async () => {
+    ip.valor = "desconocida";
+    expect((await limiteContactoPorIp()).permitido).toBe(true);
+    expect(porIp).not.toHaveBeenCalled();
   });
 
-  it("tope diario por profesional: bloquea al profesional cuando llega al tope", async () => {
-    persistente.mockResolvedValueOnce(BLOQUEA);
-    expect((await limiteContactosDelProfesional("prof-1")).permitido).toBe(false);
-  });
-
-  it("la clave del profesional es distinta para cada profesional", async () => {
-    await limiteContactosDelProfesional("prof-1");
-    await limiteContactosDelProfesional("prof-2");
-    const claves = persistente.mock.calls.map((llamada) => llamada[0]);
-    expect(claves).toEqual(["contacto-profesional:prof-1", "contacto-profesional:prof-2"]);
-  });
-});
-
-describe("reportes por IP (M-05)", () => {
-  it("clave 'reporte' por IP, 30 por día", async () => {
+  it("reportes: clave 'reporte' por IP, 30 por día", async () => {
     await limiteReportePorIp();
     expect(porIp).toHaveBeenCalledWith("reporte", { maximo: 30, ventanaMs: DIA });
   });
 
-  it("bloquea cuando la IP supera el tope", async () => {
+  it("reportes: bloquea cuando la IP supera el tope", async () => {
     porIp.mockResolvedValueOnce(BLOQUEA);
     expect((await limiteReportePorIp()).permitido).toBe(false);
   });
+
+  it("reportes con IP desconocida no aplican el tope por IP", async () => {
+    ip.valor = "desconocida";
+    expect((await limiteReportePorIp()).permitido).toBe(true);
+    expect(porIp).not.toHaveBeenCalled();
+  });
 });
 
-describe("ingreso por cuenta (B-11)", () => {
-  it("clave por email normalizado, 10 cada 15 minutos", async () => {
-    await limiteIngresoPorCuenta("  Ana@Ejemplo.COM ");
-    expect(persistente).toHaveBeenCalledWith("ingreso-cuenta:ana@ejemplo.com", {
+describe("fallos de ingreso (B-11)", () => {
+  it("registra el fallo por email+IP con 10 cada 15 minutos", async () => {
+    await registrarFalloDeIngreso("  Ana@Ejemplo.COM ");
+    expect(persistente).toHaveBeenCalledWith("ingreso-fallo:ana@ejemplo.com:190.1.2.3", {
       maximo: 10,
       ventanaMs: 15 * MINUTO,
     });
   });
 
-  it("la misma cuenta con distinta capitalización comparte el mismo cupo", async () => {
-    await limiteIngresoPorCuenta("ana@ejemplo.com");
-    await limiteIngresoPorCuenta("ANA@ejemplo.com");
-    const claves = persistente.mock.calls.map((llamada) => llamada[0]);
-    expect(claves[0]).toBe(claves[1]);
+  it("registra también el fallo por email global con 50 por hora", async () => {
+    await registrarFalloDeIngreso("ana@ejemplo.com");
+    expect(persistente).toHaveBeenCalledWith("ingreso-fallo-cuenta:ana@ejemplo.com", {
+      maximo: 50,
+      ventanaMs: HORA,
+    });
   });
 
-  it("bloquea cuando la cuenta supera el tope", async () => {
+  it("bloquea si se pasa el tope de email+IP", async () => {
     persistente.mockResolvedValueOnce(BLOQUEA);
-    expect((await limiteIngresoPorCuenta("ana@ejemplo.com")).permitido).toBe(false);
+    expect((await registrarFalloDeIngreso("ana@ejemplo.com")).permitido).toBe(false);
+  });
+
+  it("bloquea si se pasa el tope global del email aunque la IP sea otra", async () => {
+    persistente.mockResolvedValueOnce(ENTRA).mockResolvedValueOnce(BLOQUEA);
+    expect((await registrarFalloDeIngreso("ana@ejemplo.com")).permitido).toBe(false);
+  });
+
+  it("las reglas de fallos de ingreso quedan como constantes nombradas", () => {
+    expect(REGLAS_LIMITE.ingresoFallosPorCuentaIp).toEqual({ maximo: 10, ventanaMs: 15 * MINUTO });
+    expect(REGLAS_LIMITE.ingresoFallosPorCuenta).toEqual({ maximo: 50, ventanaMs: HORA });
   });
 });
 
 describe("salud por IP (B-13)", () => {
-  it("clave 'salud' por IP, 60 por minuto", async () => {
+  it("clave 'salud' por IP, 60 por minuto, también con IP desconocida", async () => {
+    ip.valor = "desconocida";
     await limiteSaludPorIp();
     expect(porIp).toHaveBeenCalledWith("salud", { maximo: 60, ventanaMs: MINUTO });
   });
 
   it("las reglas quedan como constantes nombradas", () => {
     expect(REGLAS_LIMITE.salud).toEqual({ maximo: 60, ventanaMs: MINUTO });
-    expect(REGLAS_LIMITE.ingresoPorCuenta.maximo).toBe(10);
   });
 });

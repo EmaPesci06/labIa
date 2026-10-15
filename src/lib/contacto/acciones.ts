@@ -1,6 +1,6 @@
 "use server";
 
-import { limiteContactoPorIp, limiteContactosDelProfesional } from "@/lib/limites";
+import { limiteContactoPorIp } from "@/lib/limites";
 import { obtenerPerfil } from "@/lib/perfil/cargar";
 import { profesionPrincipal } from "@/lib/perfil/datos";
 import { limitarPersistente } from "@/lib/rate-limit-persistente";
@@ -64,12 +64,6 @@ export async function contactarProfesional(
     return {
       mensaje: `Hiciste demasiados contactos desde tu conexión. Esperá ${porIp.segundosParaReintentar} segundos y probá de nuevo.`,
     };
-  }
-
-  // Tope diario por profesional, sumando a todos los clientes (M-03, escenario B).
-  const porProfesional = await limiteContactosDelProfesional(entrada.data.profesionalId);
-  if (!porProfesional.permitido) {
-    return { mensaje: "Este profesional ya recibió muchos contactos hoy. Probá mañana." };
   }
 
   if (!supabaseConfigurado()) return { mensaje: MENSAJE_FALLA };

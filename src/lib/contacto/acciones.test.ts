@@ -9,6 +9,10 @@ import { contactarProfesional } from "./acciones";
 
 vi.mock("server-only", () => ({}));
 vi.mock("@/lib/sesion", () => ({ obtenerSesion: vi.fn() }));
+vi.mock("@/lib/ip-del-pedido", () => ({
+  IP_DESCONOCIDA: "desconocida",
+  ipDelPedido: vi.fn(async () => "190.1.2.3"),
+}));
 // Límite persistente (LAB-47): por defecto se comporta como la memoria, así los casos de arriba no cambian.
 vi.mock("@/lib/rate-limit-persistente", async () => {
   const { limitarIntentos } = await import("@/lib/rate-limit");
@@ -223,28 +227,6 @@ describe("contactarProfesional: topes por IP y por profesional (LAB-54, M-03)", 
       "Hiciste demasiados contactos desde tu conexión. Esperá 90 segundos y probá de nuevo.",
     );
     expect(estado.url).toBeUndefined();
-    expect(rpcLlamadas).toHaveLength(0);
-  });
-
-  it("cuenta el profesional con su clave diaria, 50 por día", async () => {
-    preparar();
-    await contactarProfesional(estadoInicial, datos());
-    expect(limitarPersistente).toHaveBeenCalledWith(`contacto-profesional:${PROFESIONAL}`, {
-      maximo: 50,
-      ventanaMs: 86_400_000,
-    });
-  });
-
-  it("si el profesional llegó al tope diario no abre el contacto", async () => {
-    const { rpcLlamadas } = preparar();
-    // Orden de llamadas: primero el tope de la cuenta (entra), después el del profesional (bloquea).
-    vi.mocked(limitarPersistente)
-      .mockResolvedValueOnce({ permitido: true, segundosParaReintentar: 0 })
-      .mockResolvedValueOnce({ permitido: false, segundosParaReintentar: 3600 });
-
-    const estado = await contactarProfesional(estadoInicial, datos());
-
-    expect(estado.mensaje).toBe("Este profesional ya recibió muchos contactos hoy. Probá mañana.");
     expect(rpcLlamadas).toHaveLength(0);
   });
 });
