@@ -1,6 +1,6 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { MaestroDetalleMisTrabajos } from "./MaestroDetalleMisTrabajos";
 import { PestanasMisTrabajos } from "./PestanasMisTrabajos";
@@ -285,5 +285,73 @@ describe("MaestroDetalleMisTrabajos: lista vacía por pestaña", () => {
     );
     expect(screen.getByText("Todavía no publicaste trabajos.")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Publicar un trabajo" })).toBeInTheDocument();
+  });
+});
+
+describe("MaestroDetalleMisTrabajos: Abiertos (LAB-51)", () => {
+  const trabajo = {
+    id: "t-1",
+    oficio: "gas" as const,
+    titulo: "Olor a gas en la cocina",
+    descripcion: "Desde ayer",
+    urgencia: "esta_semana" as const,
+    estado: "asignado" as const,
+    profesionalElegidoId: "p-1",
+    barrioNombre: "La Perla",
+    cantidadPostulaciones: 2,
+    createdAt: "2026-10-14T10:00:00Z",
+  };
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("sin trabajos en ninguna pestaña muestra 'Todavía no publicaste trabajos.' con el botón", () => {
+    render(
+      <MaestroDetalleMisTrabajos
+        trabajos={[]}
+        trabajoSeleccionado={null}
+        tabActiva="abiertos"
+        hayTrabajosEnOtrasPestanas={false}
+      />,
+    );
+    expect(screen.getByText("Todavía no publicaste trabajos.")).toBeInTheDocument();
+    expect(screen.queryByText("No tenés trabajos abiertos.")).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Publicar un trabajo" })).toBeInTheDocument();
+  });
+
+  it("vacía con trabajos en otras pestañas muestra 'No tenés trabajos abiertos.' con el botón", () => {
+    render(
+      <MaestroDetalleMisTrabajos
+        trabajos={[]}
+        trabajoSeleccionado={null}
+        tabActiva="abiertos"
+        hayTrabajosEnOtrasPestanas={true}
+      />,
+    );
+    expect(screen.getByText("No tenés trabajos abiertos.")).toBeInTheDocument();
+    expect(screen.queryByText("Todavía no publicaste trabajos.")).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Publicar un trabajo" })).toBeInTheDocument();
+  });
+
+  it("con trabajos abiertos no muestra ningún texto de lista vacía", () => {
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn().mockReturnValue({
+        matches: false,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      }),
+    );
+    render(
+      <MaestroDetalleMisTrabajos
+        trabajos={[trabajo]}
+        trabajoSeleccionado={null}
+        tabActiva="abiertos"
+        hayTrabajosEnOtrasPestanas={true}
+      />,
+    );
+    expect(screen.queryByText("No tenés trabajos abiertos.")).not.toBeInTheDocument();
+    expect(screen.queryByText("Todavía no publicaste trabajos.")).not.toBeInTheDocument();
   });
 });

@@ -46,6 +46,31 @@ export async function obtenerMisTrabajosCliente(
   );
 }
 
+/**
+ * Cuenta todos los trabajos del cliente, sin importar la pestaña (LAB-51). Sirve para elegir el
+ * texto de una lista vacía: si no hay ninguno, "Todavía no publicaste trabajos."; si hay en otras
+ * pestañas, un texto propio. Un error de la base cuenta como 0 (mismo texto que antes).
+ */
+export async function contarMisTrabajosCliente(clienteId: string): Promise<number> {
+  return conRolFalso<number>(
+    () => 1,
+    () => contarTrabajosEnBase(clienteId),
+  );
+}
+
+async function contarTrabajosEnBase(clienteId: string): Promise<number> {
+  if (!supabaseConfigurado()) return 0;
+  const supabase = await crearClienteServidor();
+
+  const { count, error } = await supabase
+    .from("trabajos")
+    .select("id", { count: "exact", head: true })
+    .eq("cliente_id", clienteId);
+
+  if (error) return 0;
+  return count ?? 0;
+}
+
 async function consultarMisTrabajos(
   clienteId: string,
   filtro: "abiertos" | "contratados" | "terminados",

@@ -45,6 +45,10 @@ frená y preguntale a Emanuel.
 - **E2E sin base:** `tests/e2e/apoyo/supabase-falso.cjs` es un Supabase falso. Build con
   `NEXT_PUBLIC_SUPABASE_URL=http://localhost:54399` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` con cualquier valor; correr con
   `LABIA_E2E_SUPABASE_FALSO=1`. El falso se levanta a mano (`node tests/e2e/apoyo/supabase-falso.cjs`).
+- **Secreto del limitador en e2e:** los servidores de `playwright.config.ts` corren con `NODE_ENV=production`, así que
+  el limitador exige `RATE_LIMIT_SECRET`. No hace falta cargarla: el config pone un valor de prueba
+  (`secreto-falso-solo-para-e2e`) salvo que la shell ya tenga una. Con `reuseExistingServer` (un servidor ya levantado)
+  el config no interviene: ese servidor tiene que tener su propia `RATE_LIMIT_SECRET`.
 - **Procesos:** matá solo los PID de tus puertos. Nunca `taskkill /IM node.exe` ni `pkill -f playwright`.
 - **Rutas en Windows:** usá `C:/Users/WIN-10/Desktop/labia` con "Desktop" en mayúscula; con minúscula git falla en worktrees.
 - **Formato:** `pnpm format:check` es parte de la CI; corré `pnpm exec prettier --write` sobre lo que tocaste.

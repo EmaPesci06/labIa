@@ -22,8 +22,13 @@ const { tablas, rpc, cliente } = vi.hoisted(() => {
         data: Array.isArray(datos) ? (datos[0] ?? null) : datos,
         error: null,
       }),
+      // `count` lo usa `select(..., { count: "exact", head: true })`: cantidad de filas.
       then: (ok: (valor: unknown) => unknown, ko?: (error: unknown) => unknown) =>
-        Promise.resolve({ data: datos, error: null }).then(ok, ko),
+        Promise.resolve({
+          data: datos,
+          error: null,
+          count: Array.isArray(datos) ? datos.length : null,
+        }).then(ok, ko),
     };
     return b;
   }
@@ -37,7 +42,7 @@ vi.mock("@/lib/supabase/servidor", () => ({
   crearClienteServidor: async () => cliente,
 }));
 
-import { obtenerDetalleMiTrabajoCliente } from "./consulta-cliente";
+import { contarMisTrabajosCliente, obtenerDetalleMiTrabajoCliente } from "./consulta-cliente";
 
 const TRABAJO_ID = "11111111-1111-4111-8111-111111111111";
 
@@ -100,5 +105,21 @@ describe("obtenerDetalleMiTrabajoCliente: distancias sin N+1", () => {
 
     const distancias = detalle?.postulantes.map((p) => p.profesional.distanciaKm);
     expect(distancias).toEqual([3, 3, 4.5, 4.5, 0]);
+  });
+});
+
+describe("contarMisTrabajosCliente: total sin filtro de pestaña (LAB-51)", () => {
+  beforeEach(() => {
+    delete tablas.trabajos;
+  });
+
+  it("cuenta todos los trabajos del cliente, sin importar su estado", async () => {
+    tablas.trabajos = [{ id: "a" }, { id: "b" }, { id: "c" }];
+    await expect(contarMisTrabajosCliente("cliente-1")).resolves.toBe(3);
+  });
+
+  it("devuelve 0 cuando el cliente no tiene trabajos", async () => {
+    tablas.trabajos = [];
+    await expect(contarMisTrabajosCliente("cliente-1")).resolves.toBe(0);
   });
 });

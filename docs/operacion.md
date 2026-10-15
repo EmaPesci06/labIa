@@ -86,6 +86,10 @@ falta activar `pg_cron` salvo que se agregue un job dentro de la base.
    - `CRON_SECRET` = generar uno nuevo con `openssl rand -base64 32`. Distinto del de Preview y del de
      desarrollo. Vercel lo manda solo como `Authorization: Bearer` a los crons.
    - `EMAILS_SECRET` = `openssl rand -base64 32`, distinto del de desarrollo.
+   - `RATE_LIMIT_SECRET` = `openssl rand -base64 32`, distinto del de Preview y del de desarrollo. **Obligatoria en
+     Production y en Preview** (LAB-49): el limitador persistente firma con ella las claves de intentos. Si falta, las
+     acciones con límite (ingreso, registro, restablecer, reenvío, documentos, cuenta) fallan con la página de error
+     en vez de guardar claves sin llave. Cargarla en Production y en Preview, con valores distintos.
    - `RESEND_API_KEY`, `EMAIL_REMITENTE` (`LabÍA <hola@<dominio>>`), `EMAIL_SOPORTE` (LAB-7).
    - `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN` (LAB-7).
    - `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST` (LAB-7).
@@ -213,6 +217,7 @@ falta activar `pg_cron` salvo que se agregue un job dentro de la base.
 - [ ] Confirm email y Secure password change activos.
 - [ ] Site URL y Redirect URLs con el dominio propio. Google OAuth con el dominio de producción.
 - [ ] `CRON_SECRET`, `EMAILS_SECRET` y `SUPABASE_SERVICE_ROLE_KEY` nuevos y solo en Production.
+- [ ] `RATE_LIMIT_SECRET` cargada en Production y en Preview, con valores distintos (obligatoria en ambos).
 - [ ] `LABIA_ROL_DEV`, `LABIA_ID_DEV` y `LABIA_PERMITIR_ROL_DEV` no existen en Preview ni en Production.
 - [ ] Dominio con HTTPS, `www` redirige al dominio principal.
 - [ ] Resend verificado (SPF, DKIM) y SMTP de Auth activo. Los mails llegan desde el dominio propio.
