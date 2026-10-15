@@ -9,12 +9,14 @@ import { PestanasMisTrabajos, type TabMisTrabajos } from "./PestanasMisTrabajos"
 import { SeleccionInicialEscritorio } from "./SeleccionInicialEscritorio";
 import { TarjetaMiTrabajo } from "./TarjetaMiTrabajo";
 
+const DETALLE_ABIERTOS =
+  "Publicá lo que necesitás hacer en tu casa para recibir presupuestos de profesionales verificados de Mar del Plata.";
+
 /** Texto de la lista vacía por pestaña (LAB-29, LAB-48). */
 const VACIO: Record<TabMisTrabajos, { titulo: string; detalle: string }> = {
   abiertos: {
     titulo: "Todavía no publicaste trabajos.",
-    detalle:
-      "Publicá lo que necesitás hacer en tu casa para recibir presupuestos de profesionales verificados de Mar del Plata.",
+    detalle: DETALLE_ABIERTOS,
   },
   contratados: {
     titulo: "Todavía no contrataste a nadie.",
@@ -26,10 +28,21 @@ const VACIO: Record<TabMisTrabajos, { titulo: string; detalle: string }> = {
   },
 };
 
+/**
+ * Texto de Abiertos vacía cuando el cliente tiene trabajos en otras pestañas (LAB-51). Sin
+ * trabajos en ninguna, se usa el de `VACIO` (publicá el primero).
+ */
+const ABIERTOS_SIN_ABIERTOS = {
+  titulo: "No tenés trabajos abiertos.",
+  detalle: DETALLE_ABIERTOS,
+};
+
 type Props = {
   trabajos: TrabajoClienteItem[];
   trabajoSeleccionado: DetalleMiTrabajoCliente | null;
   tabActiva: TabMisTrabajos;
+  /** Solo importa con Abiertos vacía: hay trabajos del cliente en Contratados o Terminados. */
+  hayTrabajosEnOtrasPestanas?: boolean;
 };
 
 /**
@@ -38,7 +51,16 @@ type Props = {
  * - Escritorio (Desk-MisTrabajos): dos columnas, lista a la izquierda (400 px) y detalle con
  *   postulantes a la derecha. Sin `?id=` el detalle no se carga; en escritorio se elige el primero.
  */
-export function MaestroDetalleMisTrabajos({ trabajos, trabajoSeleccionado, tabActiva }: Props) {
+export function MaestroDetalleMisTrabajos({
+  trabajos,
+  trabajoSeleccionado,
+  tabActiva,
+  hayTrabajosEnOtrasPestanas = false,
+}: Props) {
+  const textoVacio =
+    tabActiva === "abiertos" && hayTrabajosEnOtrasPestanas
+      ? ABIERTOS_SIN_ABIERTOS
+      : VACIO[tabActiva];
   return (
     <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 py-2 lg:py-6">
       {!trabajoSeleccionado && trabajos.length > 0 ? (
@@ -57,8 +79,8 @@ export function MaestroDetalleMisTrabajos({ trabajos, trabajoSeleccionado, tabAc
 
       {trabajos.length === 0 ? (
         <div className="flex min-h-[280px] flex-col items-center justify-center gap-4 rounded-[22px] border border-dashed border-borde bg-superficie p-8 text-center">
-          <p className="text-lg font-bold text-texto">{VACIO[tabActiva].titulo}</p>
-          <p className="max-w-md text-sm text-texto-secundario">{VACIO[tabActiva].detalle}</p>
+          <p className="text-lg font-bold text-texto">{textoVacio.titulo}</p>
+          <p className="max-w-md text-sm text-texto-secundario">{textoVacio.detalle}</p>
           {tabActiva === "abiertos" ? (
             <Boton href="/trabajos/nuevo" variante="cliente" tamano="grande">
               Publicar un trabajo
