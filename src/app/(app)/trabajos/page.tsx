@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { Avatar } from "@/components/ui/Avatar";
 import { BannerVerificacion } from "@/components/verificacion/BannerVerificacion";
 import { FiltrosTrabajos } from "@/components/trabajos/FiltrosTrabajos";
+import type { MiPostulacionInfo } from "@/components/trabajos/FormularioPostulacion";
 import { ListaPostulaciones } from "@/components/trabajos/ListaPostulaciones";
 import { MaestroDetalleTrabajos } from "@/components/trabajos/MaestroDetalleTrabajos";
 import type { Oficio } from "@/lib/busqueda";
@@ -84,6 +85,23 @@ export default async function Trabajos({ searchParams }: PaginaTrabajosProps) {
     soloMisZonas,
   });
 
+  // Solo en escritorio hace falta el detalle: buscamos la postulación propia del trabajo elegido.
+  let miPostulacionSeleccionada: MiPostulacionInfo | null = null;
+  if (params.trabajo) {
+    const mias = await obtenerMisPostulaciones();
+    const propia = mias.find((p) => p.trabajoId === params.trabajo);
+    if (propia) {
+      miPostulacionSeleccionada = {
+        id: propia.id,
+        mensaje: propia.mensaje,
+        precioEstimado: propia.precioEstimado,
+        senaPropuesta: propia.senaPropuesta,
+        estado: propia.estado,
+        createdAt: propia.createdAt,
+      };
+    }
+  }
+
   return (
     <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-6">
       <header className="flex flex-col gap-3">
@@ -112,6 +130,7 @@ export default async function Trabajos({ searchParams }: PaginaTrabajosProps) {
       <MaestroDetalleTrabajos
         trabajos={trabajos}
         trabajoSeleccionadoId={params.trabajo}
+        miPostulacionSeleccionada={miPostulacionSeleccionada}
         publicado={perfil?.publicado ?? false}
       />
     </div>

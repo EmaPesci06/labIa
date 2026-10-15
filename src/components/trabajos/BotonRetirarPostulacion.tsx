@@ -32,13 +32,17 @@ export function BotonRetirarPostulacion({ postulacionId }: BotonRetirarPostulaci
     return (
       <div className="flex flex-col gap-2 rounded-xl bg-superficie-elevada p-3 text-sm">
         <p className="font-semibold text-texto">¿Seguro que querés retirar tu postulación?</p>
-        {error ? <p className="text-xs text-error">{error}</p> : null}
+        {error ? (
+          <p role="alert" className="text-xs text-error">
+            {error}
+          </p>
+        ) : null}
         <div className="flex items-center gap-2">
           <Boton
             variante="secundario"
             cargando={isPending}
             onClick={manejarRetiro}
-            className="h-9 px-3 text-xs text-error hover:border-error"
+            className="min-h-11 px-3 text-xs text-error hover:border-error focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
           >
             Sí, retirar
           </Boton>
@@ -49,7 +53,7 @@ export function BotonRetirarPostulacion({ postulacionId }: BotonRetirarPostulaci
               setConfirmando(false);
               setError(null);
             }}
-            className="h-9 px-3 text-xs"
+            className="min-h-11 px-3 text-xs focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
           >
             Cancelar
           </Boton>
@@ -60,11 +64,15 @@ export function BotonRetirarPostulacion({ postulacionId }: BotonRetirarPostulaci
 
   return (
     <div className="flex flex-col items-start gap-1">
-      {error ? <p className="text-xs text-error">{error}</p> : null}
+      {error ? (
+        <p role="alert" className="text-xs text-error">
+          {error}
+        </p>
+      ) : null}
       <button
         type="button"
         onClick={() => setConfirmando(true)}
-        className="rounded text-xs font-semibold text-texto-secundario underline underline-offset-2 hover:text-error focus-visible:ring-2 focus-visible:ring-naranja-accion focus-visible:outline-none"
+        className="inline-flex min-h-11 items-center rounded px-1 text-xs font-semibold text-texto-secundario underline underline-offset-2 hover:text-error focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
       >
         Retirar postulación
       </button>
