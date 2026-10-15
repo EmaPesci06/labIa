@@ -9,8 +9,8 @@ const { rpc, cargarDatosRegistro, redirect } = vi.hoisted(() => ({
 vi.mock("next/headers", () => ({ headers: async () => new Headers() }));
 vi.mock("next/navigation", () => ({ redirect }));
 vi.mock("@/lib/metricas-servidor", () => ({ registrarEventoServidor: vi.fn() }));
-vi.mock("@/lib/rate-limit", () => ({
-  limitarIntentos: () => ({ permitido: true, segundosParaReintentar: 0 }),
+vi.mock("@/lib/rate-limit-persistente", () => ({
+  limitarPersistente: async () => ({ permitido: true, segundosParaReintentar: 0 }),
 }));
 vi.mock("@/lib/registro/borrador", () => ({ cargarDatosRegistro }));
 vi.mock("@/lib/supabase/servidor", () => ({

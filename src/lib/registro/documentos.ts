@@ -1,8 +1,6 @@
 "use server";
 
-import { headers } from "next/headers";
-
-import { limitarIntentos } from "@/lib/rate-limit";
+import { limitarPorIp } from "@/lib/rate-limit-persistente";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import {
   esquemaDocumento,
@@ -14,12 +12,6 @@ import {
 import type { ItemVerificacion } from "./tipos";
 
 const REGLA_DOCUMENTO = { maximo: 15, ventanaMs: 60_000 } as const;
-
-async function ipDelPedido(): Promise<string> {
-  const encabezados = await headers();
-  const reenviado = encabezados.get("x-forwarded-for")?.split(",")[0]?.trim();
-  return reenviado || encabezados.get("x-real-ip") || "desconocida";
-}
 
 function mensajeDeError(codigo: string | undefined): string {
   // 42501 también sale cuando falta el consentimiento vigente (LAB-43): el mensaje cubre los dos casos.
@@ -95,7 +87,7 @@ export async function registrarDocumentoAccion(
   }
   const uid = auth.user.id;
 
-  const resultadoLimite = limitarIntentos(`doc:${await ipDelPedido()}`, REGLA_DOCUMENTO);
+  const resultadoLimite = await limitarPorIp("doc", REGLA_DOCUMENTO);
   if (!resultadoLimite.permitido) {
     return {
       ok: false,

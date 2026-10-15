@@ -497,6 +497,11 @@ isOneToOne: true
 "cancelar_trabajo":
 { Args: { "p_trabajo_id": string }; Returns: boolean
                            },
+"consumir_cupo":
+{ Args: { "p_clave": string,"p_maximo": number,"p_ventana_segundos": number }; Returns: {
+              "permitido": boolean,"segundos_para_reintentar": number
+            }[]
+                           },
 "contactar_profesional":
 { Args: { "p_origen": string,"p_profesional": string,"p_trabajo"?: string }; Returns: string
                            },

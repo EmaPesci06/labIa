@@ -1,10 +1,9 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { registrarEventoServidor } from "@/lib/metricas-servidor";
-import { limitarIntentos } from "@/lib/rate-limit";
+import { limitarPersistente, limitarPorIp, mensajeDeLimite } from "@/lib/rate-limit-persistente";
 import { urlDelSitio } from "@/lib/sitio";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import { erroresPorCampo } from "@/lib/validaciones/auth";
@@ -37,17 +36,9 @@ const texto = (datos: FormData, clave: string): string => {
   return typeof valor === "string" ? valor : "";
 };
 
-async function ipDelPedido(): Promise<string> {
-  const encabezados = await headers();
-  const reenviado = encabezados.get("x-forwarded-for")?.split(",")[0]?.trim();
-  return reenviado || encabezados.get("x-real-ip") || "desconocida";
-}
-
-/** Máximo 5 intentos por minuto por IP y tipo de acción (Guía §7.7). */
+/** Máximo 5 intentos por minuto por IP y tipo de acción (Guía §7.7), compartido entre instancias. */
 async function mensajeSiSuperaElLimite(accion: string): Promise<string | null> {
-  const resultado = limitarIntentos(`${accion}:${await ipDelPedido()}`, REGLA_REGISTRO);
-  if (resultado.permitido) return null;
-  return `Hiciste demasiados intentos. Esperá ${resultado.segundosParaReintentar} segundos y probá de nuevo.`;
+  return mensajeDeLimite(await limitarPorIp(accion, REGLA_REGISTRO));
 }
 
 function mensajeDeAuth(codigo: string | undefined, estado: number | undefined): string {
@@ -180,8 +171,8 @@ export async function reenviarConfirmacion(
   if (!resultado.success) return { reenvio: "error" };
   const { email } = resultado.data;
 
-  const porEmail = limitarIntentos(`reenvio:${email}`, { maximo: 1, ventanaMs: 60_000 });
-  const porIp = limitarIntentos(`reenvio-ip:${await ipDelPedido()}`, REGLA_REGISTRO);
+  const porEmail = await limitarPersistente(`reenvio:${email}`, { maximo: 1, ventanaMs: 60_000 });
+  const porIp = await limitarPorIp("reenvio-ip", REGLA_REGISTRO);
   if (!porEmail.permitido || !porIp.permitido) {
     return { reenvio: "demasiado-pronto", confirmarEmail: email };
   }
