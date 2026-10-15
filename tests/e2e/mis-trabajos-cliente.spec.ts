@@ -75,7 +75,10 @@ test.describe("Mis trabajos del cliente (LAB-29)", () => {
     await expect(page.getByText("Abierto")).toBeVisible();
 
     // Postulantes presentes
-    await expect(page.getByText("Martín G.")).toBeVisible();
+    // En escritorio la lista se renderiza dos veces (una oculta): solo cuenta la visible.
+    await expect(
+      page.getByRole("article", { name: "Postulación de Martín G." }).filter({ visible: true }),
+    ).toBeVisible();
     // Intl es-AR separa el signo con un espacio no separable: \s lo cubre.
     await expect(page.getByText(/Presupuesto estimado\s\$\s40\.000/)).toBeVisible();
     await expect(page.getByText(/Seña\s\$\s10\.000/)).toBeVisible();
@@ -83,6 +86,7 @@ test.describe("Mis trabajos del cliente (LAB-29)", () => {
     // 1. Elegir a Martín (en "Más recientes" aparece primero Diego: el botón se busca por su tarjeta)
     const botonElegir = page
       .getByRole("article", { name: "Postulación de Martín G." })
+      .filter({ visible: true })
       .getByRole("button", { name: "Elegir" });
     await botonElegir.click();
 

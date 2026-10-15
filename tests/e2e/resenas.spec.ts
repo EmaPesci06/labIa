@@ -77,6 +77,8 @@ test.describe("reseñas: elegibilidad", () => {
     await expect(page.getByRole("heading", { level: 2, name: "Reseñas" })).toBeVisible();
     await expect(botonDejarResena(page)).toHaveCount(0);
     await expect(botonEditarResena(page)).toHaveCount(0);
+    // La lista arranca con 3 reseñas: el autor borrado está más abajo, después de "Ver todas".
+    await page.getByRole("button", { name: /^Ver todas \(/ }).click();
     await expect(page.getByText("Cliente de LabÍA").first()).toBeVisible();
   });
 
@@ -249,6 +251,14 @@ test.describe("reseñas: edición dentro de las 24 horas", () => {
     await hoja(page).getByRole("button", { name: "Guardar cambios" }).click();
 
     await expect(hoja(page)).toBeHidden();
+    // Esperá a que la lista muestre el cambio antes de reabrir: si no, la hoja abre con los datos viejos.
+    await expect(
+      page
+        .getByRole("heading", { level: 2, name: "Reseñas" })
+        .locator("xpath=ancestor::section[1]")
+        .getByRole("listitem")
+        .first(),
+    ).toContainText("5 estrellas");
     await expect(botonEditarResena(page)).toBeVisible();
     await botonEditarResena(page).click();
     await expect(hoja(page).getByRole("radio", { name: "Excelente" })).toBeChecked();
