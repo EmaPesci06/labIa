@@ -526,7 +526,7 @@ isOneToOne: true
             }[]
                            },
 "reactivar_postulacion":
-{ Args: { "p_mensaje": string,"p_precio_estimado"?: number | null,"p_sena_propuesta"?: number | null,"p_trabajo_id": string }; Returns: string
+{ Args: { "p_mensaje": string,"p_precio_estimado"?: number,"p_sena_propuesta"?: number,"p_trabajo_id": string }; Returns: string
                            },
 "registrar_documento":
 { Args: { "p_storage_path": string,"p_tipo": Database["public"]['Enums']["tipo_documento"] }; Returns: string
