@@ -96,8 +96,9 @@ Rutas en español sin acentos: `/`, `/ingresar`, `/registro`, `/registro/cliente
    - `src/lib/cuenta/borrado.ts` (server-only): job de borrado de cuenta, invocado solo tras validar sesión, rol y
      reautenticación.
    - `consumirCupoServicio` en `src/lib/rate-limit-servicio.ts` (server-only): limitador de intentos
-     (`public.consumir_cupo`). Solo recibe claves ya hasheadas (HMAC-SHA256 con `RATE_LIMIT_SECRET`, o sha256 si
-     falta) y solo lo llama `src/lib/rate-limit-persistente.ts`.
+     (`public.consumir_cupo`). Solo recibe claves ya hasheadas (HMAC-SHA256 con `RATE_LIMIT_SECRET`; sha256 sin
+     secreto solo fuera de producción, porque en producción falta el secreto y lanza) y solo lo llama
+     `src/lib/rate-limit-persistente.ts`.
 6. Toda Server Action valida sesión, rol y entrada con Zod.
 7. Rate limit persistente (`src/lib/rate-limit-persistente.ts`, `limitarPorIp`) en registro, ingreso, Google,
    restablecer, reenvío de confirmación, documentos, normas y cuenta; postulación y reporte cuando lleguen.

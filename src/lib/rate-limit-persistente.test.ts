@@ -75,6 +75,57 @@ describe("limitarPersistente", () => {
     expect(mensaje).not.toContain("respaldo@mail.com");
   });
 
+  it("la caída de consumir_cupo genera un evento de Sentry distinguible (tag y fingerprint propios)", async () => {
+    consumir.mockRejectedValue(new Error("service key faltante"));
+
+    await limitarPersistente("evento@mail.com", regla);
+
+    expect(sentry.captureException).toHaveBeenCalledTimes(1);
+    const opciones = sentry.captureException.mock.calls[0]?.[1];
+    expect(opciones).toMatchObject({
+      level: "error",
+      tags: { componente: "rate-limit", evento: "consumir-cupo-respaldo-memoria" },
+      fingerprint: ["rate-limit-consumir-cupo-respaldo-memoria"],
+    });
+    expect(JSON.stringify(sentry.captureException.mock.calls[0])).not.toContain("evento@mail.com");
+  });
+
+  it("en producción sin RATE_LIMIT_SECRET lanza y no cuenta ni guarda una clave sin llave", async () => {
+    vi.stubEnv("VERCEL_ENV", "production");
+
+    await expect(limitarPersistente("ingreso:1.2.3.4", regla)).rejects.toThrow(
+      /RATE_LIMIT_SECRET es obligatorio en producción/,
+    );
+    expect(consumir).not.toHaveBeenCalled();
+  });
+
+  it("en producción con RATE_LIMIT_SECRET cuenta normalmente con HMAC", async () => {
+    vi.stubEnv("VERCEL_ENV", "production");
+    vi.stubEnv("RATE_LIMIT_SECRET", "secreto-de-prueba");
+    consumir.mockResolvedValue({ permitido: true, segundosParaReintentar: 0 });
+
+    await limitarPersistente("ingreso:1.2.3.4", regla);
+
+    expect(consumir).toHaveBeenCalledWith(hmac("ingreso:1.2.3.4", "secreto-de-prueba"), 5, 60);
+  });
+
+  it("en preview o e2e sin secreto se mantiene sha256 (la CI no se rompe)", async () => {
+    vi.stubEnv("VERCEL_ENV", "preview");
+    consumir.mockResolvedValue({ permitido: true, segundosParaReintentar: 0 });
+
+    await limitarPersistente("ingreso:1.2.3.4", regla);
+
+    expect(consumir).toHaveBeenCalledWith(sha256("ingreso:1.2.3.4"), 5, 60);
+  });
+
+  it("sin Supabase configurado en producción no exige el secreto (no se guarda nada)", async () => {
+    vi.stubEnv("VERCEL_ENV", "production");
+    configurado.valor = false;
+
+    expect((await limitarPersistente("sin-config-prod", regla)).permitido).toBe(true);
+    expect(consumir).not.toHaveBeenCalled();
+  });
+
   it("sin Supabase configurado usa solo la memoria", async () => {
     configurado.valor = false;
     const chica = { maximo: 1, ventanaMs: 60_000 };
@@ -114,6 +165,11 @@ describe("claveDeLimite", () => {
     vi.stubEnv("RATE_LIMIT_SECRET", "secreto-de-prueba");
     expect(claveDeLimite("ingreso:1.2.3.4")).toBe(hmac("ingreso:1.2.3.4", "secreto-de-prueba"));
     expect(claveDeLimite("ingreso:1.2.3.4")).not.toBe(sha256("ingreso:1.2.3.4"));
+  });
+
+  it("en producción sin secreto lanza en vez de devolver sha256", () => {
+    vi.stubEnv("VERCEL_ENV", "production");
+    expect(() => claveDeLimite("ingreso:1.2.3.4")).toThrow(/RATE_LIMIT_SECRET/);
   });
 
   it("dos secretos distintos dan claves distintas", () => {
