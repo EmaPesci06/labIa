@@ -76,12 +76,14 @@ values
 select throws_ok(
   $$update public.usuarios set nombre = 'Llamame al 2235551234' where id = 'dddddddd-5300-4000-a000-000000000001'$$,
   '23514',
+  'No pongas teléfonos, emails ni direcciones: el contacto es por WhatsApp desde la app.',
   'un teléfono en el nombre de la cuenta se rechaza'
 );
 
 select throws_ok(
   $$update public.usuarios set apellido = 'escribime a ana@gmail.com' where id = 'dddddddd-5300-4000-a000-000000000001'$$,
   '23514',
+  'No pongas teléfonos, emails ni direcciones: el contacto es por WhatsApp desde la app.',
   'un email en el apellido se rechaza'
 );
 
@@ -95,6 +97,7 @@ select throws_ok(
     select 'dddddddd-5300-4000-a000-000000000011', 'dddddddd-5300-4000-a000-000000000001', 'plomeria', 'Pérdida de agua', 'Vivo en Independencia 2100, llamame al 223 555 1234', b.id, 'sin_apuro', 'abierto'
     from public.barrios b where b.slug = 'centro'$$,
   '23514',
+  'No pongas teléfonos, emails ni direcciones: el contacto es por WhatsApp desde la app.',
   'una descripción de trabajo con dirección y teléfono se rechaza'
 );
 
@@ -111,6 +114,7 @@ select throws_ok(
   $$insert into public.postulaciones (trabajo_id, profesional_id, mensaje, estado)
     values ('dddddddd-5300-4000-a000-000000000012', 'dddddddd-5300-4000-a000-000000000002', 'Escribime a pro@gmail.com', 'enviada')$$,
   '23514',
+  'No pongas teléfonos, emails ni direcciones: el contacto es por WhatsApp desde la app.',
   'un mensaje de postulación con email se rechaza'
 );
 
