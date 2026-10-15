@@ -163,6 +163,7 @@ declare
   v_post_estado public.estado_postulacion;
   v_cliente_id uuid;
   v_trabajo_estado public.estado_trabajo;
+  v_filas integer;
 begin
   if v_uid is null or not privado.cuenta_activa() or privado.rol_actual() <> 'cliente' then
     raise exception 'No autorizado' using errcode = '42501';
@@ -178,7 +179,7 @@ begin
   from public.postulaciones po
   join public.trabajos t on t.id = po.trabajo_id
   where po.id = p_postulacion_id
-  for update of t;
+  for update of t, po;
 
   if not found then
     raise exception 'Postulación no encontrada' using errcode = 'P0002';
@@ -201,10 +202,15 @@ begin
     raise exception 'El profesional ya no está disponible para este trabajo' using errcode = '22023';
   end if;
 
-  -- 1. Marcar postulación elegida
+  -- 1. Marcar postulación elegida: solo si sigue enviada (con el bloqueo, esto no debería fallar).
   update public.postulaciones
   set estado = 'elegida'
-  where id = p_postulacion_id;
+  where id = p_postulacion_id
+    and estado = 'enviada';
+  get diagnostics v_filas = row_count;
+  if v_filas <> 1 then
+    raise exception 'La postulación ya no está enviada' using errcode = '22023';
+  end if;
 
   -- 2. Descartar las demás postulaciones activas
   update public.postulaciones
@@ -311,6 +317,7 @@ declare
   v_uid uuid := (select auth.uid());
   v_id uuid;
   v_estado public.estado_postulacion;
+  v_estado_trabajo public.estado_trabajo;
 begin
   if v_uid is null
     or not privado.cuenta_activa()
@@ -335,7 +342,14 @@ begin
     raise exception 'No hay una postulación retirada para reactivar' using errcode = 'P0002';
   end if;
 
-  if not privado.trabajo_abierto(p_trabajo_id) then
+  -- Bloquea el trabajo antes de mirar si sigue abierto: no compite con elegir_postulante (LAB-44).
+  select t.estado
+  into v_estado_trabajo
+  from public.trabajos t
+  where t.id = p_trabajo_id
+  for update;
+
+  if not found or v_estado_trabajo <> 'abierto' then
     raise exception 'Este trabajo ya no recibe postulaciones.' using errcode = '22023';
   end if;
 
@@ -352,3 +366,24 @@ $$;
 
 revoke execute on function public.reactivar_postulacion(uuid, text, integer, integer) from public, anon;
 grant execute on function public.reactivar_postulacion(uuid, text, integer, integer) to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- 6. trabajos_actualizar_propio: el cliente edita su trabajo solo mientras está abierto (LAB-44)
+-- ---------------------------------------------------------------------------
+-- Antes podía cambiar título, descripción, oficio, barrio, urgencia, presupuesto y fotos de un trabajo
+-- asignado o cerrado. La columna `estado` y `profesional_elegido_id` ya no tienen privilegio (sección 3).
+
+drop policy if exists trabajos_actualizar_propio on public.trabajos;
+create policy trabajos_actualizar_propio on public.trabajos
+  for update to authenticated
+  using (
+    cliente_id = (select auth.uid())
+    and privado.cuenta_activa()
+    and estado = 'abierto'
+  )
+  with check (
+    cliente_id = (select auth.uid())
+    and privado.cuenta_activa()
+    and estado = 'abierto'
+    and profesional_elegido_id is null
+  );

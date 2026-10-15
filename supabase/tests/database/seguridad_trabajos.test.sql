@@ -91,6 +91,20 @@ values (
 insert into public.postulaciones (id, trabajo_id, profesional_id, mensaje, estado)
 values ('44000000-0000-4000-c000-000000000003', '44000000-0000-4000-b000-000000000002', '44000000-0000-4000-a000-000000000002', 'Lo hago yo.', 'elegida');
 
+-- T3 cerrado del mismo cliente (LAB-44: el cliente no edita un trabajo cerrado)
+insert into public.trabajos (id, cliente_id, oficio, titulo, descripcion, barrio_id, urgencia, estado, profesional_elegido_id)
+values (
+  '44000000-0000-4000-b000-000000000003',
+  '44000000-0000-4000-a000-000000000001',
+  'plomeria',
+  'Pintar reja',
+  'Reja del frente.',
+  (select id from public.barrios where slug = 'centro'),
+  'sin_apuro',
+  'cerrado',
+  '44000000-0000-4000-a000-000000000002'
+);
+
 -- ---------------------------------------------------------------------------
 -- retirar_postulacion: autorización y reglas
 -- ---------------------------------------------------------------------------
@@ -203,6 +217,14 @@ select results_eq(
   $$update public.trabajos set descripcion = 'Gotea mucho más' where id = '44000000-0000-4000-b000-000000000001' returning descripcion$$,
   $$values ('Gotea mucho más'::text)$$,
   'trabajos: el dueño sigue pudiendo editar la descripción de su trabajo'
+);
+select is_empty(
+  $$update public.trabajos set titulo = 'Cambiado' where id = '44000000-0000-4000-b000-000000000002' returning 1$$,
+  'trabajos: el cliente no edita un trabajo asignado (LAB-44)'
+);
+select is_empty(
+  $$update public.trabajos set descripcion = 'Cambiado' where id = '44000000-0000-4000-b000-000000000003' returning 1$$,
+  'trabajos: el cliente no edita un trabajo cerrado (LAB-44)'
 );
 select throws_ok(
   $$update public.postulaciones set estado = 'elegida' where id = '44000000-0000-4000-c000-000000000002'$$,
