@@ -225,15 +225,25 @@ select is_empty($$update public.usuarios set nombre = 'Hack' where id = 'ccccccc
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000001');
 select is((select count(*) from public.usuarios where id in ('cccccccc-1200-4000-a000-000000000002', 'cccccccc-1200-4000-a000-000000000003', 'cccccccc-1200-4000-a000-000000000004')), 3::bigint, 'usuarios: el admin lee todas las filas');
-select results_eq(
-  $$update public.usuarios set estado = 'suspendida' where id = 'cccccccc-1200-4000-a000-000000000009' returning estado::text$$,
-  $$values ('suspendida')$$,
-  'usuarios: el admin suspende una cuenta'
+-- LAB-32: el estado de una cuenta solo cambia por las RPC de moderación (ni el admin lo cambia por update).
+select lives_ok(
+  $$select public.suspender_cuenta_admin('cccccccc-1200-4000-a000-000000000009', 'Prueba de políticas')$$,
+  'usuarios: el admin suspende una cuenta por la RPC'
 );
 select results_eq(
-  $$update public.usuarios set estado = 'activa' where id = 'cccccccc-1200-4000-a000-000000000009' returning estado::text$$,
+  $$select estado::text from public.usuarios where id = 'cccccccc-1200-4000-a000-000000000009'$$,
+  $$values ('suspendida')$$,
+  'usuarios: la RPC deja la cuenta suspendida'
+);
+select throws_ok($$update public.usuarios set estado = 'activa' where id = 'cccccccc-1200-4000-a000-000000000009'$$, '42501', null, 'usuarios: el admin no cambia el estado por update directo');
+select lives_ok(
+  $$select public.reactivar_cuenta_admin('cccccccc-1200-4000-a000-000000000009', 'Prueba cerrada')$$,
+  'usuarios: el admin reactiva una cuenta por la RPC'
+);
+select results_eq(
+  $$select estado::text from public.usuarios where id = 'cccccccc-1200-4000-a000-000000000009'$$,
   $$values ('activa')$$,
-  'usuarios: el admin reactiva una cuenta'
+  'usuarios: la RPC deja la cuenta activa'
 );
 select throws_ok($$update public.usuarios set rol = 'admin' where id = 'cccccccc-1200-4000-a000-000000000009'$$, '42501', null, 'usuarios: ni el admin cambia roles por la API');
 select throws_ok($$update public.usuarios set whatsapp = '+5492230000000' where id = 'cccccccc-1200-4000-a000-000000000009'$$, '42501', null, 'usuarios: ni el admin cambia el whatsapp de otro por la API');
