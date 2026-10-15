@@ -2,10 +2,13 @@ import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { MaestroDetalleMisTrabajos } from "./MaestroDetalleMisTrabajos";
 import { PestanasMisTrabajos } from "./PestanasMisTrabajos";
 import { SeleccionInicialEscritorio } from "./SeleccionInicialEscritorio";
 import { TarjetaMiTrabajo } from "./TarjetaMiTrabajo";
 import { TarjetaPostulante } from "./TarjetaPostulante";
+
+vi.mock("server-only", () => ({}));
 
 const reemplazar = vi.fn();
 vi.mock("next/navigation", () => ({
@@ -253,5 +256,34 @@ describe("TarjetaPostulante", () => {
 
     expect(screen.getByRole("dialog")).toBeInTheDocument();
     expect(screen.getByRole("alert")).toHaveTextContent("El trabajo ya no está abierto.");
+  });
+});
+
+describe("MaestroDetalleMisTrabajos: lista vacía por pestaña", () => {
+  it("cada pestaña vacía muestra su propio texto; el de publicar solo en Abiertos", () => {
+    const { unmount } = render(
+      <MaestroDetalleMisTrabajos
+        trabajos={[]}
+        trabajoSeleccionado={null}
+        tabActiva="contratados"
+      />,
+    );
+    expect(screen.getByText("Todavía no contrataste a nadie.")).toBeInTheDocument();
+    expect(screen.queryByText("Todavía no publicaste trabajos.")).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Publicar un trabajo" })).not.toBeInTheDocument();
+    unmount();
+
+    const { unmount: desmontarTerminados } = render(
+      <MaestroDetalleMisTrabajos trabajos={[]} trabajoSeleccionado={null} tabActiva="terminados" />,
+    );
+    expect(screen.getByText("Todavía no tenés trabajos terminados.")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Publicar un trabajo" })).not.toBeInTheDocument();
+    desmontarTerminados();
+
+    render(
+      <MaestroDetalleMisTrabajos trabajos={[]} trabajoSeleccionado={null} tabActiva="abiertos" />,
+    );
+    expect(screen.getByText("Todavía no publicaste trabajos.")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Publicar un trabajo" })).toBeInTheDocument();
   });
 });

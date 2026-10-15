@@ -9,6 +9,23 @@ import { PestanasMisTrabajos, type TabMisTrabajos } from "./PestanasMisTrabajos"
 import { SeleccionInicialEscritorio } from "./SeleccionInicialEscritorio";
 import { TarjetaMiTrabajo } from "./TarjetaMiTrabajo";
 
+/** Texto de la lista vacía por pestaña (LAB-29, LAB-48). */
+const VACIO: Record<TabMisTrabajos, { titulo: string; detalle: string }> = {
+  abiertos: {
+    titulo: "Todavía no publicaste trabajos.",
+    detalle:
+      "Publicá lo que necesitás hacer en tu casa para recibir presupuestos de profesionales verificados de Mar del Plata.",
+  },
+  contratados: {
+    titulo: "Todavía no contrataste a nadie.",
+    detalle: "Cuando elijas a un profesional para uno de tus trabajos, va a aparecer acá.",
+  },
+  terminados: {
+    titulo: "Todavía no tenés trabajos terminados.",
+    detalle: "Los trabajos que ya están resueltos se listan acá.",
+  },
+};
+
 type Props = {
   trabajos: TrabajoClienteItem[];
   trabajoSeleccionado: DetalleMiTrabajoCliente | null;
@@ -40,14 +57,13 @@ export function MaestroDetalleMisTrabajos({ trabajos, trabajoSeleccionado, tabAc
 
       {trabajos.length === 0 ? (
         <div className="flex min-h-[280px] flex-col items-center justify-center gap-4 rounded-[22px] border border-dashed border-borde bg-superficie p-8 text-center">
-          <p className="text-lg font-bold text-texto">Todavía no publicaste trabajos.</p>
-          <p className="max-w-md text-sm text-texto-secundario">
-            Publicá lo que necesitás hacer en tu casa para recibir presupuestos de profesionales
-            verificados de Mar del Plata.
-          </p>
-          <Boton href="/trabajos/nuevo" variante="cliente" tamano="grande">
-            Publicar un trabajo
-          </Boton>
+          <p className="text-lg font-bold text-texto">{VACIO[tabActiva].titulo}</p>
+          <p className="max-w-md text-sm text-texto-secundario">{VACIO[tabActiva].detalle}</p>
+          {tabActiva === "abiertos" ? (
+            <Boton href="/trabajos/nuevo" variante="cliente" tamano="grande">
+              Publicar un trabajo
+            </Boton>
+          ) : null}
         </div>
       ) : (
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-8">
