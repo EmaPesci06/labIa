@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { Oficio } from "@/lib/busqueda";
+import { rolFalso } from "@/lib/auth/sesion-falsa";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import type { UrgenciaTrabajo } from "@/lib/validaciones/trabajo";
 
@@ -428,6 +429,24 @@ export async function obtenerMisTrabajosCliente(
   clienteId: string,
   filtro: "abiertos" | "contratados" | "terminados" = "abiertos",
 ): Promise<TrabajoClienteItem[]> {
+  if (rolFalso()) {
+    return [
+      {
+        id: "88888888-8888-4888-8888-888888888881",
+        oficio: "gas",
+        titulo: "Olor a gas en la cocina",
+        descripcion: "Desde ayer hay olor cerca del horno.",
+        urgencia: "esta_semana",
+        estado:
+          filtro === "abiertos" ? "abierto" : filtro === "contratados" ? "asignado" : "cerrado",
+        profesionalElegidoId: null,
+        barrioNombre: "La Perla",
+        cantidadPostulaciones: 2,
+        createdAt: new Date().toISOString(),
+      },
+    ];
+  }
+
   if (!supabaseConfigurado()) return [];
   const supabase = await crearClienteServidor();
 
@@ -522,6 +541,24 @@ export async function obtenerDetalleMiTrabajoCliente(
   trabajoId: string,
   clienteId: string,
 ): Promise<DetalleMiTrabajoCliente | null> {
+  if (rolFalso()) {
+    return {
+      id: trabajoId,
+      oficio: "gas",
+      titulo: "Olor a gas en la cocina",
+      descripcion: "Desde ayer hay olor a gas cerca del horno. Ya cerré la llave de paso.",
+      urgencia: "esta_semana",
+      presupuestoEstimado: 25000,
+      fotos: [],
+      barrioId: 51,
+      barrioNombre: "La Perla",
+      estado: "abierto",
+      profesionalElegidoId: null,
+      createdAt: new Date().toISOString(),
+      postulantes: [],
+    };
+  }
+
   if (!supabaseConfigurado()) return null;
   const supabase = await crearClienteServidor();
 
