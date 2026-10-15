@@ -270,30 +270,8 @@ export async function guardarResena(
     accion = "creada";
   }
 
-  // Calificaciones bajas (1 o 2 estrellas) se registran en reportes para moderación
-  if (puntaje <= 2 && resenaId) {
-    try {
-      const { data: reporteExistente } = await supabase
-        .from("reportes")
-        .select("id")
-        .eq("objetivo_tipo", "resena")
-        .eq("objetivo_id", resenaId)
-        .maybeSingle();
-
-      if (!reporteExistente) {
-        await supabase.from("reportes").insert({
-          autor_id: sesion.usuario.id,
-          objetivo_tipo: "resena",
-          objetivo_id: resenaId,
-          motivo: "otro",
-          detalle: `Calificación baja (${puntaje} estrella${puntaje === 1 ? "" : "s"}) registrada para revisión.`,
-          estado: "abierto",
-        });
-      }
-    } catch {
-      // Un fallo en el reporte de moderación no interrumpe la experiencia del usuario.
-    }
-  }
+  // Las calificaciones de 1 o 2 estrellas abren el reporte de moderación en la base (trigger
+  // `resenas_moderar`, migración 20261015010000): así también lo cubren los inserts directos.
 
   // Métrica PostHog
   await registrarEventoServidor(sesion.usuario.id, "resena_publicada", {

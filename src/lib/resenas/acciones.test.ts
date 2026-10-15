@@ -364,9 +364,7 @@ describe("guardarResena", () => {
     }
   });
 
-  it("registra un reporte de moderación para puntajes 1 y 2", async () => {
-    const insertReporteMock = vi.fn().mockResolvedValue({ error: null });
-
+  it("no abre el reporte de moderación desde la acción: lo hace el trigger de la base", async () => {
     mockFrom.mockImplementation((tabla: string) => {
       if (tabla === "usuarios") {
         return {
@@ -406,18 +404,6 @@ describe("guardarResena", () => {
           }),
         };
       }
-      if (tabla === "reportes") {
-        return {
-          select: () => ({
-            eq: () => ({
-              eq: () => ({
-                maybeSingle: async () => ({ data: null }),
-              }),
-            }),
-          }),
-          insert: insertReporteMock,
-        };
-      }
       return {};
     });
 
@@ -428,15 +414,7 @@ describe("guardarResena", () => {
     });
 
     expect(res.ok).toBe(true);
-    expect(insertReporteMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        autor_id: CLIENTE_ID,
-        objetivo_tipo: "resena",
-        objetivo_id: "resena-baja",
-        motivo: "otro",
-        estado: "abierto",
-      }),
-    );
+    expect(mockFrom).not.toHaveBeenCalledWith("reportes");
   });
 });
 
