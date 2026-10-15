@@ -15,6 +15,8 @@ type PropsSeleccion = {
   valor: number;
   /** Con `onChange` las estrellas se vuelven un `radiogroup` de 1 a 5, usable con teclado. */
   onChange: (valor: number) => void;
+  /** Etiquetas accesibles por cada opción del 1 al 5 (opcional). */
+  etiquetasPuntaje?: Record<number, string>;
 };
 
 export type EstrellasProps = (PropsLectura | PropsSeleccion) & {
@@ -39,7 +41,8 @@ function Estrella({ llena }: { llena: boolean }) {
  * Puntaje con estrellas (naranja de marca). Solo lectura por defecto (`role="img"`); con `onChange`
  * es un grupo de 5 botones de radio de 44 px: flechas para cambiar, Inicio/Fin para 1 y 5.
  */
-export function Estrellas({ valor, onChange, etiqueta = "Puntaje", className }: EstrellasProps) {
+export function Estrellas(props: EstrellasProps) {
+  const { valor, onChange, etiqueta = "Puntaje", className } = props;
   const grupo = useRef<HTMLDivElement>(null);
 
   if (!onChange) {
@@ -68,6 +71,7 @@ export function Estrellas({ valor, onChange, etiqueta = "Puntaje", className }: 
     );
   }
 
+  const { etiquetasPuntaje } = props as PropsSeleccion;
   const activa = valor >= 1 ? Math.min(5, Math.round(valor)) : 0;
 
   function elegir(nuevo: number) {
@@ -100,20 +104,28 @@ export function Estrellas({ valor, onChange, etiqueta = "Puntaje", className }: 
       onKeyDown={teclado}
       className={cn("flex", className)}
     >
-      {TOTAL.map((n) => (
-        <button
-          key={n}
-          type="button"
-          role="radio"
-          aria-checked={n === activa}
-          aria-label={`${n} ${n === 1 ? "estrella" : "estrellas"}`}
-          tabIndex={n === (activa || 1) ? 0 : -1}
-          onClick={() => onChange(n)}
-          className="flex size-11 items-center justify-center rounded-campo"
-        >
-          <Estrella llena={n <= activa} />
-        </button>
-      ))}
+      {TOTAL.map((n) => {
+        const etiquetaBoton =
+          etiquetasPuntaje && etiquetasPuntaje[n]
+            ? etiquetasPuntaje[n]
+            : `${n} ${n === 1 ? "estrella" : "estrellas"}`;
+
+        return (
+          <button
+            key={n}
+            type="button"
+            role="radio"
+            aria-checked={n === activa}
+            aria-label={etiquetaBoton}
+            title={etiquetasPuntaje?.[n]}
+            tabIndex={n === (activa || 1) ? 0 : -1}
+            onClick={() => onChange(n)}
+            className="flex size-11 items-center justify-center rounded-campo"
+          >
+            <Estrella llena={n <= activa} />
+          </button>
+        );
+      })}
     </div>
   );
 }

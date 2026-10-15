@@ -11,6 +11,12 @@ vi.mock("next/image", () => ({
 }));
 vi.mock("@/lib/perfil/acciones", () => ({ cargarMasResenas: vi.fn() }));
 vi.mock("@/lib/contacto/acciones", () => ({ contactarProfesional: vi.fn() }));
+vi.mock("@/lib/resenas/acciones", () => ({
+  guardarResena: vi.fn(),
+  consultarElegibilidadResena: vi
+    .fn()
+    .mockResolvedValue({ puedeResenar: false, resenaPropia: null }),
+}));
 
 import { PerfilProfesional } from "./PerfilProfesional";
 
@@ -141,5 +147,48 @@ describe("PerfilProfesional", () => {
     for (const enlace of enlaces) {
       expect(enlace).toHaveAttribute("href", "/ingresar?volver=%2Fprofesionales%2F1");
     }
+  });
+
+  it("cliente elegible ve el botón 'Dejar reseña'", () => {
+    render(
+      <PerfilProfesional
+        perfil={perfil}
+        resenas={resenas}
+        distanciaKm={null}
+        puedeResenar={true}
+        resenaPropia={null}
+      />,
+    );
+    expect(screen.getByRole("button", { name: "Dejar reseña" })).toBeInTheDocument();
+  });
+
+  it("cliente con reseña previa ve el botón 'Editar mi reseña'", () => {
+    render(
+      <PerfilProfesional
+        perfil={perfil}
+        resenas={resenas}
+        distanciaKm={null}
+        puedeResenar={true}
+        resenaPropia={{
+          id: "r-1",
+          puntaje: 5,
+          texto: "Muy bueno",
+          createdAt: new Date().toISOString(),
+        }}
+      />,
+    );
+    expect(screen.getByRole("button", { name: "Editar mi reseña" })).toBeInTheDocument();
+  });
+
+  it("usuario no elegible no ve el botón de reseña", () => {
+    render(
+      <PerfilProfesional
+        perfil={perfil}
+        resenas={resenas}
+        distanciaKm={null}
+        puedeResenar={false}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: /reseña/i })).not.toBeInTheDocument();
   });
 });
