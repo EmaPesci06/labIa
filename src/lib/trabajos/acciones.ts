@@ -293,8 +293,8 @@ export async function postularme(
     const { data: reactivada, error } = await supabase.rpc("reactivar_postulacion", {
       p_trabajo_id: trabajoId,
       p_mensaje: valid.data.mensaje,
-      p_precio_estimado: valid.data.precioEstimado ?? null,
-      p_sena_propuesta: valid.data.senaPropuesta ?? null,
+      p_precio_estimado: valid.data.precioEstimado,
+      p_sena_propuesta: valid.data.senaPropuesta,
     });
     if (error || !reactivada) {
       const mensaje =
