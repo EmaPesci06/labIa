@@ -222,3 +222,116 @@ falta activar `pg_cron` salvo que se agregue un job dentro de la base.
 - [ ] Primer admin asignado (sección 7).
 - [ ] Prueba de humo completa (sección 9).
 - [ ] Textos legales revisados por abogado (LAB-36) antes de quitar el aviso de borrador.
+
+---
+
+# Parte 2 · Operación del día a día
+
+Las secciones 11 a 16 sirven después del lanzamiento. Cuando un paso necesita la cuenta `labia-prod`, el dominio o una cuenta de servicio, lleva la marca **[PENDIENTE LAB-7]**. Los demás pasos se pueden seguir con lo que ya existe en el repo.
+
+## 11. Desplegar
+
+1. Abrir un PR contra `main`. La CI tiene que pasar: lint, typecheck, test, build, pgTAP si hay migraciones y e2e si toca un flujo.
+2. Vercel crea un preview por PR con las variables de Preview (que apuntan a `labia-dev`). Probar ahí.
+3. Si el PR trae migraciones, el workflow `migraciones.yml` las aplica primero a `labia-dev` y después espera la aprobación del entorno `produccion` para aplicarlas a `labia-prod`. **[PENDIENTE LAB-7]** (requiere `labia-prod`).
+4. Las migraciones tienen que ser compatibles con el código que sigue corriendo mientras se despliega. Si un cambio renombra o borra columnas, se hace en dos PR: primero agregar lo nuevo y desplegar, después quitar lo viejo.
+5. Squash-merge a `main`. Vercel despliega producción solo. Si el deploy sale antes de que se apruebe la migración, aprobarla en la pestaña Actions en cuanto aparezca.
+6. Verificar después del deploy: `https://<dominio-propio>/api/salud` responde `{"estado":"ok","base":"ok"}` y la home carga. **[PENDIENTE LAB-7]** (dominio).
+
+## 12. Revertir un deploy de la app
+
+1. Vercel → proyecto `labia` → **Deployments** → elegir el último deploy bueno de Production → menú `…` → **Instant Rollback** (o "Promote to Production" sobre ese deploy). Vercel lo deja activo sin recompilar. Si el nombre del botón cambió, buscar la acción equivalente en ese menú.
+2. Verificar `/api/salud` y la home.
+3. Las variables de entorno **no** vuelven atrás con el rollback. Si la falla viene de una variable, corregirla en Settings → Environment Variables y redeployar.
+4. Arreglar la causa en un PR nuevo. No volver a mergear el cambio malo.
+
+## 13. Revertir una migración
+
+Regla: una migración mergeada en `main` nunca se edita ni se borra. Para revertir se escribe una migración nueva hacia adelante.
+
+- **Migración inversa** cuando el cambio no destruyó datos (agregar una columna, un índice, una política, una función). Se escribe la inversa (`drop policy`, `drop function`, `drop index`, etc.) con timestamp posterior a la última, con su test pgTAP, y pasa por PR como cualquier otra.
+- **Restaurar un backup** (sección 14) cuando la migración borró o alteró datos (un `drop` de tabla o columna con datos, un `update` masivo mal hecho) y no se puede reconstruir. Se pierden los cambios hechos entre el backup y el incidente. Con PITR se elige el instante justo antes de la migración.
+- Nunca correr `supabase db reset` contra producción. Nunca editar una migración ya aplicada: la CLI no tiene "down" y el workflow no la vuelve a aplicar.
+
+Pasos: (1) si la falla afecta a usuarios, revertir el deploy de la app (sección 12) primero; (2) diagnosticar con `supabase migration list` contra `labia-prod` **[PENDIENTE LAB-7]**; (3) elegir migración inversa o restauración; (4) PR, aprobación en el entorno `produccion` y verificación.
+
+## 14. Restaurar un backup de la base
+
+Supabase Pro hace backups diarios. Se activan y se miran en Project Settings → Database → Backups **[PENDIENTE LAB-7]**. Hay dos opciones:
+
+- **Backup diario**: restaurar reemplaza la base del proyecto. Sirve para un desastre total. La retención en Pro es de 7 días (verificar en el panel).
+- **PITR (Point in Time Recovery)**: restaurar a un instante exacto. Es un complemento pago de Pro. La decisión de contratarlo está en la sección 1.2 **[PENDIENTE LAB-7]**.
+
+**Prueba de restauración** (una vez antes del lanzamiento y después de cambios grandes de esquema):
+
+1. Elegir un backup diario en el panel de `labia-prod`.
+2. Restaurar en un **proyecto temporal**, nunca sobre `labia-prod`. Si el panel solo restaura sobre el mismo proyecto, bajar un dump lógico con `pg_dump` usando la cadena de conexión del panel (no se guarda en el repo) y cargarlo en el temporal con `psql` o `pg_restore`. **[PENDIENTE LAB-7]**
+3. Verificar en el temporal: `select count(*) from public.barrios;` (debe ser mayor que cero), `select count(*) from public.usuarios;` (sin cuentas `@labia.test`) y `supabase migration list` contra el temporal (todas aplicadas).
+4. Borrar el proyecto temporal y anotar la fecha en la sección 8.
+
+**Restauración real sobre `labia-prod`**: solo con Emanuel presente. Antes: avisar a las personas usuarias si el corte es visible, congelar los deploys y guardar una copia del estado actual.
+
+**Límite conocido**: el backup de la base no incluye los archivos del bucket `documentos` ni `fotos` (Storage). Esos archivos necesitan su propia estrategia de respaldo. Decidir antes del lanzamiento y anotarlo en Linear **[PENDIENTE LAB-7]**.
+
+## 15. Rotar claves
+
+Orden general para cualquier clave:
+
+1. Generar la clave nueva en el panel del proveedor. No revocar la anterior todavía.
+2. Cargarla en Vercel (Production) y, si la usa GitHub Actions, con `gh secret set <NOMBRE>`. Redeployar.
+3. Verificar con la comprobación de la tabla.
+4. Revocar la clave anterior.
+
+Los valores nunca se pegan en el chat, en Linear ni en el repo. Para generar secretos: `openssl rand -base64 32`. Las comprobaciones se hacen con una variable local de la shell, sin imprimirla.
+
+| Clave                                               | Dónde se genera                                                                               | Dónde se carga                                                                         | Verificación                                                                                                                          | Notas                                                                                                                     |
+| --------------------------------------------------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `SUPABASE_SERVICE_ROLE_KEY`                         | Supabase → `labia-prod` → Project Settings → API (o "API Keys" si el panel usa claves nuevas) | Vercel Production                                                                      | `/admin/verificaciones` carga para un admin; `/api/cron/limpiar-documentos` con Bearer responde 200                                   | Solo servidor. **[PENDIENTE LAB-7]**                                                                                      |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY`                     | Mismo panel                                                                                   | Vercel Production                                                                      | `/api/salud` responde `ok`                                                                                                            | Es pública. Rotar solo si hace falta. **[PENDIENTE LAB-7]**                                                               |
+| `CRON_SECRET`                                       | `openssl rand -base64 32`                                                                     | Vercel Production, luego redeploy                                                      | `curl -H "Authorization: Bearer $CRON_SECRET" https://<dominio>/api/cron/limpiar-documentos` responde 200; sin el header responde 401 | Vercel manda el valor nuevo a los crons después del redeploy. **[PENDIENTE LAB-7]**                                       |
+| `RESEND_API_KEY`                                    | Resend → API Keys                                                                             | Vercel Production **y** Supabase → Authentication → SMTP Settings (usa la misma clave) | Un registro de prueba recibe el mail de bienvenida                                                                                    | Revocar la anterior recién después. **[PENDIENTE LAB-7]**                                                                 |
+| `EMAILS_SECRET`                                     | `openssl rand -base64 32`                                                                     | Vercel Production, luego redeploy                                                      | Un email nuevo trae un link de baja que funciona                                                                                      | Rotarla invalida los links de baja de emails ya enviados. Hacerlo solo si hay sospecha de filtración, y avisar en Linear. |
+| `SENTRY_AUTH_TOKEN`                                 | Sentry → Settings → Auth Tokens                                                               | Vercel Production                                                                      | Build con source maps sin error                                                                                                       | Solo lo usa el build. **[PENDIENTE LAB-7]**                                                                               |
+| `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN`             | Sentry → Client Keys                                                                          | Vercel Production (mismo valor en las dos)                                             | Un error de prueba llega a Sentry                                                                                                     | Son públicos. Rotar solo si hay abuso.                                                                                    |
+| `NEXT_PUBLIC_POSTHOG_KEY`                           | PostHog (Project API key)                                                                     | Vercel Production                                                                      | Llegan eventos en Activity                                                                                                            | Es pública. Rotar solo si hay abuso; consultar con soporte de PostHog.                                                    |
+| Contraseña de la base (`SUPABASE_DB_PASSWORD_PROD`) | Supabase → Database settings → Reset database password                                        | GitHub: `gh secret set SUPABASE_DB_PASSWORD_PROD`                                      | El workflow `migraciones.yml` conecta                                                                                                 | Rotarla no afecta a la app, que usa las claves de API. **[PENDIENTE LAB-7]**                                              |
+
+Rotar el **JWT secret** de Supabase invalida todas las sesiones y todas las claves. Solo se hace ante una filtración confirmada, y avisando a las personas usuarias.
+
+## 16. Dar de baja a un usuario
+
+Hay dos casos distintos. No se mezclan.
+
+### A. Baja voluntaria (la persona quiere borrar su cuenta)
+
+- **Camino preferido**: la persona entra y borra su cuenta en `/cuenta/borrar` (LAB-33). Tiene que escribir `BORRAR` y reautenticarse (contraseña, o un ingreso con Google). Después el sistema corre `borrarCuentaDeUsuario` (`src/lib/cuenta/borrado.ts`): borra sus fotos y documentos del bucket, luego `auth.users`. La cascada borra `usuarios` y lo que cuelga de ahí. Las reseñas que escribió quedan anónimas y los trabajos asignados a un profesional se cancelan. En `acciones_moderacion` queda solo el id y la fecha.
+- **Si no puede entrar**: responder el pedido desde el **mismo email registrado** (si llega desde otra casilla, pedir confirmación desde la registrada). No pedir DNI, contraseña ni otros datos sensibles por mail.
+- **Si el pedido llega por email y la persona no puede entrar**: no hay una acción de borrado en la app para el equipo (LAB-32 es de moderación, no de borrado). El borrado manual con SQL no se hace sin autorización escrita de Emanuel y sin dejar registro. Si hace falta, se abre una tarea nueva.
+
+### B. Suspensión (cortar el acceso sin borrar)
+
+Se usa por reportes confirmados o por incumplimiento de las normas. El efecto ya está en la base y en la app, aunque la acción de admin llega con LAB-32:
+
+- `usuarios.estado = 'suspendida'`. La app trata la sesión como inexistente (`src/lib/sesion.ts`). Las políticas de RLS dejan de mostrar su perfil y sus trabajos (`privado.usuario_activo`). Si la cuenta es un admin, pierde sus facultades (`privado.es_admin` exige `estado = 'activa'`).
+- **Con LAB-32 mergeado**: la suspensión y la reactivación se hacen desde `/admin/reportes`. **[PENDIENTE LAB-32]** (PR #37 abierto, sin mergear).
+- **Hasta entonces**, solo con autorización de Emanuel, en el SQL Editor de `labia-prod`: `update public.usuarios set estado = 'suspendida' where id = '<uuid>';`. Anotar el motivo y la fecha en la tarea de Linear correspondiente, porque este cambio no deja registro en `acciones_moderacion`. **[PENDIENTE LAB-7]**
+- Reactivar: `estado = 'activa'`, con el mismo registro.
+
+### Datos de quien se va
+
+Los documentos (DNI, antecedentes) se borran con la cuenta. Los documentos ya revisados y los huérfanos los limpian los crons de la sección 17. Las fotos de perfil y de trabajos salen del bucket `fotos` en el mismo borrado.
+
+## 17. Crons y mantenimiento
+
+Configurados en `vercel.json`. Cada uno exige `Authorization: Bearer $CRON_SECRET`:
+
+| Ruta                           | Horario (UTC) | Qué hace                                                                                   |
+| ------------------------------ | ------------- | ------------------------------------------------------------------------------------------ |
+| `/api/cron/trabajos-cerca`     | 11:00 diario  | Avisos de trabajos cerca a profesionales (ver la ruta)                                     |
+| `/api/cron/pedir-resena`       | 12:00 diario  | Pide reseñas 24 h después de terminar un trabajo y manda avisos de postulaciones agrupados |
+| `/api/cron/limpiar-documentos` | 06:00 diario  | Borra documentos vencidos y huérfanos del bucket `documentos` (LAB-21)                     |
+| `/api/cron/borrar-documentos`  | 06:00 diario  | Borra documentos revisados hace más de 30 días y huérfanos de más de 24 h (LAB-42)         |
+
+Ver ejecuciones: Vercel → proyecto `labia` → Cron Jobs y Logs. Si un cron falla, revisar el log y el estado de `CRON_SECRET` (sección 15). **[PENDIENTE LAB-7]** para ver ejecuciones reales de producción.
+
+Nota: `pg_cron` no se usa. El borrado de documentos corre con Vercel Cron.
