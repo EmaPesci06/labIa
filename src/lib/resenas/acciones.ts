@@ -273,7 +273,7 @@ export async function guardarResena(
   }
 
   // Las calificaciones de 1 o 2 estrellas abren el reporte de moderación en la base (trigger
-  // `resenas_moderar`, migración 20261015010000): así también lo cubren los inserts directos.
+  // `resenas_moderar`, migración 20261015070000): así también lo cubren los inserts directos.
 
   // Métrica PostHog
   await registrarEventoServidor(sesion.usuario.id, "resena_publicada", {
