@@ -133,9 +133,11 @@ export async function guardarResena(
 
   const parseo = esquemaGuardarResena.safeParse(entrada);
   if (!parseo.success) {
+    const primero = parseo.error.issues[0];
     return {
       ok: false,
-      error: parseo.error.issues[0]?.message ?? "Revisá los datos de la reseña.",
+      error: primero?.message ?? "Revisá los datos de la reseña.",
+      codigo: primero?.path[0] === "texto" ? "texto" : undefined,
     };
   }
 

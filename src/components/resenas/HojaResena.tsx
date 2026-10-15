@@ -92,6 +92,7 @@ function FormularioResena({
   const [texto, setTexto] = useState<string>(resenaExistente?.texto ?? "");
   const [resenaCargada, setResenaCargada] = useState<ResenaPropia | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [errorTexto, setErrorTexto] = useState<string | null>(null);
   const [pendiente, startTransition] = useTransition();
 
   useEffect(() => {
@@ -135,12 +136,9 @@ function FormularioResena({
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (puntaje < 1 || puntaje > 5) {
-      setError("Elegí una calificación de 1 a 5 estrellas.");
-      return;
-    }
-
+    // El botón está deshabilitado sin estrellas: no hace falta validar la calificación acá.
     setError(null);
+    setErrorTexto(null);
     startTransition(async () => {
       const res = await guardarResena({
         profesionalId,
@@ -150,7 +148,11 @@ function FormularioResena({
       });
 
       if (!res.ok) {
-        setError(res.error);
+        if (res.codigo === "texto") {
+          setErrorTexto(res.error);
+        } else {
+          setError(res.error);
+        }
         return;
       }
 
@@ -203,13 +205,23 @@ function FormularioResena({
         <textarea
           id="comentario-resena"
           value={texto}
-          onChange={(e) => setTexto(e.target.value)}
+          onChange={(e) => {
+            setTexto(e.target.value);
+            setErrorTexto(null);
+          }}
           maxLength={500}
           rows={3}
+          aria-invalid={errorTexto ? true : undefined}
+          aria-describedby={errorTexto ? "error-comentario-resena" : undefined}
           placeholder="Contá cómo fue: puntualidad, prolijidad, si respetó el presupuesto."
           className="w-full resize-none rounded-campo border border-borde bg-superficie p-3 text-[15px] leading-relaxed text-texto placeholder:text-texto-terciario focus:border-azul focus:ring-1 focus:ring-azul focus:outline-none"
         />
-        <div className="flex justify-between text-xs text-texto-terciario">
+        {errorTexto ? (
+          <p id="error-comentario-resena" role="alert" className="text-sm font-semibold text-error">
+            {errorTexto}
+          </p>
+        ) : null}
+        <div className="flex justify-between text-xs text-texto-secundario">
           <span>Máximo 500 caracteres</span>
           <span>{texto.length}/500</span>
         </div>
