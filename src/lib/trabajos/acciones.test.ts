@@ -3,10 +3,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { MENSAJE_CONTACTO_POSTULACION, MENSAJE_SENA_MAYOR } from "@/lib/validaciones/postulacion";
 import { avisarEleccion, avisarNuevaPostulacion } from "@/lib/emails/avisos";
 import { registrarEventoServidor } from "@/lib/metricas-servidor";
+import { limitarPersistente } from "@/lib/rate-limit-persistente";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 
-import { cancelarTrabajo, elegirPostulante, marcarTrabajoTerminado, postularme } from "./acciones";
+import {
+  cancelarTrabajo,
+  elegirPostulante,
+  marcarTrabajoTerminado,
+  postularme,
+  publicarTrabajo,
+} from "./acciones";
 
 vi.mock("server-only", () => ({}));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
@@ -22,6 +29,16 @@ vi.mock("@/lib/emails/avisos", () => ({
   avisarNuevaPostulacion: vi.fn(async () => undefined),
   avisarEleccion: vi.fn(async () => undefined),
 }));
+
+// Límite persistente (LAB-47): por defecto se comporta como la memoria, así los casos de siempre no cambian.
+vi.mock("@/lib/rate-limit-persistente", async () => {
+  const { limitarIntentos } = await import("@/lib/rate-limit");
+  return {
+    limitarPersistente: vi.fn(async (clave: string, regla: { maximo: number; ventanaMs: number }) =>
+      limitarIntentos(clave, regla),
+    ),
+  };
+});
 
 const TRABAJO = "11111111-1111-4111-8111-111111111111";
 const POSTULACION = "22222222-2222-4222-8222-222222222222";
@@ -400,5 +417,63 @@ describe("cancelarTrabajo y marcarTrabajoTerminado (LAB-29)", () => {
       { rol: "cliente", usuario: { id: CLIENTE } },
     );
     expect(await marcarTrabajoTerminado(TRABAJO)).toEqual({ ok: true });
+  });
+});
+
+describe("límites persistentes (LAB-47)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("postular cuenta el intento por profesional: 30 por día", async () => {
+    const usuario = "66666666-6666-4666-8666-666666666666";
+    preparar({ perfil: perfilOk, trabajo: trabajoOk }, sesionProfesional(usuario));
+    await postularme(TRABAJO, {}, datosPostulacion());
+    expect(limitarPersistente).toHaveBeenCalledWith(`postulacion:${usuario}`, {
+      maximo: 30,
+      ventanaMs: 24 * 60 * 60 * 1000,
+    });
+  });
+
+  it("postular: si el límite persistente bloquea, no escribe", async () => {
+    const { llamadas } = preparar({ perfil: perfilOk, trabajo: trabajoOk });
+    vi.mocked(limitarPersistente).mockResolvedValueOnce({
+      permitido: false,
+      segundosParaReintentar: 60,
+    });
+
+    const r = await postularme(TRABAJO, {}, datosPostulacion());
+
+    expect(r.mensaje).toBe("Alcanzaste el límite de 30 postulaciones por día. Intentá mañana.");
+    expect(llamadas.some((l) => l.metodo === "insert")).toBe(false);
+  });
+
+  it("publicar: cuenta el intento por cliente, 5 cada 10 minutos, y si bloquea no escribe", async () => {
+    preparar({}, { rol: "cliente", usuario: { id: CLIENTE } });
+    vi.mocked(limitarPersistente).mockResolvedValueOnce({
+      permitido: false,
+      segundosParaReintentar: 9,
+    });
+    const datos = new FormData();
+    for (const [clave, valor] of Object.entries({
+      oficio: "gas",
+      titulo: "Olor a gas en la cocina",
+      descripcion: "Desde ayer hay olor a gas cerca del horno. Ya cerré la llave de paso.",
+      barrioId: "51",
+      urgencia: "lo_antes_posible",
+      presupuesto: "",
+      cantidadFotos: "0",
+    })) {
+      datos.set(clave, valor);
+    }
+
+    const r = await publicarTrabajo({}, datos);
+
+    expect(limitarPersistente).toHaveBeenCalledWith(`publicar-trabajo:${CLIENTE}`, {
+      maximo: 5,
+      ventanaMs: 10 * 60_000,
+    });
+    expect(r.mensaje).toBe("Hiciste demasiados intentos. Esperá 9 segundos y probá de nuevo.");
+    expect(crearClienteServidor).not.toHaveBeenCalled();
   });
 });

@@ -2,7 +2,7 @@
 
 import { obtenerPerfil } from "@/lib/perfil/cargar";
 import { profesionPrincipal } from "@/lib/perfil/datos";
-import { limitarIntentos } from "@/lib/rate-limit";
+import { limitarPersistente } from "@/lib/rate-limit-persistente";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import { datosDeFormularioContacto, esquemaContacto } from "@/lib/validaciones/contacto";
@@ -47,7 +47,7 @@ export async function contactarProfesional(
   const entrada = esquemaContacto.safeParse(datosDeFormularioContacto(datos));
   if (!entrada.success) return { mensaje: mensajeDeError("23514") };
 
-  const limite = limitarIntentos(`contacto:${sesion.usuario.id}`, {
+  const limite = await limitarPersistente(`contacto:${sesion.usuario.id}`, {
     maximo: 10,
     ventanaMs: 60_000,
   });

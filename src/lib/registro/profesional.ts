@@ -2,6 +2,7 @@
 
 import { erroresPorCampo } from "@/lib/validaciones/auth";
 import { limitarPorIp, mensajeDeLimite, type ReglaLimite } from "@/lib/rate-limit-persistente";
+import { rolDeLaSesion } from "@/lib/sesion";
 import { urlDelSitio } from "@/lib/sitio";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import {
@@ -227,8 +228,7 @@ export async function guardarFotosPerfil(entrada: {
     fotosTrabajos.every((ruta) => typeof ruta === "string" && esRutaFotoTrabajo(ruta, uid));
   if (!valida) return { ok: false, mensaje: "No pudimos validar las fotos." };
 
-  const { data: fila } = await supabase.from("usuarios").select("rol").eq("id", uid).maybeSingle();
-  if (fila?.rol !== "profesional")
+  if ((await rolDeLaSesion(supabase, uid)) !== "profesional")
     return { ok: false, mensaje: "Esta cuenta no es de profesional." };
 
   const { error: errorUsuario } = await supabase

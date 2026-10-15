@@ -3,8 +3,7 @@
 import { z } from "zod";
 
 import type { EstadoFormulario } from "@/lib/auth/estado";
-import { ipDelPedido } from "@/lib/ip-del-pedido";
-import { limitarIntentos } from "@/lib/rate-limit";
+import { limitarPorIp } from "@/lib/rate-limit-persistente";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import { datosDeFormularioPerfil, esquemaPerfilProfesional } from "@/lib/validaciones/perfil";
@@ -34,10 +33,7 @@ export async function cargarMasResenas(
   if (!entrada.success) return { ok: false, mensaje: "No pudimos cargar más reseñas." };
   if (!supabaseConfigurado()) return { ok: false, mensaje: MENSAJE_FALLA };
 
-  const limite = limitarIntentos(`resenas:${await ipDelPedido()}`, {
-    maximo: 30,
-    ventanaMs: 60_000,
-  });
+  const limite = await limitarPorIp("resenas", { maximo: 30, ventanaMs: 60_000 });
   if (!limite.permitido) {
     return {
       ok: false,
