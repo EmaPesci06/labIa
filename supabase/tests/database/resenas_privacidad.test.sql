@@ -20,6 +20,16 @@ begin
 end;
 $$;
 
+create function tests.editar_resena(p_id uuid, p_texto text) returns integer language plpgsql as $$
+declare
+  v_filas integer;
+begin
+  update public.resenas set texto = p_texto where id = p_id;
+  get diagnostics v_filas = row_count;
+  return v_filas;
+end;
+$$;
+
 -- ---------------------------------------------------------------------------
 -- Preparación: C (cliente activo), S (cliente suspendido), P (profesional publicado)
 -- ---------------------------------------------------------------------------
@@ -110,7 +120,7 @@ reset role;
 select tests.como('dddddddd-5600-4000-a000-000000000002');
 
 select is(
-  (with u as (update public.resenas set texto = 'Cambiada' where id = 'dddddddd-5600-4000-a000-0000000000a2' returning id) select count(*)::int from u),
+  tests.editar_resena('dddddddd-5600-4000-a000-0000000000a2', 'Cambiada'),
   0,
   'un cliente suspendido no edita su reseña'
 );
@@ -118,7 +128,7 @@ select is(
 select tests.como('dddddddd-5600-4000-a000-000000000001');
 
 select is(
-  (with u as (update public.resenas set texto = 'Editada' where id = 'dddddddd-5600-4000-a000-0000000000a1' returning id) select count(*)::int from u),
+  tests.editar_resena('dddddddd-5600-4000-a000-0000000000a1', 'Editada'),
   1,
   'un cliente activo edita su reseña dentro de 24 h'
 );
