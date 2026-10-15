@@ -4,7 +4,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(36);
+select plan(45);
 
 create schema tests;
 grant usage on schema tests to authenticated;
@@ -43,12 +43,23 @@ values
 
 update public.usuarios set rol = 'admin' where id = 'eeeeeeee-3200-4000-a000-000000000001';
 
+-- Segunda cuenta admin, suspendida: un admin suspendido no modera y un admin no cambia el estado de otro.
+insert into auth.users (instance_id, id, aud, role, email, raw_user_meta_data)
+values ('00000000-0000-0000-0000-000000000000', 'eeeeeeee-3200-4000-a000-000000000005', 'authenticated', 'authenticated', 'mod-a2@labia.test', '{"nombre": "Admin", "apellido": "Suspendido"}');
+
+update public.usuarios set rol = 'admin', estado = 'suspendida' where id = 'eeeeeeee-3200-4000-a000-000000000005';
+
 insert into public.perfiles_profesionales (usuario_id, oficios, toda_la_ciudad, identidad_verificada, antecedentes_ok, publicado)
 values ('eeeeeeee-3200-4000-a000-000000000004', '{plomeria}', true, true, true, true);
 
 insert into public.trabajos (id, cliente_id, oficio, titulo, descripcion, barrio_id, urgencia, estado)
 select 'ffffffff-3200-4000-a000-000000000001'::uuid, 'eeeeeeee-3200-4000-a000-000000000002'::uuid, 'plomeria', 'Arreglo canilla', 'Pierde agua', b.id, 'sin_apuro', 'abierto'
 from public.barrios b where b.slug = 'centro';
+
+-- Nueve trabajos más de C2 para llenar el cupo diario de reportes de C1 (10 en 24 h).
+insert into public.trabajos (id, cliente_id, oficio, titulo, descripcion, barrio_id, urgencia, estado)
+select ('ffffffff-3200-4000-a000-' || lpad(n::text, 12, '0'))::uuid, 'eeeeeeee-3200-4000-a000-000000000003'::uuid, 'plomeria', 'Trabajo de prueba', 'Para el cupo de reportes', b.id, 'sin_apuro', 'abierto'
+from generate_series(2, 11) as n cross join public.barrios b where b.slug = 'centro';
 
 insert into public.postulaciones (trabajo_id, profesional_id, mensaje, estado)
 values ('ffffffff-3200-4000-a000-000000000001', 'eeeeeeee-3200-4000-a000-000000000004', 'Puedo ir hoy', 'enviada');
@@ -103,6 +114,32 @@ select throws_ok(
   $$insert into public.reportes (autor_id, objetivo_tipo, objetivo_id, motivo)
     values ('eeeeeeee-3200-4000-a000-000000000002', 'resena', '11111111-3200-4000-a000-00000000ffff', 'otro')$$,
   'P0002', null, 'no se puede reportar una reseña que no existe'
+);
+
+-- Un usuario no puede escribir el origen: la columna no tiene grant para authenticated, así que el
+-- insert falla con 42501 antes de llegar a los triggers.
+select throws_ok(
+  $$insert into public.reportes (autor_id, objetivo_tipo, objetivo_id, motivo, origen)
+    values ('eeeeeeee-3200-4000-a000-000000000002', 'trabajo', 'ffffffff-3200-4000-a000-000000000002', 'otro', 'sistema')$$,
+  '42501',
+  null,
+  'un usuario no puede insertar un reporte con origen sistema'
+);
+
+-- Límite diario: C1 ya tiene 1 reporte (el perfil de P). Suma 9 trabajos de C2 (llega a 10) y el 11.º se rechaza.
+select lives_ok(
+  $$insert into public.reportes (autor_id, objetivo_tipo, objetivo_id, motivo)
+    select 'eeeeeeee-3200-4000-a000-000000000002', 'trabajo', ('ffffffff-3200-4000-a000-' || lpad(n::text, 12, '0'))::uuid, 'otro'
+    from generate_series(2, 10) as n$$,
+  'C1 puede reportar 9 trabajos más (llega a 10 en 24 h)'
+);
+
+select throws_ok(
+  $$insert into public.reportes (autor_id, objetivo_tipo, objetivo_id, motivo)
+    values ('eeeeeeee-3200-4000-a000-000000000002', 'trabajo', 'ffffffff-3200-4000-a000-000000000011', 'otro')$$,
+  '23514',
+  null,
+  'el reporte número 11 en 24 h se rechaza'
 );
 
 -- El trigger resenas_moderar de LAB-31 ya abrió el reporte de la reseña de 1 estrella al insertarla
@@ -168,6 +205,16 @@ select throws_ok(
   'no admin no puede ocultar resena'
 );
 
+-- Un cliente no cambia su propio estado: el trigger lo rechaza aunque la policy de su fila lo deje pasar.
+reset role;
+select tests.como('eeeeeeee-3200-4000-a000-000000000003');
+select throws_ok(
+  $$update public.usuarios set estado = 'suspendida' where id = 'eeeeeeee-3200-4000-a000-000000000003'$$,
+  '42501',
+  null,
+  'un cliente no puede cambiar su propio estado de cuenta'
+);
+
 -- ---------------------------------------------------------------------------
 -- Tests de admin
 -- ---------------------------------------------------------------------------
@@ -201,6 +248,34 @@ select is(
   'estado del reporte pasa a resuelto'
 );
 
+-- Un admin suspendido pierde los chequeos de admin: es_admin() exige cuenta activa.
+reset role;
+select tests.como('eeeeeeee-3200-4000-a000-000000000005');
+select throws_ok(
+  $$select public.ocultar_resena_admin('11111111-3200-4000-a000-000000000001')$$,
+  '42501',
+  null,
+  'un admin suspendido no puede ocultar reseñas'
+);
+
+-- Un admin no cambia el estado de otro admin por update directo: el trigger lo rechaza.
+reset role;
+select tests.como('eeeeeeee-3200-4000-a000-000000000001');
+select throws_ok(
+  $$update public.usuarios set estado = 'activa' where id = 'eeeeeeee-3200-4000-a000-000000000005'$$,
+  '42501',
+  null,
+  'un admin no puede cambiar por update directo el estado de otro admin'
+);
+reset role;
+select is(
+  (select estado from public.usuarios where id = 'eeeeeeee-3200-4000-a000-000000000005'),
+  'suspendida'::public.estado_cuenta,
+  'el estado del otro admin sigue suspendida tras el intento'
+);
+reset role;
+select tests.como('eeeeeeee-3200-4000-a000-000000000001');
+
 -- Ocultar reseña
 select is(
   public.ocultar_resena_admin('11111111-3200-4000-a000-000000000001', 'Lenguaje inapropiado'),
@@ -212,6 +287,19 @@ select is(
   (select count(*) from public.resenas where id = '11111111-3200-4000-a000-000000000001'),
   0::bigint,
   'la reseña fue borrada'
+);
+
+-- Los reportes abiertos de la reseña quedan resueltos por el admin que la ocultó.
+select is(
+  (select estado from public.reportes where objetivo_tipo = 'resena' and objetivo_id = '11111111-3200-4000-a000-000000000001'),
+  'resuelto'::public.estado_reporte,
+  'ocultar la reseña resuelve sus reportes abiertos'
+);
+
+select is(
+  (select resuelto_por from public.reportes where objetivo_tipo = 'resena' and objetivo_id = '11111111-3200-4000-a000-000000000001'),
+  'eeeeeeee-3200-4000-a000-000000000001'::uuid,
+  'el reporte de la reseña queda resuelto por el admin que la ocultó'
 );
 
 -- Lo oculto no aparece en el perfil: ni en la lista de reseñas ni en el contador (trigger de recálculo).

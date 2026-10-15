@@ -97,6 +97,9 @@ declare
   v_cuenta integer;
 begin
   if new.origen = 'usuario' and new.autor_id is not null then
+    -- Serializa los inserts concurrentes del mismo autor: sin el lock, dos reportes en paralelo
+    -- pueden leer el mismo conteo y pasar ambos el límite. Se libera al cerrar la transacción.
+    perform pg_advisory_xact_lock(hashtextextended(new.autor_id::text, 0));
     select count(*) into v_cuenta
     from public.reportes
     where autor_id = new.autor_id
@@ -405,6 +408,16 @@ begin
     raise exception 'Reseña no encontrada' using errcode = 'P0002';
   end if;
 
+  -- Los reportes abiertos de la reseña quedan resueltos antes de borrarla: no sobreviven como
+  -- pendientes de un objetivo que ya no existe.
+  update public.reportes
+  set estado = 'resuelto',
+      resuelto_por = v_admin,
+      updated_at = now()
+  where objetivo_tipo = 'resena'
+    and objetivo_id = p_resena_id
+    and estado <> 'resuelto';
+
   delete from public.resenas where id = p_resena_id;
 
   insert into public.acciones_moderacion (admin_id, usuario_id, accion, objetivo_id, motivo)
@@ -500,3 +513,41 @@ $$;
 
 revoke execute on function public.resolver_reporte(uuid, boolean, text) from public, anon;
 grant execute on function public.resolver_reporte(uuid, boolean, text) to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- 4. usuarios.estado: solo cambia por las RPC de moderación (security definer, dueño) o por la
+--    service role. anon y authenticated no lo modifican ni siquiera siendo admin: el admin usa
+--    suspender_cuenta_admin / reactivar_cuenta_admin. Sin esto, un admin podía suspender o
+--    reactivar a otro admin por update directo (la policy usuarios_admin_actualizar lo permitía).
+--    Cuerpo partido de la versión vigente (20261014150000_consentimiento_datos_sensibles.sql):
+--    se conservan todas sus columnas protegidas; solo cambia la cláusula de estado.
+-- ---------------------------------------------------------------------------
+
+create or replace function privado.usuarios_proteger_columnas()
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
+begin
+  if current_user in ('anon', 'authenticated') then
+    if new.id is distinct from old.id
+       or new.rol is distinct from old.rol
+       or new.whatsapp is distinct from old.whatsapp
+       or new.normas_version is distinct from old.normas_version
+       or new.normas_aceptadas_at is distinct from old.normas_aceptadas_at
+       or new.datos_sensibles_version is distinct from old.datos_sensibles_version
+       or new.datos_sensibles_consentido_at is distinct from old.datos_sensibles_consentido_at then
+      raise exception 'No podés modificar esas columnas directamente'
+        using errcode = 'insufficient_privilege';
+    end if;
+    if new.estado is distinct from old.estado then
+      raise exception 'El estado de la cuenta lo cambia solo la moderación'
+        using errcode = 'insufficient_privilege';
+    end if;
+  end if;
+  return new;
+end;
+$$;
+
+-- El trigger ya existe (20261011200000_politicas.sql) y create or replace conserva sus privilegios:
+-- el revoke de execute a public, anon y authenticated sigue vigente.
