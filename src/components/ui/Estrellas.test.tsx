@@ -41,4 +41,22 @@ describe("Estrellas", () => {
     render(<Estrellas valor={0} onChange={() => {}} />);
     for (const radio of screen.getAllByRole("radio")) expect(radio).toHaveClass("size-11");
   });
+
+  it("admite etiquetas personalizadas para accesibilidad", () => {
+    render(
+      <Estrellas
+        valor={5}
+        onChange={() => {}}
+        etiquetasPuntaje={{
+          1: "Muy mal",
+          2: "Mal",
+          3: "Regular",
+          4: "Bien",
+          5: "Excelente",
+        }}
+      />,
+    );
+    expect(screen.getByRole("radio", { name: "Excelente" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: "Muy mal" })).toBeInTheDocument();
+  });
 });

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 
 import { HojaContacto } from "@/components/perfil/HojaContacto";
+import { HojaResena } from "@/components/resenas/HojaResena";
 import { GaleriaFotosTrabajo } from "@/components/trabajos/GaleriaFotosTrabajo";
 import { Chip } from "@/components/ui/Chip";
 import { EtiquetaMono } from "@/components/ui/EtiquetaMono";
@@ -42,6 +43,7 @@ export function DetalleMiTrabajo({
   const [modalTerminarAbierto, setModalTerminarAbierto] = useState(false);
   const [modalCambiarAbierto, setModalCambiarAbierto] = useState(false);
   const [hojaContactoAbierta, setHojaContactoAbierta] = useState(false);
+  const [hojaResenaAbierta, setHojaResenaAbierta] = useState(false);
 
   const botonCancelarRef = useRef<HTMLButtonElement | null>(null);
   const botonTerminarRef = useRef<HTMLButtonElement | null>(null);
@@ -103,6 +105,7 @@ export function DetalleMiTrabajo({
         setMensajeError(res.mensaje ?? "No pudimos marcar el trabajo como terminado.");
       } else {
         setModalTerminarAbierto(false);
+        setHojaResenaAbierta(true);
         router.refresh();
       }
     });
@@ -325,6 +328,10 @@ export function DetalleMiTrabajo({
             <div className="pt-1">
               <Link
                 href={`/profesionales/${trabajo.profesionalElegidoId}#resena`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setHojaResenaAbierta(true);
+                }}
                 className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-boton bg-naranja-accion px-5 text-sm font-bold text-sobre-naranja hover:opacity-95 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
               >
                 <Star aria-hidden className="size-4" />
@@ -388,6 +395,20 @@ export function DetalleMiTrabajo({
           </div>
         )}
       </section>
+
+      {trabajo.profesionalElegidoId ? (
+        <HojaResena
+          abierta={hojaResenaAbierta}
+          onCambioAbierta={setHojaResenaAbierta}
+          profesionalId={trabajo.profesionalElegidoId}
+          nombreProfesional={nombreElegido}
+          trabajoId={trabajo.id}
+          devolverFocoA={botonTerminarRef}
+          alGuardar={() => {
+            router.refresh();
+          }}
+        />
+      ) : null}
     </div>
   );
 }

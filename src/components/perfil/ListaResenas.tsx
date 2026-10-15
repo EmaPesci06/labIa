@@ -54,11 +54,13 @@ export function ListaResenas({ profesionalId, iniciales, total }: Props) {
             key={resena.id}
             className="flex flex-col gap-1.5 rounded-[14px] bg-superficie p-3.5 lg:rounded-2xl lg:p-[18px]"
           >
-            <div className="flex flex-wrap items-baseline justify-between gap-x-3 text-sm font-bold lg:text-[15px]">
+            <div className="flex flex-wrap items-baseline gap-x-1.5 text-sm font-bold lg:text-[15px]">
               <span>
                 {resena.autor} · {textoPuntaje(resena.puntaje)}
               </span>
-              <span className="text-[13px] font-normal text-texto-terciario">{resena.cuando}</span>
+              <span className="text-[13px] font-normal text-texto-terciario">
+                · {resena.cuando}
+              </span>
             </div>
             {resena.texto ? (
               <p className="text-[15px] leading-snug text-texto lg:text-base lg:leading-normal">

@@ -772,6 +772,29 @@ const server = http.createServer((req, res) => {
     }
 
     if (ruta === "/rest/v1/resenas") {
+      if (req.method === "POST") {
+        const datos = JSON.parse(cuerpo || "{}");
+        const nueva = {
+          id: "res-nueva-1",
+          autor_id: yo?.id ?? ID_CLIENTE,
+          profesional_id: datos.profesional_id,
+          trabajo_id: datos.trabajo_id || null,
+          puntaje: datos.puntaje,
+          texto: datos.texto || null,
+          created_at: new Date().toISOString(),
+        };
+        return responder(res, 201, unObjeto ? nueva : [nueva]);
+      }
+      if (req.method === "PATCH") {
+        const datos = JSON.parse(cuerpo || "{}");
+        return responder(res, 200, unObjeto ? datos : [datos]);
+      }
+      if (unObjeto) {
+        const autorParam = url.searchParams.get("autor_id");
+        if (autorParam) {
+          return responder(res, 406, { message: "sin filas" });
+        }
+      }
       const vacio = (url.searchParams.get("profesional_id") ?? "").includes(ID_EN_REVISION);
       const desde = Number(url.searchParams.get("offset") ?? 0);
       const limite = Number(url.searchParams.get("limit") ?? TOTAL_RESENAS);

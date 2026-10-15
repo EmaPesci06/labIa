@@ -7,8 +7,10 @@ import { Aviso } from "@/components/ui/Aviso";
 import { Boton } from "@/components/ui/Boton";
 import { CintaDistancia } from "@/components/ui/cinta-metrica";
 import { Insignia } from "@/components/ui/Insignia";
+import { BotonDejarResena } from "@/components/resenas/BotonDejarResena";
 import { cn } from "@/lib/cn";
 import type { PaginaResenas, PerfilPublico } from "@/lib/perfil/cargar";
+import type { ResenaPropia } from "@/lib/resenas/acciones";
 import {
   formatearPromedio,
   lineaOficio,
@@ -32,6 +34,10 @@ type Props = {
   hrefIngreso?: string;
   /** Cliente con sesión: el botón abre la hoja "Antes de contactar" (LAB-25). */
   puedeContactar?: boolean;
+  /** Si el cliente actual puede reseñar al profesional (LAB-31). */
+  puedeResenar?: boolean;
+  /** Reseña previa del cliente si ya escribió una (LAB-31). */
+  resenaPropia?: ResenaPropia | null;
 };
 
 function Insignias({ perfil, className }: { perfil: PerfilPublico; className?: string }) {
@@ -143,6 +149,8 @@ export function PerfilProfesional({
   distanciaKm,
   hrefIngreso,
   puedeContactar = false,
+  puedeResenar = false,
+  resenaPropia = null,
 }: Props) {
   const { esPropio } = perfil;
   // Los profesionales no contactan a otros: sin sesión de cliente no hay botón de contacto.
@@ -230,8 +238,25 @@ export function PerfilProfesional({
             </section>
           ) : null}
 
-          <section className="flex flex-col gap-2.5 lg:gap-3">
-            <h2 className="text-[17px] font-bold lg:text-xl">Reseñas</h2>
+          <section id="resena" className="flex flex-col gap-2.5 lg:gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <h2 className="text-[17px] font-bold lg:text-xl">Reseñas</h2>
+                {perfil.promedio !== null && perfil.cantidadResenas > 0 ? (
+                  <span className="text-sm font-semibold text-texto-secundario">
+                    · {formatearPromedio(perfil.promedio)} (
+                    {textoCantidadResenas(perfil.cantidadResenas)})
+                  </span>
+                ) : null}
+              </div>
+              {puedeResenar ? (
+                <BotonDejarResena
+                  profesionalId={perfil.id}
+                  nombreProfesional={perfil.nombre}
+                  resenaPropia={resenaPropia ?? null}
+                />
+              ) : null}
+            </div>
             <ListaResenas
               profesionalId={perfil.id}
               iniciales={resenas.resenas}
