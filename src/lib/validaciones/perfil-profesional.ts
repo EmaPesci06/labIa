@@ -3,7 +3,7 @@ import { z } from "zod";
 import { normalizarTelefono } from "@/lib/whatsapp";
 
 import { esquemaRegistro } from "./auth";
-import { MENSAJE_CONTENIDO_PUBLICO, sinDatosDeContacto } from "./contenido-publico";
+import { textoLibrePublico } from "./contenido-publico";
 
 /** Los 7 oficios del MVP: valor del enum `oficio` de la base y texto para la interfaz. */
 export const OFICIOS = [
@@ -48,15 +48,6 @@ const textoOpcional = (maximo: number, mensaje: string) =>
     .string()
     .trim()
     .max(maximo, mensaje)
-    .transform((valor) => (valor === "" ? null : valor));
-
-/** Texto libre que se muestra en el perfil público: sin teléfonos, emails ni direcciones. */
-const textoLibrePublico = (maximo: number, mensaje: string) =>
-  z
-    .string()
-    .trim()
-    .max(maximo, mensaje)
-    .refine(sinDatosDeContacto, MENSAJE_CONTENIDO_PUBLICO)
     .transform((valor) => (valor === "" ? null : valor));
 
 export const esquemaPerfilProfesional = z

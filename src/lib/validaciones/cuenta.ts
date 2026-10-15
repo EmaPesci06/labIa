@@ -1,12 +1,27 @@
 import { z } from "zod";
 
+import { MENSAJE_CONTENIDO_PUBLICO, sinDatosDeContacto } from "./contenido-publico";
 import { email, barrio, nombreCompleto, whatsapp } from "./registro-cliente";
 
 /** Palabra que hay que escribir para confirmar el borrado de la cuenta. */
 export const PALABRA_BORRAR = "BORRAR";
 
-/** "Mis datos": nombre, WhatsApp y barrio. Valida igual que el registro. */
-export const esquemaDatosCuenta = z.object({ nombreCompleto, whatsapp, barrio });
+/** "Mis datos": nombre, WhatsApp y barrio. Valida igual que el registro, y el nombre no lleva contacto. */
+export const esquemaDatosCuenta = z.object({
+  nombreCompleto: nombreCompleto.refine(sinDatosDeContacto, MENSAJE_CONTENIDO_PUBLICO),
+  whatsapp,
+  barrio,
+});
+
+/**
+ * Nombre o apellido que llega de un proveedor (Google, en `user_metadata`) antes de guardarlo en
+ * `usuarios`. Si no pasa, el callback no lo guarda: nunca entra un teléfono o un email como nombre.
+ */
+export const esquemaNombreDeProveedor = z
+  .string()
+  .trim()
+  .max(60)
+  .refine(sinDatosDeContacto, MENSAJE_CONTENIDO_PUBLICO);
 
 /** Contraseña actual: se pide para cambiar el email o la contraseña (cuentas con contraseña). */
 function contrasenaActual() {

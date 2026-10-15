@@ -1,13 +1,7 @@
 import { z } from "zod";
 
 import { OFICIOS } from "@/lib/busqueda";
-
-const textoOpcional = (max: number, mensaje: string) =>
-  z
-    .string()
-    .trim()
-    .max(max, mensaje)
-    .transform((v) => (v === "" ? null : v));
+import { textoLibrePublico } from "@/lib/validaciones/contenido-publico";
 
 /** Edición del perfil profesional (`/cuenta/perfil`). Los errores van al lado de cada campo. */
 export const esquemaPerfilProfesional = z
@@ -16,8 +10,8 @@ export const esquemaPerfilProfesional = z
       .array(z.enum(OFICIOS, { error: "Ese oficio no existe." }))
       .min(1, "Elegí al menos un oficio.")
       .max(OFICIOS.length, "Elegiste demasiados oficios."),
-    especialidades: textoOpcional(120, "Las especialidades pueden tener hasta 120 caracteres."),
-    descripcion: textoOpcional(500, "La descripción puede tener hasta 500 caracteres."),
+    especialidades: textoLibrePublico(120, "Las especialidades pueden tener hasta 120 caracteres."),
+    descripcion: textoLibrePublico(500, "La descripción puede tener hasta 500 caracteres."),
     aniosExperiencia: z
       .string()
       .trim()
@@ -30,7 +24,7 @@ export const esquemaPerfilProfesional = z
           .max(70, "Los años de experiencia pueden ser hasta 70.")
           .nullable(),
       ),
-    disponibilidad: textoOpcional(120, "La disponibilidad puede tener hasta 120 caracteres."),
+    disponibilidad: textoLibrePublico(120, "La disponibilidad puede tener hasta 120 caracteres."),
     todaLaCiudad: z.boolean(),
     zonas: z
       .array(z.number().int().positive("Esa zona no es válida."))

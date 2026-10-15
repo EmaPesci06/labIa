@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  LARGO_MAXIMO_ANALISIS,
   MENSAJE_CONTENIDO_PUBLICO,
   detectarDatoDeContacto,
   sinDatosDeContacto,
@@ -14,8 +15,11 @@ describe("detectarDatoDeContacto · bloquea", () => {
     ["+54 9 223 555 1234", "telefono"],
     ["(0223) 495-1234", "telefono"],
     ["223.555.1234 después de las 18", "telefono"],
+    ["２２３ ５５５ １２３４", "telefono"],
     ["escribime a laura@correo.com", "email"],
     ["laura arroba gmail punto com", "email"],
+    ["laura punto com, escribime", "email"],
+    ["laura(at)gmail.com", "email"],
     ["hablame por wa.me/5492235551234", "mensajeria"],
     ["buscame en instagram.com/plomero_mdp", "mensajeria"],
     ["Vivo en Av. Colón 1234, puerta negra", "direccion"],
@@ -43,9 +47,15 @@ describe("detectarDatoDeContacto · deja pasar", () => {
     "Disponible de lunes a viernes de 8 a 18 hs",
     "Trabajé entre 2020-2024 en obras de Chauvín",
     "Fecha tentativa 12.03.2026 a la mañana",
+    "trabajo el 12 03 2026 por la mañana",
     "Ya tengo 15 años de experiencia en gas",
     "Presupuesto 2025 para el baño completo",
+    "Fiat Palio 1998 2000 cc, motor nafta",
     "Caño de 1200 mm y 3 codos",
+    "Gasista matriculado 12345, con matrícula al día",
+    "Matrícula N° 12345 de gas natural",
+    "Calle 3 de Abril, a la vuelta de la plaza",
+    "Av. Independencia y calle 12, esquina con kiosco",
     "",
   ])("no bloquea «%s»", (texto) => {
     expect(detectarDatoDeContacto(texto)).toBeNull();
@@ -58,6 +68,22 @@ describe("detectarDatoDeContacto · deja pasar", () => {
 
   it("una lista de dígitos sueltos no cuenta como teléfono", () => {
     expect(detectarDatoDeContacto("Medidas: 1 2 3 4 5 6 7 8 cm")).toBeNull();
+  });
+});
+
+describe("límites de costo (LAB-53, hallazgo ReDoS)", () => {
+  it("un texto que pasa el largo máximo se trata como contacto, sin analizarlo", () => {
+    const inicio = performance.now();
+    expect(tieneDatosDeContacto("a".repeat(LARGO_MAXIMO_ANALISIS + 1))).toBe(true);
+    expect(tieneDatosDeContacto("a".repeat(200_000))).toBe(true);
+    expect(performance.now() - inicio).toBeLessThan(100);
+  });
+
+  it("un texto de 5000 caracteres con dígitos y separadores responde en menos de 100 ms", () => {
+    const inicio = performance.now();
+    detectarDatoDeContacto("1 ".repeat(2500));
+    detectarDatoDeContacto("Calle ".repeat(833) + "x");
+    expect(performance.now() - inicio).toBeLessThan(100);
   });
 });
 

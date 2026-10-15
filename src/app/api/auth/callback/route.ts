@@ -7,6 +7,7 @@ import { registrarEventoServidor } from "@/lib/metricas-servidor";
 import { urlDelSitio } from "@/lib/sitio";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import { ROLES_REGISTRABLES, type RolRegistrable } from "@/lib/validaciones/auth";
+import { esquemaNombreDeProveedor } from "@/lib/validaciones/cuenta";
 import { esquemaCompletarCliente } from "@/lib/validaciones/registro-cliente";
 
 const TIPOS_OTP: readonly EmailOtpType[] = [
@@ -91,12 +92,14 @@ export async function GET(request: NextRequest) {
   // `nombre` y `apellido` sí los puede editar el usuario (RLS y grants de LAB-12).
   if (fila && !fila.nombre) {
     const meta = usuario.user_metadata ?? {};
-    const nombre = String(meta.given_name ?? meta.name ?? meta.full_name ?? "")
-      .trim()
-      .slice(0, 60);
-    const apellido = String(meta.family_name ?? "")
-      .trim()
-      .slice(0, 60);
+    // Lo que llega en la metadata no es confiable: se valida igual que lo que escribe el usuario.
+    // Si no pasa (por ejemplo, un teléfono en el nombre), no se guarda.
+    const nombreCrudo = String(meta.given_name ?? meta.name ?? meta.full_name ?? "").slice(0, 60);
+    const apellidoCrudo = String(meta.family_name ?? "").slice(0, 60);
+    const nombreValidado = esquemaNombreDeProveedor.safeParse(nombreCrudo);
+    const apellidoValidado = esquemaNombreDeProveedor.safeParse(apellidoCrudo);
+    const nombre = nombreValidado.success ? nombreValidado.data : "";
+    const apellido = apellidoValidado.success ? apellidoValidado.data : "";
     if (nombre) {
       await supabase
         .from("usuarios")
