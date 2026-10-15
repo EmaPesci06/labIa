@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { obtenerPerfil } from "@/lib/perfil/cargar";
+import { limitarPersistente } from "@/lib/rate-limit-persistente";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 
@@ -8,6 +9,15 @@ import { contactarProfesional } from "./acciones";
 
 vi.mock("server-only", () => ({}));
 vi.mock("@/lib/sesion", () => ({ obtenerSesion: vi.fn() }));
+// Límite persistente (LAB-47): por defecto se comporta como la memoria, así los casos de arriba no cambian.
+vi.mock("@/lib/rate-limit-persistente", async () => {
+  const { limitarIntentos } = await import("@/lib/rate-limit");
+  return {
+    limitarPersistente: vi.fn(async (clave: string, regla: { maximo: number; ventanaMs: number }) =>
+      limitarIntentos(clave, regla),
+    ),
+  };
+});
 vi.mock("@/lib/supabase/servidor", () => ({
   crearClienteServidor: vi.fn(),
   supabaseConfigurado: vi.fn(() => true),
@@ -148,5 +158,41 @@ describe("contactarProfesional con origen postulacion (LAB-29)", () => {
     );
 
     expect(r.mensaje).toBe("Tu sesión venció. Ingresá de nuevo para contactar.");
+  });
+});
+
+describe("contactarProfesional: límite persistente (LAB-47)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("cuenta el intento por usuario con el límite persistente de 10 por minuto", async () => {
+    preparar();
+    await contactarProfesional(
+      estadoInicial,
+      formulario({ profesionalId: PROFESIONAL, origen: "postulacion", trabajoId: TRABAJO }),
+    );
+    expect(limitarPersistente).toHaveBeenCalledWith(`contacto:${CLIENTE}`, {
+      maximo: 10,
+      ventanaMs: 60_000,
+    });
+  });
+
+  it("si el límite persistente bloquea, no consulta la base ni devuelve el número", async () => {
+    preparar();
+    vi.mocked(limitarPersistente).mockResolvedValueOnce({
+      permitido: false,
+      segundosParaReintentar: 42,
+    });
+
+    const r = await contactarProfesional(
+      estadoInicial,
+      formulario({ profesionalId: PROFESIONAL, origen: "postulacion", trabajoId: TRABAJO }),
+    );
+
+    expect(r).toEqual({
+      mensaje: "Hiciste demasiados intentos. Esperá 42 segundos y probá de nuevo.",
+    });
+    expect(crearClienteServidor).not.toHaveBeenCalled();
   });
 });

@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 
 import type { EstadoFormulario } from "@/lib/auth/estado";
-import { limitarIntentos } from "@/lib/rate-limit";
+import { limitarPersistente } from "@/lib/rate-limit-persistente";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import { preferenciasDeFormulario } from "@/lib/validaciones/emails";
 
@@ -21,7 +21,7 @@ export async function guardarPreferenciasEmail(
   const { data } = await supabase.auth.getUser();
   if (!data.user) return { mensaje: "Ingresá de nuevo para cambiar tus preferencias." };
 
-  const limite = limitarIntentos(`preferencias-email:${data.user.id}`, {
+  const limite = await limitarPersistente(`preferencias-email:${data.user.id}`, {
     maximo: 20,
     ventanaMs: 60_000,
   });

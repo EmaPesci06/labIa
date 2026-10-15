@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { limitarPorIp, mensajeDeLimite } from "@/lib/rate-limit-persistente";
+import { rolDeLaSesion } from "@/lib/sesion";
 import { urlDelSitio } from "@/lib/sitio";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import {
@@ -15,7 +16,7 @@ import {
 } from "@/lib/validaciones/auth";
 
 import type { EstadoFormulario } from "./estado";
-import { inicioDelRol, volverSeguro, type RolUsuario } from "./rutas";
+import { inicioDelRol, volverSeguro } from "./rutas";
 
 const REGLA_INGRESO = { maximo: 5, ventanaMs: 60_000 } as const;
 
@@ -55,14 +56,6 @@ function mensajeDeAuth(codigo: string | undefined, estado: number | undefined): 
         ? "Revisá los datos e intentá de nuevo."
         : MENSAJE_ERROR_GENERAL;
   }
-}
-
-async function rolDeLaSesion(
-  supabase: Awaited<ReturnType<typeof crearClienteServidor>>,
-  idUsuario: string,
-): Promise<RolUsuario> {
-  const { data } = await supabase.from("usuarios").select("rol").eq("id", idUsuario).maybeSingle();
-  return data?.rol ?? "cliente";
 }
 
 export async function ingresar(
