@@ -17,9 +17,19 @@
  * de `auth.users` se borran en cascada su fila de `usuarios` y su perfil. Los datos salen de
  * `random()` (no de una semilla), así que cada carga es distinta. Reparto: ~90 % publicados,
  * ~25 % en toda la ciudad, 1 o 2 oficios, 1 a 5 zonas, gasistas matriculados el 80 % de las veces.
+ *
+ * Guardia (LAB-41): el script aborta si `NEXT_PUBLIC_SUPABASE_URL` no apunta a localhost. Antes de
+ * correrlo, exportá la URL local: `NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321`.
  */
 
 const PREFIJO_ID = "dddddddd-0000-4000-a000-";
+
+const urlSupabase = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+if (!/^https?:\/\/(127\.0\.0\.1|localhost|\[::1\])(:\d+)?(\/|$)/.test(urlSupabase)) {
+  throw new Error(
+    "generar-perfiles solo corre contra la base local. Definí NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321.",
+  );
+}
 
 const args = process.argv.slice(2);
 const cantidadArg = args.find((a) => a.startsWith("--cantidad="));

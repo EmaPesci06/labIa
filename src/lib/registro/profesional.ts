@@ -1,9 +1,7 @@
 "use server";
 
-import { headers } from "next/headers";
-
 import { erroresPorCampo } from "@/lib/validaciones/auth";
-import { limitarIntentos } from "@/lib/rate-limit";
+import { limitarPorIp, mensajeDeLimite, type ReglaLimite } from "@/lib/rate-limit-persistente";
 import { urlDelSitio } from "@/lib/sitio";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import {
@@ -25,21 +23,10 @@ const REGLA_GUARDAR = { maximo: 30, ventanaMs: 60_000 } as const;
 const MENSAJE_SIN_SUPABASE = "El registro todavía no está disponible. Probá de nuevo más tarde.";
 const MENSAJE_ERROR_GENERAL = "No pudimos guardar tu perfil. Probá de nuevo en unos minutos.";
 
-async function ipDelPedido(): Promise<string> {
-  const encabezados = await headers();
-  const reenviado = encabezados.get("x-forwarded-for")?.split(",")[0]?.trim();
-  return reenviado || encabezados.get("x-real-ip") || "desconocida";
-}
-
-async function superaElLimite(
-  accion: string,
-  regla: { maximo: number; ventanaMs: number },
-): Promise<EstadoPerfil | null> {
-  const resultado = limitarIntentos(`${accion}:${await ipDelPedido()}`, regla);
-  if (resultado.permitido) return null;
-  return {
-    mensaje: `Hiciste demasiados intentos. Esperá ${resultado.segundosParaReintentar} segundos y probá de nuevo.`,
-  };
+/** Límite por IP y acción, compartido entre instancias (LAB-41). */
+async function superaElLimite(accion: string, regla: ReglaLimite): Promise<EstadoPerfil | null> {
+  const mensaje = mensajeDeLimite(await limitarPorIp(accion, regla));
+  return mensaje ? { mensaje } : null;
 }
 
 /** Errores de Supabase Auth que se muestran junto al campo o como mensaje general. */

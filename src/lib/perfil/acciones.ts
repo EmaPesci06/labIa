@@ -1,9 +1,9 @@
 "use server";
 
-import { headers } from "next/headers";
 import { z } from "zod";
 
 import type { EstadoFormulario } from "@/lib/auth/estado";
+import { ipDelPedido } from "@/lib/ip-del-pedido";
 import { limitarIntentos } from "@/lib/rate-limit";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
@@ -13,12 +13,6 @@ import { obtenerResenas, type PaginaResenas } from "./cargar";
 import { RESENAS_POR_PAGINA } from "./datos";
 
 const MENSAJE_FALLA = "No pudimos completar la operación. Probá de nuevo en unos minutos.";
-
-async function ipDelPedido(): Promise<string> {
-  const encabezados = await headers();
-  const reenviado = encabezados.get("x-forwarded-for")?.split(",")[0]?.trim();
-  return reenviado || encabezados.get("x-real-ip") || "desconocida";
-}
 
 const esquemaMasResenas = z.object({
   profesionalId: z.uuid({ error: "Ese perfil no existe." }),
