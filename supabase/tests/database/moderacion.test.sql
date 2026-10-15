@@ -7,6 +7,7 @@ create extension if not exists pgtap with schema extensions;
 select plan(22);
 
 create schema tests;
+grant usage on schema tests to authenticated;
 
 -- Id del reporte de C1 sobre P (se genera al insertar; los grants de reportes no incluyen id).
 create function tests.reporte_perfil() returns uuid language sql stable as $$
