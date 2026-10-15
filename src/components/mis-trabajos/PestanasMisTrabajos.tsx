@@ -15,23 +15,20 @@ type Props = {
 };
 
 /**
- * Pestañas de filtrado de "Mis trabajos" del cliente (LAB-29).
- * Permite cambiar entre trabajos abiertos, contratados y terminados.
+ * Filtro de "Mis trabajos" del cliente (LAB-29, LAB-48).
+ * Cada opción es un enlace a `?tab=` (la lista se filtra en el servidor), así que usa el patrón de
+ * navegación: links con `aria-current="page"` en la activa. No usa roles de pestaña (tablist/tab/
+ * tabpanel), porque esas pestañas piden flechas y paneles que acá no existen.
  */
 export function PestanasMisTrabajos({ tabActiva }: Props) {
   return (
-    <nav
-      role="tablist"
-      aria-label="Filtro de mis trabajos"
-      className="flex flex-wrap items-center gap-2"
-    >
+    <nav aria-label="Filtro de mis trabajos" className="flex flex-wrap items-center gap-2">
       {TABS.map((tab) => {
         const activa = tabActiva === tab.clave;
         return (
           <Link
             key={tab.clave}
-            role="tab"
-            aria-selected={activa}
+            aria-current={activa ? "page" : undefined}
             href={`/mis-trabajos?tab=${tab.clave}`}
             className={cn(
               "rounded-chip inline-flex min-h-[44px] items-center justify-center px-4 text-sm font-bold transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco",

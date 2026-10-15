@@ -50,6 +50,18 @@ describe("Boton", () => {
     expect(alClic).toHaveBeenCalledTimes(1);
   });
 
+  it("variante peligro usa el token de error y reenvía el ref al botón", () => {
+    const ref = { current: null as HTMLButtonElement | null };
+    render(
+      <Boton variante="peligro" ref={ref}>
+        Cancelar trabajo
+      </Boton>,
+    );
+    const boton = screen.getByRole("button", { name: "Cancelar trabajo" });
+    expect(boton).toHaveClass("bg-error", "text-sobre-azul");
+    expect(ref.current).toBe(boton);
+  });
+
   it("con href se dibuja como enlace", () => {
     render(
       <Boton href="/registro" variante="secundario">

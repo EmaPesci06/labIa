@@ -17,12 +17,16 @@ type Props = {
   trabajoEstado: "abierto" | "asignado" | "cerrado" | "cancelado";
   esElegido: boolean;
   hayElegido: boolean;
-  onElegir: (postulacionId: string) => void | Promise<void>;
+  /** Devuelve `true` si la elección salió bien (la hoja se cierra) y `false` si falló (queda abierta con el error). */
+  onElegir: (postulacionId: string) => Promise<boolean>;
   pendiente: boolean;
+  /** Error de la última elección; se muestra solo en la hoja de este postulante. */
+  errorElegir?: string | null;
+  onLimpiarErrorElegir?: () => void;
 };
 
 /**
- * Tarjeta de un postulante en la vista del cliente (LAB-29).
+ * Tarjeta de un postulante en la vista del cliente (LAB-29, LAB-48).
  * Muestra avatar, nombre, oficio/calificación, distancia, mensaje presupuestario,
  * link al perfil público y botón para elegirlo con confirmación atómica.
  */
@@ -33,6 +37,8 @@ export function TarjetaPostulante({
   hayElegido,
   onElegir,
   pendiente,
+  errorElegir = null,
+  onLimpiarErrorElegir,
 }: Props) {
   const [modalAbierto, setModalAbierto] = useState(false);
   const botonAbridorRef = useRef<HTMLButtonElement | null>(null);
@@ -63,8 +69,15 @@ export function TarjetaPostulante({
   const textoPresupuesto = partesPresupuesto.join(" · ");
 
   async function handleConfirmarEleccion() {
-    await onElegir(postulante.id);
-    setModalAbierto(false);
+    const salio = await onElegir(postulante.id);
+    if (salio) {
+      setModalAbierto(false);
+    }
+  }
+
+  function handleCambioModal(abierta: boolean) {
+    setModalAbierto(abierta);
+    if (!abierta) onLimpiarErrorElegir?.();
   }
 
   return (
@@ -125,7 +138,7 @@ export function TarjetaPostulante({
             </button>
             <ModalConfirmacion
               abierta={modalAbierto}
-              onCambioAbierta={setModalAbierto}
+              onCambioAbierta={handleCambioModal}
               titulo={`¿Elegís a ${postulante.profesional.nombre}?`}
               descripcion="Los demás postulantes van a ver que elegiste a otra persona. Podrás contactarlo directamente por WhatsApp."
               textoConfirmar="Elegir profesional"
@@ -133,6 +146,7 @@ export function TarjetaPostulante({
               pendiente={pendiente}
               onConfirmar={handleConfirmarEleccion}
               devolverFocoA={botonAbridorRef}
+              error={errorElegir}
             />
           </>
         ) : (

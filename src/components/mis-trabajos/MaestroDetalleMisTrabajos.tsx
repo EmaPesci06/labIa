@@ -6,6 +6,7 @@ import type { DetalleMiTrabajoCliente, TrabajoClienteItem } from "@/lib/trabajos
 
 import { DetalleMiTrabajo } from "./DetalleMiTrabajo";
 import { PestanasMisTrabajos, type TabMisTrabajos } from "./PestanasMisTrabajos";
+import { SeleccionInicialEscritorio } from "./SeleccionInicialEscritorio";
 import { TarjetaMiTrabajo } from "./TarjetaMiTrabajo";
 
 type Props = {
@@ -15,13 +16,20 @@ type Props = {
 };
 
 /**
- * Vista maestro-detalle de "Mis trabajos" del cliente (LAB-29).
+ * Vista maestro-detalle de "Mis trabajos" del cliente (LAB-29, LAB-48).
  * - Celular: lista de trabajos con pestañas; tocar uno lleva a `/mis-trabajos/[id]`.
- * - Escritorio (Desk-MisTrabajos): lista a la izquierda y detalle con postulantes a la derecha.
+ * - Escritorio (Desk-MisTrabajos): dos columnas, lista a la izquierda (400 px) y detalle con
+ *   postulantes a la derecha. Sin `?id=` el detalle no se carga; en escritorio se elige el primero.
  */
 export function MaestroDetalleMisTrabajos({ trabajos, trabajoSeleccionado, tabActiva }: Props) {
   return (
     <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 py-2 lg:py-6">
+      {!trabajoSeleccionado && trabajos.length > 0 ? (
+        <SeleccionInicialEscritorio
+          tabActiva={tabActiva}
+          primerTrabajoId={trabajos[0]?.id ?? null}
+        />
+      ) : null}
       {/* Encabezado y Pestañas */}
       <div className="flex flex-col gap-3">
         <h1 className="font-titulo text-2xl font-extrabold tracking-tight text-texto lg:text-[32px]">
@@ -46,7 +54,7 @@ export function MaestroDetalleMisTrabajos({ trabajos, trabajoSeleccionado, tabAc
           {/* Columna izquierda (Lista) */}
           <section
             aria-label="Lista de mis trabajos"
-            className="flex w-full flex-col gap-3 lg:w-[380px] lg:shrink-0"
+            className="flex w-full flex-col gap-3 lg:w-[400px] lg:shrink-0"
           >
             {/* Lista visible en móvil y escritorio */}
             <div className="flex flex-col gap-3">

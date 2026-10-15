@@ -8,6 +8,7 @@ import { useRef, useState, useTransition } from "react";
 import { HojaContacto } from "@/components/perfil/HojaContacto";
 import { HojaResena } from "@/components/resenas/HojaResena";
 import { GaleriaFotosTrabajo } from "@/components/trabajos/GaleriaFotosTrabajo";
+import { Boton } from "@/components/ui/Boton";
 import { Chip } from "@/components/ui/Chip";
 import { EtiquetaMono } from "@/components/ui/EtiquetaMono";
 import { formatearPesos, haceCuanto } from "@/lib/formato";
@@ -37,6 +38,9 @@ export function DetalleMiTrabajo({
   const router = useRouter();
   const [pendiente, startTransition] = useTransition();
   const [mensajeError, setMensajeError] = useState<string | null>(null);
+  const [elegirEnCurso, setElegirEnCurso] = useState(false);
+  const [errorElegir, setErrorElegir] = useState<string | null>(null);
+  const ocupado = pendiente || elegirEnCurso;
 
   // Modales
   const [modalCancelarAbierto, setModalCancelarAbierto] = useState(false);
@@ -72,16 +76,28 @@ export function DetalleMiTrabajo({
     : "el profesional";
 
   // Acciones
-  function handleElegir(postulacionId: string) {
-    setMensajeError(null);
-    startTransition(async () => {
+  /**
+   * Elige un postulante. Devuelve `true` si salió bien (la tarjeta cierra su hoja) o `false` si
+   * falló (la hoja queda abierta y muestra el error). El error vive aparte del banner general porque
+   * la hoja de confirmación tapa el resto de la página.
+   */
+  async function handleElegir(postulacionId: string): Promise<boolean> {
+    setErrorElegir(null);
+    setElegirEnCurso(true);
+    try {
       const res = await elegirPostulante(postulacionId, trabajo.id);
       if (!res.ok) {
-        setMensajeError(res.mensaje ?? "No pudimos elegir al profesional.");
-      } else {
-        router.refresh();
+        setErrorElegir(res.mensaje ?? "No pudimos elegir al profesional.");
+        return false;
       }
-    });
+      router.refresh();
+      return true;
+    } catch {
+      setErrorElegir("No pudimos elegir al profesional. Probá de nuevo.");
+      return false;
+    } finally {
+      setElegirEnCurso(false);
+    }
   }
 
   function handleCancelar() {
@@ -205,16 +221,15 @@ export function DetalleMiTrabajo({
         {/* Acciones principales según estado */}
         {trabajo.estado === "abierto" ? (
           <div className="mt-2 flex flex-wrap items-center justify-end gap-2 border-t border-divisor pt-3">
-            <button
+            <Boton
               ref={botonCancelarRef}
-              type="button"
+              variante="peligro"
               disabled={pendiente}
               onClick={() => setModalCancelarAbierto(true)}
-              className="inline-flex min-h-[44px] cursor-pointer items-center justify-center gap-1.5 rounded-boton border border-divisor px-4 text-sm font-semibold text-error hover:bg-error/10 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
             >
               <XCircle aria-hidden className="size-4" />
               Cancelar trabajo
-            </button>
+            </Boton>
             <ModalConfirmacion
               abierta={modalCancelarAbierto}
               onCambioAbierta={setModalCancelarAbierto}
@@ -388,7 +403,9 @@ export function DetalleMiTrabajo({
                   esElegido={esElegido}
                   hayElegido={Boolean(trabajo.profesionalElegidoId)}
                   onElegir={handleElegir}
-                  pendiente={pendiente}
+                  pendiente={ocupado}
+                  errorElegir={errorElegir}
+                  onLimpiarErrorElegir={() => setErrorElegir(null)}
                 />
               );
             })}
