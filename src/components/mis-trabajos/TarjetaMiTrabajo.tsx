@@ -75,7 +75,7 @@ export function TarjetaMiTrabajo({ trabajo, seleccionado = false, href }: Props)
         </span>
       </div>
 
-      <span className="font-titulo text-[17px] font-bold tracking-tight text-texto group-hover:text-azul lg:text-lg dark:group-hover:text-azul-suave">
+      <span className="font-titulo text-[17px] font-bold tracking-tight text-texto group-hover:text-azul lg:text-lg">
         {trabajo.titulo}
       </span>
 

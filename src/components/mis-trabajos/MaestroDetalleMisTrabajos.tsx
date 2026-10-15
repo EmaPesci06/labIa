@@ -75,7 +75,7 @@ export function MaestroDetalleMisTrabajos({ trabajos, trabajoSeleccionado, tabAc
             {/* Botón "+ Publicar otro trabajo" de escritorio */}
             <Link
               href="/trabajos/nuevo"
-              className="hidden min-h-[48px] items-center justify-center gap-2 rounded-[12px] border-[1.5px] border-dashed border-borde text-[15px] font-bold text-azul transition-colors hover:border-azul hover:bg-azul-suave/20 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco lg:flex dark:border-borde dark:text-azul-suave"
+              className="hidden min-h-[48px] items-center justify-center gap-2 rounded-[12px] border-[1.5px] border-dashed border-borde text-[15px] font-bold text-azul transition-colors hover:border-azul hover:bg-azul-suave/20 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco lg:flex"
             >
               <Plus aria-hidden className="size-4" />
               Publicar otro trabajo

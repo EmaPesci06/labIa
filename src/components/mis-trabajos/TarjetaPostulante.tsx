@@ -103,7 +103,7 @@ export function TarjetaPostulante({
       <div className="mt-1 grid grid-cols-2 gap-2 pt-1 sm:flex sm:justify-end">
         <Link
           href={`/profesionales/${postulante.profesionalId}`}
-          className="inline-flex min-h-[44px] items-center justify-center rounded-boton border-[1.5px] border-azul px-4 text-center text-sm font-bold text-azul transition-colors hover:bg-azul-suave focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco sm:w-auto dark:border-azul-suave dark:text-azul-suave dark:hover:bg-azul-suave/20"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-boton border-[1.5px] border-azul px-4 text-center text-sm font-bold text-azul transition-colors hover:bg-azul-suave focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco sm:w-auto"
         >
           Ver perfil
         </Link>
