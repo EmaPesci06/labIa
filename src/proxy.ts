@@ -15,11 +15,11 @@ export async function proxy(request: NextRequest) {
 
   // Sesión falsa de desarrollo/e2e: no se consulta a Supabase.
   const falso = rolFalso();
-  const { respuesta, rol } = falso
-    ? { respuesta: NextResponse.next(), rol: falso }
+  const { respuesta, rol, estado } = falso
+    ? { respuesta: NextResponse.next(), rol: falso, estado: "activa" as const }
     : await refrescarSesion(request);
 
-  const decision = decidirAcceso(pathname, search, rol);
+  const decision = decidirAcceso(pathname, search, rol, estado);
   if (decision.tipo === "pasar") return respuesta;
 
   // Se devuelven las cookies refrescadas también en redirecciones y 404.

@@ -36,6 +36,21 @@ export function nombreVisible(
   return local || "Tu cuenta";
 }
 
+type ClienteServidor = Awaited<ReturnType<typeof crearClienteServidor>>;
+
+/**
+ * Rol de una cuenta leído con el cliente de la sesión (la RLS deja leer la fila propia). Sin fila
+ * devuelve `cliente`. Único helper de rol para las Server Actions y las rutas que ya validaron la
+ * sesión (LAB-47). Para Server Components usar `obtenerSesion`.
+ */
+export async function rolDeLaSesion(
+  supabase: ClienteServidor,
+  idUsuario: string,
+): Promise<RolUsuario> {
+  const { data } = await supabase.from("usuarios").select("rol").eq("id", idUsuario).maybeSingle();
+  return data?.rol ?? "cliente";
+}
+
 /**
  * Sesión del pedido actual para Server Components: `{ usuario, rol, perfil }` o `null` si no hay
  * sesión. Se memoriza por pedido (`cache` de React): llamarla desde varios componentes cuesta una

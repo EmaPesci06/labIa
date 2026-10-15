@@ -7,6 +7,7 @@ import { FiltrosTrabajos } from "@/components/trabajos/FiltrosTrabajos";
 import type { MiPostulacionInfo } from "@/components/trabajos/FormularioPostulacion";
 import { ListaPostulaciones } from "@/components/trabajos/ListaPostulaciones";
 import { MaestroDetalleTrabajos } from "@/components/trabajos/MaestroDetalleTrabajos";
+import { Boton } from "@/components/ui/Boton";
 import type { Oficio } from "@/lib/busqueda";
 import { obtenerMisVerificaciones } from "@/lib/registro/documentos";
 import { obtenerSesion } from "@/lib/sesion";
@@ -16,6 +17,13 @@ import {
   obtenerPerfilParaTrabajos,
   obtenerTrabajosParaMi,
 } from "@/lib/trabajos/consulta";
+import {
+  alcanzoElTopeDePaginas,
+  hayMasTrabajos,
+  leerPaginaTrabajos,
+  limiteParaPagina,
+  urlTrabajosConPagina,
+} from "@/lib/trabajos/paginacion";
 import { resumenBannerVerificacion } from "@/lib/verificacion/logica";
 
 export const metadata: Metadata = { title: "Trabajos · LabÍA" };
@@ -26,6 +34,7 @@ type PaginaTrabajosProps = {
     oficio?: string;
     zonas?: string;
     trabajo?: string;
+    pagina?: string;
   }>;
 };
 
@@ -80,10 +89,17 @@ export default async function Trabajos({ searchParams }: PaginaTrabajosProps) {
     ? formatearBajadaTrabajos(perfil.oficios, perfil.zonasNombres, perfil.todaLaCiudad)
     : "Mar del Plata";
 
-  const { trabajos } = await obtenerTrabajosParaMi({
+  const pagina = leerPaginaTrabajos(params.pagina);
+  const { trabajos, total } = await obtenerTrabajosParaMi({
     oficio: oficioFiltrado,
     soloMisZonas,
+    limite: limiteParaPagina(pagina),
   });
+  const urlFiltros = {
+    oficio: oficioFiltrado,
+    zonas: soloMisZonas ? null : "todas",
+    trabajo: params.trabajo ?? null,
+  };
 
   // Solo en escritorio hace falta el detalle: buscamos la postulación propia del trabajo elegido.
   let miPostulacionSeleccionada: MiPostulacionInfo | null = null;
@@ -133,6 +149,16 @@ export default async function Trabajos({ searchParams }: PaginaTrabajosProps) {
         miPostulacionSeleccionada={miPostulacionSeleccionada}
         publicado={perfil?.publicado ?? false}
       />
+
+      {hayMasTrabajos(trabajos.length, total, pagina) ? (
+        <Boton href={urlTrabajosConPagina(urlFiltros, pagina + 1)} variante="secundario" bloque>
+          Ver más
+        </Boton>
+      ) : alcanzoElTopeDePaginas(trabajos.length, total, pagina) ? (
+        <p className="text-center text-[15px] text-texto-secundario">
+          Refiná los filtros para ver menos trabajos.
+        </p>
+      ) : null}
     </div>
   );
 }

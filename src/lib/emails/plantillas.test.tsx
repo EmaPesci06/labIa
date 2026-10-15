@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import BienvenidaCliente from "@/emails/bienvenida_cliente";
 import BienvenidaProfesional from "@/emails/bienvenida_profesional";
+import CuentaSuspendida from "@/emails/cuenta_suspendida";
 import DocumentoRechazado from "@/emails/documento_rechazado";
 import EligieronAOtro from "@/emails/eligieron_a_otro";
 import NuevaPostulacion, { asuntoNuevaPostulacion } from "@/emails/nueva_postulacion";
@@ -24,6 +25,7 @@ const PLANTILLAS: Record<string, ConVistaPrevia> = {
   eligieron_a_otro: EligieronAOtro as unknown as ConVistaPrevia,
   trabajos_cerca: TrabajosCerca as unknown as ConVistaPrevia,
   pedir_resena: PedirResena as unknown as ConVistaPrevia,
+  cuenta_suspendida: CuentaSuspendida as unknown as ConVistaPrevia,
 };
 
 const vista = (c: ConVistaPrevia) =>

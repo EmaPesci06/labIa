@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 
 import { Boton } from "@/components/ui/Boton";
+import { BotonReportar } from "@/components/reportes/BotonReportar";
 import { cargarMasResenas } from "@/lib/perfil/acciones";
 import type { ResenaPerfil } from "@/lib/perfil/cargar";
 import { textoPuntaje } from "@/lib/perfil/datos";
@@ -69,6 +70,13 @@ export function ListaResenas({ profesionalId, iniciales, total }: Props) {
               <span className="text-[13px] font-normal text-texto-terciario">
                 · {resena.cuando}
               </span>
+              <BotonReportar
+                objetivoTipo="resena"
+                objetivoId={resena.id}
+                tituloObjetivo={`Reseña de ${resena.autor}`}
+                texto="Reportar"
+                className="text-xs text-texto-terciario underline hover:text-texto"
+              />
             </div>
             {resena.texto ? (
               <p className="text-[15px] leading-snug text-texto lg:text-base lg:leading-normal">

@@ -23,6 +23,9 @@ const ID_RECHAZADO = "55555555-5555-4555-8555-555555555555";
 // no comparten estado (el límite diario se simula por token, no con un contador global).
 const ID_CLIENTE_LIMITE = "66666666-6666-4666-8666-666666666666";
 const ID_CLIENTE_DESPUBLICADO = "77777777-7777-4777-8777-777777777777";
+// LAB-32: profesional que se modera (suspensión, reseñas bajas). Sus datos son propios de la moderación.
+const ID_MODERADO = "99999999-9999-4999-8999-999999999999";
+
 // LAB-31 (reseñas): clientes para el flujo de reseñas. Los tres primeros contactaron a ID_PUBLICADO
 // (contactos falsos); ID_RESENA_AJENA no contactó a nadie y no puede reseñar.
 const ID_RESENA_NUEVA = "aaaaaaa1-aaaa-4aaa-8aaa-aaaaaaaaaaa1";
@@ -95,6 +98,13 @@ const USUARIOS = {
     nombre: "Sofía",
     apellido: "Ríos",
     barrio_id: 2,
+  },
+  "tok-moderado": {
+    id: ID_MODERADO,
+    rol: "profesional",
+    nombre: "Tomás",
+    apellido: "Ruiz",
+    barrio_id: 3,
   },
   "tok-admin": {
     id: ID_ADMIN,
@@ -206,6 +216,39 @@ const USUARIOS_ADMIN = [
     barrio_id: 1,
     normas_version: "2026-10",
     normas_aceptadas_at: hace(300),
+  },
+  {
+    id: ID_CLIENTE_LIMITE,
+    rol: "cliente",
+    estado: "activa",
+    nombre: "Ana",
+    apellido: "Pérez",
+    whatsapp: null,
+    barrio_id: 1,
+    normas_version: "2026-10",
+    normas_aceptadas_at: hace(120),
+  },
+  {
+    id: ID_CLIENTE_DESPUBLICADO,
+    rol: "cliente",
+    estado: "activa",
+    nombre: "Bruno",
+    apellido: "Dávila",
+    whatsapp: null,
+    barrio_id: 1,
+    normas_version: "2026-10",
+    normas_aceptadas_at: hace(120),
+  },
+  {
+    id: ID_MODERADO,
+    rol: "profesional",
+    estado: "activa",
+    nombre: "Tomás",
+    apellido: "Ruiz",
+    whatsapp: "+5492236000004",
+    barrio_id: 3,
+    normas_version: "2026-10",
+    normas_aceptadas_at: hace(150),
   },
 ];
 
@@ -570,6 +613,19 @@ function filaPerfil(id, yo) {
     es_propio: propio,
   };
   if (id === ID_PUBLICADO) return [{ ...base, publicado: true }];
+  if (id === ID_MODERADO) {
+    return [
+      {
+        ...base,
+        nombre: "Tomás",
+        apellido: yo ? "Ruiz" : null,
+        apellido_inicial: "R",
+        publicado: true,
+        cantidad_resenas: 2,
+        promedio: 1.5,
+      },
+    ];
+  }
   if (id === ID_EN_REVISION && propio) {
     return [
       {
@@ -601,6 +657,11 @@ function filtrar(filas, url) {
     if (["select", "order", "limit", "offset"].includes(clave)) continue;
     const eq = /^eq\.(.*)$/.exec(valor);
     const en = /^in\.\((.*)\)$/.exec(valor);
+    const menor = /^lte\.(.*)$/.exec(valor);
+    if (menor) {
+      resultado = resultado.filter((f) => Number(f[clave]) <= Number(menor[1]));
+      continue;
+    }
     if (eq) {
       resultado = resultado.filter((f) => String(f[clave]) === eq[1]);
     } else if (en) {
@@ -619,7 +680,7 @@ function filtrar(filas, url) {
 function tablaAdmin(nombre) {
   switch (nombre) {
     case "usuarios":
-      return USUARIOS_ADMIN;
+      return USUARIOS_ADMIN.map((u) => ({ ...u, estado: estadoDe(u.id) }));
     case "perfiles_profesionales":
       return PERFILES_ADMIN;
     case "matricula_propia":
@@ -628,6 +689,24 @@ function tablaAdmin(nombre) {
       return VERIFICACIONES.map(({ archivo, ...fila }) => fila);
     case "barrios":
       return BARRIOS;
+    case "reportes":
+      return MODERACION.reportes;
+    case "trabajos":
+      return TRABAJOS_MOCK.map((t) => ({
+        id: t.id,
+        titulo: t.titulo,
+        cliente_id: t.cliente_id,
+        estado: MODERACION.trabajosCerrados.has(t.id) ? "cancelado" : t.estado,
+      }));
+    case "resenas":
+      return todasLasResenas().map((r) => ({
+        id: r.id,
+        autor_id: r.autor_id,
+        profesional_id: r.profesional_id ?? ID_PUBLICADO,
+        puntaje: r.puntaje,
+        texto: r.texto,
+        created_at: r.created_at,
+      }));
     default:
       return null;
   }
@@ -680,6 +759,238 @@ function servirDocumento(url, req, res) {
   res.end(archivo.bytes);
 }
 
+// ---------------------------------------------------------------------------------------------
+// LAB-32: reportes y moderación. Estado solo en memoria; /__moderacion/reiniciar lo vuelve a los datos
+// de partida. Las RPC de moderación exigen rol admin (como la base) y la reseña ocultada se borra.
+// ---------------------------------------------------------------------------------------------
+
+const crypto = require("node:crypto");
+
+const RESENAS_MODERACION_BASE = [
+  {
+    id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+    autor_id: ID_CLIENTE_DESPUBLICADO,
+    profesional_id: ID_MODERADO,
+    puntaje: 1,
+    texto: "Llegó tarde y dejó todo sin limpiar.",
+    created_at: hace(5),
+  },
+  {
+    id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2",
+    autor_id: ID_CLIENTE_LIMITE,
+    profesional_id: ID_MODERADO,
+    puntaje: 2,
+    texto: "Cambió el presupuesto sin avisarme.",
+    created_at: hace(7),
+  },
+  {
+    id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa3",
+    autor_id: ID_CLIENTE,
+    profesional_id: ID_MODERADO,
+    puntaje: 1,
+    texto: "Presupuesto inflado y trato agresivo.",
+    created_at: hace(9),
+  },
+];
+
+const REPORTES_BASE = [
+  {
+    id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb1",
+    autor_id: ID_CLIENTE_LIMITE,
+    objetivo_tipo: "perfil",
+    objetivo_id: ID_MODERADO,
+    motivo: "estafa",
+    detalle: "Me pidió una seña por transferencia fuera de la app.",
+    estado: "abierto",
+    resuelto_por: null,
+    created_at: hace(3),
+  },
+  {
+    id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
+    autor_id: ID_CLIENTE_DESPUBLICADO,
+    objetivo_tipo: "resena",
+    objetivo_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa3",
+    motivo: "contenido_inapropiado",
+    detalle: null,
+    estado: "abierto",
+    resuelto_por: null,
+    created_at: hace(2),
+  },
+];
+
+let MODERACION;
+
+function reiniciarModeracion() {
+  MODERACION = {
+    reportes: REPORTES_BASE.map((r) => ({ ...r })),
+    resenas: RESENAS_MODERACION_BASE.map((r) => ({ ...r })),
+    ocultas: new Set(),
+    suspendidos: new Map(),
+    trabajosCerrados: new Set(),
+  };
+}
+reiniciarModeracion();
+
+function estadoDe(id) {
+  return MODERACION.suspendidos.has(id) ? "suspendida" : "activa";
+}
+
+/** Reseñas visibles: las de partida y las de moderación, sin las que se ocultaron (se borran). */
+function todasLasResenas() {
+  return [...resenas, ...MODERACION.resenas].filter((r) => !MODERACION.ocultas.has(r.id));
+}
+
+const RPC_ADMIN = new Set([
+  "marcar_reporte_en_revision",
+  "resolver_reporte",
+  "ocultar_resena_admin",
+  "cerrar_trabajo_admin",
+  "suspender_cuenta_admin",
+  "reactivar_cuenta_admin",
+]);
+
+function errorRpc(res, estado, codigo, mensaje) {
+  responder(res, estado, { code: codigo, message: mensaje });
+  return true;
+}
+
+function atenderResenas(url, res, unObjeto) {
+  const idParam = (url.searchParams.get("id") ?? "").replace(/^eq\./, "");
+  if (idParam) {
+    const resena = todasLasResenas().find((r) => r.id === idParam);
+    if (!resena) return errorRpc(res, 406, "PGRST116", "The result contains 0 rows");
+    responder(res, 200, unObjeto ? resena : [resena]);
+    return true;
+  }
+  const profesional = (url.searchParams.get("profesional_id") ?? "").replace(/^eq\./, "");
+  const candidatas = todasLasResenas().filter(
+    (r) => !profesional || (r.profesional_id ?? ID_PUBLICADO) === profesional,
+  );
+  const desde = Number(url.searchParams.get("offset") ?? 0);
+  const limite = Number(url.searchParams.get("limit") ?? TOTAL_RESENAS);
+  const pagina = candidatas.slice(desde, desde + limite);
+  responder(res, 200, pagina, {
+    "content-range": `${pagina.length ? desde : "*"}${pagina.length ? `-${desde + pagina.length - 1}` : ""}/${candidatas.length}`,
+  });
+  return true;
+}
+
+function atenderReportes(req, url, cuerpo, yo, unObjeto, res) {
+  if (req.method === "POST") {
+    const datos = JSON.parse(cuerpo || "{}");
+    const duplicado = MODERACION.reportes.some(
+      (r) =>
+        r.autor_id === datos.autor_id &&
+        r.objetivo_tipo === datos.objetivo_tipo &&
+        r.objetivo_id === datos.objetivo_id,
+    );
+    if (duplicado) {
+      responder(res, 409, { code: "23505", message: "duplicate key value" });
+      return true;
+    }
+    MODERACION.reportes.push({
+      id: crypto.randomUUID(),
+      estado: "abierto",
+      resuelto_por: null,
+      detalle: null,
+      created_at: new Date().toISOString(),
+      ...datos,
+    });
+    res.writeHead(201);
+    res.end();
+    return true;
+  }
+  // Lectura de quien reporta: solo sus propios reportes (la comprobación de duplicados).
+  const filas = filtrar(
+    MODERACION.reportes.filter((r) => yo && r.autor_id === yo.id),
+    url,
+  );
+  if (!unObjeto) {
+    responder(res, 200, filas);
+  } else if (filas.length === 1) {
+    responder(res, 200, filas[0]);
+  } else {
+    errorRpc(res, 406, "PGRST116", "The result contains 0 rows");
+  }
+  return true;
+}
+
+function atenderRpcAdmin(nombre, cuerpo, yo, res) {
+  if (yo?.rol !== "admin") return errorRpc(res, 403, "42501", "permission denied");
+  const p = JSON.parse(cuerpo || "{}");
+  const reporte = () => MODERACION.reportes.find((r) => r.id === p.p_reporte_id);
+
+  switch (nombre) {
+    case "marcar_reporte_en_revision": {
+      if (!reporte()) return errorRpc(res, 400, "P0002", "Reporte no encontrado");
+      if (reporte().estado === "abierto") reporte().estado = "en_revision";
+      break;
+    }
+    case "resolver_reporte": {
+      if (!reporte()) return errorRpc(res, 400, "P0002", "Reporte no encontrado");
+      reporte().estado = "resuelto";
+      reporte().resuelto_por = yo.id;
+      break;
+    }
+    case "ocultar_resena_admin": {
+      if (!todasLasResenas().some((r) => r.id === p.p_resena_id)) {
+        return errorRpc(res, 400, "P0002", "Reseña no encontrada");
+      }
+      // Como la función real: la reseña se borra, no queda visible para nadie.
+      MODERACION.ocultas.add(p.p_resena_id);
+      break;
+    }
+    case "cerrar_trabajo_admin": {
+      if (!TRABAJOS_MOCK.some((t) => t.id === p.p_trabajo_id)) {
+        return errorRpc(res, 400, "P0002", "Trabajo no encontrado");
+      }
+      MODERACION.trabajosCerrados.add(p.p_trabajo_id);
+      break;
+    }
+    case "suspender_cuenta_admin": {
+      const usuario = USUARIOS_ADMIN.find((u) => u.id === p.p_usuario_id);
+      if (!usuario) return errorRpc(res, 400, "P0002", "Usuario no encontrado");
+      if (usuario.rol === "admin") {
+        return errorRpc(res, 400, "22023", "No se puede suspender a un admin");
+      }
+      if (!p.p_motivo) return errorRpc(res, 400, "22023", "El motivo de suspensión es obligatorio");
+      MODERACION.suspendidos.set(usuario.id, p.p_motivo);
+      break;
+    }
+    case "reactivar_cuenta_admin": {
+      if (!USUARIOS_ADMIN.some((u) => u.id === p.p_usuario_id)) {
+        return errorRpc(res, 400, "P0002", "Usuario no encontrado");
+      }
+      MODERACION.suspendidos.delete(p.p_usuario_id);
+      break;
+    }
+  }
+  responder(res, 200, null);
+  return true;
+}
+
+/** Atiende las rutas de moderación. Devuelve `true` si las respondió. */
+function atenderModeracion(ruta, url, req, res, cuerpo, yo, unObjeto) {
+  if (ruta === "/rest/v1/resenas" && req.method === "GET") {
+    return atenderResenas(url, res, unObjeto);
+  }
+  if (ruta === "/rest/v1/reportes") {
+    return atenderReportes(req, url, cuerpo, yo, unObjeto, res);
+  }
+  if (ruta === "/rest/v1/rpc/mi_motivo_suspension") {
+    responder(res, 200, (yo && MODERACION.suspendidos.get(yo.id)) ?? null);
+    return true;
+  }
+  if (ruta === "/rest/v1/rpc/revocar_sesiones_admin") {
+    responder(res, 200, null);
+    return true;
+  }
+  if (!ruta.startsWith("/rest/v1/rpc/")) return false;
+  const nombre = ruta.replace("/rest/v1/rpc/", "");
+  if (!RPC_ADMIN.has(nombre)) return false;
+  return atenderRpcAdmin(nombre, cuerpo, yo, res);
+}
+
 const server = http.createServer((req, res) => {
   const url = new URL(req.url ?? "/", `http://localhost:${PUERTO}`);
   const yo = usuarioDe(req);
@@ -690,6 +1001,10 @@ const server = http.createServer((req, res) => {
     const ruta = url.pathname;
 
     if (ruta === "/__decisiones") return responder(res, 200, DECISIONES);
+    if (ruta === "/__moderacion/reiniciar") {
+      reiniciarModeracion();
+      return responder(res, 200, { ok: true });
+    }
     if (ruta === "/__accesos") return responder(res, 200, ACCESOS);
     // Vuelve las reseñas al estado inicial (las altas y ediciones de LAB-31 quedan en memoria).
     if (ruta === "/__reiniciar") {
@@ -766,6 +1081,8 @@ const server = http.createServer((req, res) => {
     if (yo?.rol === "admin" && ruta.startsWith("/rest/v1/") && req.method === "GET") {
       if (atenderLecturaAdmin(url, res, unObjeto)) return;
     }
+
+    if (atenderModeracion(ruta, url, req, res, cuerpo, yo, unObjeto)) return;
 
     if (ruta === "/rest/v1/rpc/perfil_profesional") {
       const { p_id: id } = JSON.parse(cuerpo || "{}");
@@ -953,7 +1270,7 @@ const server = http.createServer((req, res) => {
         return unObjeto ? responder(res, 406, { message: "sin filas" }) : responder(res, 200, []);
       const fila = {
         rol: yo.rol,
-        estado: "activa",
+        estado: estadoDe(yo.id),
         nombre: yo.nombre,
         apellido: yo.apellido,
         normas_version: "2026-10",

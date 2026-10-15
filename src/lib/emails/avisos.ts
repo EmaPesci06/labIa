@@ -290,3 +290,17 @@ export function avisarEleccion(trabajoId: string, clienteId: string): Promise<vo
     }
   });
 }
+
+/**
+ * Aviso de cuenta suspendida (LAB-32). Lo llama la acción de moderación al suspender una cuenta.
+ */
+export function avisarCuentaSuspendida(usuarioId: string, motivo: string): Promise<void> {
+  return seguro("cuenta_suspendida", async (admin) => {
+    const emailContacto = process.env.EMAIL_SOPORTE || "soporte@labia.com.ar";
+    await enviarAUsuario(admin, usuarioId, "cuenta_suspendida", (d) => ({
+      nombre: d.nombre,
+      motivo,
+      emailContacto,
+    }));
+  });
+}
