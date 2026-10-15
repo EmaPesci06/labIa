@@ -486,6 +486,9 @@ const POSTULACIONES_MOCK = [
 // Lo que la prueba necesita leer después: decisiones y accesos (solo en memoria).
 const DECISIONES = [];
 const ACCESOS = [];
+// Estado inicial de trabajos y postulaciones: `/__reiniciar` vuelve a él (LAB-50).
+const TRABAJOS_INICIALES = structuredClone(TRABAJOS_MOCK);
+const POSTULACIONES_INICIALES = structuredClone(POSTULACIONES_MOCK);
 
 // --- Archivos de muestra: PNG generado en memoria (sin dependencias) y un PDF mínimo. ---
 
@@ -1006,9 +1009,16 @@ const server = http.createServer((req, res) => {
       return responder(res, 200, { ok: true });
     }
     if (ruta === "/__accesos") return responder(res, 200, ACCESOS);
-    // Vuelve las reseñas al estado inicial (las altas y ediciones de LAB-31 quedan en memoria).
+    // Vuelve las reseñas, los trabajos y las postulaciones al estado inicial (las altas, ediciones y
+    // cambios de estado quedan en memoria). Trabajos y postulaciones: LAB-50.
     if (ruta === "/__reiniciar") {
       resenas.splice(0, resenas.length, ...RESENAS_INICIALES.map((r) => ({ ...r })));
+      TRABAJOS_MOCK.splice(0, TRABAJOS_MOCK.length, ...structuredClone(TRABAJOS_INICIALES));
+      POSTULACIONES_MOCK.splice(
+        0,
+        POSTULACIONES_MOCK.length,
+        ...structuredClone(POSTULACIONES_INICIALES),
+      );
       return responder(res, 200, { ok: true });
     }
 
