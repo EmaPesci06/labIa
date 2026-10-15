@@ -46,6 +46,26 @@ describe("limpiarEvento (beforeSend)", () => {
     });
   });
 
+  it.each([
+    "apellido",
+    "antecedentes",
+    "matricula",
+    "matricula_numero",
+    "storage_path",
+    "direccion",
+    "nombre",
+  ])("borra el campo %s en cualquier nivel, sin mirar mayúsculas", (campo) => {
+    const evento = {
+      extra: { [campo]: "dato personal", oficio: "gas" },
+      contexts: { trabajo: { lista: [{ [campo.toUpperCase()]: "otro", id: "1" }] } },
+    };
+
+    expect(limpiarEvento(evento)).toEqual({
+      extra: { oficio: "gas" },
+      contexts: { trabajo: { lista: [{ id: "1" }] } },
+    });
+  });
+
   it("limpia emails y teléfonos del mensaje, la excepción, el request y las migas", () => {
     const evento = {
       message: "Falló el registro de ana@ejemplo.com",

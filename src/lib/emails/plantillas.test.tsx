@@ -36,7 +36,7 @@ describe.each(Object.entries(PLANTILLAS))("plantilla %s", (_nombre, Plantilla) =
     const html = await render(vista(Plantilla));
     expect(html).toContain("LabÍA");
     expect(html).toContain("Recibís este email porque tenés cuenta en LabÍA");
-    expect(html).toContain("https://labia.example/baja?t=ejemplo");
+    expect(html).toContain("https://labia.example/baja#t=ejemplo");
     expect(html).toContain("https://labia.example/cuenta/emails");
   });
 
