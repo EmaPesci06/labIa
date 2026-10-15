@@ -3,6 +3,7 @@ import { z } from "zod";
 import { normalizarTelefono } from "@/lib/whatsapp";
 
 import { esquemaRegistro } from "./auth";
+import { MENSAJE_CONTENIDO_PUBLICO, sinDatosDeContacto } from "./contenido-publico";
 
 /** Los 7 oficios del MVP: valor del enum `oficio` de la base y texto para la interfaz. */
 export const OFICIOS = [
@@ -49,6 +50,15 @@ const textoOpcional = (maximo: number, mensaje: string) =>
     .max(maximo, mensaje)
     .transform((valor) => (valor === "" ? null : valor));
 
+/** Texto libre que se muestra en el perfil público: sin teléfonos, emails ni direcciones. */
+const textoLibrePublico = (maximo: number, mensaje: string) =>
+  z
+    .string()
+    .trim()
+    .max(maximo, mensaje)
+    .refine(sinDatosDeContacto, MENSAJE_CONTENIDO_PUBLICO)
+    .transform((valor) => (valor === "" ? null : valor));
+
 export const esquemaPerfilProfesional = z
   .object({
     nombreCompleto: z
@@ -86,7 +96,7 @@ export const esquemaPerfilProfesional = z
       .min(1, "Elegí al menos un oficio.")
       .max(VALORES_OFICIO.length)
       .transform((valores) => [...new Set(valores)]),
-    especialidades: textoOpcional(
+    especialidades: textoLibrePublico(
       MAX_TEXTO_CORTO,
       `Las especialidades pueden tener hasta ${MAX_TEXTO_CORTO} caracteres.`,
     ),
@@ -104,11 +114,11 @@ export const esquemaPerfilProfesional = z
       )
       .transform((valor) => (valor === "" ? null : Number(valor))),
     matricula: textoOpcional(40, "La matrícula puede tener hasta 40 caracteres."),
-    descripcion: textoOpcional(
+    descripcion: textoLibrePublico(
       MAX_DESCRIPCION,
       `La descripción puede tener hasta ${MAX_DESCRIPCION} caracteres.`,
     ),
-    disponibilidad: textoOpcional(
+    disponibilidad: textoLibrePublico(
       MAX_TEXTO_CORTO,
       `La disponibilidad puede tener hasta ${MAX_TEXTO_CORTO} caracteres.`,
     ),

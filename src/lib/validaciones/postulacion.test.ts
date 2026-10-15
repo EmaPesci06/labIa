@@ -89,3 +89,21 @@ describe("esquemaPostulacion", () => {
     expect(res.success).toBe(true);
   });
 });
+
+describe("esquemaPostulacion · dirección exacta (LAB-53)", () => {
+  it("rechaza una dirección exacta en el mensaje", () => {
+    const res = esquemaPostulacion.safeParse({
+      mensaje: "Paso por Independencia 2100 mañana a las 9 y reviso el caño.",
+    });
+    expect(res.success).toBe(false);
+    if (!res.success)
+      expect(erroresDePostulacion(res.error).mensaje).toBe(MENSAJE_CONTACTO_POSTULACION);
+  });
+
+  it("acepta un mensaje con precio y medidas", () => {
+    const res = esquemaPostulacion.safeParse({
+      mensaje: "Son 2x3 m de pintura, el material sale $ 45.000 y tardo medio día.",
+    });
+    expect(res.success).toBe(true);
+  });
+});

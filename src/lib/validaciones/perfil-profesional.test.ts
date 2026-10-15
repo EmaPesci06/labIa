@@ -171,3 +171,32 @@ describe("separarNombre", () => {
     });
   });
 });
+
+describe("campos libres del perfil público (LAB-53)", () => {
+  it("rechaza teléfono, email y dirección en descripción, disponibilidad y especialidades", () => {
+    for (const campo of ["descripcion", "disponibilidad", "especialidades"] as const) {
+      for (const texto of [
+        "Llamame al 223 555-1234 para coordinar",
+        "Escribime a plomero@gmail.com",
+        "Atiendo en Av. Colón 1234",
+      ]) {
+        const r = esquemaPerfilProfesional.safeParse({ ...valido, [campo]: texto });
+        expect(r.success, `${campo} con «${texto}»`).toBe(false);
+        if (!r.success) {
+          const err = erroresPorCampo(r.error);
+          expect(err[campo]).toMatch(/^No pongas teléfonos, emails ni direcciones/);
+        }
+      }
+    }
+  });
+
+  it("acepta precios, medidas, años y cantidades en los mismos campos", () => {
+    const r = esquemaPerfilProfesional.safeParse({
+      ...valido,
+      descripcion: "Instalo termotanques de 80 litros desde $ 150.000 con 2 años de garantía.",
+      disponibilidad: "Lunes a viernes de 8 a 18 hs, sábados 2x3 m de taller",
+      especialidades: "Canillas, 12 metros de caño, desde 2015",
+    });
+    expect(r.success).toBe(true);
+  });
+});

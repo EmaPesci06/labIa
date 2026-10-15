@@ -1,0 +1,76 @@
+import { describe, expect, it } from "vitest";
+
+import {
+  MENSAJE_CONTENIDO_PUBLICO,
+  detectarDatoDeContacto,
+  sinDatosDeContacto,
+  tieneDatosDeContacto,
+} from "./contenido-publico";
+
+describe("detectarDatoDeContacto · bloquea", () => {
+  it.each([
+    ["llamame al 223 555-1234", "telefono"],
+    ["mi cel es 2235551234", "telefono"],
+    ["+54 9 223 555 1234", "telefono"],
+    ["(0223) 495-1234", "telefono"],
+    ["223.555.1234 después de las 18", "telefono"],
+    ["escribime a laura@correo.com", "email"],
+    ["laura arroba gmail punto com", "email"],
+    ["hablame por wa.me/5492235551234", "mensajeria"],
+    ["buscame en instagram.com/plomero_mdp", "mensajeria"],
+    ["Vivo en Av. Colón 1234, puerta negra", "direccion"],
+    ["Trabajo en la calle 12 n 1234", "direccion"],
+    ["Pasaje Mitre 500 timbre 3", "direccion"],
+    ["Independencia 2100 PB", "direccion"],
+    ["Mitre n° 1234, al fondo", "direccion"],
+  ])("detecta en «%s» (%s)", (texto, tipo) => {
+    expect(detectarDatoDeContacto(texto)).toBe(tipo);
+    expect(tieneDatosDeContacto(texto)).toBe(true);
+    expect(sinDatosDeContacto(texto)).toBe(false);
+  });
+});
+
+describe("detectarDatoDeContacto · deja pasar", () => {
+  it.each([
+    "Son 3 canillas y 12 metros de caño",
+    "Presupuesto previo: $ 150.000",
+    "Precio de referencia $15000 por visita",
+    "Presupuesto de $15.000.000 con materiales incluidos",
+    "Presupuesto de $ 15000000 sin materiales",
+    "Trabajo en 2x3 m de living",
+    "Tablero de 220 V y 32 A, 2 disyuntores",
+    "Cambio 4 canillas y 1 termotanque de 80 litros",
+    "Disponible de lunes a viernes de 8 a 18 hs",
+    "Trabajé entre 2020-2024 en obras de Chauvín",
+    "Fecha tentativa 12.03.2026 a la mañana",
+    "Ya tengo 15 años de experiencia en gas",
+    "Presupuesto 2025 para el baño completo",
+    "Caño de 1200 mm y 3 codos",
+    "",
+  ])("no bloquea «%s»", (texto) => {
+    expect(detectarDatoDeContacto(texto)).toBeNull();
+    expect(sinDatosDeContacto(texto)).toBe(true);
+  });
+
+  it("una calle sin número no es dirección exacta", () => {
+    expect(detectarDatoDeContacto("Trabajo sobre calle Independencia, zona céntrica")).toBeNull();
+  });
+
+  it("una lista de dígitos sueltos no cuenta como teléfono", () => {
+    expect(detectarDatoDeContacto("Medidas: 1 2 3 4 5 6 7 8 cm")).toBeNull();
+  });
+});
+
+describe("sinDatosDeContacto", () => {
+  it("acepta null y vacío (campos opcionales)", () => {
+    expect(sinDatosDeContacto(null)).toBe(true);
+    expect(sinDatosDeContacto(undefined)).toBe(true);
+    expect(sinDatosDeContacto("")).toBe(true);
+  });
+
+  it("tiene un mensaje en castellano para el campo", () => {
+    expect(MENSAJE_CONTENIDO_PUBLICO).toBe(
+      "No pongas teléfonos, emails ni direcciones: el contacto es por WhatsApp desde la app.",
+    );
+  });
+});
