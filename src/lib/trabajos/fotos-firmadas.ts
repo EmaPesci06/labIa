@@ -4,8 +4,9 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { Database } from "@/lib/supabase/tipos";
 
-/** Bucket privado de las fotos de trabajos (LAB-52). Las rutas son `<cliente_id>/<trabajo_id>/…`. */
-export const BUCKET_FOTOS_TRABAJOS = "fotos-trabajos";
+import { BUCKET_FOTOS_TRABAJOS } from "./quitar-fotos";
+
+export { BUCKET_FOTOS_TRABAJOS } from "./quitar-fotos";
 
 /** Vida de cada URL firmada: corta, para que un enlace reenviado no quede abierto (LAB-52). */
 export const SEGUNDOS_URL_FOTO_TRABAJO = 600;

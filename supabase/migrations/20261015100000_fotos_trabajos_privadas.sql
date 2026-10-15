@@ -39,6 +39,7 @@ create policy fotos_trabajos_subir_propias on storage.objects
       select 1 from public.trabajos t
       where t.id::text = (storage.foldername(name))[2]
         and t.cliente_id = (select auth.uid())
+        and t.estado = 'abierto'
     )
   );
 
@@ -48,6 +49,9 @@ create policy fotos_trabajos_leer_visibles on storage.objects
   for select to authenticated
   using (
     bucket_id = 'fotos-trabajos'
+    -- Un profesional suspendido no ve nada, aunque tenga el trabajo asignado (la policy de
+    -- trabajos por asignación no exige cuenta activa).
+    and privado.cuenta_activa()
     and exists (
       select 1 from public.trabajos t
       where t.id::text = (storage.foldername(name))[2]
@@ -60,6 +64,7 @@ create policy fotos_trabajos_borrar_propias on storage.objects
   for delete to authenticated
   using (
     bucket_id = 'fotos-trabajos'
+    and (storage.foldername(name))[1] = (select auth.uid())::text
     and exists (
       select 1 from public.trabajos t
       where t.id::text = (storage.foldername(name))[2]

@@ -17,7 +17,9 @@ import {
   esquemaPostulacion,
   type ErroresPostulacion,
 } from "@/lib/validaciones/postulacion";
-import { BUCKET_FOTOS_TRABAJOS } from "@/lib/trabajos/fotos-firmadas";
+import * as Sentry from "@sentry/nextjs";
+
+import { quitarFotosDelTrabajo } from "@/lib/trabajos/quitar-fotos";
 import { esUuid } from "@/lib/validaciones/uuid";
 import {
   MAX_TRABAJOS_ABIERTOS,
@@ -521,12 +523,6 @@ export async function cancelarTrabajo(
   }
 
   const supabase = await crearClienteServidor();
-  const { data: delTrabajo } = await supabase
-    .from("trabajos")
-    .select("fotos")
-    .eq("id", trabajoId)
-    .maybeSingle();
-
   const { error } = await supabase.rpc("cancelar_trabajo", {
     p_trabajo_id: trabajoId,
   });
@@ -535,11 +531,11 @@ export async function cancelarTrabajo(
     return { ok: false, mensaje: "No se pudo cancelar el trabajo." };
   }
 
-  // Las fotos se quitan al cancelar (LAB-52). Si esto falla, la base ya dejó el borrado programado
-  // para el job diario de /api/cron/limpiar-fotos-trabajos.
-  const fotos = delTrabajo?.fotos ?? [];
-  if (fotos.length > 0) {
-    await supabase.storage.from(BUCKET_FOTOS_TRABAJOS).remove([...fotos]);
+  // Las fotos se quitan al cancelar (LAB-52): toda la carpeta del trabajo, no solo lo que figura en
+  // `trabajos.fotos`. Si Storage falla, la base ya dejó el borrado programado para el job diario.
+  const quitadas = await quitarFotosDelTrabajo(supabase, sesion.usuario.id, trabajoId);
+  if (!quitadas.ok) {
+    Sentry.captureException(new Error("No se pudieron quitar las fotos al cancelar un trabajo"));
   }
 
   revalidatePath("/mis-trabajos");

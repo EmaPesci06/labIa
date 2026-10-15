@@ -1,5 +1,6 @@
 "use server";
 
+import * as Sentry from "@sentry/nextjs";
 import { revalidatePath } from "next/cache";
 
 import { sesionAdmin } from "@/lib/admin/sesion";
@@ -7,7 +8,7 @@ import { revocarSesionesUsuario } from "@/lib/admin/sesiones";
 import { avisarCuentaSuspendida } from "@/lib/emails/avisos";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 import { crearClienteServidor } from "@/lib/supabase/servidor";
-import { BUCKET_FOTOS_TRABAJOS } from "@/lib/trabajos/fotos-firmadas";
+import { quitarFotosDelTrabajo } from "@/lib/trabajos/quitar-fotos";
 import {
   esquemaCerrarTrabajo,
   esquemaMarcarEnRevision,
@@ -118,7 +119,7 @@ export async function cerrarTrabajoAccion(
   const admin = crearClienteAdmin();
   const { data: delTrabajo } = await admin
     .from("trabajos")
-    .select("fotos")
+    .select("cliente_id")
     .eq("id", parseo.data.trabajoId)
     .maybeSingle();
 
@@ -131,11 +132,17 @@ export async function cerrarTrabajoAccion(
     return { ok: false, error: "No se pudo cerrar el trabajo." };
   }
 
-  // Al cerrar por moderación se quitan las fotos del trabajo (LAB-52). Si esto falla, el job diario
-  // de /api/cron/limpiar-fotos-trabajos las borra: la base ya dejó el borrado programado.
-  const fotos = delTrabajo?.fotos ?? [];
-  if (fotos.length > 0) {
-    await admin.storage.from(BUCKET_FOTOS_TRABAJOS).remove([...fotos]);
+  // Al cerrar por moderación se quita toda la carpeta del trabajo (LAB-52). Si Storage falla, el job
+  // diario de /api/cron/limpiar-fotos-trabajos la borra: la base ya dejó el borrado programado.
+  if (delTrabajo?.cliente_id) {
+    const quitadas = await quitarFotosDelTrabajo(
+      admin,
+      delTrabajo.cliente_id,
+      parseo.data.trabajoId,
+    );
+    if (!quitadas.ok) {
+      Sentry.captureException(new Error("No se pudieron quitar las fotos al cerrar un trabajo"));
+    }
   }
 
   revalidatePath("/admin/reportes");

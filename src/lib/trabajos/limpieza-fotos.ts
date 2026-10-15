@@ -5,7 +5,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 import type { Database } from "@/lib/supabase/tipos";
 
-import { BUCKET_FOTOS_TRABAJOS } from "./fotos-firmadas";
+import { quitarFotosDelTrabajo } from "./quitar-fotos";
 
 const TAMANO_LOTE = 100;
 
@@ -30,7 +30,7 @@ export async function limpiarFotosTrabajos(
 ): Promise<ResultadoLimpiezaFotos> {
   const { data: filas, error } = await admin
     .from("trabajos")
-    .select("id, fotos")
+    .select("id, cliente_id, fotos")
     .not("fotos_borrar_despues_de", "is", null)
     .lte("fotos_borrar_despues_de", ahora.toISOString())
     .limit(TAMANO_LOTE);
@@ -42,15 +42,13 @@ export async function limpiarFotosTrabajos(
   let fallidos = 0;
 
   for (const fila of filas ?? []) {
-    const rutas = fila.fotos ?? [];
-    if (rutas.length > 0) {
-      const { error: errorStorage } = await admin.storage.from(BUCKET_FOTOS_TRABAJOS).remove(rutas);
-      if (errorStorage) {
-        fallidos += 1;
-        continue;
-      }
-      fotosBorradas += rutas.length;
+    // Se quita la carpeta completa del trabajo, no solo lo que figura en `trabajos.fotos`.
+    const quitadas = await quitarFotosDelTrabajo(admin, fila.cliente_id, fila.id);
+    if (!quitadas.ok) {
+      fallidos += 1;
+      continue;
     }
+    fotosBorradas += quitadas.quitadas;
 
     const { error: errorMarca } = await admin
       .from("trabajos")

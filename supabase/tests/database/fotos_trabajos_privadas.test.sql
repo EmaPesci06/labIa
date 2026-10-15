@@ -4,7 +4,11 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(19);
+select plan(23);
+
+-- Storage bloquea el DELETE directo sobre storage.objects (protect_delete). Igual que en
+-- politicas.test.sql, se habilita para esta transacción y así se prueba lo que decide la RLS.
+select set_config('storage.allow_delete_query', 'true', true);
 
 insert into auth.users (instance_id, id, aud, role, email, raw_user_meta_data)
 values
@@ -13,11 +17,19 @@ values
   ('00000000-0000-0000-0000-000000000000', 'cccccccc-2700-4000-a000-000000000003', 'authenticated', 'authenticated', 'fp-p1@labia.test', '{"rol": "profesional", "nombre": "Pablo", "apellido": "Uno"}'),
   ('00000000-0000-0000-0000-000000000000', 'cccccccc-2700-4000-a000-000000000004', 'authenticated', 'authenticated', 'fp-p2@labia.test', '{"rol": "profesional", "nombre": "Paula", "apellido": "Dos"}');
 
--- P1 verificado y publicado (ve los trabajos abiertos); P2 todavía en revisión.
-insert into public.perfiles_profesionales (usuario_id, oficios, toda_la_ciudad, identidad_verificada, antecedentes_ok, publicado)
+-- P1 cumple todo lo que pide la base para publicarse (perfiles_profesionales_validar): verificado,
+-- antecedentes OK, activo y, por ser gasista, matriculado. Así `publicado` queda en true.
+-- P2 todavía en revisión.
+insert into public.perfiles_profesionales (usuario_id, oficios, toda_la_ciudad, matriculado, identidad_verificada, antecedentes_ok)
 values
   ('cccccccc-2700-4000-a000-000000000003', '{gas}', true, true, true, true),
   ('cccccccc-2700-4000-a000-000000000004', '{gas}', true, false, false, false);
+
+select is(
+  (select publicado from public.perfiles_profesionales where usuario_id = 'cccccccc-2700-4000-a000-000000000003'),
+  true,
+  'fixture: el profesional de referencia queda publicado (la base lo calcula)'
+);
 
 insert into public.trabajos (id, cliente_id, oficio, titulo, descripcion, barrio_id, urgencia, fotos)
 values
@@ -100,11 +112,9 @@ select is(
 );
 select lives_ok(
   $$delete from storage.objects where bucket_id = 'fotos-trabajos' and name like 'cccccccc-2700-4000-a000-000000000001/%'$$,
-  'otro cliente: intentar borrar no falla (no encuentra nada)'
+  'otro cliente: intentar borrar las fotos ajenas no falla'
 );
-
 reset role;
-
 select is(
   (select count(*) from storage.objects where bucket_id = 'fotos-trabajos'),
   2::bigint,
@@ -119,22 +129,55 @@ select is(
   'anon: no ve ninguna foto de trabajo'
 );
 
--- Dueño quita una foto propia (lo que hace cancelar un trabajo)
+-- Dueño quita una foto propia (lo que hace cancelar un trabajo, vía storage.remove)
 select tests.como('cccccccc-2700-4000-a000-000000000001');
 select lives_ok(
   $$delete from storage.objects where bucket_id = 'fotos-trabajos' and name = 'cccccccc-2700-4000-a000-000000000001/dddddddd-2700-4000-a000-000000000001/1-1791734400001.jpg'$$,
   'dueño: quita una de sus fotos'
 );
-
 reset role;
-
 select is(
   (select count(*) from storage.objects where bucket_id = 'fotos-trabajos'),
   1::bigint,
   'dueño: la foto quitada no queda y la otra sigue'
 );
 
+-- Profesional asignado a un trabajo: ve sus fotos, y deja de verlas si la cuenta se suspende
+-- (la policy de trabajos por asignación no exige cuenta activa; la de Storage sí).
+update public.trabajos
+set estado = 'asignado', profesional_elegido_id = 'cccccccc-2700-4000-a000-000000000003'
+where id = 'dddddddd-2700-4000-a000-000000000002';
+insert into storage.objects (bucket_id, name)
+values ('fotos-trabajos', 'cccccccc-2700-4000-a000-000000000001/dddddddd-2700-4000-a000-000000000002/0-1791734400002.jpg');
+
+select tests.como('cccccccc-2700-4000-a000-000000000003');
+select is(
+  (select count(*) from storage.objects where bucket_id = 'fotos-trabajos' and name like 'cccccccc-2700-4000-a000-000000000001/dddddddd-2700-4000-a000-000000000002/%'),
+  1::bigint,
+  'profesional asignado con cuenta activa: ve las fotos del trabajo'
+);
+
+reset role;
+update public.usuarios set estado = 'suspendida' where id = 'cccccccc-2700-4000-a000-000000000003';
+
+select tests.como('cccccccc-2700-4000-a000-000000000003');
+select is(
+  (select count(*) from storage.objects where bucket_id = 'fotos-trabajos' and name like 'cccccccc-2700-4000-a000-000000000001/dddddddd-2700-4000-a000-000000000002/%'),
+  0::bigint,
+  'profesional asignado con cuenta suspendida: no ve las fotos'
+);
+
+-- Un trabajo que ya no está abierto no recibe fotos nuevas (el dueño es el mismo, pero el trabajo
+-- ya está asignado).
+select tests.como('cccccccc-2700-4000-a000-000000000001');
+select throws_ok(
+  $$insert into storage.objects (bucket_id, name) values ('fotos-trabajos', 'cccccccc-2700-4000-a000-000000000001/dddddddd-2700-4000-a000-000000000002/1-1791734400003.jpg')$$,
+  '42501', null, 'dueño: no sube fotos a un trabajo que ya no está abierto'
+);
+reset role;
+
 -- Programación del borrado según el estado (trigger)
+update public.trabajos set estado = 'cancelado' where id = 'dddddddd-2700-4000-a000-000000000001';
 select ok(
   coalesce(
     (select fotos_borrar_despues_de <= now() + interval '1 minute' from public.trabajos where id = 'dddddddd-2700-4000-a000-000000000001'),

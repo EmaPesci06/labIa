@@ -27,19 +27,18 @@ vi.mock("next/cache", () => ({
 }));
 
 // LAB-52: al cerrar un trabajo, las fotos se quitan con la service role (desde /admin).
-const { mockFotosDelTrabajo, mockRemoveFotos } = vi.hoisted(() => ({
-  mockFotosDelTrabajo: vi.fn().mockResolvedValue({ data: { fotos: [] }, error: null }),
+const { mockTrabajoDelCierre, mockListFotos, mockRemoveFotos } = vi.hoisted(() => ({
+  mockTrabajoDelCierre: vi.fn().mockResolvedValue({ data: { cliente_id: "c-1" }, error: null }),
+  mockListFotos: vi.fn().mockResolvedValue({ data: [], error: null }),
   mockRemoveFotos: vi.fn().mockResolvedValue({ error: null }),
 }));
 
 vi.mock("@/lib/supabase/admin", () => ({
   crearClienteAdmin: () => ({
-    from: () => ({ select: () => ({ eq: () => ({ maybeSingle: mockFotosDelTrabajo }) }) }),
-    storage: { from: () => ({ remove: mockRemoveFotos }) },
+    from: () => ({ select: () => ({ eq: () => ({ maybeSingle: mockTrabajoDelCierre }) }) }),
+    storage: { from: () => ({ list: mockListFotos, remove: mockRemoveFotos }) },
   }),
 }));
-
-vi.mock("@/lib/trabajos/fotos-firmadas", () => ({ BUCKET_FOTOS_TRABAJOS: "fotos-trabajos" }));
 
 import { sesionAdmin } from "@/lib/admin/sesion";
 import { revocarSesionesUsuario } from "@/lib/admin/sesiones";
@@ -216,18 +215,28 @@ describe("reportes-acciones (admin)", () => {
       mockRpc.mockResolvedValue({ error: null });
     });
 
-    it("quita del bucket privado las fotos del trabajo cerrado", async () => {
-      const ruta = `${UUID_1}/${UUID_1}/0-1.jpg`;
-      mockFotosDelTrabajo.mockResolvedValueOnce({ data: { fotos: [ruta] }, error: null });
+    it("quita toda la carpeta del trabajo del bucket privado, listando lo que hay", async () => {
+      mockTrabajoDelCierre.mockResolvedValueOnce({ data: { cliente_id: "c-1" }, error: null });
+      mockListFotos.mockResolvedValueOnce({
+        data: [
+          { id: "a", name: "0-1.jpg" },
+          { id: "b", name: "1-2.jpg" },
+        ],
+        error: null,
+      });
 
       const res = await cerrarTrabajoAccion(UUID_1, "Contenido inapropiado");
 
       expect(res.ok).toBe(true);
-      expect(mockRemoveFotos).toHaveBeenCalledWith([ruta]);
+      expect(mockListFotos).toHaveBeenCalledWith(`c-1/${UUID_1}`, { limit: 1000 });
+      expect(mockRemoveFotos).toHaveBeenCalledWith([
+        `c-1/${UUID_1}/0-1.jpg`,
+        `c-1/${UUID_1}/1-2.jpg`,
+      ]);
     });
 
-    it("sin fotos no toca Storage", async () => {
-      mockFotosDelTrabajo.mockResolvedValueOnce({ data: { fotos: [] }, error: null });
+    it("sin fotos en la carpeta no toca Storage", async () => {
+      mockListFotos.mockResolvedValueOnce({ data: [], error: null });
 
       await cerrarTrabajoAccion(UUID_1);
 
