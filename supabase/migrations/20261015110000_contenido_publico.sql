@@ -88,7 +88,7 @@ begin
   for nombre in
     select (regexp_matches(
       limpio,
-      '\y[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:[[:space:]]+(?:de|del|y|[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+))?[[:space:]]+(?:n[°º.]?[[:space:]]*)?([0-9]{4,5})\y(?![[:space:]]*(?i:v|volts?|mm|cm|m2|m|mts?|metros?|kgs?|kg|lts?|litros?|l|w|kw|amp|hs|horas?|ml|pesos|usd)\y)',
+      '\y[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:[[:space:]]+(?:de|del|y|[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+))?[[:space:]]+(?:n[°º.]?[[:space:]]*)?([0-9]{4,5})\y(?![[:space:]]*(?:[vV]|[vV][oO][lL][tT][sS]?|[mM][mM]|[cC][mM]|[mM]2|[mM]|[mM][tT][sS]?|[mM][eE][tT][rR][oO][sS]?|[kK][gG][sS]?|[kK][gG]|[lL][tT][sS]?|[lL][iI][tT][rR][oO][sS]?|[lL]|[wW]|[kK][wW]|[aA][mM][pP]|[hH][sS]|[hH][oO][rR][aA][sS]?|[mM][lL]|[pP][eE][sS][oO][sS]|[uU][sS][dD])\y)',
       'g'
     ))[1]
   loop
