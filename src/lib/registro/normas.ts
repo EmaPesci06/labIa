@@ -1,12 +1,12 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import type { EstadoFormulario } from "@/lib/auth/estado";
+import { ipDelPedido } from "@/lib/ip-del-pedido";
 import { registrarEventoServidor } from "@/lib/metricas-servidor";
 import { VERSION_NORMAS } from "@/lib/normas";
-import { limitarIntentos } from "@/lib/rate-limit";
+import { limitarPersistente } from "@/lib/rate-limit-persistente";
 import { cargarDatosRegistro } from "@/lib/registro/borrador";
 import { faltantesRegistrados } from "@/lib/registro/documentos-estado";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
@@ -41,12 +41,8 @@ export async function aceptarNormas(
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) return { mensaje: "Tu sesión venció. Ingresá de nuevo." };
 
-  const encabezados = await headers();
-  const ip =
-    encabezados.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    encabezados.get("x-real-ip") ||
-    "desconocida";
-  const limite = limitarIntentos(`normas:${auth.user.id}:${ip}`, REGLA);
+  const ip = await ipDelPedido();
+  const limite = await limitarPersistente(`normas:${auth.user.id}:${ip}`, REGLA);
   if (!limite.permitido) {
     return {
       mensaje: `Hiciste demasiados intentos. Esperá ${limite.segundosParaReintentar} segundos y probá de nuevo.`,

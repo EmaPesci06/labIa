@@ -144,15 +144,14 @@ select is(
 );
 
 -- ---------------------------------------------------------------------------
--- 4. Profesional en revisión ve trabajos de su oficio
+-- 4. Profesional en revisión no ve trabajos (LAB-44: exige perfil publicado)
 -- ---------------------------------------------------------------------------
 
 reset role; select tests.como('27000000-0000-4000-a000-000000000004'); -- P3 en revisión
-select cmp_ok(
+select is(
   (select count(*) from public.trabajos_para_mi(p_solo_mis_zonas => false)),
-  '>=',
-  2::bigint,
-  'un profesional en revisión ve los trabajos de su oficio con p_solo_mis_zonas => false'
+  0::bigint,
+  'un profesional en revisión no recibe trabajos aunque sean de su oficio, con p_solo_mis_zonas => false'
 );
 
 -- ---------------------------------------------------------------------------

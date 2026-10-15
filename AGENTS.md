@@ -88,14 +88,21 @@ Rutas en español sin acentos: `/`, `/ingresar`, `/registro`, `/registro/cliente
    solo un admin genera URLs firmadas de 60 s.
 3. Nunca mostrar DNI ni antecedentes en pantallas públicas: solo insignias.
 4. Nunca pedir ni guardar dirección exacta.
-5. `SUPABASE_SERVICE_ROLE_KEY` solo en servidor dentro de `/admin` y jobs. Única excepción: `src/lib/emails/*`
-   (avisos por email), porque tiene que leer el email de Auth de otro usuario y mandarle un aviso, algo que la
-   RLS no permite con la sesión del que dispara el evento. Sus funciones se llaman solo después de verificar
-   sesión y dueño, con ids leídos de la base, y nunca reciben emails del cliente. También se usa en el job de
-   borrado de cuenta (`src/lib/cuenta/borrado.ts`, server-only), invocado solo tras validar sesión, rol y
-   reautenticación.
+5. `SUPABASE_SERVICE_ROLE_KEY` solo en servidor dentro de `/admin` y jobs. Lista cerrada de los usos fuera de
+   `/admin` y jobs (ningún otro está permitido):
+   - `src/lib/emails/*`: avisos por email. Lee el email de Auth de otro usuario, algo que la RLS no permite con la
+     sesión del que dispara el evento. Sus funciones se llaman solo tras verificar sesión y dueño, con ids leídos
+     de la base; nunca reciben emails del cliente.
+   - `src/lib/cuenta/borrado.ts` (server-only): job de borrado de cuenta, invocado solo tras validar sesión, rol y
+     reautenticación.
+   - `consumirCupoServicio` en `src/lib/rate-limit-servicio.ts` (server-only): limitador de intentos
+     (`public.consumir_cupo`). Solo recibe claves ya hasheadas (HMAC-SHA256 con `RATE_LIMIT_SECRET`, o sha256 si
+     falta) y solo lo llama `src/lib/rate-limit-persistente.ts`.
 6. Toda Server Action valida sesión, rol y entrada con Zod.
-7. Rate limit simple en registro, postulación y reporte.
+7. Rate limit persistente (`src/lib/rate-limit-persistente.ts`, `limitarPorIp`) en registro, ingreso, Google,
+   restablecer, reenvío de confirmación, documentos, normas y cuenta; postulación y reporte cuando lleguen.
+   La IP sale solo de `x-vercel-forwarded-for`: el despliegue es solo en Vercel, sin proxy delante. Si la
+   cabecera falta, el pedido cae en el balde `desconocida` (un límite más estricto, no un bypass).
 
 ## Ramas, PR y Linear
 

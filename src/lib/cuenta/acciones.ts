@@ -1,13 +1,12 @@
 "use server";
 
 import { createClient } from "@supabase/supabase-js";
-import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import type { EstadoFormulario } from "@/lib/auth/estado";
 import { guardarDatosDeCliente } from "@/lib/auth/datos-de-cliente";
-import { limitarIntentos } from "@/lib/rate-limit";
+import { limitarPersistente, limitarPorIp } from "@/lib/rate-limit-persistente";
 import { urlDelSitio } from "@/lib/sitio";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
@@ -35,20 +34,14 @@ const texto = (datos: FormData, clave: string): string => {
   return typeof valor === "string" ? valor : "";
 };
 
-async function ipDelPedido(): Promise<string> {
-  const encabezados = await headers();
-  const reenviado = encabezados.get("x-forwarded-for")?.split(",")[0]?.trim();
-  return reenviado || encabezados.get("x-real-ip") || "desconocida";
-}
-
-/** Límite por persona (y por IP) para estas acciones. */
+/** Límite por persona (y por IP) para estas acciones, compartido entre instancias (LAB-41). */
 async function superaElLimite(
   accion: string,
   uid: string,
   regla: { maximo: number; ventanaMs: number } = REGLA,
 ): Promise<string | null> {
-  const porUsuario = limitarIntentos(`cuenta-${accion}:${uid}`, regla);
-  const porIp = limitarIntentos(`cuenta-${accion}-ip:${await ipDelPedido()}`, regla);
+  const porUsuario = await limitarPersistente(`cuenta-${accion}:${uid}`, regla);
+  const porIp = await limitarPorIp(`cuenta-${accion}-ip`, regla);
   const bloqueo = !porUsuario.permitido ? porUsuario : !porIp.permitido ? porIp : null;
   return bloqueo
     ? `Hiciste demasiados intentos. Esperá ${bloqueo.segundosParaReintentar} segundos y probá de nuevo.`

@@ -791,6 +791,21 @@ const server = http.createServer((req, res) => {
       }
       return responder(res, 200, post.profesional_id);
     }
+    // LAB-44: el profesional retira su postulación solo por la función (ya no por PATCH directo).
+    if (ruta === "/rest/v1/rpc/retirar_postulacion") {
+      const { p_postulacion_id } = JSON.parse(cuerpo || "{}");
+      const post = POSTULACIONES_MOCK.find((p) => p.id === p_postulacion_id);
+      if (!post)
+        return responder(res, 400, { code: "P0002", message: "Postulación no encontrada" });
+      if (post.estado !== "enviada") {
+        return responder(res, 400, {
+          code: "22023",
+          message: "Solo podés retirar una postulación que sigue enviada",
+        });
+      }
+      post.estado = "retirada";
+      return responder(res, 200, true);
+    }
     if (ruta === "/rest/v1/rpc/cambiar_profesional") {
       const { p_trabajo_id } = JSON.parse(cuerpo || "{}");
       const trab = TRABAJOS_MOCK.find((t) => t.id === p_trabajo_id);
@@ -1064,12 +1079,6 @@ const server = http.createServer((req, res) => {
           targetTrabajo.cantidad_postulaciones = (targetTrabajo.cantidad_postulaciones || 0) + 1;
         }
         return responder(res, 201, unObjeto ? nueva : [nueva]);
-      }
-      if (req.method === "PATCH") {
-        const id = (url.searchParams.get("id") ?? "").replace("eq.", "");
-        const post = POSTULACIONES_MOCK.find((p) => p.id === id);
-        if (post) post.estado = "retirada";
-        return responder(res, 200, post ? [post] : []);
       }
       let lista = POSTULACIONES_MOCK;
       const tid = url.searchParams.get("trabajo_id");
