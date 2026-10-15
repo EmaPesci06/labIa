@@ -530,8 +530,14 @@ isOneToOne: true
               "anios_experiencia": number,"antecedentes_ok": boolean,"apellido": string,"apellido_inicial": string,"barrio_id": number,"cantidad_resenas": number,"descripcion": string,"disponibilidad": string,"es_propio": boolean,"especialidades": string,"foto_path": string,"fotos_trabajos": (string)[],"identidad_verificada": boolean,"matriculado": boolean,"nombre": string,"oficios": (Database["public"]['Enums']["oficio"])[],"promedio": number,"publicado": boolean,"toda_la_ciudad": boolean,"usuario_id": string,"zonas_texto": string
             }[]
                            },
+"reactivar_postulacion":
+{ Args: { "p_mensaje": string,"p_precio_estimado"?: number,"p_sena_propuesta"?: number,"p_trabajo_id": string }; Returns: string
+                           },
 "registrar_documento":
 { Args: { "p_storage_path": string,"p_tipo": Database["public"]['Enums']["tipo_documento"] }; Returns: string
+                           },
+"retirar_postulacion":
+{ Args: { "p_postulacion_id": string }; Returns: boolean
                            },
 "trabajos_para_mi":
 { Args: { "p_desde"?: number,"p_limite"?: number,"p_oficio"?: Database["public"]['Enums']["oficio"],"p_solo_mis_zonas"?: boolean }; Returns: {

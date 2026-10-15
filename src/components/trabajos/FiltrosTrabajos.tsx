@@ -45,7 +45,8 @@ export function FiltrosTrabajos({
     params.delete("trabajo");
 
     const query = params.toString();
-    router.push(query ? `${pathname}?${query}` : pathname);
+    // replace: cambiar un filtro no agrega una entrada al historial.
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
   }
 
   return (
