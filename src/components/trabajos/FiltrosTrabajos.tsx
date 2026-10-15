@@ -43,6 +43,8 @@ export function FiltrosTrabajos({
 
     // Al filtrar, quitamos la selección de trabajo en escritorio para resetear el detalle
     params.delete("trabajo");
+    // y volvemos a la primera página de la lista (LAB-46)
+    params.delete("pagina");
 
     const query = params.toString();
     // replace: cambiar un filtro no agrega una entrada al historial.
