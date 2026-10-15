@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { ResenaPerfil } from "@/lib/perfil/cargar";
 
 vi.mock("@/lib/perfil/acciones", () => ({ cargarMasResenas: vi.fn() }));
+vi.mock("@/lib/reportes/acciones", () => ({ enviarReporte: vi.fn() }));
 
 import { cargarMasResenas } from "@/lib/perfil/acciones";
 

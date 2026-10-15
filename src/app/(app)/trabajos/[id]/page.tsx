@@ -8,6 +8,7 @@ import { EtiquetaMono } from "@/components/ui/EtiquetaMono";
 import { Insignia } from "@/components/ui/Insignia";
 import { FormularioPostulacion } from "@/components/trabajos/FormularioPostulacion";
 import { GaleriaFotosTrabajo } from "@/components/trabajos/GaleriaFotosTrabajo";
+import { BotonReportar } from "@/components/reportes/BotonReportar";
 import { formatearDistancia, formatearPesos, haceCuanto } from "@/lib/formato";
 import { obtenerSesion } from "@/lib/sesion";
 import { obtenerTrabajoDetalle } from "@/lib/trabajos/consulta";
@@ -114,6 +115,16 @@ export default async function PaginaDetalleTrabajo({ params }: PaginaDetalleTrab
         publicado={perfil?.publicado ?? false}
         miPostulacion={trabajo.miPostulacion}
       />
+
+      {/* Reportar trabajo */}
+      <div className="flex justify-center pt-2">
+        <BotonReportar
+          objetivoTipo="trabajo"
+          objetivoId={trabajo.id}
+          tituloObjetivo={trabajo.titulo}
+          texto="Reportar trabajo"
+        />
+      </div>
     </div>
   );
 }

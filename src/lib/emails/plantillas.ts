@@ -4,6 +4,7 @@ import BienvenidaCliente, { type DatosBienvenidaCliente } from "@/emails/bienven
 import BienvenidaProfesional, {
   type DatosBienvenidaProfesional,
 } from "@/emails/bienvenida_profesional";
+import CuentaSuspendida, { type DatosCuentaSuspendida } from "@/emails/cuenta_suspendida";
 import DocumentoRechazado, { type DatosDocumentoRechazado } from "@/emails/documento_rechazado";
 import EligieronAOtro, { type DatosEligieronAOtro } from "@/emails/eligieron_a_otro";
 import NuevaPostulacion, {
@@ -27,6 +28,7 @@ export interface DatosPlantillas {
   bienvenida_profesional: DatosBienvenidaProfesional;
   perfil_publicado: DatosPerfilPublicado;
   documento_rechazado: DatosDocumentoRechazado;
+  cuenta_suspendida: DatosCuentaSuspendida;
   nueva_postulacion: DatosNuevaPostulacion;
   te_eligieron: DatosTeEligieron;
   eligieron_a_otro: DatosEligieronAOtro;
@@ -67,6 +69,11 @@ export const PLANTILLAS: Registro = {
   documento_rechazado: {
     componente: DocumentoRechazado,
     asunto: (d) => `Necesitamos que vuelvas a subir tu ${d.documento}`,
+    preferencia: null,
+  },
+  cuenta_suspendida: {
+    componente: CuentaSuspendida,
+    asunto: () => "Tu cuenta de LabÍA fue suspendida",
     preferencia: null,
   },
   nueva_postulacion: {
