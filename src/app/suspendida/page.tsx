@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
+import { Suspense } from "react";
 
 import { BotonSalir } from "@/components/auth/BotonSalir";
 import { Logo } from "@/components/ui/Logo";
@@ -9,7 +11,11 @@ export const metadata: Metadata = {
   title: "Cuenta suspendida · LabÍA",
 };
 
-export default async function PaginaCuentaSuspendida() {
+// El motivo es de cada usuario: el contenido se lee en cada pedido (dentro de Suspense, como en
+// (app)/layout), nunca en el build.
+async function Contenido() {
+  await connection();
+
   let motivo: string | null = null;
 
   if (supabaseConfigurado()) {
@@ -67,5 +73,13 @@ export default async function PaginaCuentaSuspendida() {
         </Tarjeta>
       </main>
     </div>
+  );
+}
+
+export default function PaginaCuentaSuspendida() {
+  return (
+    <Suspense fallback={null}>
+      <Contenido />
+    </Suspense>
   );
 }
