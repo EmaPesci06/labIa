@@ -4,9 +4,15 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(21);
+select plan(22);
 
 create schema tests;
+
+-- Id del reporte de C1 sobre P (se genera al insertar; los grants de reportes no incluyen id).
+create function tests.reporte_perfil() returns uuid language sql stable as $$
+  select id from public.reportes
+  where autor_id = 'eeeeeeee-3200-4000-a000-000000000002' and objetivo_id = 'eeeeeeee-3200-4000-a000-000000000004' and objetivo_tipo = 'perfil';
+$$;
 
 create function tests.como(p_uid uuid) returns void language plpgsql as $$
 begin
@@ -58,8 +64,8 @@ select tests.como('eeeeeeee-3200-4000-a000-000000000002');
 
 -- C1 reporta el perfil de P
 select lives_ok(
-  $$insert into public.reportes (id, autor_id, objetivo_tipo, objetivo_id, motivo, detalle)
-    values ('22222222-3200-4000-a000-000000000001', 'eeeeeeee-3200-4000-a000-000000000002', 'perfil', 'eeeeeeee-3200-4000-a000-000000000004', 'datos_falsos', 'Foto falsa')$$,
+  $$insert into public.reportes (autor_id, objetivo_tipo, objetivo_id, motivo, detalle)
+    values ('eeeeeeee-3200-4000-a000-000000000002', 'perfil', 'eeeeeeee-3200-4000-a000-000000000004', 'datos_falsos', 'Foto falsa')$$,
   'C1 puede reportar el perfil de P'
 );
 
@@ -119,26 +125,26 @@ select tests.como('eeeeeeee-3200-4000-a000-000000000001');
 
 -- Marcar en revisión
 select is(
-  public.marcar_reporte_en_revision('22222222-3200-4000-a000-000000000001'),
+  public.marcar_reporte_en_revision(tests.reporte_perfil()),
   true,
   'admin puede marcar reporte en revisión'
 );
 
 select is(
-  (select estado from public.reportes where id = '22222222-3200-4000-a000-000000000001'),
+  (select estado from public.reportes where id = tests.reporte_perfil()),
   'en_revision'::public.estado_reporte,
   'estado del reporte pasa a en_revision'
 );
 
 -- Resolver reporte
 select is(
-  public.resolver_reporte('22222222-3200-4000-a000-000000000001', true, 'Se investigó el caso'),
+  public.resolver_reporte(tests.reporte_perfil(), true, 'Se investigó el caso'),
   true,
   'admin puede resolver reporte con acción'
 );
 
 select is(
-  (select estado from public.reportes where id = '22222222-3200-4000-a000-000000000001'),
+  (select estado from public.reportes where id = tests.reporte_perfil()),
   'resuelto'::public.estado_reporte,
   'estado del reporte pasa a resuelto'
 );

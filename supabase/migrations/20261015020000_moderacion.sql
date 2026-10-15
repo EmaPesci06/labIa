@@ -2,7 +2,8 @@
 --
 -- 1. Tabla acciones_moderacion:
 --    Columna usuario_id para identificar directamente al usuario afectado por la acción.
---    Permiso de insert para authenticated con verificación de privado.es_admin().
+--    Nadie escribe por la API: las acciones las registran las RPC security definer (y el
+--    servidor con service role, en borrado de cuenta). Un admin solo lee.
 -- 2. Tabla reportes:
 --    Índice único para evitar que un usuario reporte dos veces el mismo objetivo.
 --    Trigger que limita a 10 reportes por usuario por ventana de 24 horas.
@@ -39,17 +40,11 @@ alter table public.acciones_moderacion enable row level security;
 
 revoke all on table public.acciones_moderacion from anon, authenticated;
 grant select on public.acciones_moderacion to authenticated;
-grant insert on public.acciones_moderacion to authenticated;
 
 drop policy if exists acciones_moderacion_admin_leer on public.acciones_moderacion;
 create policy acciones_moderacion_admin_leer on public.acciones_moderacion
   for select to authenticated
   using (privado.es_admin());
-
-drop policy if exists acciones_moderacion_admin_insert on public.acciones_moderacion;
-create policy acciones_moderacion_admin_insert on public.acciones_moderacion
-  for insert to authenticated
-  with check (privado.es_admin());
 
 -- ---------------------------------------------------------------------------
 -- 2. reportes: unicidad, rate limit y no autoreporte
