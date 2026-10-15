@@ -231,7 +231,9 @@ test.describe("reportes del cliente y del profesional", () => {
       await expect(hoja).toBeVisible();
       await hoja.getByLabel(MOTIVO_ESTAFA).check();
       await capturar(page, "reporte-hoja", tema);
-      expect(graves(await new AxeBuilder({ page }).analyze()), tema).toEqual([]);
+      // Solo la hoja: la página de fondo queda atenuada por el velo y axe mide ese color mezclado.
+      const resultado = await new AxeBuilder({ page }).include('[role="dialog"]').analyze();
+      expect(graves(resultado), tema).toEqual([]);
       await page.keyboard.press("Escape");
       await expect(hoja).toBeHidden();
     }

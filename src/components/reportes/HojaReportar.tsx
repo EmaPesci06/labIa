@@ -59,6 +59,9 @@ export function HojaReportar({
     onCambioAbierta(nuevaAbierta);
   };
 
+  // Al reabrir la hoja tras enviar, se sigue mostrando "Reporte enviado" a propósito: el servidor
+  // acepta un solo reporte por autor y objetivo, así que el formulario solo llevaría a "Ya enviaste...".
+
   // Si se envió exitosamente, registrar métrica en cliente
   useEffect(() => {
     if (estado.exito && estado.motivoEnviado) {
@@ -176,7 +179,7 @@ export function HojaReportar({
               placeholder="Contanos qué pasó con el mayor detalle posible..."
               className="focus:border-borde-fuerte w-full rounded-campo border border-borde bg-superficie p-3 text-[15px] text-texto placeholder:text-texto-terciario focus:ring-2 focus:ring-foco focus:outline-none"
             />
-            <div className="flex justify-end text-xs text-texto-terciario">
+            <div className="flex justify-end text-xs text-texto-secundario">
               <span>
                 {detalle.length} / {MAX_CARACTERES_DETALLE}
               </span>
