@@ -1,6 +1,4 @@
-import { Check } from "lucide-react";
-import Link from "next/link";
-
+import { textoPostulantes } from "@/components/TarjetaTrabajo";
 import { CintaDistancia } from "@/components/ui/cinta-metrica";
 import { EtiquetaMono } from "@/components/ui/EtiquetaMono";
 import { Insignia } from "@/components/ui/Insignia";
@@ -8,21 +6,25 @@ import { formatearPesos, haceCuanto } from "@/lib/formato";
 import type { TrabajoParaMi } from "@/lib/trabajos/consulta";
 import { ETIQUETA_OFICIO, ETIQUETA_URGENCIA } from "@/lib/validaciones/trabajo";
 
-import { FormularioPostulacion } from "./FormularioPostulacion";
+import { FormularioPostulacion, type MiPostulacionInfo } from "./FormularioPostulacion";
 import { GaleriaFotosTrabajo } from "./GaleriaFotosTrabajo";
 
 type DetalleTrabajoEscritorioProps = {
   trabajo: TrabajoParaMi | null;
+  /** Postulación propia de este trabajo (la página la carga para el trabajo seleccionado). */
+  miPostulacion?: MiPostulacionInfo | null;
   publicado?: boolean;
 };
 
 /**
  * Detalle del trabajo seleccionado en vista de escritorio (maestro-detalle de LAB-27 y LAB-28).
- * Coincide con Desk-Trabajos.dc.html:
- * Permite ver las fotos, el presupuesto estimado y postularse directamente.
+ * Coincide con Desk-Trabajos.dc.html: datos del trabajo, fotos, y la postulación propia o el
+ * formulario para postularse. El formulario tiene `key` por trabajo: al cambiar de trabajo se
+ * monta de nuevo y no arrastra mensajes ni valores del anterior.
  */
 export function DetalleTrabajoEscritorio({
   trabajo,
+  miPostulacion = null,
   publicado = true,
 }: DetalleTrabajoEscritorioProps) {
   if (!trabajo) {
@@ -84,36 +86,19 @@ export function DetalleTrabajoEscritorio({
           {ETIQUETA_URGENCIA[trabajo.urgencia]}
         </Insignia>
         <span className="text-sm font-semibold text-texto-secundario">
-          {trabajo.cantidadPostulaciones === 0
-            ? "Sin postulantes"
-            : trabajo.cantidadPostulaciones === 1
-              ? "1 postulante"
-              : `${trabajo.cantidadPostulaciones} postulantes`}
+          {textoPostulantes(trabajo.cantidadPostulaciones)}
         </span>
       </div>
 
       <div className="mt-2 border-t border-divisor pt-4">
-        {trabajo.yaMePostule ? (
-          <div className="flex flex-col gap-2 rounded-[14px] bg-exito-suave p-4 text-[15px] font-semibold text-sobre-exito-suave">
-            <div className="flex items-center gap-2.5">
-              <Check aria-hidden className="size-5 shrink-0" />
-              <span>Postulación enviada. Si te elige, el cliente te escribe por WhatsApp.</span>
-            </div>
-            <Link
-              href={`/trabajos/${trabajo.id}`}
-              className="self-start text-xs underline underline-offset-2 hover:opacity-80"
-            >
-              Ver detalle de mi postulación
-            </Link>
-          </div>
-        ) : (
-          <FormularioPostulacion
-            trabajoId={trabajo.id}
-            clienteNombre={clienteNombreParaFormulario}
-            trabajoEstado="abierto"
-            publicado={publicado}
-          />
-        )}
+        <FormularioPostulacion
+          key={trabajo.id}
+          trabajoId={trabajo.id}
+          clienteNombre={clienteNombreParaFormulario}
+          trabajoEstado="abierto"
+          publicado={publicado}
+          miPostulacion={miPostulacion}
+        />
       </div>
     </section>
   );
