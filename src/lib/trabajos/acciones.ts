@@ -11,7 +11,7 @@ import { registrarEventoServidor } from "@/lib/metricas-servidor";
 import { limitarIntentos } from "@/lib/rate-limit";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
-import { avisarNuevaPostulacion } from "@/lib/emails/avisos";
+import { avisarEleccion, avisarNuevaPostulacion } from "@/lib/emails/avisos";
 import {
   erroresDePostulacion,
   esquemaPostulacion,
@@ -346,4 +346,184 @@ export async function postularme(
   revalidatePath("/mis-trabajos");
 
   return { ok: true, postulacionId: nueva.id };
+}
+
+/**
+ * El cliente elige a un postulante para su trabajo abierto (LAB-29).
+ * Invoca el RPC transaccional elegir_postulante, dispara avisos por email y métrica.
+ */
+export async function elegirPostulante(
+  postulacionId: string,
+  trabajoId: string,
+): Promise<{ ok: boolean; profesionalId?: string; mensaje?: string }> {
+  const sesion = await obtenerSesion();
+  if (!sesion || sesion.rol !== "cliente") {
+    return { ok: false, mensaje: "Solo el cliente dueño del trabajo puede elegir un postulante." };
+  }
+
+  if (!/^[0-9a-f-]{36}$/.test(postulacionId) || !/^[0-9a-f-]{36}$/.test(trabajoId)) {
+    return { ok: false, mensaje: "Identificador inválido." };
+  }
+
+  if (rolFalso()) {
+    revalidatePath("/mis-trabajos");
+    revalidatePath(`/mis-trabajos/${trabajoId}`);
+    return { ok: true, profesionalId: "11111111-1111-4111-8111-111111111111" };
+  }
+
+  if (!supabaseConfigurado()) {
+    return { ok: false, mensaje: "No pudimos conectar con el servidor." };
+  }
+
+  const supabase = await crearClienteServidor();
+  const { data: profesionalId, error } = await supabase.rpc("elegir_postulante", {
+    p_postulacion_id: postulacionId,
+  });
+
+  if (error || !profesionalId) {
+    const msj =
+      error?.code === "22023"
+        ? "El trabajo ya no está disponible para elegir postulantes."
+        : "No pudimos elegir al profesional. Verificá que el trabajo siga abierto.";
+    return { ok: false, mensaje: msj };
+  }
+
+  // Métricas
+  await registrarEventoServidor(sesion.usuario.id, "postulante_elegido");
+
+  // Avisos por email: al elegido y a los demás postulantes
+  await avisarEleccion(trabajoId, sesion.usuario.id);
+
+  revalidatePath("/mis-trabajos");
+  revalidatePath(`/mis-trabajos/${trabajoId}`);
+  revalidatePath("/trabajos");
+  revalidatePath(`/trabajos/${trabajoId}`);
+
+  return { ok: true, profesionalId };
+}
+
+/**
+ * El cliente cambia de profesional contratado volviendo a abrir el trabajo (LAB-29).
+ */
+export async function cambiarProfesional(
+  trabajoId: string,
+): Promise<{ ok: boolean; mensaje?: string }> {
+  const sesion = await obtenerSesion();
+  if (!sesion || sesion.rol !== "cliente") {
+    return { ok: false, mensaje: "Solo el cliente dueño puede cambiar de profesional." };
+  }
+
+  if (!/^[0-9a-f-]{36}$/.test(trabajoId)) {
+    return { ok: false, mensaje: "Identificador inválido." };
+  }
+
+  if (rolFalso()) {
+    revalidatePath("/mis-trabajos");
+    revalidatePath(`/mis-trabajos/${trabajoId}`);
+    return { ok: true };
+  }
+
+  if (!supabaseConfigurado()) {
+    return { ok: false, mensaje: "No pudimos conectar con el servidor." };
+  }
+
+  const supabase = await crearClienteServidor();
+  const { error } = await supabase.rpc("cambiar_profesional", {
+    p_trabajo_id: trabajoId,
+  });
+
+  if (error) {
+    return { ok: false, mensaje: "No se pudo cambiar de profesional." };
+  }
+
+  revalidatePath("/mis-trabajos");
+  revalidatePath(`/mis-trabajos/${trabajoId}`);
+  revalidatePath("/trabajos");
+  revalidatePath(`/trabajos/${trabajoId}`);
+
+  return { ok: true };
+}
+
+/**
+ * Marca el trabajo contratado como completado/cerrado para habilitar la reseña (LAB-29).
+ */
+export async function marcarTrabajoTerminado(
+  trabajoId: string,
+): Promise<{ ok: boolean; mensaje?: string }> {
+  const sesion = await obtenerSesion();
+  if (!sesion || sesion.rol !== "cliente") {
+    return { ok: false, mensaje: "Solo el cliente dueño puede marcar el trabajo como terminado." };
+  }
+
+  if (!/^[0-9a-f-]{36}$/.test(trabajoId)) {
+    return { ok: false, mensaje: "Identificador inválido." };
+  }
+
+  if (rolFalso()) {
+    revalidatePath("/mis-trabajos");
+    revalidatePath(`/mis-trabajos/${trabajoId}`);
+    return { ok: true };
+  }
+
+  if (!supabaseConfigurado()) {
+    return { ok: false, mensaje: "No pudimos conectar con el servidor." };
+  }
+
+  const supabase = await crearClienteServidor();
+  const { error } = await supabase.rpc("marcar_trabajo_terminado", {
+    p_trabajo_id: trabajoId,
+  });
+
+  if (error) {
+    return { ok: false, mensaje: "No se pudo marcar el trabajo como terminado." };
+  }
+
+  revalidatePath("/mis-trabajos");
+  revalidatePath(`/mis-trabajos/${trabajoId}`);
+  revalidatePath("/trabajos");
+  revalidatePath(`/trabajos/${trabajoId}`);
+
+  return { ok: true };
+}
+
+/**
+ * Cancela un trabajo del cliente (LAB-29).
+ */
+export async function cancelarTrabajo(
+  trabajoId: string,
+): Promise<{ ok: boolean; mensaje?: string }> {
+  const sesion = await obtenerSesion();
+  if (!sesion || sesion.rol !== "cliente") {
+    return { ok: false, mensaje: "Solo el cliente dueño puede cancelar el trabajo." };
+  }
+
+  if (!/^[0-9a-f-]{36}$/.test(trabajoId)) {
+    return { ok: false, mensaje: "Identificador inválido." };
+  }
+
+  if (rolFalso()) {
+    revalidatePath("/mis-trabajos");
+    revalidatePath(`/mis-trabajos/${trabajoId}`);
+    return { ok: true };
+  }
+
+  if (!supabaseConfigurado()) {
+    return { ok: false, mensaje: "No pudimos conectar con el servidor." };
+  }
+
+  const supabase = await crearClienteServidor();
+  const { error } = await supabase.rpc("cancelar_trabajo", {
+    p_trabajo_id: trabajoId,
+  });
+
+  if (error) {
+    return { ok: false, mensaje: "No se pudo cancelar el trabajo." };
+  }
+
+  revalidatePath("/mis-trabajos");
+  revalidatePath(`/mis-trabajos/${trabajoId}`);
+  revalidatePath("/trabajos");
+  revalidatePath(`/trabajos/${trabajoId}`);
+
+  return { ok: true };
 }

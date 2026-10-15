@@ -491,6 +491,12 @@ isOneToOne: true
               "anios_experiencia": number,"antecedentes_ok": boolean,"apellido_inicial": string,"cantidad_resenas": number,"distancia_km": number,"foto_path": string,"identidad_verificada": boolean,"matriculado": boolean,"nombre": string,"oficios": (Database["public"]['Enums']["oficio"])[],"promedio": number,"total": number,"usuario_id": string,"zonas_texto": string
             }[]
                            },
+"cambiar_profesional":
+{ Args: { "p_trabajo_id": string }; Returns: boolean
+                           },
+"cancelar_trabajo":
+{ Args: { "p_trabajo_id": string }; Returns: boolean
+                           },
 "contactar_profesional":
 { Args: { "p_origen": string,"p_profesional": string,"p_trabajo"?: string }; Returns: string
                            },
@@ -505,8 +511,14 @@ isOneToOne: true
 "documentos_huerfanos":
 { Args: { "p_antes": string }; Returns: string[]
                            },
+"elegir_postulante":
+{ Args: { "p_postulacion_id": string }; Returns: string
+                           },
 "elegir_rol_inicial":
 { Args: { "p_rol": Database["public"]['Enums']["rol"] }; Returns: undefined
+                           },
+"marcar_trabajo_terminado":
+{ Args: { "p_trabajo_id": string }; Returns: boolean
                            },
 "perfil_profesional":
 { Args: { "p_id": string }; Returns: {
