@@ -55,6 +55,10 @@ export function MaestroDetalleTrabajos({
 
   function seleccionarEnEscritorio(evento: MouseEvent<HTMLLIElement>, id: string) {
     if (!window.matchMedia(MEDIA_ESCRITORIO).matches) return;
+    // Ctrl/Cmd/Shift/Alt o botón distinto del principal: dejamos que el navegador abra el enlace
+    // (pestaña nueva, ventana nueva o clic medio).
+    const modificado = evento.ctrlKey || evento.metaKey || evento.shiftKey || evento.altKey;
+    if (modificado || evento.button !== 0) return;
     evento.preventDefault();
     router.push(urlParaSeleccionar(id), { scroll: false });
   }
