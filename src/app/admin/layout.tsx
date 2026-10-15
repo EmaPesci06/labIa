@@ -4,6 +4,7 @@ import { Suspense, type ReactNode } from "react";
 import { BotonSalir } from "@/components/auth/BotonSalir";
 import { SaltarAlContenido } from "@/components/navegacion/SaltarAlContenido";
 import { Logo } from "@/components/ui/Logo";
+import { NavegacionAdmin } from "@/components/admin/NavegacionAdmin";
 import { sesionAdmin } from "@/lib/admin/sesion";
 
 /**
@@ -27,12 +28,15 @@ async function MarcoAdmin({ children }: { children: ReactNode }) {
     <div className="flex min-h-dvh flex-col bg-fondo text-texto">
       <SaltarAlContenido />
       <header className="border-b border-divisor bg-superficie">
-        <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between gap-4 px-5 py-3 lg:px-10">
-          <div className="flex items-center gap-3">
-            <Logo variante="icono" alt="" />
-            <p className="font-mono text-xs font-semibold tracking-[0.4px] text-texto-secundario uppercase">
-              Panel interno · LabÍA
-            </p>
+        <div className="mx-auto flex w-full max-w-[1200px] flex-wrap items-center justify-between gap-4 px-5 py-3 lg:px-10">
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+            <div className="flex items-center gap-3">
+              <Logo variante="icono" alt="" />
+              <p className="font-mono text-xs font-semibold tracking-[0.4px] text-texto-secundario uppercase">
+                Panel interno · LabÍA
+              </p>
+            </div>
+            <NavegacionAdmin />
           </div>
           <div className="flex items-center gap-3">
             <p className="hidden text-sm text-texto-secundario sm:block">

@@ -11,6 +11,7 @@ vi.mock("next/image", () => ({
 }));
 vi.mock("@/lib/perfil/acciones", () => ({ cargarMasResenas: vi.fn() }));
 vi.mock("@/lib/contacto/acciones", () => ({ contactarProfesional: vi.fn() }));
+vi.mock("@/lib/reportes/acciones", () => ({ enviarReporte: vi.fn() }));
 
 import { PerfilProfesional } from "./PerfilProfesional";
 

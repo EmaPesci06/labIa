@@ -114,9 +114,47 @@ describe("decidirAcceso", () => {
     }
   });
 
+  it("una cuenta suspendida siempre se redirige a /suspendida salvo endpoints de auth", () => {
+    for (const ruta of ["/inicio", "/buscar", "/trabajos", "/cuenta", "/mis-trabajos"]) {
+      expect(decidirAcceso(ruta, "", "cliente", "suspendida")).toEqual({
+        tipo: "redirigir",
+        destino: "/suspendida",
+      });
+      expect(decidirAcceso(ruta, "", "profesional", "suspendida")).toEqual({
+        tipo: "redirigir",
+        destino: "/suspendida",
+      });
+    }
+    // Deja pasar /suspendida
+    expect(decidirAcceso("/suspendida", "", "cliente", "suspendida")).toEqual({ tipo: "pasar" });
+    // Deja pasar endpoints de auth para poder cerrar sesión
+    expect(decidirAcceso("/api/auth/signout", "", "cliente", "suspendida")).toEqual({
+      tipo: "pasar",
+    });
+    expect(decidirAcceso("/cerrar-sesion", "", "cliente", "suspendida")).toEqual({
+      tipo: "pasar",
+    });
+  });
+
+  it("un usuario que no está suspendido en /suspendida es redirigido a su inicio o ingresar", () => {
+    expect(decidirAcceso("/suspendida", "", "cliente", "activa")).toEqual({
+      tipo: "redirigir",
+      destino: "/inicio",
+    });
+    expect(decidirAcceso("/suspendida", "", "profesional", "activa")).toEqual({
+      tipo: "redirigir",
+      destino: "/trabajos",
+    });
+    expect(decidirAcceso("/suspendida", "", null, null)).toEqual({
+      tipo: "redirigir",
+      destino: "/ingresar",
+    });
+  });
+
   it("no confunde prefijos parecidos", () => {
     expect(decidirAcceso("/trabajos-viejos", "", null)).toEqual({ tipo: "pasar" });
     expect(necesitaSesion("/normas")).toBe(false);
+    expect(necesitaSesion("/suspendida")).toBe(true);
   });
 });
 

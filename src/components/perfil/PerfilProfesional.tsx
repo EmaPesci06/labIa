@@ -18,6 +18,7 @@ import {
   textoOficios,
 } from "@/lib/perfil/datos";
 
+import { BotonReportar } from "@/components/reportes/BotonReportar";
 import { BotonContactar } from "./BotonContactar";
 import { EnlaceVolver } from "./EnlaceVolver";
 import { GaleriaTrabajos } from "./GaleriaTrabajos";
@@ -241,12 +242,15 @@ export function PerfilProfesional({
 
           <Aviso className="lg:hidden">Se comprometió con las normas de seguridad de LabÍA.</Aviso>
           {esPropio ? null : (
-            <Link
-              href="#"
+            <BotonReportar
+              objetivoTipo="perfil"
+              objetivoId={perfil.id}
+              tituloObjetivo={perfil.nombre}
+              texto="Reportar perfil"
+              estaAutenticado={!hrefIngreso}
+              hrefIngreso={hrefIngreso}
               className="flex min-h-11 items-center justify-center text-sm text-texto-terciario underline lg:hidden"
-            >
-              Reportar perfil
-            </Link>
+            />
           )}
         </div>
 
@@ -264,12 +268,15 @@ export function PerfilProfesional({
                 {hayContacto ? (
                   <BotonContactar hrefIngreso={hrefIngreso} profesionalId={idContacto} />
                 ) : null}
-                <Link
-                  href="#"
+                <BotonReportar
+                  objetivoTipo="perfil"
+                  objetivoId={perfil.id}
+                  tituloObjetivo={perfil.nombre}
+                  texto="Reportar perfil"
+                  estaAutenticado={!hrefIngreso}
+                  hrefIngreso={hrefIngreso}
                   className="flex min-h-11 items-center justify-center text-sm text-texto-terciario underline"
-                >
-                  Reportar perfil
-                </Link>
+                />
               </>
             )}
           </div>
