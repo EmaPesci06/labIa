@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 
+import { limiteIngresoPorCuenta } from "@/lib/limites";
 import { limitarPorIp, mensajeDeLimite } from "@/lib/rate-limit-persistente";
 import { rolDeLaSesion } from "@/lib/sesion";
 import { urlDelSitio } from "@/lib/sitio";
@@ -74,6 +75,10 @@ export async function ingresar(
 
   const bloqueado = await superaElLimite("ingreso");
   if (bloqueado) return { ...bloqueado, valores };
+
+  // Tope por cuenta además del de IP (B-11): el mensaje no revela si el email tiene cuenta.
+  const porCuenta = mensajeDeLimite(await limiteIngresoPorCuenta(resultado.data.email));
+  if (porCuenta) return { mensaje: porCuenta, valores };
 
   if (!supabaseConfigurado()) return { mensaje: MENSAJE_SIN_SUPABASE, valores };
   const supabase = await crearClienteServidor();

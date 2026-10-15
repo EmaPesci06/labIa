@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 
+import { Boton } from "@/components/ui/Boton";
+import { Vacio } from "@/components/ui/Vacio";
 import { PerfilProfesional } from "@/components/perfil/PerfilProfesional";
 import { RegistrarVistaPerfil } from "@/components/perfil/RegistrarVistaPerfil";
+import { bloqueoLecturaPublica } from "@/lib/limites";
 import {
   distanciaEntreBarrios,
   esIdValido,
@@ -26,6 +29,9 @@ const perfilDelPedido = cache(async (id: string) => {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
+  // Con el tope por IP cumplido no se lee el perfil (M-03): mismo chequeo que la página, cacheado.
+  if (await bloqueoLecturaPublica("perfil"))
+    return { title: "Perfil · LabÍA", robots: { index: false } };
   const perfil = await perfilDelPedido(id).catch(() => null);
   if (!perfil) return { title: "Perfil no encontrado · LabÍA" };
 
@@ -47,6 +53,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PerfilDelProfesional({ params }: Props) {
   const { id } = await params;
+  const bloqueo = await bloqueoLecturaPublica("perfil");
+  if (bloqueo) {
+    return (
+      <div role="alert">
+        <Vacio
+          titulo={bloqueo}
+          accion={
+            <Boton href="/buscar" variante="secundario">
+              Volver a buscar
+            </Boton>
+          }
+        />
+      </div>
+    );
+  }
   const perfil = await perfilDelPedido(id);
   // No existe, no está publicado o la cuenta está suspendida (salvo para el dueño y los admins).
   if (!perfil) notFound();

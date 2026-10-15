@@ -1,13 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { mockInsert, mockSelect, mockLimitarPersistente, mockRegistrarEventoServidor } = vi.hoisted(
-  () => ({
-    mockInsert: vi.fn(),
-    mockSelect: vi.fn(),
-    mockLimitarPersistente: vi.fn(),
-    mockRegistrarEventoServidor: vi.fn(),
-  }),
-);
+const {
+  mockInsert,
+  mockSelect,
+  mockLimitarPersistente,
+  mockLimitarPorIp,
+  mockRegistrarEventoServidor,
+} = vi.hoisted(() => ({
+  mockInsert: vi.fn(),
+  mockSelect: vi.fn(),
+  mockLimitarPersistente: vi.fn(),
+  mockLimitarPorIp: vi.fn(),
+  mockRegistrarEventoServidor: vi.fn(),
+}));
 
 vi.mock("@/lib/sesion", () => ({
   obtenerSesion: vi.fn(),
@@ -15,6 +20,7 @@ vi.mock("@/lib/sesion", () => ({
 
 vi.mock("@/lib/rate-limit-persistente", () => ({
   limitarPersistente: mockLimitarPersistente,
+  limitarPorIp: mockLimitarPorIp,
 }));
 
 vi.mock("@/lib/metricas-servidor", () => ({
@@ -67,6 +73,7 @@ describe("enviarReporte", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockLimitarPersistente.mockResolvedValue({ permitido: true, segundosParaReintentar: 0 });
+    mockLimitarPorIp.mockResolvedValue({ permitido: true, segundosParaReintentar: 0 });
     mockSelect.mockResolvedValue({ data: null });
     mockInsert.mockResolvedValue({ error: null });
   });
@@ -107,6 +114,47 @@ describe("enviarReporte", () => {
     const res = await enviarReporte(ESTADO_REPORTE_INICIAL, formData);
     expect(res.mensaje).toContain("Alcanzaste el límite de 10 reportes por día");
     expect(mockInsert).not.toHaveBeenCalled();
+  });
+
+  it("rechaza si la IP supera su tope diario aunque la cuenta tenga cupo (M-05)", async () => {
+    vi.mocked(obtenerSesion).mockResolvedValue({
+      usuario: { id: UUID_USUARIO, email: "test@example.com" },
+      rol: "cliente",
+      normasVersion: "1.0",
+      perfil: { nombre: "Test", apellido: null, nombreVisible: "Test", completo: true },
+    });
+    mockLimitarPorIp.mockResolvedValue({ permitido: false, segundosParaReintentar: 3600 });
+
+    const formData = new FormData();
+    formData.set("objetivoTipo", "perfil");
+    formData.set("objetivoId", UUID_OBJETIVO);
+    formData.set("motivo", "datos_falsos");
+
+    const res = await enviarReporte(ESTADO_REPORTE_INICIAL, formData);
+    expect(res.mensaje).toBe(
+      "Hiciste demasiados reportes desde tu conexión hoy. Probá de nuevo mañana.",
+    );
+    expect(mockInsert).not.toHaveBeenCalled();
+  });
+
+  it("cuenta la IP con la clave 'reporte' y 30 reportes por día (M-05)", async () => {
+    vi.mocked(obtenerSesion).mockResolvedValue({
+      usuario: { id: UUID_USUARIO, email: "test@example.com" },
+      rol: "cliente",
+      normasVersion: "1.0",
+      perfil: { nombre: "Test", apellido: null, nombreVisible: "Test", completo: true },
+    });
+
+    const formData = new FormData();
+    formData.set("objetivoTipo", "perfil");
+    formData.set("objetivoId", UUID_OBJETIVO);
+    formData.set("motivo", "estafa");
+
+    await enviarReporte(ESTADO_REPORTE_INICIAL, formData);
+    expect(mockLimitarPorIp).toHaveBeenCalledWith("reporte", {
+      maximo: 30,
+      ventanaMs: 24 * 60 * 60 * 1000,
+    });
   });
 
   it("cuenta el intento con la clave y la regla persistentes de reportes", async () => {

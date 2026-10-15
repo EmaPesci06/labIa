@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { obtenerPerfil } from "@/lib/perfil/cargar";
-import { limitarPersistente } from "@/lib/rate-limit-persistente";
+import { limitarPersistente, limitarPorIp } from "@/lib/rate-limit-persistente";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 
@@ -16,6 +16,9 @@ vi.mock("@/lib/rate-limit-persistente", async () => {
     limitarPersistente: vi.fn(async (clave: string, regla: { maximo: number; ventanaMs: number }) =>
       limitarIntentos(clave, regla),
     ),
+    // Tope por IP (LAB-54): por defecto entra; cada test que lo necesite lo cambia.
+    limitarPorIp: vi.fn(async () => ({ permitido: true, segundosParaReintentar: 0 })),
+    mensajeDeLimite: vi.fn(() => null),
   };
 });
 vi.mock("@/lib/supabase/servidor", () => ({
@@ -194,5 +197,54 @@ describe("contactarProfesional: límite persistente (LAB-47)", () => {
       mensaje: "Hiciste demasiados intentos. Esperá 42 segundos y probá de nuevo.",
     });
     expect(crearClienteServidor).not.toHaveBeenCalled();
+  });
+});
+
+describe("contactarProfesional: topes por IP y por profesional (LAB-54, M-03)", () => {
+  const datos = () => formulario({ profesionalId: PROFESIONAL, origen: "perfil", trabajoId: "" });
+
+  beforeEach(() => {
+    vi.mocked(limitarPorIp).mockResolvedValue({ permitido: true, segundosParaReintentar: 0 });
+  });
+
+  it("cuenta la IP con la clave 'contacto', 30 por hora", async () => {
+    preparar();
+    await contactarProfesional(estadoInicial, datos());
+    expect(limitarPorIp).toHaveBeenCalledWith("contacto", { maximo: 30, ventanaMs: 3_600_000 });
+  });
+
+  it("si la IP supera el tope no abre WhatsApp ni llega a la base", async () => {
+    const { rpcLlamadas } = preparar();
+    vi.mocked(limitarPorIp).mockResolvedValueOnce({ permitido: false, segundosParaReintentar: 90 });
+
+    const estado = await contactarProfesional(estadoInicial, datos());
+
+    expect(estado.mensaje).toBe(
+      "Hiciste demasiados contactos desde tu conexión. Esperá 90 segundos y probá de nuevo.",
+    );
+    expect(estado.url).toBeUndefined();
+    expect(rpcLlamadas).toHaveLength(0);
+  });
+
+  it("cuenta el profesional con su clave diaria, 50 por día", async () => {
+    preparar();
+    await contactarProfesional(estadoInicial, datos());
+    expect(limitarPersistente).toHaveBeenCalledWith(`contacto-profesional:${PROFESIONAL}`, {
+      maximo: 50,
+      ventanaMs: 86_400_000,
+    });
+  });
+
+  it("si el profesional llegó al tope diario no abre el contacto", async () => {
+    const { rpcLlamadas } = preparar();
+    // Orden de llamadas: primero el tope de la cuenta (entra), después el del profesional (bloquea).
+    vi.mocked(limitarPersistente)
+      .mockResolvedValueOnce({ permitido: true, segundosParaReintentar: 0 })
+      .mockResolvedValueOnce({ permitido: false, segundosParaReintentar: 3600 });
+
+    const estado = await contactarProfesional(estadoInicial, datos());
+
+    expect(estado.mensaje).toBe("Este profesional ya recibió muchos contactos hoy. Probá mañana.");
+    expect(rpcLlamadas).toHaveLength(0);
   });
 });
