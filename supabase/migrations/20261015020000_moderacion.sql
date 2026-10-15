@@ -111,8 +111,8 @@ for each row execute function privado.reportes_limite_diario();
 -- Reglas de contenido. El objetivo tiene que existir (a la vista de quien inserta) y, si lo
 -- reporta un usuario, no puede ser propio. Los reportes del sistema sobre una reseña de su autor
 -- (1-2 estrellas, LAB-31) no pasan por la regla de autoreporte.
--- Solo devuelve true/false: no expone datos del objetivo, así que se evita que el filtro de RLS
--- (perfiles sin publicar, por ejemplo) decida si un objetivo "existe" para quien reporta.
+-- Solo devuelve true/false: no expone datos del objetivo. Un perfil sin publicar cuenta como
+-- inexistente: "no existe" y "no visible" dan el mismo error al reportar.
 create or replace function privado.objetivo_existe(p_tipo text, p_id uuid)
 returns boolean
 language sql
@@ -121,7 +121,9 @@ security definer
 set search_path = ''
 as $$
   select case p_tipo
-    when 'perfil' then exists (select 1 from public.perfiles_profesionales where usuario_id = p_id)
+    when 'perfil' then exists (
+      select 1 from public.perfiles_profesionales where usuario_id = p_id and publicado
+    )
     when 'trabajo' then exists (select 1 from public.trabajos where id = p_id)
     when 'resena' then exists (select 1 from public.resenas where id = p_id)
     else false
@@ -196,12 +198,17 @@ grant execute on function public.mi_motivo_suspension() to authenticated;
 -- Solo service_role puede ejecutarla.
 create or replace function public.revocar_sesiones_admin(p_usuario_id uuid)
 returns void
-language sql
+language plpgsql
 security definer
 set search_path = ''
 as $$
+begin
+  if exists (select 1 from public.usuarios where id = p_usuario_id and rol = 'admin') then
+    raise exception 'No se revocan las sesiones de un admin' using errcode = '22023';
+  end if;
   delete from auth.refresh_tokens where user_id = p_usuario_id::text;
   delete from auth.sessions where user_id = p_usuario_id;
+end;
 $$;
 
 revoke execute on function public.revocar_sesiones_admin(uuid) from public, anon, authenticated;

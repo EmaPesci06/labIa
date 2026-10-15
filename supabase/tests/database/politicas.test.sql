@@ -737,15 +737,23 @@ select throws_ok(
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000002');
 select is((select count(*) from public.reportes where id in ('cccccccc-1200-4000-c000-000000000001', 'cccccccc-1200-4000-c000-000000000002')), 1::bigint, 'reportes: el autor ve solo los suyos');
 select lives_ok(
-  $$insert into public.reportes (autor_id, objetivo_tipo, objetivo_id, motivo, detalle) values ('cccccccc-1200-4000-a000-000000000002', 'perfil', 'cccccccc-1200-4000-a000-000000000005', 'datos_falsos', 'No coincide la foto')$$,
+  $$insert into public.reportes (autor_id, objetivo_tipo, objetivo_id, motivo, detalle) values ('cccccccc-1200-4000-a000-000000000002', 'perfil', 'cccccccc-1200-4000-a000-000000000008', 'datos_falsos', 'No coincide la foto')$$,
   'reportes: un cliente reporta'
 );
 select throws_ok(
-  $$insert into public.reportes (autor_id, objetivo_tipo, objetivo_id, motivo) values ('cccccccc-1200-4000-a000-000000000003', 'perfil', 'cccccccc-1200-4000-a000-000000000005', 'otro')$$,
+  $$insert into public.reportes (autor_id, objetivo_tipo, objetivo_id, motivo) values ('cccccccc-1200-4000-a000-000000000002', 'perfil', 'cccccccc-1200-4000-a000-000000000005', 'otro')$$,
+  'P0002', 'El contenido reportado no existe', 'reportes: un perfil sin publicar da el mismo error que uno inexistente'
+);
+select throws_ok(
+  $$insert into public.reportes (autor_id, objetivo_tipo, objetivo_id, motivo) values ('cccccccc-1200-4000-a000-000000000002', 'perfil', 'cccccccc-1200-4000-a000-00000000ffff', 'otro')$$,
+  'P0002', 'El contenido reportado no existe', 'reportes: un perfil inexistente da el mismo error'
+);
+select throws_ok(
+  $$insert into public.reportes (autor_id, objetivo_tipo, objetivo_id, motivo) values ('cccccccc-1200-4000-a000-000000000003', 'perfil', 'cccccccc-1200-4000-a000-000000000008', 'otro')$$,
   '42501', null, 'reportes: no se reporta a nombre de otro'
 );
 select throws_ok(
-  $$insert into public.reportes (autor_id, objetivo_tipo, objetivo_id, motivo, estado) values ('cccccccc-1200-4000-a000-000000000002', 'perfil', 'cccccccc-1200-4000-a000-000000000005', 'otro', 'resuelto')$$,
+  $$insert into public.reportes (autor_id, objetivo_tipo, objetivo_id, motivo, estado) values ('cccccccc-1200-4000-a000-000000000003', 'perfil', 'cccccccc-1200-4000-a000-000000000008', 'otro', 'resuelto')$$,
   '42501', null, 'reportes: no se crea ya resuelto'
 );
 select is_empty($$update public.reportes set estado = 'resuelto' where id = 'cccccccc-1200-4000-c000-000000000001' returning 1$$, 'reportes: el autor no cambia el estado');

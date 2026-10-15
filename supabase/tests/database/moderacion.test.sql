@@ -4,7 +4,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(32);
+select plan(33);
 
 create schema tests;
 grant usage on schema tests to authenticated;
@@ -296,6 +296,12 @@ select is(
   (select count(*) from auth.sessions where user_id = 'eeeeeeee-3200-4000-a000-000000000004'),
   0::bigint,
   'revocar_sesiones_admin borra las sesiones de la cuenta'
+);
+select throws_ok(
+  $$select public.revocar_sesiones_admin('eeeeeeee-3200-4000-a000-000000000001')$$,
+  '22023',
+  null,
+  'revocar_sesiones_admin rechaza la cuenta de un admin'
 );
 
 -- Reactivar cuenta
