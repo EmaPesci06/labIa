@@ -4,18 +4,18 @@ Foto al momento de pasar de Claude Code a Gemini. Confirmá contra Linear y `gh 
 
 ## En main (Done)
 
-LAB-5, 6, 8 a 28, 30, 33, 35, 40 y 43. Lo último que entró: LAB-28 (detalle del trabajo y postulación con precio y seña, 6be1f9c).
+LAB-5, 6, 8 a 30, 33, 35, 40 y 43. Lo último que entró: LAB-29 (mis trabajos del cliente: ver postulantes y elegir a uno, PR #34, commit 70c52a2).
 
-## PRs abiertos
+## Tareas en desarrollo activo en paralelo (Subagentes)
 
-Ninguno. Todos los PRs previos (LAB-43 #28, LAB-21 #30, LAB-27 #32, LAB-28 #33) fueron integrados en `main` con CI en verde.
+- LAB-42: Borrar documentos de verificación 30 días después de revisados (subagente Backend Security Dev).
+- LAB-31: Reseñas de clientes a profesionales (subagente Fullstack Dev).
+- LAB-32: Reportes y moderación: reportar perfiles, trabajos y reseñas, y suspender cuentas (subagente Fullstack Dev).
 
-## Próximas tareas (Todo)
+## Próximas tareas pendientes
 
-- LAB-29 (mis trabajos del cliente: ver postulantes y elegir a uno): destrabada tras LAB-28.
-- LAB-32 (reportes y moderación): destrabada por LAB-21.
-- Después: LAB-31 (reseñas de clientes a profesionales), LAB-42 (borrado de documentos a 30 días), LAB-34 (QA final).
-- LAB-41 (rate limit persistente y helpers de auth) está en Backlog: hacerlo antes de producción (LAB-37).
+- LAB-34 (QA final, accesibilidad y rendimiento).
+- LAB-41 (rate limit persistente y helpers de auth) antes de producción (LAB-37).
 
 ## Decisiones tomadas que no están en las tareas
 
