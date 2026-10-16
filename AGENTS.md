@@ -99,6 +99,9 @@ Rutas en español sin acentos: `/`, `/ingresar`, `/registro`, `/registro/cliente
      (`public.consumir_cupo`). Solo recibe claves ya hasheadas (HMAC-SHA256 con `RATE_LIMIT_SECRET`, obligatorio
      con `NODE_ENV=production` o `VERCEL_ENV` production/preview; sha256 sin secreto solo en dev y tests) y solo lo llama
      `src/lib/rate-limit-persistente.ts`.
+   - `consultarCupoServicio` en el mismo archivo (LAB-54): lectura sin consumo (`public.consultar_cupo`), con las
+     mismas condiciones de clave. Solo la llama `src/lib/rate-limit-consulta.ts` (`cupoDisponible`), antes de
+     atender una contraseña en ingreso.
 6. Toda Server Action valida sesión, rol y entrada con Zod.
 7. Rate limit persistente (`src/lib/rate-limit-persistente.ts`, `limitarPorIp`) en registro, ingreso, Google,
    restablecer, reenvío de confirmación, documentos, normas y cuenta; postulación y reporte cuando lleguen.

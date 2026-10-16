@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { obtenerPerfil } from "@/lib/perfil/cargar";
-import { limitarPersistente } from "@/lib/rate-limit-persistente";
+import { limitarPersistente, limitarPorIp } from "@/lib/rate-limit-persistente";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 
@@ -9,6 +9,10 @@ import { contactarProfesional } from "./acciones";
 
 vi.mock("server-only", () => ({}));
 vi.mock("@/lib/sesion", () => ({ obtenerSesion: vi.fn() }));
+vi.mock("@/lib/ip-del-pedido", () => ({
+  IP_DESCONOCIDA: "desconocida",
+  ipDelPedido: vi.fn(async () => "190.1.2.3"),
+}));
 // Límite persistente (LAB-47): por defecto se comporta como la memoria, así los casos de arriba no cambian.
 vi.mock("@/lib/rate-limit-persistente", async () => {
   const { limitarIntentos } = await import("@/lib/rate-limit");
@@ -16,6 +20,9 @@ vi.mock("@/lib/rate-limit-persistente", async () => {
     limitarPersistente: vi.fn(async (clave: string, regla: { maximo: number; ventanaMs: number }) =>
       limitarIntentos(clave, regla),
     ),
+    // Tope por IP (LAB-54): por defecto entra; cada test que lo necesite lo cambia.
+    limitarPorIp: vi.fn(async () => ({ permitido: true, segundosParaReintentar: 0 })),
+    mensajeDeLimite: vi.fn(() => null),
   };
 });
 vi.mock("@/lib/supabase/servidor", () => ({
@@ -194,5 +201,32 @@ describe("contactarProfesional: límite persistente (LAB-47)", () => {
       mensaje: "Hiciste demasiados intentos. Esperá 42 segundos y probá de nuevo.",
     });
     expect(crearClienteServidor).not.toHaveBeenCalled();
+  });
+});
+
+describe("contactarProfesional: topes por IP y por profesional (LAB-54, M-03)", () => {
+  const datos = () => formulario({ profesionalId: PROFESIONAL, origen: "perfil", trabajoId: "" });
+
+  beforeEach(() => {
+    vi.mocked(limitarPorIp).mockResolvedValue({ permitido: true, segundosParaReintentar: 0 });
+  });
+
+  it("cuenta la IP con la clave 'contacto', 30 por hora", async () => {
+    preparar();
+    await contactarProfesional(estadoInicial, datos());
+    expect(limitarPorIp).toHaveBeenCalledWith("contacto", { maximo: 30, ventanaMs: 3_600_000 });
+  });
+
+  it("si la IP supera el tope no abre WhatsApp ni llega a la base", async () => {
+    const { rpcLlamadas } = preparar();
+    vi.mocked(limitarPorIp).mockResolvedValueOnce({ permitido: false, segundosParaReintentar: 90 });
+
+    const estado = await contactarProfesional(estadoInicial, datos());
+
+    expect(estado.mensaje).toBe(
+      "Hiciste demasiados contactos desde tu conexión. Esperá 90 segundos y probá de nuevo.",
+    );
+    expect(estado.url).toBeUndefined();
+    expect(rpcLlamadas).toHaveLength(0);
   });
 });

@@ -1,5 +1,6 @@
 "use server";
 
+import { limiteContactoPorIp } from "@/lib/limites";
 import { obtenerPerfil } from "@/lib/perfil/cargar";
 import { profesionPrincipal } from "@/lib/perfil/datos";
 import { limitarPersistente } from "@/lib/rate-limit-persistente";
@@ -54,6 +55,14 @@ export async function contactarProfesional(
   if (!limite.permitido) {
     return {
       mensaje: `Hiciste demasiados intentos. Esperá ${limite.segundosParaReintentar} segundos y probá de nuevo.`,
+    };
+  }
+
+  // Tope por IP (M-03): frena a quien usa muchas cuentas desde la misma conexión.
+  const porIp = await limiteContactoPorIp();
+  if (!porIp.permitido) {
+    return {
+      mensaje: `Hiciste demasiados contactos desde tu conexión. Esperá ${porIp.segundosParaReintentar} segundos y probá de nuevo.`,
     };
   }
 

@@ -19,8 +19,32 @@ export async function consumirCupoServicio(
     p_maximo: maximo,
     p_ventana_segundos: ventanaSegundos,
   });
+  return leerCupo(data, error);
+}
+
+/**
+ * Llama a `public.consultar_cupo` con la service role (LAB-54): lee el cupo sin consumirlo. Solo lo
+ * llama `rate-limit-consulta.ts` con claves ya hasheadas. Lanza si la base falla.
+ */
+export async function consultarCupoServicio(
+  clave: string,
+  maximo: number,
+  ventanaSegundos: number,
+): Promise<CupoServicio> {
+  const { data, error } = await crearClienteAdmin().rpc("consultar_cupo", {
+    p_clave: clave,
+    p_maximo: maximo,
+    p_ventana_segundos: ventanaSegundos,
+  });
+  return leerCupo(data, error);
+}
+
+function leerCupo(
+  data: { permitido: boolean; segundos_para_reintentar: number }[] | null,
+  error: unknown,
+): CupoServicio {
   const fila = data?.[0];
-  if (error || !fila) throw new Error("consumir_cupo no devolvió resultado");
+  if (error || !fila) throw new Error("El cupo no devolvió resultado");
   return {
     permitido: fila.permitido,
     segundosParaReintentar: fila.segundos_para_reintentar,

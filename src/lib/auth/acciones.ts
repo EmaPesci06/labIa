@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 
+import { cupoIngresoAgotado, registrarFalloDeIngreso } from "@/lib/limites";
 import { limitarPorIp, mensajeDeLimite } from "@/lib/rate-limit-persistente";
 import { rolDeLaSesion } from "@/lib/sesion";
 import { urlDelSitio } from "@/lib/sitio";
@@ -75,6 +76,11 @@ export async function ingresar(
   const bloqueado = await superaElLimite("ingreso");
   if (bloqueado) return { ...bloqueado, valores };
 
+  // Tope de fallos (B-11, LAB-54): se consulta sin consumir antes de atender la contraseña. Si está
+  // agotado, no se intenta el ingreso, aunque la clave sea correcta.
+  const agotado = mensajeDeLimite(await cupoIngresoAgotado(resultado.data.email));
+  if (agotado) return { mensaje: agotado, valores };
+
   if (!supabaseConfigurado()) return { mensaje: MENSAJE_SIN_SUPABASE, valores };
   const supabase = await crearClienteServidor();
   const { data, error } = await supabase.auth.signInWithPassword({
@@ -82,6 +88,9 @@ export async function ingresar(
     password: resultado.data.contrasena,
   });
   if (error || !data.user) {
+    // Solo los fallos consumen cupo por cuenta (B-11): el ingreso correcto no consume nada.
+    const bloqueoPorCuenta = mensajeDeLimite(await registrarFalloDeIngreso(resultado.data.email));
+    if (bloqueoPorCuenta) return { mensaje: bloqueoPorCuenta, valores };
     return { mensaje: mensajeDeAuth(error?.code, error?.status), valores };
   }
 
