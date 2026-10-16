@@ -9,7 +9,9 @@
 // Rutas de prueba (solo para Playwright, no las usa la app):
 //   GET /__decisiones  -> decisiones recibidas por decidir_documento (cuerpo del RPC)
 //   GET /__accesos     -> accesos registrados en accesos_documentos (firmas de URL)
+const fs = require("node:fs");
 const http = require("node:http");
+const path = require("node:path");
 const zlib = require("node:zlib");
 
 const PUERTO = Number(process.env.LABIA_SUPABASE_FALSO_PUERTO ?? 54399);
@@ -348,6 +350,23 @@ const VERIFICACIONES = [
   },
 ];
 
+// LAB-52: fotos del trabajo de gas en el bucket privado `fotos-trabajos`. Se firman con createSignedUrls y
+// el falso sirve la imagen de prueba que ya está en el repo (public/marca/labia-icono.png).
+const FOTO_TRABAJO_PRUEBA = path.join(
+  __dirname,
+  "..",
+  "..",
+  "..",
+  "public",
+  "marca",
+  "labia-icono.png",
+);
+const FOTOS_TRABAJO_GAS = [
+  `${ID_CLIENTE}/88888888-8888-4888-8888-888888888881/foto-1.png`,
+  `${ID_CLIENTE}/88888888-8888-4888-8888-888888888881/foto-2.png`,
+];
+const FOTOS_TRABAJO_PRUEBA = new Set(FOTOS_TRABAJO_GAS);
+
 // Trabajos y postulaciones para LAB-27 y LAB-29.
 const TRABAJOS_MOCK = [
   {
@@ -357,7 +376,7 @@ const TRABAJOS_MOCK = [
     descripcion: "Desde ayer hay olor cerca del horno. Ya cerré la llave de paso.",
     urgencia: "lo_antes_posible",
     presupuesto_estimado: null,
-    fotos: [],
+    fotos: [...FOTOS_TRABAJO_GAS],
     barrio_id: 2,
     barrio_nombre: "La Perla",
     distancia_km: 0.8,
@@ -896,6 +915,39 @@ function atenderResenas(url, res, unObjeto) {
   return true;
 }
 
+/**
+ * Vista pública de reseñas (LAB-56): sin autor_id ni trabajo_id; el autor sale como nombre e inicial.
+ * Usa las mismas reseñas que la tabla (incluidas las de moderación) y la misma regla de visibilidad:
+ * solo profesionales activos. El autor sale de las cuentas de admin y de prueba.
+ */
+function atenderResenasPublicas(url, res) {
+  const profesional = (url.searchParams.get("profesional_id") ?? "").replace(/^eq\./, "");
+  const candidatas = todasLasResenas().filter(
+    (r) =>
+      estadoDe(r.profesional_id ?? ID_PUBLICADO) === "activa" &&
+      (!profesional || (r.profesional_id ?? ID_PUBLICADO) === profesional),
+  );
+  const cuentas = [...USUARIOS_ADMIN, ...Object.values(USUARIOS)];
+  const desde = Number(url.searchParams.get("offset") ?? 0);
+  const limite = Number(url.searchParams.get("limit") ?? TOTAL_RESENAS);
+  const pagina = candidatas.slice(desde, desde + limite).map((r) => {
+    const autor = cuentas.find((u) => u.id === r.autor_id);
+    return {
+      id: r.id,
+      profesional_id: r.profesional_id ?? ID_PUBLICADO,
+      puntaje: r.puntaje,
+      texto: r.texto,
+      created_at: r.created_at,
+      autor_nombre: autor ? autor.nombre : null,
+      autor_inicial: autor && autor.apellido ? autor.apellido[0] : null,
+    };
+  });
+  responder(res, 200, pagina, {
+    "content-range": `${pagina.length ? desde : "*"}${pagina.length ? `-${desde + pagina.length - 1}` : ""}/${candidatas.length}`,
+  });
+  return true;
+}
+
 function atenderReportes(req, url, cuerpo, yo, unObjeto, res) {
   if (req.method === "POST") {
     const datos = JSON.parse(cuerpo || "{}");
@@ -1076,6 +1128,35 @@ const server = http.createServer((req, res) => {
       });
     }
 
+    // Fotos de trabajos (LAB-52): firma por lote (createSignedUrls) y descarga de la URL firmada.
+    if (ruta === "/storage/v1/object/sign/fotos-trabajos" && req.method === "POST") {
+      const datos = JSON.parse(cuerpo || "{}");
+      const rutas = Array.isArray(datos.paths) ? datos.paths : [];
+      return responder(
+        res,
+        200,
+        rutas.map((p) =>
+          FOTOS_TRABAJO_PRUEBA.has(p)
+            ? {
+                error: null,
+                path: p,
+                signedURL: `/object/sign/fotos-trabajos/${p}?token=falso-${Date.now()}`,
+              }
+            : { error: "Object not found", path: p, signedURL: null },
+        ),
+      );
+    }
+    if (ruta.startsWith("/storage/v1/object/sign/fotos-trabajos/") && req.method === "GET") {
+      const archivo = decodeURIComponent(
+        ruta.replace(/^\/storage\/v1\/object\/sign\/fotos-trabajos\//, ""),
+      );
+      if (!FOTOS_TRABAJO_PRUEBA.has(archivo) || !url.searchParams.get("token")) {
+        return responder(res, 404, { message: "Object not found" });
+      }
+      res.writeHead(200, { "content-type": "image/png" });
+      return res.end(fs.readFileSync(FOTO_TRABAJO_PRUEBA));
+    }
+
     // Auditoría de accesos: la service role inserta una fila por cada URL firmada.
     if (ruta === "/rest/v1/accesos_documentos") {
       if (req.method === "POST") {
@@ -1215,20 +1296,6 @@ const server = http.createServer((req, res) => {
       return responder(res, 200, WHATSAPP_FALSO);
     }
 
-    // Vista pública de reseñas (LAB-56): sin autor_id ni trabajo_id; el autor sale como nombre e inicial.
-    const resenaPublica = (r) => {
-      const u = USUARIOS_ADMIN.find((x) => x.id === r.autor_id);
-      return {
-        id: r.id,
-        profesional_id: r.profesional_id,
-        puntaje: r.puntaje,
-        texto: r.texto,
-        created_at: r.created_at,
-        autor_nombre: u ? u.nombre : null,
-        autor_inicial: u && u.apellido ? u.apellido[0] : null,
-      };
-    };
-
     // La vista es de solo lectura (LAB-56): las escrituras responden 405 como PostgREST.
     if (ruta === "/rest/v1/resenas_publicas" && req.method !== "GET") {
       return responder(res, 405, {
@@ -1274,12 +1341,12 @@ const server = http.createServer((req, res) => {
         }
         return responder(res, 200, unObjeto ? propia : [propia]);
       }
+      if (ruta === "/rest/v1/resenas_publicas") return atenderResenasPublicas(url, res);
       const vacio = (url.searchParams.get("profesional_id") ?? "").includes(ID_EN_REVISION);
       const desde = Number(url.searchParams.get("offset") ?? 0);
       const limite = Number(url.searchParams.get("limit") ?? resenas.length);
       const pagina = vacio ? [] : resenas.slice(desde, desde + limite);
-      const salida = ruta === "/rest/v1/resenas_publicas" ? pagina.map(resenaPublica) : pagina;
-      return responder(res, 200, salida, {
+      return responder(res, 200, pagina, {
         "content-range": `${pagina.length ? desde : "*"}${pagina.length ? `-${desde + pagina.length - 1}` : ""}/${vacio ? 0 : resenas.length}`,
       });
     }
