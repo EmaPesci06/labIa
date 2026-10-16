@@ -47,7 +47,7 @@ frená y preguntale a Emanuel.
   `LABIA_E2E_SUPABASE_FALSO=1`. El falso se levanta a mano (`node tests/e2e/apoyo/supabase-falso.cjs`).
 - **Secreto del limitador en e2e:** los servidores de `playwright.config.ts` corren con `NODE_ENV=production`, así que
   el limitador exige `RATE_LIMIT_SECRET`. No hace falta cargarla: el config pone un valor de prueba
-  (`secreto-falso-solo-para-e2e`) salvo que la shell ya tenga una. Con `reuseExistingServer` (un servidor ya levantado)
+  (`secreto-falso-solo-para-e2e-de-prueba`) salvo que la shell ya tenga una. Con `reuseExistingServer` (un servidor ya levantado)
   el config no interviene: ese servidor tiene que tener su propia `RATE_LIMIT_SECRET`.
 - **Procesos:** matá solo los PID de tus puertos. Nunca `taskkill /IM node.exe` ni `pkill -f playwright`.
 - **Rutas en Windows:** usá `C:/Users/WIN-10/Desktop/labia` con "Desktop" en mayúscula; con minúscula git falla en worktrees.

@@ -6,7 +6,7 @@ const enCI = Boolean(process.env.CI);
 // Los servidores de e2e corren con `NODE_ENV=production`, así que el limitador exige `RATE_LIMIT_SECRET`
 // (LAB-49). Acá va un valor de prueba, público y solo para la base local o la de la CI; si el que corre
 // la prueba tiene uno propio, se respeta.
-const SECRETO_LIMITE_E2E = process.env.RATE_LIMIT_SECRET ?? "secreto-falso-solo-para-e2e";
+const SECRETO_LIMITE_E2E = process.env.RATE_LIMIT_SECRET ?? "secreto-falso-solo-para-e2e-de-prueba";
 
 export default defineConfig({
   testDir: "./tests/e2e",
