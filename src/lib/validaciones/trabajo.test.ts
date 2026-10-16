@@ -78,3 +78,24 @@ describe("esquemaFotos", () => {
     expect(esquemaFotos(id, cliente).safeParse([`${cliente}/${id}/x/0-1.jpg`]).success).toBe(false);
   });
 });
+
+describe("esquemaTrabajo · direcciones y mails (LAB-53)", () => {
+  it("rechaza una dirección exacta en la descripción y en el título", () => {
+    const enDescripcion = esquemaTrabajo.safeParse({
+      ...valido,
+      descripcion: "Pérdida de agua en Independencia 2100, timbre roto, llamá al portero.",
+    });
+    expect(enDescripcion.success).toBe(false);
+    const enTitulo = esquemaTrabajo.safeParse({ ...valido, titulo: "Gotera en Av. Colón 1234" });
+    expect(enTitulo.success).toBe(false);
+  });
+
+  it("rechaza un email en la descripción con el mensaje de contacto", () => {
+    const r = esquemaTrabajo.safeParse({
+      ...valido,
+      descripcion: "Mandame un correo a vecina@mail.com con las fotos del caño roto.",
+    });
+    expect(r.success).toBe(false);
+    if (!r.success) expect(erroresDeTrabajo(r.error).descripcion).toMatch(/No pongas tu teléfono/);
+  });
+});

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { tieneDatosDeContacto } from "@/lib/validaciones/trabajo";
+import { sinDatosDeContacto } from "@/lib/validaciones/contenido-publico";
 
 export const MENSAJE_CONTACTO_POSTULACION =
   "No pongas tu teléfono: si te eligen, el cliente te escribe.";
@@ -14,7 +14,7 @@ function aPesos(valor: unknown): unknown {
   return /^\d+$/.test(limpio) ? Number(limpio) : Number.NaN;
 }
 
-const sinContacto = (valor: string) => !tieneDatosDeContacto(valor);
+const sinContacto = (valor: string) => sinDatosDeContacto(valor);
 
 export const esquemaPostulacion = z
   .object({

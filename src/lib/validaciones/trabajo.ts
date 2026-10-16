@@ -1,6 +1,9 @@
 import { z } from "zod";
 
 import { OFICIOS, type Oficio } from "@/lib/busqueda";
+import { sinDatosDeContacto, tieneDatosDeContacto } from "@/lib/validaciones/contenido-publico";
+
+export { tieneDatosDeContacto };
 
 export const URGENCIAS = ["lo_antes_posible", "esta_semana", "sin_apuro"] as const;
 export type UrgenciaTrabajo = (typeof URGENCIAS)[number];
@@ -28,18 +31,7 @@ export const MENSAJE_CONTACTO =
 export const MENSAJE_LIMITE_ABIERTOS =
   "Ya tenés 5 trabajos abiertos. Cerrá alguno para publicar otro.";
 
-const EMAIL = /[^\s@]+@[^\s@]+\.[^\s@]+/;
-// Una secuencia de dígitos con separadores comunes (espacios, guiones, puntos, paréntesis).
-const SECUENCIA_NUMERICA = /\+?\d[\d\s().-]{6,}\d/g;
-
-/** ¿El texto trae un email o un número de teléfono (8 dígitos o más seguidos)? */
-export function tieneDatosDeContacto(texto: string): boolean {
-  if (EMAIL.test(texto)) return true;
-  const secuencias = texto.match(SECUENCIA_NUMERICA) ?? [];
-  return secuencias.some((s) => s.replace(/\D/g, "").length >= 8);
-}
-
-const sinContacto = (valor: string) => !tieneDatosDeContacto(valor);
+const sinContacto = (valor: string) => sinDatosDeContacto(valor);
 
 /** "$ 15.000" → 15000; vacío → undefined; otra cosa → NaN (falla la validación). */
 function aPesos(valor: unknown): unknown {
