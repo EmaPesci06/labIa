@@ -36,8 +36,16 @@ export function armarPie(usuarioId: string | undefined, plantilla: Plantilla): D
   if (!usuarioId || !secretoValido(secreto)) return { urlBaja: urlPreferencias, urlPreferencias };
 
   const categoria = definicion(plantilla).preferencia ?? "novedades";
-  const token = firmarTokenBaja({ usuarioId, categoria }, secreto);
-  return { urlBaja: `${sitio}/baja?t=${encodeURIComponent(token)}`, urlPreferencias };
+  const token = encodeURIComponent(firmarTokenBaja({ usuarioId, categoria }, secreto));
+  return {
+    // El token va en el fragmento (#): el navegador no lo manda al servidor, así que no queda en los
+    // logs de acceso (LAB-57, B-01). Los links ya enviados con `/baja?t=` siguen funcionando.
+    urlBaja: `${sitio}/baja#t=${token}`,
+    // RFC 8058: el cliente de correo hace POST a esta URL con el token en la query. Es la única forma
+    // que acepta el estándar; el token solo autoriza apagar una categoría de avisos.
+    urlBajaUnClic: `${sitio}/api/baja?t=${token}`,
+    urlPreferencias,
+  };
 }
 
 async function mandar(
@@ -74,9 +82,9 @@ export async function enviarEmail<K extends Plantilla>(
     ]);
 
     const soporte = process.env.EMAIL_SOPORTE;
-    const conBaja = pie.urlBaja !== pie.urlPreferencias;
     // Baja de un clic (RFC 8058): el cliente de correo hace POST a esta URL, que no es la página.
-    const urlBajaUnClic = pie.urlBaja.replace("/baja?", "/api/baja?");
+    const urlBajaUnClic = pie.urlBajaUnClic;
+    const conBaja = urlBajaUnClic !== undefined;
     const mensaje = {
       from: process.env.EMAIL_REMITENTE || REMITENTE_POR_DEFECTO,
       to: envio.para,

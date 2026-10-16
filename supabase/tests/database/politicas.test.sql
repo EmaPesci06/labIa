@@ -655,7 +655,7 @@ select is((select count(*) from public.contactos where profesional_id in ('ccccc
 -- ===========================================================================
 
 reset role; select tests.anonimo();
-select is((select count(*) from public.resenas where profesional_id = 'cccccccc-1200-4000-a000-000000000004'), 2::bigint, 'resenas: anon las lee');
+select is((select count(*) from public.resenas_publicas where profesional_id = 'cccccccc-1200-4000-a000-000000000004'), 2::bigint, 'resenas: anon las lee por la vista pública');
 select throws_ok(
   $$insert into public.resenas (autor_id, profesional_id, puntaje) values ('cccccccc-1200-4000-a000-000000000002', 'cccccccc-1200-4000-a000-000000000008', 5)$$,
   '42501', null, 'resenas: anon no crea'
@@ -917,8 +917,8 @@ select is(
   (select array_agg(c.relname::text order by c.relname)
    from pg_class c join pg_namespace n on n.oid = c.relnamespace
    where n.nspname = 'public' and c.relkind in ('r', 'v', 'p') and has_any_column_privilege('anon', c.oid, 'select')),
-  array['barrios', 'perfiles_profesionales', 'resenas', 'usuarios_publicos'],
-  'anon solo puede leer barrios, perfiles_profesionales, resenas y usuarios_publicos'
+  array['barrios', 'perfiles_profesionales', 'resenas_publicas', 'usuarios_publicos'],
+  'anon solo puede leer barrios, perfiles_profesionales, resenas_publicas y usuarios_publicos'
 );
 
 select is(

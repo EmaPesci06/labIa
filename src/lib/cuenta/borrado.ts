@@ -2,6 +2,7 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { crearClienteAdmin } from "@/lib/supabase/admin";
 import type { Database } from "@/lib/supabase/tipos";
 
 type Admin = SupabaseClient<Database>;
@@ -10,6 +11,7 @@ export class ErrorBorrado extends Error {}
 
 const POR_PAGINA = 100;
 const MAXIMO_PAGINAS = 100;
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
 /** Borra todos los archivos de una carpeta de un bucket (sin recursión: las carpetas son planas). */
 async function vaciarCarpeta(admin: Admin, bucket: string, carpeta: string): Promise<void> {
@@ -27,7 +29,8 @@ async function vaciarCarpeta(admin: Admin, bucket: string, carpeta: string): Pro
 
 /**
  * Job de borrado de cuenta (LAB-33, Ley 25.326). Se corre con la service role y SOLO después de
- * haber validado sesión, confirmación y reautenticación de la persona.
+ * haber validado sesión, confirmación y reautenticación de la persona. El cliente con service role
+ * se crea acá adentro (LAB-57): quien llama pasa solo el id, nunca la clave.
  *
  * 1. Borra sus archivos: `fotos/perfiles/<uid>`, `fotos/trabajos-hechos/<uid>`, `fotos/trabajos/<id>`
  *    (fotos de trabajos anteriores a LAB-52), `fotos-trabajos/<uid>/<id>` de cada trabajo suyo
@@ -37,7 +40,10 @@ async function vaciarCarpeta(admin: Admin, bucket: string, carpeta: string): Pro
  *    `borrado_de_cuenta`).
  * 3. Registra en `acciones_moderacion` solo el id y la fecha.
  */
-export async function borrarCuentaDeUsuario(admin: Admin, uid: string): Promise<void> {
+export async function borrarCuentaDeUsuario(uid: string): Promise<void> {
+  if (!UUID.test(uid)) throw new ErrorBorrado("Falta el identificador de la cuenta.");
+  const admin = crearClienteAdmin();
+
   const { data: trabajos, error } = await admin.from("trabajos").select("id").eq("cliente_id", uid);
   if (error) throw new ErrorBorrado("No pudimos preparar el borrado de la cuenta.");
 

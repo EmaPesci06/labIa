@@ -103,10 +103,31 @@ falta activar `pg_cron` salvo que se agregue un job dentro de la base.
    **redirect** hacia el dominio principal. HTTPS lo emite Vercel solo.
 5. DNS en el proveedor del dominio: usar los registros exactos que muestre Vercel en Settings → Domains.
    Esperar la propagación y verificar el candado en el navegador.
-6. Settings → Git → Production Branch: `main`.
-7. Después del primer deploy de producción, confirmar en Vercel → Settings → Cron Jobs que aparecen los
+6. **Cabeceras de seguridad y HSTS (LAB-55).** `next.config.ts` manda la CSP, `X-Frame-Options: DENY`,
+   `X-Content-Type-Options: nosniff`, `Referrer-Policy` y `Permissions-Policy` en todas las rutas
+   (`src/lib/seguridad/cabeceras.ts`). **HSTS no lo manda la app**: lo pone Vercel en los dominios propios.
+   Verificarlo cuando el DNS ya propagó:
+   ```bash
+   curl -sI https://<dominio-propio>/ | grep -i -E "strict-transport|content-security|x-frame|x-content|referrer|permissions"
+   curl -sI http://<dominio-propio>/ | grep -i "^location"
+   ```
+   La primera debe mostrar `strict-transport-security` y las cabeceras de la app. La segunda debe redirigir
+   a `https://`. Si HSTS no aparece, revisar que el dominio esté en **Verified** en Settings → Domains y
+   que la respuesta venga de Vercel (`server: Vercel`). No agregar HSTS a mano en `next.config.ts` sin
+   decidirlo antes: podría pisar el `max-age` que ya fija Vercel.
+   Después de cada cambio de CSP, abrir `/ingresar`, entrar con Google y revisar la consola del navegador:
+   no debe haber líneas `Refused to ...`.
+   **Por qué `script-src` tiene `'unsafe-inline'` y no nonce ni hashes:** la app usa `cacheComponents` y
+   las páginas se prerenderizan (`◐ Partial Prerender` en `next build`). Un nonce por pedido obliga a render
+   dinámico y Next documenta que PPR es incompatible con nonces. Los hashes tampoco alcanzan: cada página
+   prerenderizada trae sus propios scripts inline de Next (`self.__next_f.push`), y el de redirección de
+   escritorio (`IrABuscarEnEscritorio`) cambia según el barrio. El resto de la CSP (`frame-ancestors`,
+   `object-src`, `base-uri`, `form-action`, `connect-src`, `frame-src`) sigue siendo estricta. Si en el
+   futuro la app deja de prerenderizar, revisar nonces con `proxy.ts`.
+7. Settings → Git → Production Branch: `main`.
+8. Después del primer deploy de producción, confirmar en Vercel → Settings → Cron Jobs que aparecen los
    cuatro crons. Ver la última ejecución en Logs.
-8. Deploy: mergear a `main` o usar "Redeploy" sobre el último deploy de `main`.
+9. Deploy: mergear a `main` o usar "Redeploy" sobre el último deploy de `main`.
 
 ---
 

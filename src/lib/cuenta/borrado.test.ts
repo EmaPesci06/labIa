@@ -1,11 +1,15 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Database } from "@/lib/supabase/tipos";
 
 import { borrarCuentaDeUsuario, ErrorBorrado } from "./borrado";
 
 vi.mock("server-only", () => ({}));
+
+// El job crea su propio cliente admin: el test lo reemplaza por un Storage en memoria (LAB-57).
+const { cliente } = vi.hoisted(() => ({ cliente: { actual: null as unknown } }));
+vi.mock("@/lib/supabase/admin", () => ({ crearClienteAdmin: () => cliente.actual }));
 
 const UID = "11111111-1111-4111-8111-111111111111";
 const OTRO = "22222222-2222-4222-8222-222222222222";
@@ -62,10 +66,15 @@ function crearAdmin(opciones: { falla?: "borrar-usuario" | "listar" } = {}) {
   return { admin, archivos, eventos, insertar, deleteUser };
 }
 
+beforeEach(() => {
+  cliente.actual = null;
+});
+
 describe("borrarCuentaDeUsuario", () => {
   it("borra los archivos de la persona y la cuenta, y deja el registro sin datos", async () => {
     const { admin, archivos, eventos, insertar, deleteUser } = crearAdmin();
-    await borrarCuentaDeUsuario(admin, UID);
+    cliente.actual = admin;
+    await borrarCuentaDeUsuario(UID);
 
     // No queda ningún archivo con ese uid ni de sus trabajos; los de otra persona siguen.
     expect([...(archivos.fotos ?? [])]).toEqual([`perfiles/${OTRO}/1.jpg`]);
@@ -79,14 +88,23 @@ describe("borrarCuentaDeUsuario", () => {
 
   it("si falla el Storage no toca la cuenta", async () => {
     const { admin, deleteUser, insertar } = crearAdmin({ falla: "listar" });
-    await expect(borrarCuentaDeUsuario(admin, UID)).rejects.toBeInstanceOf(ErrorBorrado);
+    cliente.actual = admin;
+    await expect(borrarCuentaDeUsuario(UID)).rejects.toBeInstanceOf(ErrorBorrado);
     expect(deleteUser).not.toHaveBeenCalled();
     expect(insertar).not.toHaveBeenCalled();
   });
 
   it("si falla el borrado de la cuenta no registra nada", async () => {
     const { admin, insertar } = crearAdmin({ falla: "borrar-usuario" });
-    await expect(borrarCuentaDeUsuario(admin, UID)).rejects.toBeInstanceOf(ErrorBorrado);
+    cliente.actual = admin;
+    await expect(borrarCuentaDeUsuario(UID)).rejects.toBeInstanceOf(ErrorBorrado);
     expect(insertar).not.toHaveBeenCalled();
+  });
+
+  it("rechaza un id que no es uuid antes de tocar nada", async () => {
+    const { admin, deleteUser } = crearAdmin();
+    cliente.actual = admin;
+    await expect(borrarCuentaDeUsuario("no-es-un-uuid")).rejects.toBeInstanceOf(ErrorBorrado);
+    expect(deleteUser).not.toHaveBeenCalled();
   });
 });
