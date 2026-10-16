@@ -73,6 +73,27 @@ describe("quitarFotosDelTrabajo", () => {
     expect(resultado).toEqual({ ok: true, quitadas: 250 });
   });
 
+  it("si la carpeta no se vacía dentro del tope de páginas, devuelve ok: false y no borra nada", async () => {
+    const llenaSiempre = vi.fn(async () => ({
+      data: Array.from({ length: TAMANO_PAGINA_LISTADO }, (_, i) => ({
+        id: "f",
+        name: `${i}.jpg`,
+      })),
+      error: null,
+    }));
+    const remove = vi.fn(async (_rutas: string[]) => ({ error: null }));
+    const cliente = {
+      storage: { from: () => ({ list: llenaSiempre, remove }) },
+    } as unknown as SupabaseClient<Database>;
+
+    expect(await quitarFotosDelTrabajo(cliente, CLIENTE, TRABAJO)).toEqual({
+      ok: false,
+      quitadas: 0,
+    });
+    expect(remove).not.toHaveBeenCalled();
+    expect(llenaSiempre).toHaveBeenCalledTimes(100);
+  });
+
   it("ignora las subcarpetas (su id es null) y no borra nada si no hay archivos", async () => {
     const { cliente, remove } = fakeStorage({ archivos: [{ id: null, name: "sub" }] });
 

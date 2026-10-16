@@ -25,22 +25,43 @@ set name = excluded.name,
 -- Políticas de Storage del bucket nuevo
 -- ---------------------------------------------------------------------------
 
--- Cuenta los objetos de una carpeta del bucket sin pasar por la RLS de storage.objects (security
--- definer, la corre el dueño de la tabla). Solo la usa la policy de insert, como tope de fotos.
-create function privado.cuenta_fotos_de_carpeta(p_carpeta text)
-returns bigint
+-- Tope de fotos por trabajo. Fuente única en SQL; el mismo número es MAX_FOTOS en
+-- src/lib/validaciones/trabajo.ts. Si cambia uno, cambiar el otro.
+create function privado.fotos_trabajo_max()
+returns integer
 language sql
-stable
+immutable
+set search_path = ''
+as $$
+  select 4
+$$;
+
+-- Cuenta las fotos de la carpeta <cliente>/<trabajo>/ del objeto dado. Corre como dueño de la tabla
+-- (security definer), así no pasa por la RLS de storage.objects: un subselect ahí dentro de la policy
+-- de insert recursiona (42P17). Toma un lock transaccional por carpeta: dos subidas simultáneas al
+-- mismo trabajo se serializan, y la segunda cuenta la foto que la primera ya confirmó.
+create function privado.fotos_trabajo_cantidad(p_nombre text)
+returns bigint
+language plpgsql
 security definer
 set search_path = ''
 as $$
-  select count(*) from storage.objects o
-  where o.bucket_id = 'fotos-trabajos'
-    and starts_with(o.name, p_carpeta)
+declare
+  v_carpeta text := split_part(p_nombre, '/', 1) || '/' || split_part(p_nombre, '/', 2) || '/';
+begin
+  perform pg_advisory_xact_lock(hashtext(v_carpeta));
+  return (
+    select count(*) from storage.objects o
+    where o.bucket_id = 'fotos-trabajos'
+      and starts_with(o.name, v_carpeta)
+  );
+end;
 $$;
 
-revoke execute on function privado.cuenta_fotos_de_carpeta(text) from public, anon;
-grant execute on function privado.cuenta_fotos_de_carpeta(text) to authenticated;
+revoke execute on function privado.fotos_trabajo_max() from public, anon;
+revoke execute on function privado.fotos_trabajo_cantidad(text) from public, anon;
+grant execute on function privado.fotos_trabajo_max() to authenticated;
+grant execute on function privado.fotos_trabajo_cantidad(text) to authenticated;
 
 create policy fotos_trabajos_subir_propias on storage.objects
   for insert to authenticated
@@ -58,12 +79,13 @@ create policy fotos_trabajos_subir_propias on storage.objects
         and t.cliente_id = (select auth.uid())
         and t.estado = 'abierto'
     )
-    -- Tope por trabajo: como mucho 4 fotos (MAX_FOTOS en src/lib/validaciones/trabajo.ts). La quinta se
-    -- rechaza. El conteo va por función security definer: un subselect a storage.objects dentro de una
-    -- policy de insert de storage.objects recursiona (Postgres evalúa todas las policies de insert).
-    and privado.cuenta_fotos_de_carpeta(
-      split_part(name, '/', 1) || '/' || split_part(name, '/', 2) || '/'
-    ) < 4
+    -- Tope de fotos por trabajo (privado.fotos_trabajo_max). Solo se evalúa en este bucket: el CASE
+    -- garantiza el orden, así que la función nunca corre para otros buckets.
+    and case
+      when bucket_id = 'fotos-trabajos'
+        then privado.fotos_trabajo_cantidad(name) < privado.fotos_trabajo_max()
+      else true
+    end
   );
 
 -- Quien puede ver el trabajo puede leer sus fotos. La subconsulta corre con la RLS de `trabajos`
