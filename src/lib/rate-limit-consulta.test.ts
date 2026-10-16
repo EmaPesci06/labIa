@@ -17,10 +17,12 @@ import { reiniciarLimites } from "./rate-limit";
 import { cupoDisponible } from "./rate-limit-consulta";
 
 const regla = { maximo: 2, ventanaMs: 60_000 };
+// Al menos 32 caracteres: por debajo, `claveDeLimite` trata el secreto como no configurado (LAB-57).
+const SECRETO = "secreto-de-prueba-para-tests-de-32-caracteres";
 const hmac = (t: string, secreto: string) => createHmac("sha256", secreto).update(t).digest("hex");
 
 beforeEach(() => {
-  vi.stubEnv("RATE_LIMIT_SECRET", "secreto-de-prueba");
+  vi.stubEnv("RATE_LIMIT_SECRET", SECRETO);
   consultar.mockReset();
   sentry.captureException.mockReset();
   reiniciarLimites();
@@ -38,7 +40,7 @@ describe("cupoDisponible (lectura sin consumo)", () => {
     await cupoDisponible("ingreso-fallo-cuenta:ana@ejemplo.com", regla);
 
     expect(consultar).toHaveBeenCalledWith(
-      hmac("ingreso-fallo-cuenta:ana@ejemplo.com", "secreto-de-prueba"),
+      hmac("ingreso-fallo-cuenta:ana@ejemplo.com", SECRETO),
       2,
       60,
     );
