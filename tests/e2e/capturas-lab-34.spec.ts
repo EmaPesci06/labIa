@@ -11,10 +11,12 @@ const ACTIVO = process.env.LABIA_E2E_SUPABASE_FALSO === "1" && Boolean(DIR);
 const PUERTO = Number(process.env.PUERTO_E2E ?? 3000);
 const URL_BASE = `http://localhost:${PUERTO}`;
 const URL_PROFESIONAL = `http://localhost:${PUERTO + 100}`;
-const URL_CLIENTE = `http://localhost:${PUERTO + 200}`;
 
 const ID_PUBLICADO = "11111111-1111-4111-8111-111111111111";
 const TRABAJO_OLOR_GAS = "88888888-8888-4888-8888-888888888881";
+const TITULO_OLOR_GAS = "Olor a gas en la cocina";
+// Las fotos firmadas del falso (createSignedUrls de fotos-trabajos) llevan esta ruta en la URL.
+const RUTA_FOTOS_FIRMADAS = "/object/sign/fotos-trabajos/";
 const ESQUEMAS = [
   ["claro", "light"],
   ["oscuro", "dark"],
@@ -96,10 +98,13 @@ test.describe("capturas LAB-34", () => {
       browser,
     }) => {
       const contexto = await browser.newContext({ locale: "es-AR", colorScheme: esquema });
-      await iniciarSesion(contexto, "tok-dueno");
+      // tok-cliente es Laura, dueña del trabajo de gas. tok-dueno es un profesional: con su sesión,
+      // /mis-trabajos redirige a /trabajos ("Trabajos para vos").
+      await iniciarSesion(contexto, "tok-cliente");
       const page = await contexto.newPage();
       await page.goto(`${URL_BASE}/mis-trabajos/${TRABAJO_OLOR_GAS}`);
-      await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+      await expect(page.getByRole("heading", { level: 1, name: TITULO_OLOR_GAS })).toBeVisible();
+      await expect(page.locator(`img[src*="${RUTA_FOTOS_FIRMADAS}"]`).first()).toBeVisible();
       await capturar(page, "lab52-trabajo-cliente", tema);
       await contexto.close();
     });
@@ -110,7 +115,8 @@ test.describe("capturas LAB-34", () => {
       const contexto = await browser.newContext({ locale: "es-AR", colorScheme: esquema });
       const page = await contexto.newPage();
       await page.goto(`${URL_PROFESIONAL}/trabajos/${TRABAJO_OLOR_GAS}`);
-      await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+      await expect(page.getByRole("heading", { level: 1, name: TITULO_OLOR_GAS })).toBeVisible();
+      await expect(page.locator(`img[src*="${RUTA_FOTOS_FIRMADAS}"]`).first()).toBeVisible();
       await capturar(page, "lab52-trabajo-profesional", tema);
       await contexto.close();
     });
