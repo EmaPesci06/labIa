@@ -26,6 +26,8 @@ vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
 
+vi.mock("server-only", () => ({}));
+
 // LAB-52: al cerrar un trabajo, las fotos se quitan con la service role (desde /admin).
 const { mockTrabajoDelCierre, mockListFotos, mockRemoveFotos } = vi.hoisted(() => ({
   mockTrabajoDelCierre: vi.fn().mockResolvedValue({ data: { cliente_id: "c-1" }, error: null }),
@@ -228,7 +230,7 @@ describe("reportes-acciones (admin)", () => {
       const res = await cerrarTrabajoAccion(UUID_1, "Contenido inapropiado");
 
       expect(res.ok).toBe(true);
-      expect(mockListFotos).toHaveBeenCalledWith(`c-1/${UUID_1}`, { limit: 1000 });
+      expect(mockListFotos).toHaveBeenCalledWith(`c-1/${UUID_1}`, { limit: 100, offset: 0 });
       expect(mockRemoveFotos).toHaveBeenCalledWith([
         `c-1/${UUID_1}/0-1.jpg`,
         `c-1/${UUID_1}/1-2.jpg`,

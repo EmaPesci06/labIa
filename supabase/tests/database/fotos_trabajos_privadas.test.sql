@@ -4,7 +4,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(23);
+select plan(27);
 
 -- Storage bloquea el DELETE directo sobre storage.objects (protect_delete). Igual que en
 -- politicas.test.sql, se habilita para esta transacción y así se prueba lo que decide la RLS.
@@ -141,6 +141,27 @@ select is(
   1::bigint,
   'dueño: la foto quitada no queda y la otra sigue'
 );
+
+-- Tope de fotos por trabajo (MAX_FOTOS = 4): la carpeta del trabajo 1 tiene 1; entran hasta 4 en
+-- total y la quinta (N+1) se rechaza.
+select tests.como('cccccccc-2700-4000-a000-000000000001');
+select lives_ok(
+  $$insert into storage.objects (bucket_id, name) values ('fotos-trabajos', 'cccccccc-2700-4000-a000-000000000001/dddddddd-2700-4000-a000-000000000001/2-1791734400002.jpg')$$,
+  'tope: la foto 2 de 4 entra'
+);
+select lives_ok(
+  $$insert into storage.objects (bucket_id, name) values ('fotos-trabajos', 'cccccccc-2700-4000-a000-000000000001/dddddddd-2700-4000-a000-000000000001/3-1791734400003.jpg')$$,
+  'tope: la foto 3 de 4 entra'
+);
+select lives_ok(
+  $$insert into storage.objects (bucket_id, name) values ('fotos-trabajos', 'cccccccc-2700-4000-a000-000000000001/dddddddd-2700-4000-a000-000000000001/4-1791734400004.jpg')$$,
+  'tope: la foto 4 de 4 entra'
+);
+select throws_ok(
+  $$insert into storage.objects (bucket_id, name) values ('fotos-trabajos', 'cccccccc-2700-4000-a000-000000000001/dddddddd-2700-4000-a000-000000000001/5-1791734400005.jpg')$$,
+  '42501', null, 'tope: la foto 5 (la N+1) se rechaza'
+);
+reset role;
 
 -- Profesional asignado a un trabajo: ve sus fotos, y deja de verlas si la cuenta se suspende
 -- (la policy de trabajos por asignación no exige cuenta activa; la de Storage sí).

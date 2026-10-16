@@ -3,22 +3,29 @@ import { describe, expect, it, vi } from "vitest";
 
 import type { Database } from "@/lib/supabase/tipos";
 
-import { BUCKET_FOTOS_TRABAJOS, quitarFotosDelTrabajo } from "./quitar-fotos";
+import {
+  BUCKET_FOTOS_TRABAJOS,
+  TAMANO_PAGINA_LISTADO,
+  quitarFotosDelTrabajo,
+} from "./quitar-fotos";
+
+vi.mock("server-only", () => ({}));
 
 const CLIENTE = "11111111-1111-4111-8111-111111111111";
 const TRABAJO = "22222222-2222-4222-8222-222222222222";
 
-/** Storage falso: lista y borra una carpeta por vez, y registra las llamadas. */
+/** Storage falso: lista con paginación sobre `archivos` y borra, registrando las llamadas. */
 function fakeStorage(opciones: {
   archivos?: { id: string | null; name: string }[];
   falla?: "list" | "remove";
 }) {
-  const list = vi.fn(async () =>
+  const todos = opciones.archivos ?? [];
+  const list = vi.fn(async (_carpeta: string, opts: { limit: number; offset: number }) =>
     opciones.falla === "list"
       ? { data: null, error: { message: "boom" } }
-      : { data: opciones.archivos ?? [], error: null },
+      : { data: todos.slice(opts.offset, opts.offset + opts.limit), error: null },
   );
-  const remove = vi.fn(async () =>
+  const remove = vi.fn(async (_rutas: string[]) =>
     opciones.falla === "remove" ? { error: { message: "boom" } } : { error: null },
   );
   const from = vi.fn(() => ({ list, remove }));
@@ -38,12 +45,32 @@ describe("quitarFotosDelTrabajo", () => {
     const resultado = await quitarFotosDelTrabajo(cliente, CLIENTE, TRABAJO);
 
     expect(from).toHaveBeenCalledWith(BUCKET_FOTOS_TRABAJOS);
-    expect(list).toHaveBeenCalledWith(`${CLIENTE}/${TRABAJO}`, { limit: 1000 });
+    expect(list).toHaveBeenCalledWith(`${CLIENTE}/${TRABAJO}`, {
+      limit: TAMANO_PAGINA_LISTADO,
+      offset: 0,
+    });
     expect(remove).toHaveBeenCalledWith([
       `${CLIENTE}/${TRABAJO}/0-1.jpg`,
       `${CLIENTE}/${TRABAJO}/1-2.webp`,
     ]);
     expect(resultado).toEqual({ ok: true, quitadas: 2 });
+  });
+
+  it("pagina hasta vaciar la carpeta: 250 archivos se listan en 3 páginas y se borran todos", async () => {
+    const archivos = Array.from({ length: 250 }, (_, i) => ({
+      id: "f",
+      name: `${i}-1.jpg`,
+    }));
+    const { cliente, list, remove } = fakeStorage({ archivos });
+
+    const resultado = await quitarFotosDelTrabajo(cliente, CLIENTE, TRABAJO);
+
+    expect(list.mock.calls.map((llamada) => llamada[1].offset)).toEqual([0, 100, 200]);
+    expect(remove).toHaveBeenCalledTimes(1);
+    const borrados = remove.mock.calls[0]?.[0] as string[];
+    expect(borrados).toHaveLength(250);
+    expect(borrados[249]).toBe(`${CLIENTE}/${TRABAJO}/249-1.jpg`);
+    expect(resultado).toEqual({ ok: true, quitadas: 250 });
   });
 
   it("ignora las subcarpetas (su id es null) y no borra nada si no hay archivos", async () => {

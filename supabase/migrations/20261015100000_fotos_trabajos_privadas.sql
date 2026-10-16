@@ -41,6 +41,16 @@ create policy fotos_trabajos_subir_propias on storage.objects
         and t.cliente_id = (select auth.uid())
         and t.estado = 'abierto'
     )
+    -- Tope por trabajo: como mucho 4 fotos (MAX_FOTOS en src/lib/validaciones/trabajo.ts). La quinta se
+    -- rechaza. La subconsulta corre con la RLS del dueño, que ve las fotos de su trabajo.
+    and (
+      select count(*) from storage.objects o
+      where o.bucket_id = 'fotos-trabajos'
+        and starts_with(
+          o.name,
+          split_part(storage.objects.name, '/', 1) || '/' || split_part(storage.objects.name, '/', 2) || '/'
+        )
+    ) < 4
   );
 
 -- Quien puede ver el trabajo puede leer sus fotos. La subconsulta corre con la RLS de `trabajos`
@@ -59,7 +69,9 @@ create policy fotos_trabajos_leer_visibles on storage.objects
     )
   );
 
--- El cliente puede quitar sus propias fotos (al cancelar). Los profesionales no borran nada.
+-- Borrar en cualquier estado del trabajo es intencional: el dueño puede quitar sus propias fotos
+-- (la acción de cancelar, o cuando quiera). Solo el dueño de la carpeta; los profesionales y otros
+-- clientes no borran nada. El borrado de las fotos vencidas lo hace el job con la service role.
 create policy fotos_trabajos_borrar_propias on storage.objects
   for delete to authenticated
   using (
