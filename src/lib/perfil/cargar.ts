@@ -92,8 +92,9 @@ export async function obtenerPerfil(
 }
 
 /**
- * Reseñas del profesional, de la más nueva a la más vieja. La tabla `resenas` es de lectura
- * pública; el autor sale de `usuarios_publicos` (nombre e inicial, nunca el apellido completo).
+ * Reseñas del profesional, de la más nueva a la más vieja. Se leen de la vista `resenas_publicas`
+ * (LAB-56): no trae autor_id ni trabajo_id; el autor llega como nombre e inicial del apellido,
+ * nunca el apellido completo.
  */
 export async function obtenerResenas(
   supabase: SupabaseClient<Database>,
@@ -105,8 +106,8 @@ export async function obtenerResenas(
   if (!esIdValido(profesionalId)) return { resenas: [], total: 0 };
 
   const { data, count, error } = await supabase
-    .from("resenas")
-    .select("id, autor_id, puntaje, texto, created_at", { count: "exact" })
+    .from("resenas_publicas")
+    .select("id, puntaje, texto, created_at, autor_nombre, autor_inicial", { count: "exact" })
     .eq("profesional_id", profesionalId)
     .order("created_at", { ascending: false })
     .order("id", { ascending: true })
@@ -114,30 +115,18 @@ export async function obtenerResenas(
   if (error) throw new Error("No pudimos cargar las reseñas.");
 
   const filas = data ?? [];
-  const autores = new Map<string, { nombre: string | null; inicial: string | null }>();
-  if (filas.length > 0) {
-    const { data: personas } = await supabase
-      .from("usuarios_publicos")
-      .select("id, nombre, apellido_inicial")
-      .in(
-        "id",
-        filas.map((f) => f.autor_id).filter((id): id is string => id !== null),
-      );
-    for (const p of personas ?? []) {
-      if (p.id) autores.set(p.id, { nombre: p.nombre, inicial: p.apellido_inicial });
-    }
-  }
-
   return {
-    resenas: filas.map((fila) => {
-      const autor = fila.autor_id ? autores.get(fila.autor_id) : undefined;
-      return {
-        id: fila.id,
-        autor: autorResena(autor?.nombre ?? null, autor?.inicial ?? null),
-        puntaje: fila.puntaje,
-        texto: fila.texto,
-        cuando: haceCuanto(fila.created_at, ahora),
-      };
+    resenas: filas.flatMap((fila) => {
+      if (fila.id === null || fila.puntaje === null || fila.created_at === null) return [];
+      return [
+        {
+          id: fila.id,
+          autor: autorResena(fila.autor_nombre, fila.autor_inicial),
+          puntaje: fila.puntaje,
+          texto: fila.texto,
+          cuando: haceCuanto(fila.created_at, ahora),
+        },
+      ];
     }),
     total: count ?? filas.length,
   };

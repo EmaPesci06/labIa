@@ -19,6 +19,7 @@ import {
 } from "@/lib/busqueda";
 import { barrioDeLaCuenta, obtenerBarrios } from "@/lib/busqueda-servidor";
 import { urlBusqueda } from "@/lib/busqueda-url";
+import { bloqueoLecturaPublica } from "@/lib/limites";
 import { pluralOficio } from "@/lib/oficios";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
@@ -50,7 +51,11 @@ function leer(crudo: ParametrosUrl, slug: string): ParametrosBusqueda | ErrorBus
 }
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  // Primero el acceso a searchParams (lo hace dinámico en el build); después el tope por IP (M-03).
   const crudo = await searchParams;
+  if (await bloqueoLecturaPublica("busqueda")) {
+    return { title: "Buscar · LabÍA", robots: { index: false } };
+  }
   const { barrios, slug } = await resolverBarrio(crudo);
   const params = leer(crudo, slug);
   const oficio = params instanceof ErrorBusqueda ? undefined : params.oficio;
@@ -113,6 +118,9 @@ function textoResultados(total: number, nombreBarrio: string, p: ParametrosBusqu
 
 export default async function Buscar({ searchParams }: Props) {
   const crudo = await searchParams;
+  const bloqueo = await bloqueoLecturaPublica("busqueda");
+  if (bloqueo) return <ErrorEnBusqueda mensaje={bloqueo} />;
+
   const { barrios, slug } = await resolverBarrio(crudo);
   const params = leer(crudo, slug);
 

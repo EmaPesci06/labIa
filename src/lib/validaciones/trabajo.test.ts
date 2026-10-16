@@ -63,10 +63,19 @@ describe("esquemaTrabajo", () => {
 
 describe("esquemaFotos", () => {
   const id = "11111111-1111-1111-1111-111111111111";
-  it("solo acepta rutas de la carpeta del trabajo", () => {
-    expect(esquemaFotos(id).safeParse([`trabajos/${id}/0-1.jpg`]).success).toBe(true);
-    expect(esquemaFotos(id).safeParse([`trabajos/otro/0-1.jpg`]).success).toBe(false);
-    expect(esquemaFotos(id).safeParse([`trabajos/${id}/../x.jpg`]).success).toBe(false);
+  const cliente = "22222222-2222-2222-2222-222222222222";
+  const otroCliente = "33333333-3333-3333-3333-333333333333";
+  it("solo acepta rutas en <cliente>/<trabajo>/ del propio trabajo", () => {
+    expect(esquemaFotos(id, cliente).safeParse([`${cliente}/${id}/0-1.jpg`]).success).toBe(true);
+    expect(esquemaFotos(id, cliente).safeParse([`${cliente}/${id}/0-1.webp`]).success).toBe(true);
+    expect(esquemaFotos(id, cliente).safeParse([`trabajos/${id}/0-1.jpg`]).success).toBe(false);
+    expect(esquemaFotos(id, cliente).safeParse([`${cliente}/otro/0-1.jpg`]).success).toBe(false);
+    expect(esquemaFotos(id, cliente).safeParse([`${otroCliente}/${id}/0-1.jpg`]).success).toBe(
+      false,
+    );
+    expect(esquemaFotos(id, cliente).safeParse([`${cliente}/${id}/../x.jpg`]).success).toBe(false);
+    expect(esquemaFotos(id, cliente).safeParse([`${cliente}/${id}/0-1.gif`]).success).toBe(false);
+    expect(esquemaFotos(id, cliente).safeParse([`${cliente}/${id}/x/0-1.jpg`]).success).toBe(false);
   });
 });
 

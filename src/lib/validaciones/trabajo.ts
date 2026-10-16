@@ -88,7 +88,12 @@ export function erroresDeTrabajo(error: z.ZodError): Partial<Record<string, stri
   return errores;
 }
 
-export function esquemaFotos(trabajoId: string) {
+/**
+ * Rutas de fotos de un trabajo en el bucket privado `fotos-trabajos` (LAB-52): la carpeta es
+ * `<cliente_id>/<trabajo_id>/<archivo>`. Misma regla que la constraint de `trabajos.fotos`.
+ */
+export function esquemaFotos(trabajoId: string, clienteId: string) {
+  const prefijo = `${clienteId}/${trabajoId}/`;
   return z
     .array(
       z
@@ -96,9 +101,9 @@ export function esquemaFotos(trabajoId: string) {
         .max(200)
         .refine(
           (ruta) =>
-            ruta.startsWith(`trabajos/${trabajoId}/`) &&
+            ruta.startsWith(prefijo) &&
             !ruta.includes("..") &&
-            /\.(jpe?g|png|webp)$/.test(ruta),
+            /^[A-Za-z0-9_-]+\.(jpe?g|png|webp)$/.test(ruta.slice(prefijo.length)),
           "Ruta de foto no válida.",
         ),
     )

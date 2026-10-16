@@ -40,7 +40,7 @@ type Props = {
 
 /**
  * Formulario "Publicar un trabajo" (LAB-26). Server Action + Zod; las fotos se comprimen en el
- * navegador y se suben a `fotos/trabajos/<id>/` una vez creado el trabajo.
+ * navegador y se suben al bucket privado `fotos-trabajos` (carpeta `<cliente>/<id>/`) una vez creado el trabajo.
  */
 export function FormularioTrabajo({
   barrios,
@@ -75,14 +75,14 @@ export function FormularioTrabajo({
       const id = nuevo.trabajoId;
       if (!id) return nuevo;
 
-      // El trabajo ya existe: se suben las fotos a su carpeta y se guardan las rutas.
-      if (!sinAlmacenamiento) {
+      // El trabajo ya existe: se suben las fotos a su carpeta privada (LAB-52) y se guardan las rutas.
+      if (!sinAlmacenamiento && nuevo.carpetaFotos) {
         const supabase = crearClienteNavegador();
         const rutas: string[] = [];
         for (const [i, foto] of fotos.entries()) {
-          const ruta = `trabajos/${id}/${i}-${Date.now()}.jpg`;
+          const ruta = `${nuevo.carpetaFotos}/${i}-${Date.now()}.jpg`;
           const { error } = await supabase.storage
-            .from("fotos")
+            .from("fotos-trabajos")
             .upload(ruta, foto.blob, { contentType: "image/jpeg" });
           if (!error) rutas.push(ruta);
         }

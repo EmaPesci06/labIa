@@ -103,10 +103,31 @@ falta activar `pg_cron` salvo que se agregue un job dentro de la base.
    **redirect** hacia el dominio principal. HTTPS lo emite Vercel solo.
 5. DNS en el proveedor del dominio: usar los registros exactos que muestre Vercel en Settings → Domains.
    Esperar la propagación y verificar el candado en el navegador.
-6. Settings → Git → Production Branch: `main`.
-7. Después del primer deploy de producción, confirmar en Vercel → Settings → Cron Jobs que aparecen los
+6. **Cabeceras de seguridad y HSTS (LAB-55).** `next.config.ts` manda la CSP, `X-Frame-Options: DENY`,
+   `X-Content-Type-Options: nosniff`, `Referrer-Policy` y `Permissions-Policy` en todas las rutas
+   (`src/lib/seguridad/cabeceras.ts`). **HSTS no lo manda la app**: lo pone Vercel en los dominios propios.
+   Verificarlo cuando el DNS ya propagó:
+   ```bash
+   curl -sI https://<dominio-propio>/ | grep -i -E "strict-transport|content-security|x-frame|x-content|referrer|permissions"
+   curl -sI http://<dominio-propio>/ | grep -i "^location"
+   ```
+   La primera debe mostrar `strict-transport-security` y las cabeceras de la app. La segunda debe redirigir
+   a `https://`. Si HSTS no aparece, revisar que el dominio esté en **Verified** en Settings → Domains y
+   que la respuesta venga de Vercel (`server: Vercel`). No agregar HSTS a mano en `next.config.ts` sin
+   decidirlo antes: podría pisar el `max-age` que ya fija Vercel.
+   Después de cada cambio de CSP, abrir `/ingresar`, entrar con Google y revisar la consola del navegador:
+   no debe haber líneas `Refused to ...`.
+   **Por qué `script-src` tiene `'unsafe-inline'` y no nonce ni hashes:** la app usa `cacheComponents` y
+   las páginas se prerenderizan (`◐ Partial Prerender` en `next build`). Un nonce por pedido obliga a render
+   dinámico y Next documenta que PPR es incompatible con nonces. Los hashes tampoco alcanzan: cada página
+   prerenderizada trae sus propios scripts inline de Next (`self.__next_f.push`), y el de redirección de
+   escritorio (`IrABuscarEnEscritorio`) cambia según el barrio. El resto de la CSP (`frame-ancestors`,
+   `object-src`, `base-uri`, `form-action`, `connect-src`, `frame-src`) sigue siendo estricta. Si en el
+   futuro la app deja de prerenderizar, revisar nonces con `proxy.ts`.
+7. Settings → Git → Production Branch: `main`.
+8. Después del primer deploy de producción, confirmar en Vercel → Settings → Cron Jobs que aparecen los
    cuatro crons. Ver la última ejecución en Logs.
-8. Deploy: mergear a `main` o usar "Redeploy" sobre el último deploy de `main`.
+9. Deploy: mergear a `main` o usar "Redeploy" sobre el último deploy de `main`.
 
 ---
 
@@ -330,13 +351,24 @@ Los documentos (DNI, antecedentes) se borran con la cuenta. Los documentos ya re
 
 Configurados en `vercel.json`. Cada uno exige `Authorization: Bearer $CRON_SECRET`:
 
-| Ruta                           | Horario (UTC) | Qué hace                                                                                   |
-| ------------------------------ | ------------- | ------------------------------------------------------------------------------------------ |
-| `/api/cron/trabajos-cerca`     | 11:00 diario  | Avisos de trabajos cerca a profesionales (ver la ruta)                                     |
-| `/api/cron/pedir-resena`       | 12:00 diario  | Pide reseñas 24 h después de terminar un trabajo y manda avisos de postulaciones agrupados |
-| `/api/cron/limpiar-documentos` | 06:00 diario  | Borra documentos vencidos y huérfanos del bucket `documentos` (LAB-21)                     |
-| `/api/cron/borrar-documentos`  | 06:00 diario  | Borra documentos revisados hace más de 30 días y huérfanos de más de 24 h (LAB-42)         |
+| Ruta                               | Horario (UTC) | Qué hace                                                                                   |
+| ---------------------------------- | ------------- | ------------------------------------------------------------------------------------------ |
+| `/api/cron/trabajos-cerca`         | 11:00 diario  | Avisos de trabajos cerca a profesionales (ver la ruta)                                     |
+| `/api/cron/pedir-resena`           | 12:00 diario  | Pide reseñas 24 h después de terminar un trabajo y manda avisos de postulaciones agrupados |
+| `/api/cron/limpiar-documentos`     | 06:00 diario  | Borra documentos vencidos y huérfanos del bucket `documentos` (LAB-21)                     |
+| `/api/cron/borrar-documentos`      | 06:00 diario  | Borra documentos revisados hace más de 30 días y huérfanos de más de 24 h (LAB-42)         |
+| `/api/cron/limpiar-fotos-trabajos` | 06:30 diario  | Quita del bucket `fotos-trabajos` las fotos de trabajos cuyo borrado venció (LAB-52)       |
 
 Ver ejecuciones: Vercel → proyecto `labia` → Cron Jobs y Logs. Si un cron falla, revisar el log y el estado de `CRON_SECRET` (sección 15). **[PENDIENTE LAB-7]** para ver ejecuciones reales de producción.
 
 Nota: `pg_cron` no se usa. El borrado de documentos corre con Vercel Cron.
+
+### 17.1 Fotos de trabajos (LAB-52)
+
+Las fotos de los trabajos (interior o fachada de la casa del cliente) están en el bucket privado `fotos-trabajos`, en `<cliente_id>/<trabajo_id>/<archivo>`. Nunca tienen URL pública: se muestran con URL firmada de 10 minutos generada en el servidor.
+
+- **Cuándo se borran:** al cancelar el trabajo o cerrarlo por moderación, la acción quita las fotos de inmediato (con la sesión del cliente, o con la service role desde `/admin`). Al terminar, se borran 30 días después. Un trigger de `trabajos` fija `fotos_borrar_despues_de` según el estado, y el cron `limpiar-fotos-trabajos` borra lo que quedó pendiente (si Storage falló en el momento).
+- **Fotos del bucket público `fotos` (anteriores a LAB-52):** en producción no hay fotos de trabajos todavía, así que no hay nada que migrar. Si existen en un entorno de desarrollo, quitarlas así:
+  1. Borrar los archivos `trabajos/<id>/…` del bucket `fotos` (panel de Storage o API con la service role).
+  2. Vaciar las filas que apuntan a esas rutas: `update public.trabajos set fotos = '{}' where cardinality(fotos) > 0 and not privado.rutas_fotos_de_trabajo(fotos, cliente_id, id);`. La constraint `trabajos_fotos_propias` es `NOT VALID`, así que esas filas se revalidan recién al escribirlas.
+- **Antes de producción:** correr `pnpm db:test` en un proyecto aislado (ver sección 0), que incluye `fotos_trabajos_privadas.test.sql`.

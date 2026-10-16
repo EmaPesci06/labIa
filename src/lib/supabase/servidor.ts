@@ -3,6 +3,7 @@ import "server-only";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+import { OPCIONES_COOKIES_SESION } from "./cookies";
 import type { Database } from "./tipos";
 
 /** ¿Están cargadas las variables públicas de Supabase? Sin ellas no hay sesión posible. */
@@ -23,6 +24,7 @@ export async function crearClienteServidor() {
   const almacen = await cookies();
 
   return createServerClient<Database>(url, clave, {
+    cookieOptions: OPCIONES_COOKIES_SESION,
     cookies: {
       getAll: () => almacen.getAll(),
       setAll: (pendientes) => {

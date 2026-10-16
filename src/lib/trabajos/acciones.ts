@@ -17,6 +17,9 @@ import {
   esquemaPostulacion,
   type ErroresPostulacion,
 } from "@/lib/validaciones/postulacion";
+import * as Sentry from "@sentry/nextjs";
+
+import { quitarFotosDelTrabajo } from "@/lib/trabajos/quitar-fotos";
 import { esUuid } from "@/lib/validaciones/uuid";
 import {
   MAX_TRABAJOS_ABIERTOS,
@@ -27,8 +30,11 @@ import {
   esquemaTrabajo,
 } from "@/lib/validaciones/trabajo";
 
-/** Estado de `publicarTrabajo`: si trae `trabajoId`, el trabajo ya existe y faltan las fotos. */
-export type EstadoPublicar = EstadoFormulario & { trabajoId?: string };
+/**
+ * Estado de `publicarTrabajo`: si trae `trabajoId`, el trabajo ya existe y faltan las fotos.
+ * `carpetaFotos` es `<cliente_id>/<trabajo_id>`: la carpeta donde el navegador sube las fotos (LAB-52).
+ */
+export type EstadoPublicar = EstadoFormulario & { trabajoId?: string; carpetaFotos?: string };
 
 const REGLA_PUBLICAR = { maximo: 5, ventanaMs: 10 * 60_000 } as const;
 const MENSAJE_GENERAL = "No pudimos publicar tu trabajo. Probá de nuevo en unos minutos.";
@@ -119,8 +125,11 @@ export async function publicarTrabajo(
     urgencia: trabajo.urgencia,
   });
 
-  // Con fotos, el navegador las sube a `fotos/trabajos/<id>/` y después llama a `adjuntarFotos`.
-  if (trabajo.cantidadFotos > 0) return { trabajoId: id, valores };
+  // Con fotos, el navegador las sube al bucket privado `fotos-trabajos` en `<cliente>/<id>/` y
+  // después llama a `adjuntarFotos`.
+  if (trabajo.cantidadFotos > 0) {
+    return { trabajoId: id, carpetaFotos: `${sesion.usuario.id}/${id}`, valores };
+  }
   redirect(rutaTrabajoPublicado(id));
 }
 
@@ -129,7 +138,7 @@ export async function adjuntarFotos(trabajoId: string, rutas: string[]): Promise
   const sesion = await obtenerSesion();
   if (!sesion || sesion.rol !== "cliente") return { ok: false };
   if (!esUuid(trabajoId)) return { ok: false };
-  const validas = esquemaFotos(trabajoId).safeParse(rutas);
+  const validas = esquemaFotos(trabajoId, sesion.usuario.id).safeParse(rutas);
   if (!validas.success) return { ok: false };
 
   if (rolFalso()) return { ok: true };
@@ -520,6 +529,13 @@ export async function cancelarTrabajo(
 
   if (error) {
     return { ok: false, mensaje: "No se pudo cancelar el trabajo." };
+  }
+
+  // Las fotos se quitan al cancelar (LAB-52): toda la carpeta del trabajo, no solo lo que figura en
+  // `trabajos.fotos`. Si Storage falla, la base ya dejó el borrado programado para el job diario.
+  const quitadas = await quitarFotosDelTrabajo(supabase, sesion.usuario.id, trabajoId);
+  if (!quitadas.ok) {
+    Sentry.captureException(new Error("No se pudieron quitar las fotos al cancelar un trabajo"));
   }
 
   revalidatePath("/mis-trabajos");

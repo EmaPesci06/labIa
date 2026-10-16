@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext } from "@playwright/test";
+import { reiniciarFalso } from "./apoyo/reiniciar-falso";
 
 // LAB-27: camino feliz de la lista de trabajos del profesional y postulaciones,
 // con el Supabase FALSO (tests/e2e/apoyo/supabase-falso.cjs).
@@ -27,6 +28,11 @@ async function iniciarSesion(contexto: BrowserContext, baseURL: string, token: s
 }
 
 test.describe("Trabajos para profesionales (LAB-27)", () => {
+  // Retirar una postulación cambia el falso: cada prueba parte del estado inicial (LAB-50).
+  test.beforeEach(async () => {
+    await reiniciarFalso();
+  });
+
   test("profesional publicado ve la lista de trabajos con filtros y tarjetas", async ({
     page,
     context,
@@ -77,10 +83,15 @@ test.describe("Trabajos para profesionales (LAB-27)", () => {
 
     await expect(page.getByRole("heading", { level: 1, name: "Mis postulaciones" })).toBeVisible();
     await expect(page.getByText("Cambiar canilla del baño")).toBeVisible();
-    await expect(page.getByText("Enviada")).toBeVisible();
+    // Las tres postulaciones del falso siguen enviadas: el "Enviada" de cada tarjeta, no uno suelto.
+    await expect(page.getByText("Enviada")).toHaveCount(3);
 
-    // Retirar postulación
-    const botonRetirar = page.getByRole("button", { name: "Retirar postulación" });
+    // Retirar la postulación de ESTA tarjeta: el botón más cercano al título del trabajo.
+    const botonRetirar = page
+      .locator(
+        "xpath=//a[normalize-space()='Cambiar canilla del baño']/ancestor::div[.//button[normalize-space()='Retirar postulación']][1]",
+      )
+      .getByRole("button", { name: "Retirar postulación" });
     await expect(botonRetirar).toBeVisible();
     await botonRetirar.click();
 
@@ -92,10 +103,12 @@ test.describe("Trabajos para profesionales (LAB-27)", () => {
     await expect(page.getByText("¿Seguro que querés retirar tu postulación?")).not.toBeVisible();
   });
 
-  test("cliente que entra a /trabajos es redirigido a /mis-trabajos", async ({ page, context }) => {
+  test("cliente que entra a /trabajos vuelve a su inicio (/inicio)", async ({ page, context }) => {
+    // Regla de rutas.ts: /trabajos es de profesionales; el cliente vuelve a su inicio.
     await iniciarSesion(context, "http://localhost:3000", "tok-cliente");
     await page.goto("/trabajos");
-    await expect(page).toHaveURL(/\/mis-trabajos/);
+    // En escritorio /inicio redirige a la búsqueda del barrio (mismo criterio que acceso.spec).
+    await expect(page).toHaveURL(/\/(inicio|buscar\?barrio=[a-z0-9-]+)$/);
   });
 
   test("accesibilidad: sin violaciones serias ni críticas", async ({ page, context }) => {

@@ -608,7 +608,8 @@ function filaPerfil(id, yo) {
     antecedentes_ok: true,
     matriculado: true,
     promedio: 4.6,
-    cantidad_resenas: TOTAL_RESENAS,
+    // Las 25 de la serie más las dos de LAB-31 (editable y vencida), que están en la lista.
+    cantidad_resenas: TOTAL_RESENAS + 2,
     nombre: "Martín",
     // Solo cliente con sesión y dueño ven el apellido; el resto, la inicial.
     apellido: yo ? "Gómez" : null,
@@ -866,6 +867,23 @@ function atenderResenas(url, res, unObjeto) {
     return true;
   }
   const profesional = (url.searchParams.get("profesional_id") ?? "").replace(/^eq\./, "");
+  // La reseña propia (`autor_id` + `profesional_id`, maybeSingle): LAB-31. Sin esto el falso devolvía
+  // la lista entera y el perfil creía que el cliente nunca reseñó.
+  const autor = (url.searchParams.get("autor_id") ?? "").replace(/^eq\./, "");
+  if (autor) {
+    const propia = todasLasResenas().find(
+      (r) =>
+        r.autor_id === autor &&
+        (r.profesional_id ?? ID_PUBLICADO) === (profesional || ID_PUBLICADO),
+    );
+    if (!propia) {
+      if (unObjeto) errorRpc(res, 406, "PGRST116", "The result contains 0 rows");
+      else responder(res, 200, []);
+      return true;
+    }
+    responder(res, 200, unObjeto ? propia : [propia]);
+    return true;
+  }
   const candidatas = todasLasResenas().filter(
     (r) => !profesional || (r.profesional_id ?? ID_PUBLICADO) === profesional,
   );
@@ -1197,7 +1215,33 @@ const server = http.createServer((req, res) => {
       return responder(res, 200, WHATSAPP_FALSO);
     }
 
-    if (ruta === "/rest/v1/resenas") {
+    // Vista pública de reseñas (LAB-56): sin autor_id ni trabajo_id; el autor sale como nombre e inicial.
+    const resenaPublica = (r) => {
+      const u = USUARIOS_ADMIN.find((x) => x.id === r.autor_id);
+      return {
+        id: r.id,
+        profesional_id: r.profesional_id,
+        puntaje: r.puntaje,
+        texto: r.texto,
+        created_at: r.created_at,
+        autor_nombre: u ? u.nombre : null,
+        autor_inicial: u && u.apellido ? u.apellido[0] : null,
+      };
+    };
+
+    // La vista es de solo lectura (LAB-56): las escrituras responden 405 como PostgREST.
+    if (ruta === "/rest/v1/resenas_publicas" && req.method !== "GET") {
+      return responder(res, 405, {
+        code: "PGRST105",
+        message: "Método no permitido sobre la vista",
+      });
+    }
+    // anon no lee la tabla resenas (LAB-56): solo la vista resenas_publicas.
+    if (ruta === "/rest/v1/resenas" && req.method === "GET" && !yo) {
+      return responder(res, 401, { code: "42501", message: "permission denied for table resenas" });
+    }
+
+    if (ruta === "/rest/v1/resenas" || ruta === "/rest/v1/resenas_publicas") {
       // Las altas, ediciones y la reseña propia se guardan en memoria (se pierden al reiniciar el falso).
       if (req.method === "POST") {
         const datos = JSON.parse(cuerpo || "{}");
@@ -1234,7 +1278,8 @@ const server = http.createServer((req, res) => {
       const desde = Number(url.searchParams.get("offset") ?? 0);
       const limite = Number(url.searchParams.get("limit") ?? resenas.length);
       const pagina = vacio ? [] : resenas.slice(desde, desde + limite);
-      return responder(res, 200, pagina, {
+      const salida = ruta === "/rest/v1/resenas_publicas" ? pagina.map(resenaPublica) : pagina;
+      return responder(res, 200, salida, {
         "content-range": `${pagina.length ? desde : "*"}${pagina.length ? `-${desde + pagina.length - 1}` : ""}/${vacio ? 0 : resenas.length}`,
       });
     }
@@ -1254,13 +1299,16 @@ const server = http.createServer((req, res) => {
       const idParam = url.searchParams.get("id");
       if (idParam && idParam.startsWith("in.")) {
         const ids = idParam.replace("in.(", "").replace(")", "").split(",");
-        const encontrados = USUARIOS_ADMIN.filter((u) => ids.includes(u.id)).map((u) => ({
-          id: u.id,
-          nombre: u.nombre,
-          apellido_inicial: u.apellido ? u.apellido[0] : "",
-          foto_path: null,
-          barrio_id: u.barrio_id,
-        }));
+        // Cuentas de admin y cuentas de prueba (las de reseñas de LAB-31 también tienen nombre).
+        const encontrados = [...USUARIOS_ADMIN, ...Object.values(USUARIOS)]
+          .filter((u) => ids.includes(u.id))
+          .map((u) => ({
+            id: u.id,
+            nombre: u.nombre,
+            apellido_inicial: u.apellido ? u.apellido[0] : "",
+            foto_path: null,
+            barrio_id: u.barrio_id,
+          }));
         return responder(res, 200, encontrados);
       }
       const cli = {
@@ -1492,6 +1540,6 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PUERTO, () => {
+server.listen(PUERTO, "127.0.0.1", () => {
   process.stdout.write(`Supabase falso en http://localhost:${PUERTO}\n`);
 });

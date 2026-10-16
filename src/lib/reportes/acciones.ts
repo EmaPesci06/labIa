@@ -1,5 +1,6 @@
 "use server";
 
+import { limiteReportePorIp } from "@/lib/limites";
 import { registrarEventoServidor } from "@/lib/metricas-servidor";
 import { limitarPersistente } from "@/lib/rate-limit-persistente";
 import { obtenerSesion } from "@/lib/sesion";
@@ -46,6 +47,14 @@ export async function enviarReporte(
   if (!limite.permitido) {
     return {
       mensaje: "Alcanzaste el límite de 10 reportes por día. Probá de nuevo mañana.",
+    };
+  }
+
+  // Tope por IP además del de cuenta (M-05): frena a quien crea cuentas nuevas para reportar.
+  const porIp = await limiteReportePorIp();
+  if (!porIp.permitido) {
+    return {
+      mensaje: "Hiciste demasiados reportes desde tu conexión hoy. Probá de nuevo mañana.",
     };
   }
 

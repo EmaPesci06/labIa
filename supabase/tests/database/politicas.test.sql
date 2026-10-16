@@ -655,7 +655,7 @@ select is((select count(*) from public.contactos where profesional_id in ('ccccc
 -- ===========================================================================
 
 reset role; select tests.anonimo();
-select is((select count(*) from public.resenas where profesional_id = 'cccccccc-1200-4000-a000-000000000004'), 2::bigint, 'resenas: anon las lee');
+select is((select count(*) from public.resenas_publicas where profesional_id = 'cccccccc-1200-4000-a000-000000000004'), 2::bigint, 'resenas: anon las lee por la vista pública');
 select throws_ok(
   $$insert into public.resenas (autor_id, profesional_id, puntaje) values ('cccccccc-1200-4000-a000-000000000002', 'cccccccc-1200-4000-a000-000000000008', 5)$$,
   '42501', null, 'resenas: anon no crea'
@@ -917,8 +917,8 @@ select is(
   (select array_agg(c.relname::text order by c.relname)
    from pg_class c join pg_namespace n on n.oid = c.relnamespace
    where n.nspname = 'public' and c.relkind in ('r', 'v', 'p') and has_any_column_privilege('anon', c.oid, 'select')),
-  array['barrios', 'perfiles_profesionales', 'resenas', 'usuarios_publicos'],
-  'anon solo puede leer barrios, perfiles_profesionales, resenas y usuarios_publicos'
+  array['barrios', 'perfiles_profesionales', 'resenas_publicas', 'usuarios_publicos'],
+  'anon solo puede leer barrios, perfiles_profesionales, resenas_publicas y usuarios_publicos'
 );
 
 select is(
@@ -1110,9 +1110,10 @@ select is((select count(*) from storage.objects where bucket_id = 'fotos'), 0::b
 select is_empty($$delete from storage.objects where bucket_id = 'fotos' returning 1$$, 'fotos: no borra archivos ajenos');
 
 reset role; select tests.como('cccccccc-1200-4000-a000-000000000002');
-select lives_ok(
+-- LAB-52: las fotos de trabajos ya no van al bucket público; viven en `fotos-trabajos` (privado).
+select throws_ok(
   $$insert into storage.objects (bucket_id, name) values ('fotos', 'trabajos/cccccccc-1200-4000-b000-000000000001/foto.jpg')$$,
-  'fotos: el cliente sube fotos de su trabajo'
+  '42501', null, 'fotos: el cliente ya no sube fotos de trabajo al bucket público'
 );
 select throws_ok(
   $$insert into storage.objects (bucket_id, name) values ('fotos', 'trabajos/cccccccc-1200-4000-b000-000000000003/foto.jpg')$$,

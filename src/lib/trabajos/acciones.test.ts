@@ -51,6 +51,8 @@ type Resultado = { data: unknown; error: { code?: string; message?: string } | n
 type Config = {
   perfil?: { publicado: boolean; oficios: string[] } | null;
   trabajo?: { id: string; oficio: string; estado: string } | null;
+  /** Archivos que hay en la carpeta `<cliente>/<trabajo>/` del bucket `fotos-trabajos`. */
+  archivosDelTrabajo?: string[];
   previa?: { id: string; estado: string } | null;
   insertar?: Resultado;
   rpc?: Record<string, Resultado>;
@@ -93,6 +95,19 @@ function crearSupabase(config: Config = {}) {
     rpc: async (nombre: string, args: unknown) => {
       llamadas.push({ metodo: "rpc", args: [nombre, args] });
       return config.rpc?.[nombre] ?? { data: null, error: null };
+    },
+    // LAB-52: las fotos de un trabajo se quitan con storage.remove (la policy de delete del dueño).
+    storage: {
+      from: (bucket: string) => ({
+        list: async () => ({
+          data: (config.archivosDelTrabajo ?? []).map((name) => ({ id: "f", name })),
+          error: null,
+        }),
+        remove: async (rutas: string[]) => {
+          llamadas.push({ tabla: `storage:${bucket}`, metodo: "remove", args: [rutas] });
+          return { data: rutas, error: null };
+        },
+      }),
     },
   };
 
@@ -393,6 +408,39 @@ describe("cancelarTrabajo y marcarTrabajoTerminado (LAB-29)", () => {
       { rol: "cliente", usuario: { id: CLIENTE } },
     );
     expect(await cancelarTrabajo(TRABAJO)).toEqual({ ok: true });
+  });
+
+  it("cancelar: quita del bucket privado las fotos del trabajo (LAB-52)", async () => {
+    const ruta = `${CLIENTE}/${TRABAJO}/0-1.jpg`;
+    const { llamadas } = preparar(
+      {
+        trabajo: { id: TRABAJO, oficio: "gas", estado: "abierto" },
+        archivosDelTrabajo: ["0-1.jpg"],
+        rpc: { cancelar_trabajo: { data: true, error: null } },
+      },
+      { rol: "cliente", usuario: { id: CLIENTE } },
+    );
+
+    expect(await cancelarTrabajo(TRABAJO)).toEqual({ ok: true });
+    expect(llamadas).toContainEqual({
+      tabla: "storage:fotos-trabajos",
+      metodo: "remove",
+      args: [[ruta]],
+    });
+  });
+
+  it("cancelar: sin fotos no llama a Storage", async () => {
+    const { llamadas } = preparar(
+      {
+        trabajo: { id: TRABAJO, oficio: "gas", estado: "abierto" },
+        archivosDelTrabajo: [],
+        rpc: { cancelar_trabajo: { data: true, error: null } },
+      },
+      { rol: "cliente", usuario: { id: CLIENTE } },
+    );
+
+    expect(await cancelarTrabajo(TRABAJO)).toEqual({ ok: true });
+    expect(llamadas.some((l) => l.metodo === "remove")).toBe(false);
   });
 
   it("terminar: solo el cliente, y un error se informa", async () => {

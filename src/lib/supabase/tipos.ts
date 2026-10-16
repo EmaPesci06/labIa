@@ -335,14 +335,14 @@ isOneToOne: false
                   ]
                 },"trabajos": {
                   Row: {
-                    "barrio_id": number,"cantidad_postulaciones": number,"cliente_id": string,"created_at": string,"descripcion": string,"estado": Database["public"]['Enums']["estado_trabajo"],"fotos": (string)[],"id": string,"oficio": Database["public"]['Enums']["oficio"],"presupuesto_estimado": number | null,"profesional_elegido_id": string | null,"titulo": string,"updated_at": string,"urgencia": Database["public"]['Enums']["urgencia"]
+                    "barrio_id": number,"cantidad_postulaciones": number,"cliente_id": string,"created_at": string,"descripcion": string,"estado": Database["public"]['Enums']["estado_trabajo"],"fotos": (string)[],"fotos_borrar_despues_de": string | null,"id": string,"oficio": Database["public"]['Enums']["oficio"],"presupuesto_estimado": number | null,"profesional_elegido_id": string | null,"titulo": string,"updated_at": string,"urgencia": Database["public"]['Enums']["urgencia"]
                   }
                   ComputedFields: never
                   Insert: {
-                    "barrio_id": number,"cantidad_postulaciones"?: number,"cliente_id": string,"created_at"?: string,"descripcion": string,"estado"?: Database["public"]['Enums']["estado_trabajo"],"fotos"?: (string)[],"id"?: string,"oficio": Database["public"]['Enums']["oficio"],"presupuesto_estimado"?: number | null,"profesional_elegido_id"?: string | null,"titulo": string,"updated_at"?: string,"urgencia": Database["public"]['Enums']["urgencia"]
+                    "barrio_id": number,"cantidad_postulaciones"?: number,"cliente_id": string,"created_at"?: string,"descripcion": string,"estado"?: Database["public"]['Enums']["estado_trabajo"],"fotos"?: (string)[],"fotos_borrar_despues_de"?: string | null,"id"?: string,"oficio": Database["public"]['Enums']["oficio"],"presupuesto_estimado"?: number | null,"profesional_elegido_id"?: string | null,"titulo": string,"updated_at"?: string,"urgencia": Database["public"]['Enums']["urgencia"]
                   }
                   Update: {
-                    "barrio_id"?: number,"cantidad_postulaciones"?: number,"cliente_id"?: string,"created_at"?: string,"descripcion"?: string,"estado"?: Database["public"]['Enums']["estado_trabajo"],"fotos"?: (string)[],"id"?: string,"oficio"?: Database["public"]['Enums']["oficio"],"presupuesto_estimado"?: number | null,"profesional_elegido_id"?: string | null,"titulo"?: string,"updated_at"?: string,"urgencia"?: Database["public"]['Enums']["urgencia"]
+                    "barrio_id"?: number,"cantidad_postulaciones"?: number,"cliente_id"?: string,"created_at"?: string,"descripcion"?: string,"estado"?: Database["public"]['Enums']["estado_trabajo"],"fotos"?: (string)[],"fotos_borrar_despues_de"?: string | null,"id"?: string,"oficio"?: Database["public"]['Enums']["oficio"],"presupuesto_estimado"?: number | null,"profesional_elegido_id"?: string | null,"titulo"?: string,"updated_at"?: string,"urgencia"?: Database["public"]['Enums']["urgencia"]
                   }
                   Relationships: [
                     {
@@ -478,6 +478,26 @@ isOneToOne: true
                         Relationships: [
                     
                   ]
+                },"resenas_publicas": {
+                  Row: {
+                    "autor_inicial": string | null,"autor_nombre": string | null,"created_at": string | null,"id": string | null,"profesional_id": string | null,"puntaje": number | null,"texto": string | null
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    {
+      foreignKeyName: "resenas_profesional_id_fkey"
+      columns: ["profesional_id"]
+isOneToOne: false
+      referencedRelation: "usuarios"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "resenas_profesional_id_fkey"
+      columns: ["profesional_id"]
+isOneToOne: false
+      referencedRelation: "usuarios_publicos"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"usuarios_publicos": {
                   Row: {
                     "apellido_inicial": string | null,"barrio_id": number | null,"foto_path": string | null,"id": string | null,"nombre": string | null
@@ -511,6 +531,11 @@ isOneToOne: true
                            },
 "cerrar_trabajo_admin":
 { Args: { "p_motivo"?: string,"p_trabajo_id": string }; Returns: boolean
+                           },
+"consultar_cupo":
+{ Args: { "p_clave": string,"p_maximo": number,"p_ventana_segundos": number }; Returns: {
+              "permitido": boolean,"segundos_para_reintentar": number
+            }[]
                            },
 "consumir_cupo":
 { Args: { "p_clave": string,"p_maximo": number,"p_ventana_segundos": number }; Returns: {
