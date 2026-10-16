@@ -478,6 +478,26 @@ isOneToOne: true
                         Relationships: [
                     
                   ]
+                },"resenas_publicas": {
+                  Row: {
+                    "autor_inicial": string | null,"autor_nombre": string | null,"created_at": string | null,"id": string | null,"profesional_id": string | null,"puntaje": number | null,"texto": string | null
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    {
+      foreignKeyName: "resenas_profesional_id_fkey"
+      columns: ["profesional_id"]
+isOneToOne: false
+      referencedRelation: "usuarios"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "resenas_profesional_id_fkey"
+      columns: ["profesional_id"]
+isOneToOne: false
+      referencedRelation: "usuarios_publicos"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"usuarios_publicos": {
                   Row: {
                     "apellido_inicial": string | null,"barrio_id": number | null,"foto_path": string | null,"id": string | null,"nombre": string | null

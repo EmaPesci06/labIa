@@ -23,6 +23,8 @@ import {
 } from "./rate-limit-persistente";
 
 const regla = { maximo: 5, ventanaMs: 60_000 };
+// 39 caracteres: cumple el mínimo de 32 (LAB-57).
+const SECRETO = "secreto-de-prueba-largo-para-tests-0123";
 const sha256 = (t: string) => createHash("sha256").update(t).digest("hex");
 const hmac = (t: string, secreto: string) => createHmac("sha256", secreto).update(t).digest("hex");
 
@@ -117,22 +119,22 @@ describe("limitarPersistente", () => {
 
   it("en producción con RATE_LIMIT_SECRET cuenta normalmente con HMAC", async () => {
     vi.stubEnv("VERCEL_ENV", "production");
-    vi.stubEnv("RATE_LIMIT_SECRET", "secreto-de-prueba");
+    vi.stubEnv("RATE_LIMIT_SECRET", SECRETO);
     consumir.mockResolvedValue({ permitido: true, segundosParaReintentar: 0 });
 
     await limitarPersistente("ingreso:1.2.3.4", regla);
 
-    expect(consumir).toHaveBeenCalledWith(hmac("ingreso:1.2.3.4", "secreto-de-prueba"), 5, 60);
+    expect(consumir).toHaveBeenCalledWith(hmac("ingreso:1.2.3.4", SECRETO), 5, 60);
   });
 
   it("en preview con RATE_LIMIT_SECRET cuenta normalmente con HMAC", async () => {
     vi.stubEnv("VERCEL_ENV", "preview");
-    vi.stubEnv("RATE_LIMIT_SECRET", "secreto-de-prueba");
+    vi.stubEnv("RATE_LIMIT_SECRET", SECRETO);
     consumir.mockResolvedValue({ permitido: true, segundosParaReintentar: 0 });
 
     await limitarPersistente("ingreso:1.2.3.4", regla);
 
-    expect(consumir).toHaveBeenCalledWith(hmac("ingreso:1.2.3.4", "secreto-de-prueba"), 5, 60);
+    expect(consumir).toHaveBeenCalledWith(hmac("ingreso:1.2.3.4", SECRETO), 5, 60);
   });
 
   it("en desarrollo (NODE_ENV=development, sin VERCEL_ENV) sin secreto se mantiene sha256", async () => {
@@ -188,8 +190,8 @@ describe("claveDeLimite", () => {
   });
 
   it("con RATE_LIMIT_SECRET usa HMAC-SHA256 con ese secreto", () => {
-    vi.stubEnv("RATE_LIMIT_SECRET", "secreto-de-prueba");
-    expect(claveDeLimite("ingreso:1.2.3.4")).toBe(hmac("ingreso:1.2.3.4", "secreto-de-prueba"));
+    vi.stubEnv("RATE_LIMIT_SECRET", SECRETO);
+    expect(claveDeLimite("ingreso:1.2.3.4")).toBe(hmac("ingreso:1.2.3.4", SECRETO));
     expect(claveDeLimite("ingreso:1.2.3.4")).not.toBe(sha256("ingreso:1.2.3.4"));
   });
 
@@ -214,16 +216,32 @@ describe("claveDeLimite", () => {
   });
 
   it("dos secretos distintos dan claves distintas", () => {
-    vi.stubEnv("RATE_LIMIT_SECRET", "uno");
+    vi.stubEnv("RATE_LIMIT_SECRET", "uno-de-32-caracteres-para-el-test-1");
     const con1 = claveDeLimite("x");
-    vi.stubEnv("RATE_LIMIT_SECRET", "dos");
+    vi.stubEnv("RATE_LIMIT_SECRET", "dos-de-32-caracteres-para-el-test-2");
     expect(claveDeLimite("x")).not.toBe(con1);
   });
 
+  it("un secreto de 31 caracteres no se usa: en desarrollo cae a sha256", () => {
+    vi.stubEnv("RATE_LIMIT_SECRET", "a".repeat(31));
+    expect(claveDeLimite("ingreso:1.2.3.4")).toBe(sha256("ingreso:1.2.3.4"));
+  });
+
+  it("un secreto de 31 caracteres en producción lanza como si faltara", () => {
+    vi.stubEnv("VERCEL_ENV", "production");
+    vi.stubEnv("RATE_LIMIT_SECRET", "a".repeat(31));
+    expect(() => claveDeLimite("ingreso:1.2.3.4")).toThrow(/al menos 32 caracteres/);
+  });
+
+  it("un secreto de exactamente 32 caracteres se acepta", () => {
+    vi.stubEnv("RATE_LIMIT_SECRET", "a".repeat(32));
+    expect(claveDeLimite("ingreso:1.2.3.4")).toBe(hmac("ingreso:1.2.3.4", "a".repeat(32)));
+  });
+
   it("limitarPersistente manda la clave con HMAC cuando hay secreto", async () => {
-    vi.stubEnv("RATE_LIMIT_SECRET", "secreto-de-prueba");
+    vi.stubEnv("RATE_LIMIT_SECRET", SECRETO);
     consumir.mockResolvedValue({ permitido: true, segundosParaReintentar: 0 });
     await limitarPersistente("registro:a@b.com", regla);
-    expect(consumir).toHaveBeenCalledWith(hmac("registro:a@b.com", "secreto-de-prueba"), 5, 60);
+    expect(consumir).toHaveBeenCalledWith(hmac("registro:a@b.com", SECRETO), 5, 60);
   });
 });

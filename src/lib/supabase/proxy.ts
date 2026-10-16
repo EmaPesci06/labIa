@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import type { EstadoUsuario, RolUsuario } from "@/lib/auth/rutas";
 
+import { OPCIONES_COOKIES_SESION } from "./cookies";
 import type { Database } from "./tipos";
 
 export type SesionProxy = {
@@ -27,6 +28,7 @@ export async function refrescarSesion(request: NextRequest): Promise<SesionProxy
   if (!url || !clave) return { respuesta, rol: null, estado: null };
 
   const supabase = createServerClient<Database>(url, clave, {
+    cookieOptions: OPCIONES_COOKIES_SESION,
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll: (pendientes, encabezados) => {

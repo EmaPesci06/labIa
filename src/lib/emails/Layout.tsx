@@ -59,8 +59,10 @@ export const estilosTexto = {
 
 /** Datos del pie que arma `enviarEmail`: las plantillas no los calculan. */
 export type DatosPie = {
-  /** Link de baja con token firmado (no requiere ingresar). */
+  /** Link de baja con token firmado en el fragmento (no requiere ingresar). */
   urlBaja: string;
+  /** Baja de un clic (RFC 8058, header `List-Unsubscribe`). Solo si hay token. */
+  urlBajaUnClic?: string;
   /** Pantalla `/cuenta/emails` (requiere ingresar). */
   urlPreferencias: string;
 };
@@ -128,6 +130,7 @@ export function BotonAccion({ href, children }: { href: string; children: ReactN
 
 /** Datos de ejemplo del pie para la vista previa (`pnpm email:dev`) y los tests. */
 export const PIE_DE_PRUEBA: DatosPie = {
-  urlBaja: "https://labia.example/baja?t=ejemplo",
+  urlBaja: "https://labia.example/baja#t=ejemplo",
+  urlBajaUnClic: "https://labia.example/api/baja?t=ejemplo",
   urlPreferencias: "https://labia.example/cuenta/emails",
 };
