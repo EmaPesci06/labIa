@@ -3,7 +3,7 @@ import { z } from "zod";
 // Detección de datos de contacto y direcciones en los textos libres que se muestran en pantallas
 // públicas (descripciones de perfil, disponibilidad, trabajos y mensajes de postulación).
 // El contacto es siempre por WhatsApp desde la app, y nunca se publica la dirección exacta (Guía §7.4 y §7.5).
-// La misma lógica vive en SQL (`privado.tiene_dato_de_contacto`, migración 20261015110000). El test
+// La misma lógica vive en SQL (`privado.tiene_dato_de_contacto`, migración 20261015160000). El test
 // `contenido-publico.paridad.test.ts` corre los mismos casos contra las dos implementaciones.
 // La detección es heurística: prefiere dejar pasar un número común (precio, medida, año, cantidad)
 // antes que bloquear un texto legítimo.
@@ -62,7 +62,7 @@ function sinMayusculas(alternativas: string): string {
 
 /**
  * NFKC (anchos completos y ligaduras a su forma común) y dígitos de cualquier alfabeto a ASCII.
- * Así "２２３" y "٢٢٣" se leen igual que "223" en la base (migración 20261015110000).
+ * Así "２２３" y "٢٢٣" se leen igual que "223" en la base (migración 20261015160000).
  */
 function normalizar(texto: string): string {
   return texto
