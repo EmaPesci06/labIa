@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { normalizarTelefono } from "@/lib/whatsapp";
 
-import { MENSAJE_CONTENIDO_PUBLICO, sinDatosDeContacto } from "./contenido-publico";
+import { MENSAJE_CONTENIDO_PUBLICO, nombreSinDatosDeContacto } from "./contenido-publico";
 
 /** Los 7 barrios más comunes del registro (ids de la tabla `barrios`, migración de LAB-11). */
 export const BARRIOS_FRECUENTES = [
@@ -46,7 +46,7 @@ export const nombreCompleto = z
       .min(2, "Ingresá tu nombre y apellido, con al menos 2 letras.")
       .max(60, "El nombre puede tener hasta 60 caracteres."),
   )
-  .refine(sinDatosDeContacto, MENSAJE_CONTENIDO_PUBLICO);
+  .refine(nombreSinDatosDeContacto, MENSAJE_CONTENIDO_PUBLICO);
 
 export const whatsapp = z
   .string({ error: "Ingresá tu número de WhatsApp." })

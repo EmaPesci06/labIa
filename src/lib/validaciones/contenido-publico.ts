@@ -27,11 +27,13 @@ const EMAIL_EN_PALABRAS = /\barroba\b|\(at\)|\bpunto\s+(?:com|me|ar|net|org)\b/i
 const MENSAJERIA =
   /\b(?:wa\.me|api\.whatsapp\.com|whatsapp\.com|t\.me|telegram\.me|m\.me|fb\.me|signal\.me|instagram\.com|facebook\.com)\b/i;
 
-// Montos con signo de pesos: "$ 15000", "$15.000.000". No son teléfonos.
-const MONTO_CON_PESO = /\$\s*\d[\d.\s]*/g;
-// Número de matrícula, registro o ENARGAS: "Matrícula N° 12345", "matriculado 12345", "mat. 12345".
+// Montos con signo de pesos: "$ 15000", "$ 3.500", "$15.000.000". Solo números de hasta 7 dígitos
+// (con puntos de miles): un número más largo pegado a "$" se evalúa como teléfono ("Llamame al $2235551234").
+const MONTO_CON_PESO = /\$\s*\d{1,7}(?!\d)(?:\.\d{3})*/g;
+// Número de matrícula, registro o ENARGAS de hasta 7 dígitos: "Matrícula N° 12345". Una matrícula
+// con 8 o más dígitos ("Matrícula 2235551234") se evalúa como teléfono.
 const NUMERO_DE_MATRICULA =
-  /(?:matr[ií]cul[a-záéíóúñ]*|mat\.?|registro|enargas)[\s.:,°º#n]{0,8}\d+/gi;
+  /(?:matr[ií]cul[a-záéíóúñ]*|mat\.?|registro|enargas)[\s.:,°º#n]{0,8}\d{1,7}(?!\d)/gi;
 
 // Secuencia de dígitos con separadores comunes y "+" opcional. El largo está acotado.
 const CANDIDATO_NUMERICO = /\+?[\d(][\d\s().-]{0,60}\d/g;
@@ -129,6 +131,16 @@ export function tieneDatosDeContacto(texto: string): boolean {
 export const sinDatosDeContacto = (valor: string | null | undefined): boolean => {
   if (!valor) return true;
   return !tieneDatosDeContacto(valor);
+};
+
+/**
+ * Nombre completo sin datos de contacto, revisando nombre y apellido por separado. Parte igual que
+ * `separarNombre`: la primera palabra es el nombre y el resto, el apellido. Así el error sale junto
+ * al campo y no como un `check_violation` genérico de la base.
+ */
+export const nombreSinDatosDeContacto = (valor: string): boolean => {
+  const [nombre = "", ...resto] = valor.trim().split(/\s+/);
+  return sinDatosDeContacto(nombre) && sinDatosDeContacto(resto.join(" "));
 };
 
 /**

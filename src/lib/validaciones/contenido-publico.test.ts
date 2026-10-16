@@ -26,8 +26,28 @@ describe("dígitos de otros alfabetos (LAB-53, paridad con la base)", () => {
     expect(valorDeDigito("５")).toBe("5");
   });
 
-  it("un precio con dígitos árabes no es teléfono", () => {
-    expect(tieneDatosDeContacto("$ ١٥٠٠٠٠٠٠")).toBe(false);
+  it("un precio con dígitos árabes de hasta 7 dígitos no es teléfono", () => {
+    expect(tieneDatosDeContacto("$ ١٥٠٠٠٠٠")).toBe(false);
+  });
+});
+
+describe("montos y matrículas no tapan teléfonos (LAB-53, revisión de seguridad)", () => {
+  it.each([
+    "Llamame al $2235551234",
+    "Llamame al $ 2235551234",
+    "Matrícula 2235551234",
+    "Juan $1500 2235551234",
+  ])("bloquea «%s» aunque tenga $ o matrícula", (texto) => {
+    expect(detectarDatoDeContacto(texto)).toBe("telefono");
+  });
+
+  it.each([
+    "Sale $ 3.500 la visita",
+    "Precio $15000 por visita",
+    "Matrícula N° 12345",
+    "Gasista matriculado 12345",
+  ])("deja pasar «%s»", (texto) => {
+    expect(tieneDatosDeContacto(texto)).toBe(false);
   });
 });
 
@@ -76,7 +96,7 @@ describe("detectarDatoDeContacto · deja pasar", () => {
     "Presupuesto previo: $ 150.000",
     "Precio de referencia $15000 por visita",
     "Presupuesto de $15.000.000 con materiales incluidos",
-    "Presupuesto de $ 15000000 sin materiales",
+    "Presupuesto de $ 1500000 sin materiales",
     "Trabajo en 2x3 m de living",
     "Tablero de 220 V y 32 A, 2 disyuntores",
     "Cambio 4 canillas y 1 termotanque de 80 litros",

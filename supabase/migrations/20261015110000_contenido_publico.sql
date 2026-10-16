@@ -55,11 +55,12 @@ begin
     return true;
   end if;
 
-  -- Montos con $ y números de matrícula, registro o ENARGAS no cuentan como teléfono ni altura.
-  limpio := regexp_replace(normal, '\$\s*[0-9][0-9.[:space:]]*', ' ', 'g');
+  -- Montos con $ y matrículas, registro o ENARGAS de hasta 7 dígitos no cuentan como teléfono ni altura.
+  -- Un número de 8 o más dígitos pegado a $ o a "matrícula" se evalúa como teléfono (igual que la app).
+  limpio := regexp_replace(normal, '\$\s*[0-9]{1,7}(?![0-9])(\.[0-9]{3})*', ' ', 'g');
   limpio := regexp_replace(
     limpio,
-    '(matr[íi]cul[a-záéíóúñ]*|mat\.?|registro|enargas)[[:space:].:,°º#n]{0,8}[0-9]+',
+    '(matr[íi]cul[a-záéíóúñ]*|mat\.?|registro|enargas)[[:space:].:,°º#n]{0,8}[0-9]{1,7}(?![0-9])',
     ' ',
     'gi'
   );
