@@ -8,7 +8,6 @@ import type { EstadoFormulario } from "@/lib/auth/estado";
 import { guardarDatosDeCliente } from "@/lib/auth/datos-de-cliente";
 import { limitarPersistente, limitarPorIp } from "@/lib/rate-limit-persistente";
 import { urlDelSitio } from "@/lib/sitio";
-import { crearClienteAdmin } from "@/lib/supabase/admin";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import type { Database } from "@/lib/supabase/tipos";
 import { erroresPorCampo, esquemaNuevaContrasena } from "@/lib/validaciones/auth";
@@ -274,7 +273,8 @@ export async function borrarMiCuenta(
   }
 
   try {
-    await borrarCuentaDeUsuario(crearClienteAdmin(), sesion.usuario.id);
+    // La service role la crea borrado.ts (lista cerrada de AGENTS.md §5, LAB-57).
+    await borrarCuentaDeUsuario(sesion.usuario.id);
   } catch {
     return {
       mensaje:

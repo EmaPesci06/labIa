@@ -50,6 +50,18 @@ test.describe("/baja con token válido", () => {
     });
   }
 
+  test("el token de un email nuevo va en el fragmento y se borra de la barra al leerlo", async ({
+    page,
+  }) => {
+    await page.goto(`/baja#t=${token("novedades")}`);
+    await expect(
+      page.getByText("Vas a dejar de recibir los recordatorios y novedades"),
+    ).toBeVisible();
+    await expect(page.getByRole("button", { name: "Confirmar la baja" })).toBeVisible();
+    await expect(page).not.toHaveURL(/#/);
+    await expect(page).toHaveURL(/\/baja$/);
+  });
+
   test("un token firmado con otro secreto es inválido", async ({ page }) => {
     await page.goto(`/baja?t=${token("novedades", "otro-secreto-tambien-de-32-caracteres-xx")}`);
     await expect(page.getByText("Este enlace no es válido")).toBeVisible();
