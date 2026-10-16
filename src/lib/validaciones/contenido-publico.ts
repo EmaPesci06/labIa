@@ -65,12 +65,24 @@ function sinMayusculas(alternativas: string): string {
 
 /**
  * NFKC (anchos completos y ligaduras a su forma común) y dígitos de cualquier alfabeto a ASCII.
- * Un dígito de otro alfabeto cuenta como "0": sigue siendo número, sin depender del script.
+ * Así "２２３" y "٢٢٣" se leen igual que "223" en la base (migración 20261015110000).
  */
 function normalizar(texto: string): string {
   return texto
     .normalize("NFKC")
-    .replace(/\p{Nd}/gu, (digito) => (/[0-9]/.test(digito) ? digito : "0"));
+    .replace(/\p{Nd}/gu, (digito) => (/[0-9]/.test(digito) ? digito : valorDeDigito(digito)));
+}
+
+/**
+ * Valor (0-9) de un dígito Unicode no ASCII (árabe, devanagari, etc.). Cada bloque de dígitos es una
+ * secuencia de 10 code points que empieza en su cero, así que el valor sale de la distancia al inicio
+ * de la corrida de \p{Nd}. La misma regla genera la tabla SQL de la migración.
+ */
+export function valorDeDigito(digito: string): string {
+  const codigo = digito.codePointAt(0) ?? 0;
+  let inicio = codigo;
+  while (inicio > 0 && /\p{Nd}/u.test(String.fromCodePoint(inicio - 1))) inicio--;
+  return String((codigo - inicio) % 10);
 }
 
 function esTelefono(run: string): boolean {
@@ -87,7 +99,8 @@ function esTelefono(run: string): boolean {
  * Un texto más largo que `LARGO_MAXIMO_ANALISIS` se informa como "telefono" sin analizarlo.
  */
 export function detectarDatoDeContacto(texto: string): TipoDatoPersonal | null {
-  if (texto.length > LARGO_MAXIMO_ANALISIS) return "telefono";
+  // Largo en code points, igual que length() de SQL (un emoji o un dígito astral cuentan como uno).
+  if ([...texto].length > LARGO_MAXIMO_ANALISIS) return "telefono";
 
   const normal = normalizar(texto);
   if (EMAIL.test(normal) || EMAIL_EN_PALABRAS.test(normal)) return "email";

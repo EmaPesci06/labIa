@@ -1,12 +1,48 @@
 import { describe, expect, it } from "vitest";
 
+import { nombreCompleto } from "./registro-cliente";
+import { esquemaNombreDeProveedor } from "./cuenta";
 import {
   LARGO_MAXIMO_ANALISIS,
   MENSAJE_CONTENIDO_PUBLICO,
   detectarDatoDeContacto,
   sinDatosDeContacto,
   tieneDatosDeContacto,
+  valorDeDigito,
 } from "./contenido-publico";
+
+describe("dígitos de otros alfabetos (LAB-53, paridad con la base)", () => {
+  it.each([
+    ["٢٢٣ ٥٥٥ ١٢٣٤", "telefono"],
+    ["२२३ ५५५ १२३४", "telefono"],
+    ["２２３ ５５５ １２３４", "telefono"],
+  ])("«%s» se lee como teléfono", (texto, tipo) => {
+    expect(detectarDatoDeContacto(texto)).toBe(tipo);
+  });
+
+  it("el valor de cada dígito sale de su bloque", () => {
+    expect(valorDeDigito("٣")).toBe("3");
+    expect(valorDeDigito("९")).toBe("9");
+    expect(valorDeDigito("５")).toBe("5");
+  });
+
+  it("un precio con dígitos árabes no es teléfono", () => {
+    expect(tieneDatosDeContacto("$ ١٥٠٠٠٠٠٠")).toBe(false);
+  });
+});
+
+describe("nombre en el alta y en la cuenta (LAB-53)", () => {
+  it("el nombre completo del registro no lleva teléfono ni email", () => {
+    expect(nombreCompleto.safeParse("Ana 2235551234").success).toBe(false);
+    expect(nombreCompleto.safeParse("ana@correo.com Pérez").success).toBe(false);
+    expect(nombreCompleto.safeParse("María de los Ángeles").success).toBe(true);
+  });
+
+  it("el nombre que llega de un proveedor se valida igual", () => {
+    expect(esquemaNombreDeProveedor.safeParse("Lucía").success).toBe(true);
+    expect(esquemaNombreDeProveedor.safeParse("Lucía 2235551234").success).toBe(false);
+  });
+});
 
 describe("detectarDatoDeContacto · bloquea", () => {
   it.each([

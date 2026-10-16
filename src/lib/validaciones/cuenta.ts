@@ -6,12 +6,8 @@ import { email, barrio, nombreCompleto, whatsapp } from "./registro-cliente";
 /** Palabra que hay que escribir para confirmar el borrado de la cuenta. */
 export const PALABRA_BORRAR = "BORRAR";
 
-/** "Mis datos": nombre, WhatsApp y barrio. Valida igual que el registro, y el nombre no lleva contacto. */
-export const esquemaDatosCuenta = z.object({
-  nombreCompleto: nombreCompleto.refine(sinDatosDeContacto, MENSAJE_CONTENIDO_PUBLICO),
-  whatsapp,
-  barrio,
-});
+/** "Mis datos": nombre, WhatsApp y barrio. Valida igual que el registro (el nombre no lleva contacto). */
+export const esquemaDatosCuenta = z.object({ nombreCompleto, whatsapp, barrio });
 
 /**
  * Nombre o apellido que llega de un proveedor (Google, en `user_metadata`) antes de guardarlo en

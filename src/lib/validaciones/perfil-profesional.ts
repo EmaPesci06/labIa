@@ -3,7 +3,11 @@ import { z } from "zod";
 import { normalizarTelefono } from "@/lib/whatsapp";
 
 import { esquemaRegistro } from "./auth";
-import { textoLibrePublico } from "./contenido-publico";
+import {
+  MENSAJE_CONTENIDO_PUBLICO,
+  sinDatosDeContacto,
+  textoLibrePublico,
+} from "./contenido-publico";
 
 /** Los 7 oficios del MVP: valor del enum `oficio` de la base y texto para la interfaz. */
 export const OFICIOS = [
@@ -61,7 +65,8 @@ export const esquemaPerfilProfesional = z
       .refine((valor) => {
         const { nombre, apellido } = separarNombre(valor);
         return nombre.length <= 60 && apellido.length <= 60;
-      }, "El nombre y el apellido pueden tener hasta 60 caracteres cada uno."),
+      }, "El nombre y el apellido pueden tener hasta 60 caracteres cada uno.")
+      .refine(sinDatosDeContacto, MENSAJE_CONTENIDO_PUBLICO),
     whatsapp: z
       .string({ error: "Ingresá tu WhatsApp." })
       .trim()

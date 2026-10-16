@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { MENSAJE_CONTENIDO_PUBLICO, sinDatosDeContacto } from "./contenido-publico";
+
 /** Roles que se pueden elegir al registrarse. `admin` NO está: se asigna a mano (Guía §7). */
 export const ROLES_REGISTRABLES = ["cliente", "profesional"] as const;
 export type RolRegistrable = (typeof ROLES_REGISTRABLES)[number];
@@ -23,7 +25,8 @@ const nombre = z
   .string({ error: "Ingresá tu nombre." })
   .trim()
   .min(1, "Ingresá tu nombre.")
-  .max(60, "El nombre puede tener hasta 60 caracteres.");
+  .max(60, "El nombre puede tener hasta 60 caracteres.")
+  .refine(sinDatosDeContacto, MENSAJE_CONTENIDO_PUBLICO);
 
 /** Ruta interna a la que volver después de ingresar (se vuelve a validar en el servidor). */
 const volver = z.string().max(500).optional();

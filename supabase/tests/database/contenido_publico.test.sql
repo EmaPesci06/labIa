@@ -8,7 +8,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(9);
+select plan(11);
 
 create temp table casos (texto text, bloquea boolean) on commit drop;
 
@@ -52,6 +52,10 @@ insert into casos (texto, bloquea) values
   ('Av. Independencia y calle 12, esquina con kiosco', false),
   ('Medidas: 1 2 3 4 5 6 7 8 cm', false),
   ('Trabajo sobre calle Independencia, zona céntrica', false),
+  ('٢٢٣ ٥٥٥ ١٢٣٤', true),
+  ('२२३ ५५५ १२३४', true),
+  ('$ ١٥٠٠٠٠٠٠', false),
+  ('Tengo ٢٠ años de experiencia', false),
   ('', false);
 
 -- El helper SQL coincide con la app en todos los casos.
@@ -63,6 +67,19 @@ select is(
 
 -- Un texto de más de 5000 caracteres se trata como dato de contacto, sin analizarlo.
 select ok(privado.tiene_dato_de_contacto(repeat('a', 5001)), 'un texto que pasa el largo máximo se bloquea');
+
+-- Tiempo: 5000 caracteres de dígitos sueltos se analizan en menos de un segundo (límite holgado para CI).
+create temp table cronometro (inicio timestamptz) on commit drop;
+insert into cronometro values (clock_timestamp());
+select is(
+  privado.tiene_dato_de_contacto(repeat('1 ', 2500)),
+  false,
+  'un texto de 5000 caracteres con dígitos sueltos no bloquea'
+);
+select ok(
+  extract(epoch from clock_timestamp() - (select inicio from cronometro)) < 1,
+  'analizar 5000 caracteres tarda menos de un segundo'
+);
 
 -- ---------------------------------------------------------------------------
 -- Escritura directa por la API: la base frena lo que Zod no vio
