@@ -25,6 +25,23 @@ set name = excluded.name,
 -- Políticas de Storage del bucket nuevo
 -- ---------------------------------------------------------------------------
 
+-- Cuenta los objetos de una carpeta del bucket sin pasar por la RLS de storage.objects (security
+-- definer, la corre el dueño de la tabla). Solo la usa la policy de insert, como tope de fotos.
+create function privado.cuenta_fotos_de_carpeta(p_carpeta text)
+returns bigint
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select count(*) from storage.objects o
+  where o.bucket_id = 'fotos-trabajos'
+    and starts_with(o.name, p_carpeta)
+$$;
+
+revoke execute on function privado.cuenta_fotos_de_carpeta(text) from public, anon;
+grant execute on function privado.cuenta_fotos_de_carpeta(text) to authenticated;
+
 create policy fotos_trabajos_subir_propias on storage.objects
   for insert to authenticated
   with check (
@@ -42,14 +59,10 @@ create policy fotos_trabajos_subir_propias on storage.objects
         and t.estado = 'abierto'
     )
     -- Tope por trabajo: como mucho 4 fotos (MAX_FOTOS en src/lib/validaciones/trabajo.ts). La quinta se
-    -- rechaza. La subconsulta corre con la RLS del dueño, que ve las fotos de su trabajo.
-    and (
-      select count(*) from storage.objects o
-      where o.bucket_id = 'fotos-trabajos'
-        and starts_with(
-          o.name,
-          split_part(storage.objects.name, '/', 1) || '/' || split_part(storage.objects.name, '/', 2) || '/'
-        )
+    -- rechaza. El conteo va por función security definer: un subselect a storage.objects dentro de una
+    -- policy de insert de storage.objects recursiona (Postgres evalúa todas las policies de insert).
+    and privado.cuenta_fotos_de_carpeta(
+      split_part(name, '/', 1) || '/' || split_part(name, '/', 2) || '/'
     ) < 4
   );
 
