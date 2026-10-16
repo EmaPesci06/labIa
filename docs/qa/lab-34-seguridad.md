@@ -31,28 +31,28 @@ Hay 2 hallazgos ALTO (H-01 cabeceras de seguridad ausentes, H-02 fotos de trabaj
 
 ## Resumen de hallazgos
 
-| ID | Sev. | Tema | Ubicación principal |
-|---|---|---|---|
-| H-01 | ALTO | Sin CSP, X-Frame-Options, Referrer-Policy, Permissions-Policy ni X-Content-Type-Options | `next.config.ts:27` |
-| H-02 | ALTO | Fotos de trabajos (interior/fachada de la casa del cliente) en bucket público sin expiración ni borrado | `FormularioTrabajo.tsx:83-86`, `storage.sql:12` |
-| M-01 | MEDIO | Teléfonos, emails y direcciones se pueden publicar en campos libres públicos | `validaciones/perfil-profesional.ts:89-113`, `postulacion.ts:21-25`, `trabajo.ts:60` |
-| M-02 | MEDIO | Enumeración de cuentas en el registro | `auth/registro-cliente.ts:110`, `auth/acciones.ts:44-46`, `registro/profesional.ts:36` |
+| ID   | Sev.  | Tema                                                                                                     | Ubicación principal                                                                                |
+| ---- | ----- | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| H-01 | ALTO  | Sin CSP, X-Frame-Options, Referrer-Policy, Permissions-Policy ni X-Content-Type-Options                  | `next.config.ts:27`                                                                                |
+| H-02 | ALTO  | Fotos de trabajos (interior/fachada de la casa del cliente) en bucket público sin expiración ni borrado  | `FormularioTrabajo.tsx:83-86`, `storage.sql:12`                                                    |
+| M-01 | MEDIO | Teléfonos, emails y direcciones se pueden publicar en campos libres públicos                             | `validaciones/perfil-profesional.ts:89-113`, `postulacion.ts:21-25`, `trabajo.ts:60`               |
+| M-02 | MEDIO | Enumeración de cuentas en el registro                                                                    | `auth/registro-cliente.ts:110`, `auth/acciones.ts:44-46`, `registro/profesional.ts:36`             |
 | M-03 | MEDIO | Lectura anónima masiva sin límite (perfiles, búsqueda, sitemap) y cosecha de WhatsApp con varias cuentas | `buscar_profesionales.sql:143-144`, `perfil_profesional.sql:86-87`, `contactar_profesional.sql:82` |
-| M-04 | MEDIO | `resenas_leer` con `using (true)` para anon, con `autor_id` y `trabajo_id` | `politicas.sql:500`, `politicas.sql:695-697` |
-| M-05 | MEDIO | Límite de reportes solo por cuenta (evadible creando cuentas) | `moderacion.sql:91-109` |
-| B-01 | BAJO | Token de baja en la query string (queda en logs de Vercel) | `api/baja/route.ts:10`, `(publico)/baja/page.tsx:23` |
-| B-02 | BAJO | Rutas de desarrollo en producción según variable de entorno | `dev/ui/page.tsx:37`, `dev/error/BotonErrorForzado.tsx:10` |
-| B-03 | BAJO | Sesión falsa de desarrollo: depende de no cargar variables en Preview | `auth/sesion-falsa.ts:11-15` |
-| B-04 | BAJO | Lista de campos prohibidos de Sentry incompleta | `observabilidad/privacidad.ts:7-19` |
-| B-05 | BAJO | Seed con contraseña fija de un admin de prueba | `supabase/seed.sql:21,57` |
-| B-06 | BAJO | `privado.objetivo_existe` ejecutable por authenticated (sondeo de existencia de ids) | `moderacion.sql:126-144` |
-| B-07 | BAJO | Autor suspendido puede editar su reseña hasta 24 h | `politicas.sql:709-712` |
-| B-08 | BAJO | Criterios de LAB-34 sin cumplir: falta `scripts/sondeo-seguridad.ts` y pgTAP no corrido | repo, CI |
-| B-09 | BAJO | Cliente de service role creado fuera de `/admin` y jobs | `cuenta/acciones.ts:277` |
-| B-10 | BAJO | `RATE_LIMIT_SECRET` sin largo mínimo (`EMAILS_SECRET` exige 32) | `rate-limit-persistente.ts:34-37` |
-| B-11 | BAJO | Login con límite solo por IP (cumple la guía, falta límite por cuenta) | `auth/acciones.ts:21,28,75` |
-| B-12 | BAJO | Cookies de sesión sin opciones explícitas en el repo | `lib/supabase/servidor.ts`, `lib/supabase/proxy.ts` |
-| B-13 | BAJO | Salud pública que consulta la base sin límite | `api/salud/route.ts` |
+| M-04 | MEDIO | `resenas_leer` con `using (true)` para anon, con `autor_id` y `trabajo_id`                               | `politicas.sql:500`, `politicas.sql:695-697`                                                       |
+| M-05 | MEDIO | Límite de reportes solo por cuenta (evadible creando cuentas)                                            | `moderacion.sql:91-109`                                                                            |
+| B-01 | BAJO  | Token de baja en la query string (queda en logs de Vercel)                                               | `api/baja/route.ts:10`, `(publico)/baja/page.tsx:23`                                               |
+| B-02 | BAJO  | Rutas de desarrollo en producción según variable de entorno                                              | `dev/ui/page.tsx:37`, `dev/error/BotonErrorForzado.tsx:10`                                         |
+| B-03 | BAJO  | Sesión falsa de desarrollo: depende de no cargar variables en Preview                                    | `auth/sesion-falsa.ts:11-15`                                                                       |
+| B-04 | BAJO  | Lista de campos prohibidos de Sentry incompleta                                                          | `observabilidad/privacidad.ts:7-19`                                                                |
+| B-05 | BAJO  | Seed con contraseña fija de un admin de prueba                                                           | `supabase/seed.sql:21,57`                                                                          |
+| B-06 | BAJO  | `privado.objetivo_existe` ejecutable por authenticated (sondeo de existencia de ids)                     | `moderacion.sql:126-144`                                                                           |
+| B-07 | BAJO  | Autor suspendido puede editar su reseña hasta 24 h                                                       | `politicas.sql:709-712`                                                                            |
+| B-08 | BAJO  | Criterios de LAB-34 sin cumplir: falta `scripts/sondeo-seguridad.ts` y pgTAP no corrido                  | repo, CI                                                                                           |
+| B-09 | BAJO  | Cliente de service role creado fuera de `/admin` y jobs                                                  | `cuenta/acciones.ts:277`                                                                           |
+| B-10 | BAJO  | `RATE_LIMIT_SECRET` sin largo mínimo (`EMAILS_SECRET` exige 32)                                          | `rate-limit-persistente.ts:34-37`                                                                  |
+| B-11 | BAJO  | Login con límite solo por IP (cumple la guía, falta límite por cuenta)                                   | `auth/acciones.ts:21,28,75`                                                                        |
+| B-12 | BAJO  | Cookies de sesión sin opciones explícitas en el repo                                                     | `lib/supabase/servidor.ts`, `lib/supabase/proxy.ts`                                                |
+| B-13 | BAJO  | Salud pública que consulta la base sin límite                                                            | `api/salud/route.ts`                                                                               |
 
 Sin CRÍTICO.
 
