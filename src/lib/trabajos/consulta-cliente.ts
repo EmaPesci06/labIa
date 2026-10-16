@@ -5,6 +5,7 @@ import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servid
 import type { UrgenciaTrabajo } from "@/lib/validaciones/trabajo";
 
 import { type EstadoPostulacion, conRolFalso, distanciasDesdeBarrio } from "./consulta-comun";
+import { firmarFotosTrabajo } from "./fotos-firmadas";
 
 export type TrabajoClienteItem = {
   id: string;
@@ -342,7 +343,8 @@ async function consultarDetalleMiTrabajo(
     descripcion: t.descripcion,
     urgencia: t.urgencia as UrgenciaTrabajo,
     presupuestoEstimado: t.presupuesto_estimado,
-    fotos: t.fotos ?? [],
+    // URLs firmadas de 10 min para el dueño del trabajo (LAB-52).
+    fotos: await firmarFotosTrabajo(supabase, t.fotos ?? []),
     barrioId: t.barrio_id,
     barrioNombre: barrioObj?.nombre ?? "Mar del Plata",
     estado: t.estado as "abierto" | "asignado" | "cerrado" | "cancelado",

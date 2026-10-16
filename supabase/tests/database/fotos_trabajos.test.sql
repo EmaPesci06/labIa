@@ -25,9 +25,9 @@ $$;
 
 select tests.como('cccccccc-2600-4000-a000-000000000001');
 
--- Mismo formato de nombre que genera el navegador: <índice>-<Date.now()>.jpg
+-- Mismo formato que genera el navegador: <cliente>/<trabajo>/<índice>-<Date.now()>.jpg (LAB-52)
 select lives_ok(
-  $$update public.trabajos set fotos = array['trabajos/dddddddd-2600-4000-a000-000000000001/0-1791734400000.jpg', 'trabajos/dddddddd-2600-4000-a000-000000000001/1-1791734400001.jpg'] where id = 'dddddddd-2600-4000-a000-000000000001'$$,
+  $$update public.trabajos set fotos = array['cccccccc-2600-4000-a000-000000000001/dddddddd-2600-4000-a000-000000000001/0-1791734400000.jpg', 'cccccccc-2600-4000-a000-000000000001/dddddddd-2600-4000-a000-000000000001/1-1791734400001.jpg'] where id = 'dddddddd-2600-4000-a000-000000000001'$$,
   'acepta rutas de la carpeta del trabajo'
 );
 select lives_ok(
@@ -35,23 +35,27 @@ select lives_ok(
   'acepta una lista vacía'
 );
 select throws_ok(
-  $$update public.trabajos set fotos = array['trabajos/dddddddd-2600-4000-a000-000000000002/0-1.jpg'] where id = 'dddddddd-2600-4000-a000-000000000001'$$,
+  $$update public.trabajos set fotos = array['cccccccc-2600-4000-a000-000000000001/dddddddd-2600-4000-a000-000000000002/0-1.jpg'] where id = 'dddddddd-2600-4000-a000-000000000001'$$,
   '23514', null, 'rechaza la carpeta de otro trabajo'
 );
 select throws_ok(
-  $$update public.trabajos set fotos = array['trabajos/dddddddd-2600-4000-a000-000000000001/0-1.jpg', 'trabajos/dddddddd-2600-4000-a000-000000000002/0-1.jpg'] where id = 'dddddddd-2600-4000-a000-000000000001'$$,
+  $$update public.trabajos set fotos = array['cccccccc-2600-4000-a000-000000000001/dddddddd-2600-4000-a000-000000000001/0-1.jpg', 'cccccccc-2600-4000-a000-000000000001/dddddddd-2600-4000-a000-000000000002/0-1.jpg'] where id = 'dddddddd-2600-4000-a000-000000000001'$$,
   '23514', null, 'un solo elemento ajeno rechaza toda la lista'
+);
+select throws_ok(
+  $$update public.trabajos set fotos = array['cccccccc-2600-4000-a000-000000000002/dddddddd-2600-4000-a000-000000000001/0-1.jpg'] where id = 'dddddddd-2600-4000-a000-000000000001'$$,
+  '23514', null, 'rechaza la carpeta de otro cliente, aunque sea el mismo trabajo'
 );
 select throws_ok(
   $$update public.trabajos set fotos = array['https://malo.example/x.jpg'] where id = 'dddddddd-2600-4000-a000-000000000001'$$,
   '23514', null, 'rechaza una URL'
 );
 select throws_ok(
-  $$update public.trabajos set fotos = array['trabajos/dddddddd-2600-4000-a000-000000000001/../x.jpg'] where id = 'dddddddd-2600-4000-a000-000000000001'$$,
+  $$update public.trabajos set fotos = array['cccccccc-2600-4000-a000-000000000001/dddddddd-2600-4000-a000-000000000001/../x.jpg'] where id = 'dddddddd-2600-4000-a000-000000000001'$$,
   '23514', null, 'rechaza ..'
 );
 select throws_ok(
-  $$update public.trabajos set fotos = array['trabajos/dddddddd-2600-4000-a000-000000000001/x.gif'] where id = 'dddddddd-2600-4000-a000-000000000001'$$,
+  $$update public.trabajos set fotos = array['cccccccc-2600-4000-a000-000000000001/dddddddd-2600-4000-a000-000000000001/x.gif'] where id = 'dddddddd-2600-4000-a000-000000000001'$$,
   '23514', null, 'rechaza extensiones no permitidas'
 );
 select throws_ok(
@@ -59,7 +63,7 @@ select throws_ok(
   '23514', null, 'rechaza texto libre'
 );
 select throws_ok(
-  $$insert into public.trabajos (cliente_id, oficio, titulo, descripcion, barrio_id, urgencia, fotos) values ('cccccccc-2600-4000-a000-000000000001', 'gas', 'Con foto ajena', 'Una descripción cualquiera', 17, 'sin_apuro', array['trabajos/dddddddd-2600-4000-a000-000000000001/0-1.jpg'])$$,
+  $$insert into public.trabajos (cliente_id, oficio, titulo, descripcion, barrio_id, urgencia, fotos) values ('cccccccc-2600-4000-a000-000000000001', 'gas', 'Con foto ajena', 'Una descripción cualquiera', 17, 'sin_apuro', array['cccccccc-2600-4000-a000-000000000001/dddddddd-2600-4000-a000-000000000001/0-1.jpg'])$$,
   '23514', null, 'al crear, las fotos no pueden apuntar a la carpeta de otro trabajo'
 );
 

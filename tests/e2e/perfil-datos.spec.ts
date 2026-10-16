@@ -59,8 +59,12 @@ async function sinViolacionesGraves(page: Page) {
   expect.soft(graves.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
 }
 
+// La lista es hermana del encabezado (dentro de la misma sección), no hija de su contenedor.
 const listaResenas = (page: Page) =>
-  page.getByRole("heading", { name: "Reseñas" }).locator("..").getByRole("listitem");
+  page
+    .getByRole("heading", { level: 2, name: "Reseñas" })
+    .locator("xpath=ancestor::section[1]")
+    .getByRole("listitem");
 
 test.describe("perfil público: visitante sin sesión", () => {
   test("muestra la inicial del apellido, solo insignias y manda a ingresar para contactar", async ({
@@ -102,16 +106,19 @@ test.describe("perfil público: visitante sin sesión", () => {
     const reseñas = listaResenas(page);
     await expect(reseñas).toHaveCount(3);
     await expect(page.getByText("Reseña número 1", { exact: true })).toBeVisible();
-    await expect(reseñas.nth(0)).toContainText("Laura F.");
-    // La segunda reseña tiene el autor borrado.
-    await expect(reseñas.nth(1)).toContainText("Cliente de LabÍA");
+    // Las dos primeras son de las cuentas de prueba de LAB-31 (editable y vencida); después, la número 1.
+    await expect(reseñas.nth(0)).toContainText("Diego S.");
+    await expect(reseñas.nth(1)).toContainText("Mora V.");
+    await expect(reseñas.nth(2)).toContainText("Laura F.");
 
-    await page.getByRole("button", { name: "Ver todas (25)" }).click();
+    await page.getByRole("button", { name: "Ver todas (27)" }).click();
     await expect(reseñas).toHaveCount(13);
-    await page.getByRole("button", { name: "Ver más reseñas (12)" }).click();
+    // La reseña número 2 tiene el autor borrado (autor_id null en el falso).
+    await expect(reseñas.nth(3)).toContainText("Cliente de LabÍA");
+    await page.getByRole("button", { name: "Ver más reseñas (14)" }).click();
     await expect(reseñas).toHaveCount(23);
-    await page.getByRole("button", { name: "Ver más reseñas (2)" }).click();
-    await expect(reseñas).toHaveCount(25);
+    await page.getByRole("button", { name: "Ver más reseñas (4)" }).click();
+    await expect(reseñas).toHaveCount(27);
     await expect(page.getByRole("button", { name: /Ver (todas|más)/ })).toHaveCount(0);
     await expect(page.getByText("Reseña número 25", { exact: true })).toBeVisible();
   });
@@ -244,8 +251,10 @@ test.describe("perfil público: el dueño", () => {
     await expect(page.getByRole("heading", { level: 1, name: "Editar perfil" })).toBeVisible();
     await expect(page.getByRole("checkbox", { name: "Gas" })).toBeChecked();
 
-    // Sin oficios: error en castellano al lado del campo.
+    // Sin oficios: error en castellano al lado del campo. El falso tiene gas y plomería: hay que
+    // desmarcar los dos para quedar sin ninguno.
     await page.getByRole("checkbox", { name: "Gas" }).uncheck();
+    await page.getByRole("checkbox", { name: "Plomería" }).uncheck();
     await page.getByRole("button", { name: "Guardar cambios" }).click();
     await expect(page.getByText(/al menos un oficio/i)).toBeVisible();
 

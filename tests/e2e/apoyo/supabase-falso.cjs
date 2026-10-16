@@ -608,7 +608,8 @@ function filaPerfil(id, yo) {
     antecedentes_ok: true,
     matriculado: true,
     promedio: 4.6,
-    cantidad_resenas: TOTAL_RESENAS,
+    // Las 25 de la serie más las dos de LAB-31 (editable y vencida), que están en la lista.
+    cantidad_resenas: TOTAL_RESENAS + 2,
     nombre: "Martín",
     // Solo cliente con sesión y dueño ven el apellido; el resto, la inicial.
     apellido: yo ? "Gómez" : null,
@@ -866,6 +867,23 @@ function atenderResenas(url, res, unObjeto) {
     return true;
   }
   const profesional = (url.searchParams.get("profesional_id") ?? "").replace(/^eq\./, "");
+  // La reseña propia (`autor_id` + `profesional_id`, maybeSingle): LAB-31. Sin esto el falso devolvía
+  // la lista entera y el perfil creía que el cliente nunca reseñó.
+  const autor = (url.searchParams.get("autor_id") ?? "").replace(/^eq\./, "");
+  if (autor) {
+    const propia = todasLasResenas().find(
+      (r) =>
+        r.autor_id === autor &&
+        (r.profesional_id ?? ID_PUBLICADO) === (profesional || ID_PUBLICADO),
+    );
+    if (!propia) {
+      if (unObjeto) errorRpc(res, 406, "PGRST116", "The result contains 0 rows");
+      else responder(res, 200, []);
+      return true;
+    }
+    responder(res, 200, unObjeto ? propia : [propia]);
+    return true;
+  }
   const candidatas = todasLasResenas().filter(
     (r) => !profesional || (r.profesional_id ?? ID_PUBLICADO) === profesional,
   );
@@ -1281,13 +1299,16 @@ const server = http.createServer((req, res) => {
       const idParam = url.searchParams.get("id");
       if (idParam && idParam.startsWith("in.")) {
         const ids = idParam.replace("in.(", "").replace(")", "").split(",");
-        const encontrados = USUARIOS_ADMIN.filter((u) => ids.includes(u.id)).map((u) => ({
-          id: u.id,
-          nombre: u.nombre,
-          apellido_inicial: u.apellido ? u.apellido[0] : "",
-          foto_path: null,
-          barrio_id: u.barrio_id,
-        }));
+        // Cuentas de admin y cuentas de prueba (las de reseñas de LAB-31 también tienen nombre).
+        const encontrados = [...USUARIOS_ADMIN, ...Object.values(USUARIOS)]
+          .filter((u) => ids.includes(u.id))
+          .map((u) => ({
+            id: u.id,
+            nombre: u.nombre,
+            apellido_inicial: u.apellido ? u.apellido[0] : "",
+            foto_path: null,
+            barrio_id: u.barrio_id,
+          }));
         return responder(res, 200, encontrados);
       }
       const cli = {
@@ -1519,6 +1540,6 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PUERTO, () => {
+server.listen(PUERTO, "127.0.0.1", () => {
   process.stdout.write(`Supabase falso en http://localhost:${PUERTO}\n`);
 });
