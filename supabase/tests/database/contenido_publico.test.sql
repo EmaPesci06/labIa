@@ -61,6 +61,22 @@ insert into casos (texto, bloquea) values
   ('Matrícula 2235551234', true),
   ('Juan $1500 2235551234', true),
   ('Sale $ 3.500 la visita', false),
+  ('Llamame al $ 223 555 1234', true),
+  ('Llamame al $223 555-1234', true),
+  ('Llamame al $2235-551234', true),
+  ('Matrícula 223 555 1234', true),
+  ('Registro 223 555 1234', true),
+  ('mat. 223-555-1234', true),
+  ('Llamame al 2.235.551.234', true),
+  ('Llamame al $1500.2235551234', true),
+  ('Juan $ 223 555 1234', true),
+  ('$15000', false),
+  ('$15.000.000', false),
+  ('Matrícula N° 12345', false),
+  ('Gasista matriculado 12345', false),
+  ('Fiat Palio 1998 2000 cc', false),
+  ('trabajo el 12 03 2026', false),
+  ('Pintura de 3 ambientes 4x4', false),
   ('', false);
 
 -- El helper SQL coincide con la app en todos los casos.

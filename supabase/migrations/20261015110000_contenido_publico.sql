@@ -24,7 +24,6 @@ set search_path = ''
 as $$
 declare
   normal text;
-  limpio text;
   run text;
   nombre text;
 begin
@@ -55,47 +54,58 @@ begin
     return true;
   end if;
 
-  -- Montos con $ y matrículas, registro o ENARGAS de hasta 7 dígitos no cuentan como teléfono ni altura.
-  -- Un número de 8 o más dígitos pegado a $ o a "matrícula" se evalúa como teléfono (igual que la app).
-  limpio := regexp_replace(normal, '\$\s*[0-9]{1,7}(?![0-9])(\.[0-9]{3})*', ' ', 'g');
-  limpio := regexp_replace(
-    limpio,
-    '(matr[íi]cul[a-záéíóúñ]*|mat\.?|registro|enargas)[[:space:].:,°º#n]{0,8}[0-9]{1,7}(?![0-9])',
-    ' ',
-    'gi'
-  );
-
-  -- Teléfonos: secuencias de 8 o más dígitos con separadores comunes, sin fechas, rangos de años ni miles.
-  for run in
-    select (regexp_matches(limpio, '\+?[0-9(][0-9[:space:]().-]{0,60}[0-9]', 'g'))[1]
+  -- Candidatos numéricos completos, con sus separadores internos. El prefijo ($ o matrícula, registro,
+  -- enargas, mat.) se decide sobre el candidato entero: solo excluye hasta 7 dígitos. Nada se reemplaza.
+  for prefijo, candidato in
+    select m[1], m[2]
+    from regexp_matches(
+      normal,
+      '(\$[[:space:]]*|(?:matr[íi]cul[a-záéíóúñ]*|mat\.?|registro|enargas)[[:space:].:,°º#n]{0,8})?(\+?[0-9(][0-9[:space:]().-]{0,60}[0-9])',
+      'gi'
+    ) as m
   loop
-    if length(regexp_replace(run, '[^0-9]', '', 'g')) >= 8
-      and run !~ '^[0-9]{1,2}([.[:space:]-])[0-9]{1,2}\1(19|20)[0-9]{2}$'
-      and run !~ '^(19|20)[0-9]{2}([[:space:]]*-[[:space:]]*|[[:space:]]+)(19|20)[0-9]{2}$'
-      and run !~ '^[0-9]{1,3}(\.[0-9]{3})+$' then
-      if left(run, 1) = '+' then
-        return true;
+    digitos := length(regexp_replace(candidato, '[^0-9]', '', 'g'));
+    if prefijo is not null and digitos <= 7 then
+      continue;
+    end if;
+    if digitos < 8 then
+      continue;
+    end if;
+    -- Fechas, rangos de años y miles con $ delante no son teléfono.
+    if candidato ~ '^[0-9]{1,2}([.[:space:]-])[0-9]{1,2}\1(19|20)[0-9]{2}$'
+      or candidato ~ '^(19|20)[0-9]{2}([[:space:]]*-[[:space:]]*|[[:space:]]+)(19|20)[0-9]{2}$' then
+      continue;
+    end if;
+    if candidato ~ '^[0-9]{1,3}(\.[0-9]{3})+$' then
+      if prefijo is not null and left(prefijo, 1) = '$' then
+        continue;
       end if;
-      if exists (
-        select 1
-        from unnest(regexp_split_to_array(run, '[[:space:].()+-]+')) as grupo
-        where length(grupo) >= 2
-      ) then
-        return true;
-      end if;
+      return true;
+    end if;
+    if left(candidato, 1) = '+' then
+      return true;
+    end if;
+    -- Sin "+", un número tiene al menos un grupo de dos dígitos.
+    if exists (
+      select 1
+      from unnest(regexp_split_to_array(candidato, '[[:space:].()+-]+')) as grupo
+      where length(grupo) >= 2
+    ) then
+      return true;
     end if;
   end loop;
 
   -- Dirección: calle o avenida con altura de 3 a 5 dígitos.
-  if limpio ~* '\y(calle|av(\.|enida)?|pasaje|pje\.?|bv\.?|boulevard|diagonal|diag\.?)[[:space:]]+(?:[a-zA-ZÁÉÍÓÚÑÜáéíóúñü.0-9]+[[:space:]]+){0,3}?(?:n[°º.]?[[:space:]]*)?[0-9]{3,5}\y' then
+  if normal ~* '\y(calle|av(\.|enida)?|pasaje|pje\.?|bv\.?|boulevard|diagonal|diag\.?)[[:space:]]+(?:[a-zA-ZÁÉÍÓÚÑÜáéíóúñü.0-9]+[[:space:]]+){0,3}?(?:n[°º.]?[[:space:]]*)?[0-9]{3,5}\y' then
     return true;
   end if;
 
-  -- Dirección: nombre propio (mayúscula inicial) seguido de 4 o 5 dígitos. Un año o una unidad no cuenta.
+  -- Dirección: nombre propio (mayúscula inicial) seguido de 4 o 5 dígitos. Un año, una unidad o una
+  -- palabra de matrícula, registro o ENARGAS no cuentan.
   for nombre in
     select (regexp_matches(
-      limpio,
-      '\y[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:[[:space:]]+(?:de|del|y|[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+))?[[:space:]]+(?:n[°º.]?[[:space:]]*)?([0-9]{4,5})\y(?![[:space:]]*(?:[vV]|[vV][oO][lL][tT][sS]?|[mM][mM]|[cC][mM]|[mM]2|[mM]|[mM][tT][sS]?|[mM][eE][tT][rR][oO][sS]?|[kK][gG][sS]?|[kK][gG]|[lL][tT][sS]?|[lL][iI][tT][rR][oO][sS]?|[lL]|[wW]|[kK][wW]|[aA][mM][pP]|[hH][sS]|[hH][oO][rR][aA][sS]?|[mM][lL]|[pP][eE][sS][oO][sS]|[uU][sS][dD])\y)',
+      normal,
+      '\y(?![Mm]atr[íi]cul[a-záéíóúñ]*\y|[Rr]egistro\y|[Ee]nargas\y)[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:[[:space:]]+(?:de|del|y|[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+))?[[:space:]]+(?:n[°º.]?[[:space:]]*)?([0-9]{4,5})\y(?![[:space:]]*(?:[vV]|[vV][oO][lL][tT][sS]?|[mM][mM]|[cC][mM]|[mM]2|[mM]|[mM][tT][sS]?|[mM][eE][tT][rR][oO][sS]?|[kK][gG][sS]?|[kK][gG]|[lL][tT][sS]?|[lL][iI][tT][rR][oO][sS]?|[lL]|[wW]|[kK][wW]|[aA][mM][pP]|[hH][sS]|[hH][oO][rR][aA][sS]?|[mM][lL]|[pP][eE][sS][oO][sS]|[uU][sS][dD])\y)',
       'g'
     ))[1]
   loop

@@ -27,16 +27,11 @@ const EMAIL_EN_PALABRAS = /\barroba\b|\(at\)|\bpunto\s+(?:com|me|ar|net|org)\b/i
 const MENSAJERIA =
   /\b(?:wa\.me|api\.whatsapp\.com|whatsapp\.com|t\.me|telegram\.me|m\.me|fb\.me|signal\.me|instagram\.com|facebook\.com)\b/i;
 
-// Montos con signo de pesos: "$ 15000", "$ 3.500", "$15.000.000". Solo números de hasta 7 dígitos
-// (con puntos de miles): un número más largo pegado a "$" se evalúa como teléfono ("Llamame al $2235551234").
-const MONTO_CON_PESO = /\$\s*\d{1,7}(?!\d)(?:\.\d{3})*/g;
-// Número de matrícula, registro o ENARGAS de hasta 7 dígitos: "Matrícula N° 12345". Una matrícula
-// con 8 o más dígitos ("Matrícula 2235551234") se evalúa como teléfono.
-const NUMERO_DE_MATRICULA =
-  /(?:matr[ií]cul[a-záéíóúñ]*|mat\.?|registro|enargas)[\s.:,°º#n]{0,8}\d{1,7}(?!\d)/gi;
-
-// Secuencia de dígitos con separadores comunes y "+" opcional. El largo está acotado.
-const CANDIDATO_NUMERICO = /\+?[\d(][\d\s().-]{0,60}\d/g;
+// Candidato numérico completo, con sus separadores internos (espacios, guiones, puntos, paréntesis).
+// El grupo 1 captura el prefijo, si lo hay: "$" o una palabra de matrícula. El grupo 2 es el número entero.
+// Nada se reemplaza en el texto: el prefijo se decide sobre el candidato entero.
+const CANDIDATO_NUMERICO =
+  /(\$\s*|(?:matr[ií]cul[a-záéíóúñ]*|mat\.?|registro|enargas)[\s.:,°º#n]{0,8})?(\+?[\d(][\d\s().-]{0,60}\d)/gi;
 const FECHA = /^\d{1,2}([.\s-])\d{1,2}\1(?:19|20)\d{2}$/;
 const RANGO_ANIOS = /^(?:19|20)\d{2}(?:\s*-\s*|\s+)(?:19|20)\d{2}$/;
 const MILES = /^\d{1,3}(?:\.\d{3})+$/;
@@ -53,7 +48,7 @@ const UNIDADES = sinMayusculas(
 );
 // Nombre propio (mayúscula inicial real, sin flag i) seguido de 4 o 5 dígitos: "Independencia 2100".
 const NOMBRE_CON_NUMERO = new RegExp(
-  String.raw`\b\p{Lu}\p{Ll}+(?:\s+(?:de|del|y|\p{Lu}\p{Ll}+))?\s+(?:n[°º.]?\s*)?(\d{4,5})\b(?!\s*(?:${UNIDADES})\b)`,
+  String.raw`\b(?!(?:[Mm]atr[íi]cul[a-záéíóúñ]*|[Rr]egistro|[Ee]nargas)\b)\p{Lu}\p{Ll}+(?:\s+(?:de|del|y|\p{Lu}\p{Ll}+))?\s+(?:n[°º.]?\s*)?(\d{4,5})\b(?!\s*(?:${UNIDADES})\b)`,
   "gu",
 );
 
@@ -87,13 +82,21 @@ export function valorDeDigito(digito: string): string {
   return String((codigo - inicio) % 10);
 }
 
-function esTelefono(run: string): boolean {
-  const digitos = run.replace(/\D/g, "");
-  if (digitos.length < 8) return false;
-  if (FECHA.test(run) || RANGO_ANIOS.test(run) || MILES.test(run)) return false;
-  if (run.startsWith("+")) return true;
+/**
+ * ¿El candidato numérico (entero, con sus separadores) es un teléfono? Un prefijo ("$" o matrícula)
+ * solo excluye candidatos de hasta 7 dígitos. Cualquier candidato de 8 o más dígitos es teléfono,
+ * vaya precedido por lo que vaya, salvo fechas, rangos de años y miles con "$" delante.
+ */
+function esTelefono(candidato: string, prefijo: string | undefined): boolean {
+  const digitos = candidato.replace(/\D/g, "").length;
+  if (prefijo !== undefined && digitos <= 7) return false;
+  if (digitos < 8) return false;
+  if (FECHA.test(candidato) || RANGO_ANIOS.test(candidato)) return false;
+  const conPeso = prefijo?.startsWith("$") ?? false;
+  if (MILES.test(candidato)) return !conPeso;
+  if (candidato.startsWith("+")) return true;
   // Sin "+", un número tiene al menos un grupo de dos dígitos (una lista "1 2 3 4 5 6 7 8" no cuenta).
-  return run.split(/[\s.()+-]+/).some((grupo) => grupo.length >= 2);
+  return candidato.split(/[\s.()+-]+/).some((grupo) => grupo.length >= 2);
 }
 
 /**
@@ -108,15 +111,12 @@ export function detectarDatoDeContacto(texto: string): TipoDatoPersonal | null {
   if (EMAIL.test(normal) || EMAIL_EN_PALABRAS.test(normal)) return "email";
   if (MENSAJERIA.test(normal)) return "mensajeria";
 
-  // Montos y matrículas se quitan antes de buscar teléfonos y alturas.
-  const limpio = normal.replace(MONTO_CON_PESO, " ").replace(NUMERO_DE_MATRICULA, " ");
-
-  for (const coincidencia of limpio.matchAll(CANDIDATO_NUMERICO)) {
-    if (esTelefono(coincidencia[0])) return "telefono";
+  for (const coincidencia of normal.matchAll(CANDIDATO_NUMERICO)) {
+    if (esTelefono(coincidencia[2] ?? "", coincidencia[1])) return "telefono";
   }
 
-  if (CALLE_CON_NUMERO.test(limpio)) return "direccion";
-  for (const coincidencia of limpio.matchAll(NOMBRE_CON_NUMERO)) {
+  if (CALLE_CON_NUMERO.test(normal)) return "direccion";
+  for (const coincidencia of normal.matchAll(NOMBRE_CON_NUMERO)) {
     if (!ES_ANIO.test(coincidencia[1] ?? "")) return "direccion";
   }
   return null;

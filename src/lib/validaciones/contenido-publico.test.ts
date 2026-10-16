@@ -37,15 +37,27 @@ describe("montos y matrículas no tapan teléfonos (LAB-53, revisión de segurid
     "Llamame al $ 2235551234",
     "Matrícula 2235551234",
     "Juan $1500 2235551234",
-  ])("bloquea «%s» aunque tenga $ o matrícula", (texto) => {
+    "Llamame al $ 223 555 1234",
+    "Llamame al $223 555-1234",
+    "Llamame al $2235-551234",
+    "Matrícula 223 555 1234",
+    "Registro 223 555 1234",
+    "mat. 223-555-1234",
+    "Llamame al 2.235.551.234",
+    "Llamame al $1500.2235551234",
+  ])("bloquea «%s» aunque tenga $ o matrícula delante", (texto) => {
     expect(detectarDatoDeContacto(texto)).toBe("telefono");
   });
 
   it.each([
     "Sale $ 3.500 la visita",
     "Precio $15000 por visita",
+    "Presupuesto de $15.000.000 con materiales",
     "Matrícula N° 12345",
     "Gasista matriculado 12345",
+    "Fiat Palio 1998 2000 cc",
+    "trabajo el 12 03 2026",
+    "Pintura de 3 ambientes 4x4",
   ])("deja pasar «%s»", (texto) => {
     expect(tieneDatosDeContacto(texto)).toBe(false);
   });
@@ -54,6 +66,7 @@ describe("montos y matrículas no tapan teléfonos (LAB-53, revisión de segurid
 describe("nombre en el alta y en la cuenta (LAB-53)", () => {
   it("el nombre completo del registro no lleva teléfono ni email", () => {
     expect(nombreCompleto.safeParse("Ana 2235551234").success).toBe(false);
+    expect(nombreCompleto.safeParse("Juan $ 223 555 1234").success).toBe(false);
     expect(nombreCompleto.safeParse("ana@correo.com Pérez").success).toBe(false);
     expect(nombreCompleto.safeParse("María de los Ángeles").success).toBe(true);
   });
