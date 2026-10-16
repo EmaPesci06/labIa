@@ -39,7 +39,8 @@ test.describe("navegación del cliente", () => {
     await page.goto("/inicio");
     const barra = esCelular(page) ? barraInferior(page) : barraSuperior(page);
     await barra.getByRole("link", { name: "Mis trabajos" }).click();
-    await expect(page).toHaveURL(/\/mis-trabajos$/);
+    // Mis trabajos agrega ?tab= e ?id= (LAB-48): se valida la ruta, no la query.
+    await expect(page).toHaveURL(/\/mis-trabajos(\?.*)?$/);
     await expect(barra.getByRole("link", { name: "Mis trabajos" })).toHaveAttribute(
       "aria-current",
       "page",
