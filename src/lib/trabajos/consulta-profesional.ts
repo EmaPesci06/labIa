@@ -7,6 +7,7 @@ import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servid
 import type { UrgenciaTrabajo } from "@/lib/validaciones/trabajo";
 
 import { type EstadoPostulacion, distanciaEntreBarrios } from "./consulta-comun";
+import { firmarFotosTrabajo } from "./fotos-firmadas";
 
 export type TrabajoParaMi = {
   id: string;
@@ -355,7 +356,8 @@ export const obtenerTrabajoDetalle = cache(
           descripcion: fila.descripcion,
           urgencia: fila.urgencia as UrgenciaTrabajo,
           presupuestoEstimado: fila.presupuesto_estimado,
-          fotos: fila.fotos ?? [],
+          // URLs firmadas de 10 min, solo si quien pide ya puede ver el trabajo (LAB-52).
+          fotos: await firmarFotosTrabajo(supabase, fila.fotos ?? []),
           barrioId: fila.barrio_id,
           barrioNombre,
           distanciaKm,

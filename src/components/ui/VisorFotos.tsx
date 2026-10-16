@@ -7,8 +7,16 @@ import { useCallback, useState, type KeyboardEvent } from "react";
 
 import { cn } from "@/lib/cn";
 
+/**
+ * Las URL firmadas del bucket privado `fotos-trabajos` (LAB-52) no pasan por el optimizador de
+ * `next/image`: `images.remotePatterns` solo admite las públicas. Se muestran tal cual.
+ */
+export function esUrlFirmada(url: string): boolean {
+  return url.includes("/storage/v1/object/sign/");
+}
+
 type VisorFotosProps = {
-  /** URLs públicas de las fotos (bucket `fotos`). */
+  /** URLs de las fotos: públicas (bucket `fotos`) o firmadas (bucket `fotos-trabajos`). */
   fotos: readonly string[];
   /** Frase que dice de quién son las fotos: "Olor a gas en la cocina" o "trabajos de Martín G.". */
   contexto: string;
@@ -88,6 +96,7 @@ export function VisorFotos({ fotos, contexto, miniaturas = "cuadradas" }: VisorF
                 src={url}
                 alt=""
                 fill
+                unoptimized={esUrlFirmada(url)}
                 sizes={
                   apaisadas ? "(max-width: 768px) 50vw, 300px" : "(min-width: 1024px) 220px, 33vw"
                 }
@@ -146,6 +155,7 @@ export function VisorFotos({ fotos, contexto, miniaturas = "cuadradas" }: VisorF
                       src={url}
                       alt={`Foto ${i + 1} de ${total} de ${contexto}`}
                       fill
+                      unoptimized={esUrlFirmada(url)}
                       sizes="100vw"
                       className="object-contain"
                     />
