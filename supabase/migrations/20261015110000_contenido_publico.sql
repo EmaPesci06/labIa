@@ -24,7 +24,9 @@ set search_path = ''
 as $$
 declare
   normal text;
-  run text;
+  prefijo text;
+  candidato text;
+  digitos integer;
   nombre text;
 begin
   if p_texto is null then
