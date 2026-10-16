@@ -25,17 +25,23 @@ export function exigeSecretoDeLimite(): boolean {
   );
 }
 
+/** Largo mínimo de `RATE_LIMIT_SECRET` (LAB-57): el mismo que `EMAILS_SECRET`. */
+export const LARGO_MINIMO_SECRETO_LIMITE = 32;
+
 /**
  * Clave que va a la tabla: HMAC-SHA256 con el secreto del servidor. Si el entorno lo exige y falta,
  * lanza: nunca se guarda una clave sin llave que se pueda revertir por fuerza bruta (LAB-49). Solo en
- * desarrollo y tests, sin secreto, se usa sha256.
+ * desarrollo y tests, sin secreto, se usa sha256. Un secreto de menos de 32 caracteres se trata como
+ * si no estuviera configurado (LAB-57, igual que `EMAILS_SECRET`).
  */
 export function claveDeLimite(clave: string): string {
   const secreto = process.env.RATE_LIMIT_SECRET;
-  if (secreto) return createHmac("sha256", secreto).update(clave).digest("hex");
+  if (secreto && secreto.length >= LARGO_MINIMO_SECRETO_LIMITE) {
+    return createHmac("sha256", secreto).update(clave).digest("hex");
+  }
   if (exigeSecretoDeLimite()) {
     throw new Error(
-      "RATE_LIMIT_SECRET es obligatorio en producción y preview: no se guardan claves sin llave.",
+      "RATE_LIMIT_SECRET es obligatorio en producción y preview (al menos 32 caracteres): no se guardan claves sin llave.",
     );
   }
   return createHash("sha256").update(clave).digest("hex");
