@@ -7,6 +7,8 @@
 
 Este es el **único** documento de traspaso. `.gemini/estado.md` y `GEMINI.md` apuntan acá; no hay otro lugar donde mantener el estado.
 
+**Dos orquestadores (desde 2026-11-13):** Claude Code y Gemini trabajan a la par. El reparto es por etiqueta de Linear (`Orq: Fable` y `Orq: Gemini`) y las reglas para no pisarse están en la sección "Dos orquestadores" de `.claude/labia/protocolo.md`. Los subagentes de Gemini están en `.agents/plugins/labia/agents/` y usan las mismas instrucciones que los de Claude.
+
 Las fuentes vivas son Linear y Git. Este documento explica reglas, contexto y decisiones que no están en las tareas. Si algo de acá no coincide con Linear o con `git`, mandan Linear y `git`.
 
 ---
