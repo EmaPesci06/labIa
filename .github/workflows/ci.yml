@@ -88,7 +88,22 @@ jobs:
 
       - name: Tests de la base (pgTAP)
         if: steps.detectar.outputs.supabase == 'true' && steps.detectar.outputs.tests_sql == 'true'
-        run: supabase test db
+        run: pnpm db:test
+
+      - name: Sondeo de seguridad (rol anon)
+        if: steps.detectar.outputs.supabase == 'true'
+        run: |
+          supabase status -o env \
+            --override-name api.url=NEXT_PUBLIC_SUPABASE_URL \
+            --override-name auth.anon_key=NEXT_PUBLIC_SUPABASE_ANON_KEY \
+            | grep -E '^(NEXT_PUBLIC_SUPABASE_URL|NEXT_PUBLIC_SUPABASE_ANON_KEY)=' \
+            | sed -E 's/="?([^"]*)"?$/=\1/' > "$RUNNER_TEMP/supabase-sondeo.env"
+          while IFS='=' read -r nombre valor; do
+            if [ "$nombre" != "NEXT_PUBLIC_SUPABASE_URL" ]; then echo "::add-mask::$valor"; fi
+            export "$nombre=$valor"
+          done < "$RUNNER_TEMP/supabase-sondeo.env"
+          rm -f "$RUNNER_TEMP/supabase-sondeo.env"
+          node scripts/sondeo-seguridad.ts
 
       - name: Los tipos generados coinciden con los commiteados
         if: steps.detectar.outputs.supabase == 'true' && steps.detectar.outputs.db_tipos == 'true'
