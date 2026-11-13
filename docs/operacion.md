@@ -17,7 +17,10 @@ Vercel, GitHub, Resend, Sentry y PostHog.
 - `GET /api/salud`: responde `200 {"estado":"ok","base":"ok"}` si la base contesta, y `503` con
   `{"estado":"error","base":"error"}` si no. No devuelve datos, nombres de tablas ni mensajes de error.
 - Crons de Vercel en `vercel.json` (`trabajos-cerca`, `pedir-resena`, `limpiar-documentos`,
-  `borrar-documentos`). Cada uno exige `Authorization: Bearer $CRON_SECRET`.
+  `limpiar-fotos-trabajos`). Cada uno exige `Authorization: Bearer $CRON_SECRET`.
+- Latido de la base de desarrollo en `.github/workflows/latido-supabase-dev.yml` (LAB-65): corre dos veces por
+  semana (`0 13 * * 2,5`) contra `labia-dev` con la clave anónima para evitar que el plan gratis de Supabase la
+  pause por inactividad. **Quitar este workflow cuando exista `labia-prod`.**
 - Migraciones a producción en `.github/workflows/migraciones.yml`, detrás de la variable
   `MIGRAR_PRODUCCION` y del entorno `produccion` con aprobación manual.
 - Los barrios de Mar del Plata ya viajan en la migración `20261011190100_barrios_mar_del_plata.sql`.
@@ -71,7 +74,7 @@ Vercel, GitHub, Resend, Sentry y PostHog.
 
 ### 1.3 pg_cron
 
-El borrado de documentos corre con Vercel Cron (`/api/cron/borrar-documentos`), no con `pg_cron`. No hace
+El borrado de documentos corre con Vercel Cron (`/api/cron/limpiar-documentos`), no con `pg_cron`. No hace
 falta activar `pg_cron` salvo que se agregue un job dentro de la base.
 
 ---
@@ -355,11 +358,10 @@ Configurados en `vercel.json`. Cada uno exige `Authorization: Bearer $CRON_SECRE
 | ---------------------------------- | ------------- | ------------------------------------------------------------------------------------------ |
 | `/api/cron/trabajos-cerca`         | 11:00 diario  | Avisos de trabajos cerca a profesionales (ver la ruta)                                     |
 | `/api/cron/pedir-resena`           | 12:00 diario  | Pide reseñas 24 h después de terminar un trabajo y manda avisos de postulaciones agrupados |
-| `/api/cron/limpiar-documentos`     | 06:00 diario  | Borra documentos vencidos y huérfanos del bucket `documentos` (LAB-21)                     |
-| `/api/cron/borrar-documentos`      | 06:00 diario  | Borra documentos revisados hace más de 30 días y huérfanos de más de 24 h (LAB-42)         |
+| `/api/cron/limpiar-documentos`     | 06:00 diario  | Borra documentos revisados hace más de 30 días y huérfanos de más de 24 h (LAB-21, LAB-46) |
 | `/api/cron/limpiar-fotos-trabajos` | 06:30 diario  | Quita del bucket `fotos-trabajos` las fotos de trabajos cuyo borrado venció (LAB-52)       |
 
-Ver ejecuciones: Vercel → proyecto `labia` → Cron Jobs y Logs. Si un cron falla, revisar el log y el estado de `CRON_SECRET` (sección 15). **[PENDIENTE LAB-7]** para ver ejecuciones reales de producción.
+Ver ejecuciones: Vercel → proyecto `labia` → Cron Jobs y Logs. Vercel ejecuta los crons **únicamente contra el entorno Production**, por lo que `CRON_SECRET`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY` tienen que estar cargadas en **Production** (incluso antes del lanzamiento, apuntando a `labia-dev`). Si un cron falla con `401` o `500`, revisar el log y el estado de `CRON_SECRET` y `SUPABASE_SERVICE_ROLE_KEY` (sección 15).
 
 Nota: `pg_cron` no se usa. El borrado de documentos corre con Vercel Cron.
 
@@ -372,6 +374,17 @@ Las fotos de los trabajos (interior o fachada de la casa del cliente) están en 
   1. Borrar los archivos `trabajos/<id>/…` del bucket `fotos` (panel de Storage o API con la service role).
   2. Vaciar las filas que apuntan a esas rutas: `update public.trabajos set fotos = '{}' where cardinality(fotos) > 0 and not privado.rutas_fotos_de_trabajo(fotos, cliente_id, id);`. La constraint `trabajos_fotos_propias` es `NOT VALID`, así que esas filas se revalidan recién al escribirlas.
 - **Antes de producción:** correr `pnpm db:test` en un proyecto aislado (ver sección 0), que incluye `fotos_trabajos_privadas.test.sql`.
+
+### 17.2 Latido de `labia-dev` en GitHub Actions (LAB-65)
+
+El proyecto `labia-dev` corre en el plan gratuito de Supabase, que pausa el proyecto tras 7 días sin consultas a su API. Aunque `vercel.json` define cuatro crons diarios, si en Vercel faltan `CRON_SECRET` o las claves de Supabase en el entorno **Production** (el único donde corren los Vercel Crons), los endpoints responden `401` o `500` antes de tocar la base y no cuentan como actividad.
+
+Para asegurar que `labia-dev` no se vuelva a pausar mientras no exista `labia-prod`:
+
+- **Workflow:** `.github/workflows/latido-supabase-dev.yml` (`Latido labia-dev`).
+- **Frecuencia:** martes y viernes a las 13:00 UTC (`0 13 * * 2,5`, 10:00 en Argentina) más ejecución manual (`workflow_dispatch`).
+- **Qué hace:** consulta `GET $NEXT_PUBLIC_SUPABASE_URL/rest/v1/barrios?select=id&limit=1` usando `NEXT_PUBLIC_SUPABASE_ANON_KEY` (secretos de GitHub Actions). Falla si el código HTTP no es `2xx` o si la respuesta no devuelve al menos una fila válida. No registra datos personales ni imprime secretos en los logs.
+- **Cuándo quitarlo:** **borrar `.github/workflows/latido-supabase-dev.yml` y esta sección cuando se cree y active `labia-prod` en el plan Pro** (que no se pausa por inactividad) y `labia-dev` deje de ser la base principal de los despliegues.
 
 ## 18. Dependencias y avisos de seguridad
 

@@ -1,0 +1,56 @@
+name: Latido labia-dev
+
+# Mantiene activo el proyecto gratuito de desarrollo `labia-dev` en Supabase mientras no exista `labia-prod` (LAB-65).
+# Quitar este workflow cuando exista `labia-prod` (ver docs/operacion.md §17.2).
+on:
+  schedule:
+    # Martes y viernes a las 13:00 UTC (10:00 en Argentina).
+    - cron: "0 13 * * 2,5"
+  workflow_dispatch:
+
+concurrency:
+  group: latido-supabase-dev
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  latido:
+    name: Lectura liviana en labia-dev
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+    steps:
+      - name: Consultar barrios con la clave anónima
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::error::Faltan los secretos NEXT_PUBLIC_SUPABASE_URL o NEXT_PUBLIC_SUPABASE_ANON_KEY en GitHub Actions."
+            exit 1
+          fi
+
+          url="${SUPABASE_URL%/}/rest/v1/barrios?select=id&limit=1"
+          archivo_cuerpo="$(mktemp)"
+          trap 'rm -f "$archivo_cuerpo"' EXIT
+
+          codigo_http="$(curl -sS -o "$archivo_cuerpo" -w "%{http_code}" \
+            --max-time 15 \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            -H "Accept: application/json" \
+            "$url")"
+
+          if [ "$codigo_http" -lt 200 ] || [ "$codigo_http" -ge 300 ]; then
+            echo "::error::Supabase labia-dev respondió HTTP $codigo_http (el proyecto puede estar pausado o caído)."
+            exit 1
+          fi
+
+          cantidad="$(jq -e 'if type == "array" then length else error("no es un arreglo") end' "$archivo_cuerpo" 2>/dev/null || echo "-1")"
+          if [ "$cantidad" -lt 1 ]; then
+            echo "::error::La consulta a public.barrios no devolvió filas válidas ( proyecto pausado o sin datos iniciales)."
+            exit 1
+          fi
+
+          echo "Latido OK: HTTP $codigo_http (barrios respondió con $cantidad fila de prueba, sin datos personales)."

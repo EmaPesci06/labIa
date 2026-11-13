@@ -9,17 +9,18 @@ Proyecto local de Supabase CLI de LabÍA: esquema en `migrations/`, datos de pru
 
 ## Comandos
 
-| Comando                     | Qué hace                                                                      |
-| --------------------------- | ----------------------------------------------------------------------------- |
-| `pnpm db:start`             | Levanta Supabase local (Postgres 17 + PostGIS, Auth, Storage, API).           |
-| `pnpm db:reset`             | Recrea la base desde cero: aplica todas las migraciones y después `seed.sql`. |
-| `pnpm db:test`              | Corre los tests SQL de `tests/database/` (`supabase test db`).                |
-| `pnpm db:tipos`             | Regenera `src/lib/supabase/tipos.ts` desde la base local. Commitealo.         |
-| `pnpm exec supabase status` | URL y claves locales (las de demo del CLI, no son secretos).                  |
-| `pnpm exec supabase stop`   | Apaga la base local.                                                          |
+| Comando                            | Qué hace                                                                                  |
+| ---------------------------------- | ----------------------------------------------------------------------------------------- |
+| `pnpm db:start`                    | Levanta Supabase local (Postgres 17 + PostGIS, Auth, Storage, API).                       |
+| `pnpm db:reset`                    | Recrea la base desde cero: aplica todas las migraciones y después `seed.sql`.             |
+| `pnpm db:test`                     | Corre los tests SQL de `tests/database/` (`supabase test db`).                            |
+| `node scripts/sondeo-seguridad.ts` | Sondea la API como `anon` (`NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY`). |
+| `pnpm db:tipos`                    | Regenera `src/lib/supabase/tipos.ts` desde la base local. Commitealo.                     |
+| `pnpm exec supabase status`        | URL y claves locales (las de demo del CLI, no son secretos).                              |
+| `pnpm exec supabase stop`          | Apaga la base local.                                                                      |
 
-Después de cada migración nueva: `pnpm db:reset`, `pnpm db:test` y `pnpm db:tipos`. La CI hace lo mismo
-(job "Base de datos") y falla si los tipos commiteados no coinciden con las migraciones.
+Después de cada migración nueva: `pnpm db:reset`, `pnpm db:test`, `node scripts/sondeo-seguridad.ts` y `pnpm db:tipos`. La CI hace lo mismo
+(job "Base de datos") y falla si algún test pgTAP, control del sondeo o tipo generado no pasa.
 
 ## Migraciones
 
