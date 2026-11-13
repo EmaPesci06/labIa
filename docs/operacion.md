@@ -372,3 +372,30 @@ Las fotos de los trabajos (interior o fachada de la casa del cliente) están en 
   1. Borrar los archivos `trabajos/<id>/…` del bucket `fotos` (panel de Storage o API con la service role).
   2. Vaciar las filas que apuntan a esas rutas: `update public.trabajos set fotos = '{}' where cardinality(fotos) > 0 and not privado.rutas_fotos_de_trabajo(fotos, cliente_id, id);`. La constraint `trabajos_fotos_propias` es `NOT VALID`, así que esas filas se revalidan recién al escribirlas.
 - **Antes de producción:** correr `pnpm db:test` en un proyecto aislado (ver sección 0), que incluye `fotos_trabajos_privadas.test.sql`.
+
+## 18. Dependencias y avisos de seguridad
+
+Next.js corta `pnpm build` con `SecurityFatalError` cuando la versión instalada tiene un aviso de seguridad grave. Pasó el 2026-11-13 con la 16.4.0 (LAB-62): `main` dejó de compilar sin que nadie tocara el código, y producción siguió corriendo la versión vulnerable hasta que se actualizó.
+
+**Revisión de rutina (una vez por semana, o cuando falla un build sin motivo):**
+
+1. `pnpm audit --prod`. No tiene que haber vulnerabilidades altas ni críticas.
+2. `pnpm outdated` para ver qué quedó atrás.
+3. Revisar el PR semanal de Dependabot (grupo `menores`). Si su CI pasa, mergearlo.
+
+**Cómo actualizar:**
+
+- Versiones exactas, sin `^` (`pnpm add -E <paquete>@<versión>`).
+- pnpm no instala versiones publicadas hace menos de un día (`minimumReleaseAge`). Si avisa que agregó entradas a `minimumReleaseAgeExclude` en `pnpm-workspace.yaml`, deshacer ese cambio y usar la versión anterior. No saltear el filtro: protege contra paquetes comprometidos recién publicados.
+- Si la vulnerabilidad está en una dependencia indirecta y el paquete que la trae todavía no la actualizó, fijarla con `overrides` en `pnpm-workspace.yaml`, con un comentario que diga cuándo quitarla. Hoy hay una: `dompurify` 3.4.17 (llega con `posthog-js`).
+- Después: `pnpm lint`, `pnpm typecheck`, `pnpm test` y `pnpm build`, y la CI completa con e2e.
+- Solo una tarea abierta a la vez puede tocar `package.json` y `pnpm-lock.yaml` (ver "Dos orquestadores" en `.claude/labia/protocolo.md`).
+
+**Paquetes frenados a propósito:**
+
+| Paquete                                         | Frenado en  | Por qué                                                                               | Tarea  |
+| ----------------------------------------------- | ----------- | ------------------------------------------------------------------------------------- | ------ |
+| `@axe-core/playwright`                          | 4.13.0      | La 4.14 exige arreglos de accesibilidad en la interfaz, que se rehace después del MVP | LAB-64 |
+| `eslint`, `typescript`, `jsdom`, `supabase` CLI | 9, 6, 30, 2 | Saltos de versión mayor, sin avisos de seguridad                                      | LAB-66 |
+
+**Si producción corre una versión vulnerable y el arreglo tarda:** revertir no sirve (la versión anterior tiene la misma falla). Priorizar el PR de actualización por encima de todo lo demás.
