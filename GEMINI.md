@@ -1,6 +1,6 @@
 # GEMINI.md · LabÍA
 
-Contexto para Gemini CLI cuando sigue el desarrollo de LabÍA en lugar de Claude Code. `AGENTS.md` (cargado junto con
+Contexto para Gemini cuando orquesta el desarrollo de LabÍA **a la par** de Claude Code. `AGENTS.md` (cargado junto con
 este archivo por `.gemini/settings.json`) tiene el producto, el stack, las convenciones y la definición de terminado.
 Este archivo agrega **cómo trabajar** y **dónde quedó todo**.
 
@@ -13,22 +13,19 @@ Este archivo agrega **cómo trabajar** y **dónde quedó todo**.
 4. `docs/prototipo/` (empezá por su `README.md`): toda pantalla se construye igual al prototipo, con tokens, nunca hex sueltos.
 5. Estado, contexto y decisiones del proyecto (documento único de traspaso): @docs/traspaso-agentes.md
 
-## Flujo por tarea (sin subagentes: hacés las fases vos, en orden)
+## Flujo por tarea (orquestás subagentes)
 
-Claude Code orquestaba un agente por rol. Vos hacés las mismas fases en secuencia; en cada una, releé el archivo del rol
-y cumplilo como si fueras ese agente. No te saltees fases ni te apruebes en la misma pasada en que construiste.
+Hay dos orquestadores: Claude Code y vos. El reparto y las reglas para no pisarse están en la sección
+"Dos orquestadores" de `.claude/labia/protocolo.md`. Lo esencial:
 
-1. **Construir** (`.claude/agents/labia-fullstack.md`; para SQL puro `labia-db.md`, para diseño `labia-ui.md`,
-   para infra `labia-infra.md`). Verificá que los `blockedBy` estén en Done. Rama `lab-<n>-<slug>` desde `origin/main`.
-2. **Seguridad** (`labia-seguridad.md`) si la tarea tiene etiqueta Seguridad o Base de datos, o toca migraciones, RLS,
-   Storage, auth, `/admin`, la service role o datos personales. Leé el diff completo como revisor externo.
-3. **E2E** (`labia-e2e.md`) si agrega o cambia un flujo de usuario: Playwright a 390 y 1440, claro y oscuro, teclado y axe.
-4. **Revisión** (`labia-revisor.md`) contra la definición de terminado y el prototipo.
-5. **Integración** (`labia-integrador.md`): actualizar con `main`, CI en verde, `gh pr merge <n> --squash`, tarea en Done.
-   Emanuel dio autorización permanente para mergear lo que pase las fases 2 a 4. Mergeá de a un PR por vez.
-
-Si una fase encuentra problemas, volvé a la 1, corregí y repetí desde la fase que falló. Máximo 3 vueltas; después
-frená y preguntale a Emanuel.
+- Tomás solo las tareas de Linear con la etiqueta **`Orq: Gemini`**. Las de `Orq: Fable` son de Claude.
+- No construís ni revisás vos: lanzás un subagente por fase. Están en `.agents/plugins/labia/agents/` y usan las
+  mismas instrucciones que los de Claude (`.claude/agents/labia-*.md`).
+- El recorrido completo está en la skill `labia-tarea` (`.agents/skills/labia-tarea/SKILL.md`): constructor →
+  `labia-seguridad` → `labia-e2e` → `labia-revisor` → `labia-integrador`.
+- Cada tarea en su worktree y su rama. Se mergea de a un PR por vez. Solo una tarea abierta a la vez toca
+  `package.json` y `pnpm-lock.yaml`.
+- Nunca revisa el mismo subagente que construyó. Máximo 3 vueltas de corrección; después frená y preguntale a Emanuel.
 
 ## Lecciones aprendidas (no las repitas)
 

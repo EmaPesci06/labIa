@@ -35,6 +35,18 @@ constructor (labia-infra | labia-db | labia-ui | labia-fullstack)  → In Review
 
 Solo `labia-integrador` mergea a `main`, y solo con autorización de Emanuel. Lo orquesta la sesión principal con `/labia-tarea`.
 
+## Dos orquestadores
+
+Hay dos orquestadores trabajando a la par: Claude Code (`/labia-tarea`) y Gemini (skill `labia-tarea` de `.agents/`). Los dos usan los mismos roles y este mismo protocolo.
+
+- **Reparto por etiqueta de Linear.** Claude toma solo las tareas con `Orq: Fable`; Gemini, solo las de `Orq: Gemini`. Una tarea sin ninguna de las dos no se toma: se le avisa a Emanuel.
+- **Una tarea, un worktree, una rama** `lab-<n>-<slug>`. Nadie trabaja en el checkout principal mientras el otro orquestador esté activo.
+- **Se mergea de a un PR por vez.** Antes de mergear, `gh pr list --state open` y actualizar la rama con `main`. Si el otro orquestador está mergeando, se espera.
+- **Dependencias:** solo una tarea abierta a la vez puede tocar `package.json` y `pnpm-lock.yaml`. Si hay otro PR abierto que los toca, esperá a que se mergee.
+- **Migraciones:** el timestamp tiene que ser posterior a la última de `main` y a las de todos los PR abiertos, de los dos orquestadores.
+- **Revisión cruzada.** El PR que construyó un orquestador lo revisan `labia-seguridad` y `labia-revisor` del otro, cuando el otro está disponible. Si no lo está, lo revisa el mismo orquestador con un subagente nuevo, nunca el que construyó.
+- **Firma.** Cada orquestador firma commits y PR con su propio modelo, así se ve quién hizo qué.
+
 ## Antes de empezar (constructores)
 
 1. `get_issue` con `includeRelations: true`. Si algún `blockedBy` no está en `Done`, **no arranques**: devolvé "BLOQUEADA por LAB-x" y terminá.
