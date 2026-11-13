@@ -142,9 +142,10 @@ test.describe("registro de profesional · formulario completo", () => {
     await page.getByRole("button", { name: "Quitar foto de trabajo 2" }).click();
     await expect(page.getByText("2 de 10 fotos")).toBeVisible();
 
-    // 12 archivos de golpe: entran solo los que caben y se avisa.
+    // 12 archivos de golpe: entran solo los que caben y se avisa. Las 8 que entran se comprimen una por
+    // una en el navegador (canvas); medido en local tarda más de 5 s, así que el plazo por defecto no alcanza.
     await entrada.setInputFiles(Array.from({ length: 12 }, (_, i) => foto(i)));
-    await expect(page.getByText("10 de 10 fotos")).toBeVisible();
+    await expect(page.getByText("10 de 10 fotos")).toBeVisible({ timeout: 20_000 });
     await expect(page.getByText(/Podés subir hasta 10 fotos/)).toBeVisible();
     await expect(entrada).toBeDisabled();
   });
