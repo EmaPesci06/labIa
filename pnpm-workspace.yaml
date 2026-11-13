@@ -9,3 +9,7 @@ allowBuilds:
 
 # Versiones exactas en package.json (sin ^ ni ~).
 saveExact: true
+
+# Arreglos de seguridad transitivos (LAB-62). Quitar cuando posthog-js lo traiga solo.
+overrides:
+  dompurify: 3.4.17
