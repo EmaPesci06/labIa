@@ -16,6 +16,9 @@ updates:
     groups:
       menores:
         update-types: [minor, patch]
+    ignore:
+      # Fijo en 4.13.0 hasta rehacer la interfaz tras el MVP (LAB-64).
+      - dependency-name: "@axe-core/playwright"
 
   - package-ecosystem: github-actions
     directory: /
