@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Publicar un trabajo, modo oscuro</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;touch-action:manipulation}
+h1,h2{text-wrap:balance}
+a{color:#FFF3D6}a:hover{color:#45C4CC}
+:focus-visible{outline:3px solid #F7C948;outline-offset:2px}
+button:hover{filter:brightness(1.1)}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #0B2730; color: #FFF3D6; font-family: 'Nunito Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <header style="padding: 12px 20px 0">
+    <a href="Oscuro-Inicio.dc.html" style="min-height: 44px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-size: 15px; font-weight: 700"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 12H4M11 5l-7 7 7 7"></path></svg>Volver</a>
+    <h1 style="margin: 2px 0 0; font-family: 'Baloo 2', sans-serif; font-size: 38px; line-height: 1; font-weight: 800">Contanos qué pasó</h1>
+    <p style="margin: 6px 0 0; font-size: 16px">Lo ven los profesionales verificados de tu zona y te escriben ellos.</p>
+  </header>
+
+  <form style="flex: 1; margin: 0; padding: 16px 20px 0; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <label for="oficio" style="font-size: 16px; font-weight: 700">¿Qué oficio necesitás?</label>
+      <select id="oficio" style="height: 52px; padding: 0 14px; border: 2px solid #FFF3D6; border-radius: 16px; background: #0B2730; color: #FFF3D6; font: inherit; font-size: 17px"><option selected>Plomería</option><option>Gas</option><option>Electricidad</option></select>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <label for="que" style="font-size: 16px; font-weight: 700">Contalo con tus palabras</label>
+      <textarea id="que" rows="4" aria-describedby="que-error" aria-invalid="true" style="height: 116px; box-sizing: border-box; padding: 12px 14px; border: 3px solid #FF9A8F; border-radius: 16px; resize: none; background: #0B2730; color: #FFF3D6; font: inherit; font-size: 17px; line-height: 1.4">Pierde la canilla. Llamame al 223 555 0123.</textarea>
+      <span id="que-error" style="font-size: 15px; font-weight: 700; color: #FF9A8F">Sacá el teléfono: te escriben por WhatsApp desde la app.</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <label for="barrio" style="font-size: 16px; font-weight: 700">¿En qué barrio?</label>
+      <select id="barrio" style="height: 52px; padding: 0 14px; border: 2px solid #FFF3D6; border-radius: 16px; background: #0B2730; color: #FFF3D6; font: inherit; font-size: 17px"><option selected>La Perla</option><option>Centro</option><option>Chauvin</option></select>
+    </div>
+    <fieldset style="margin: 0; padding: 0; border: 0">
+      <legend style="padding: 0; margin-bottom: 6px; font-size: 16px; font-weight: 700">¿Para cuándo?</legend>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+        <label style="min-height: 50px; border-radius: 25px; background: #F7C948; color: #123B4A; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 15px; font-weight: 700"><input type="radio" name="cuando" checked style="width: 18px; height: 18px; margin: 0; accent-color: #123B4A">Hoy</label>
+        <label style="min-height: 50px; border-radius: 25px; background: #17485A; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 15px"><input type="radio" name="cuando" style="width: 18px; height: 18px; margin: 0; accent-color: #45C4CC">Esta semana</label>
+        <label style="min-height: 50px; border-radius: 25px; background: #17485A; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 15px"><input type="radio" name="cuando" style="width: 18px; height: 18px; margin: 0; accent-color: #45C4CC">Sin apuro</label>
+      </div>
+    </fieldset>
+    <button type="button" style="align-self: flex-start; min-height: 48px; padding: 0 18px; border: 3px dashed #FFF3D6; border-radius: 18px; background: transparent; color: #FFF3D6; font: inherit; font-size: 16px; font-weight: 700">Sumar una foto</button>
+  </form>
+
+  <footer style="padding: 12px 20px 18px; background: #17485A; border-radius: 28px 28px 0 0; display: flex; flex-direction: column; gap: 8px">
+    <button style="min-height: 56px; border: 0; border-radius: 18px; background: #45C4CC; color: #0B2730; font: inherit; font-size: 18px; font-weight: 700">Publicar el trabajo</button>
+    <p style="margin: 0; font-size: 14px; text-align: center">Lo reciben 8 plomeros verificados a menos de 5&nbsp;km.</p>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

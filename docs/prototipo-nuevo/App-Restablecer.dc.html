@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Restablecer la contraseña</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;touch-action:manipulation}
+h1,h2{text-wrap:balance}
+a{color:#123B4A}a:hover{color:#0E7C86}
+:focus-visible{outline:3px solid #123B4A;outline-offset:2px}
+button:hover{filter:brightness(0.95)}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FFF3D6; color: #123B4A; font-family: 'Nunito Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <span aria-hidden="true" style="height: 26px; background: repeating-linear-gradient(90deg, #0E7C86 0 26px, #FFFFFF 26px 52px)"></span>
+  <header style="padding: 12px 20px 0">
+    <a href="App-Ingresar.dc.html" style="min-height: 44px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-size: 15px; font-weight: 700"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 12H4M11 5l-7 7 7 7"></path></svg>Volver a ingresar</a>
+    <h1 style="margin: 10px 0 0; font-family: 'Baloo 2', sans-serif; font-size: 38px; line-height: 1; font-weight: 800">¿Te olvidaste la contraseña?</h1>
+    <p style="margin: 10px 0 0; font-size: 17px; line-height: 1.4">Pasa seguido. Decinos tu email y te mandamos un enlace para elegir una nueva.</p>
+  </header>
+
+  <form style="margin: 0; padding: 22px 20px 0; display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <label for="email" style="font-size: 16px; font-weight: 700">Email</label>
+      <input id="email" type="email" autocomplete="email" value="carla@ejemplo.com" style="height: 52px; box-sizing: border-box; padding: 0 14px; border: 2px solid #123B4A; border-radius: 16px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px">
+    </div>
+    <button style="min-height: 56px; border: 0; border-radius: 18px; background: #0E7C86; color: #FFFFFF; font: inherit; font-size: 18px; font-weight: 700">Mandarme el enlace</button>
+  </form>
+
+  <section aria-labelledby="n1" style="margin: 28px 20px 0; padding: 18px; border-radius: 22px; background: #FFFFFF; display: flex; flex-direction: column; gap: 14px">
+    <h2 id="n1" style="margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 22px; line-height: 1.1; font-weight: 800">Cuando abrís el enlace</h2>
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <label for="nueva" style="font-size: 16px; font-weight: 700">Contraseña nueva</label>
+      <input id="nueva" type="password" autocomplete="new-password" aria-describedby="nueva-ayuda" style="height: 52px; box-sizing: border-box; padding: 0 14px; border: 2px solid #123B4A; border-radius: 16px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px">
+      <span id="nueva-ayuda" style="font-size: 14px">Al menos 8 caracteres.</span>
+    </div>
+    <button style="min-height: 52px; border: 3px solid #123B4A; border-radius: 18px; background: transparent; color: #123B4A; font: inherit; font-size: 17px; font-weight: 700">Guardar y entrar</button>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

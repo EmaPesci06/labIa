@@ -79,6 +79,8 @@ Rutas en español sin acentos: `/`, `/ingresar`, `/registro`, `/registro/cliente
 - **Distancias:** una decimal con coma, `formatearDistancia` ("a 1,2 km").
 - **Imágenes:** comprimidas en el navegador (máx. 1600 px, calidad 0,8, máx. 2 MB), mostradas con `next/image`.
 - **Diseño:** colores, tipografías (Archivo, Atkinson Hyperlegible Next, IBM Plex Mono) y la cinta métrica en la guía §5.
+  **Se está reemplazando** por "Verano en la costa" (Fase 7): la referencia de toda pantalla nueva es
+  `docs/prototipo-nuevo/` (`README.md` y `CONSTRUCCION.md`). Esta línea y la de foco se actualizan en LAB-68.
 - **Sin** `console.log`, **sin** `any`, **sin** secretos en el repo. `.env.example` lista todas las variables sin valores.
 
 ## Seguridad (no negociable)

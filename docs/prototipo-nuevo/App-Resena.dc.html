@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Dejar una reseña</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;touch-action:manipulation}
+h1,h2{text-wrap:balance}
+a{color:#123B4A}a:hover{color:#0E7C86}
+:focus-visible{outline:3px solid #123B4A;outline-offset:2px}
+button:hover{filter:brightness(0.95)}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #123B4A; color: #123B4A; font-family: 'Nunito Sans', system-ui, sans-serif; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden">
+  <div aria-hidden="true" style="flex: 1; padding: 60px 20px 0; color: #7FA3AE; font-family: 'Baloo 2', sans-serif; font-size: 38px; font-weight: 800">Mis trabajos</div>
+
+  <form role="dialog" aria-modal="true" aria-labelledby="s1" style="margin: 0; padding: 10px 20px 18px; background: #FFF3D6; border-radius: 28px 28px 0 0; display: flex; flex-direction: column; gap: 16px">
+    <span aria-hidden="true" style="align-self: center; width: 48px; height: 5px; border-radius: 3px; background: #123B4A"></span>
+    <div>
+      <h1 id="s1" style="margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 30px; line-height: 1.05; font-weight: 800">¿Cómo te fue con Sofía?</h1>
+      <p style="margin: 4px 0 0; font-size: 15px">Pintar el frente · terminado hace 3 semanas</p>
+    </div>
+
+    <fieldset style="margin: 0; padding: 0; border: 0">
+      <legend style="padding: 0; margin-bottom: 8px; font-size: 16px; font-weight: 700">Tu puntaje</legend>
+      <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px">
+        <label style="height: 60px; border-radius: 18px; background: #F7C948; display: flex; align-items: center; justify-content: center; gap: 4px; font-family: 'Baloo 2', sans-serif; font-size: 24px; font-weight: 800"><input type="radio" name="p" aria-label="1 de 5" style="position: absolute; opacity: 0">1</label>
+        <label style="height: 60px; border-radius: 18px; background: #F7C948; display: flex; align-items: center; justify-content: center; gap: 4px; font-family: 'Baloo 2', sans-serif; font-size: 24px; font-weight: 800"><input type="radio" name="p" aria-label="2 de 5" style="position: absolute; opacity: 0">2</label>
+        <label style="height: 60px; border-radius: 18px; background: #F7C948; display: flex; align-items: center; justify-content: center; gap: 4px; font-family: 'Baloo 2', sans-serif; font-size: 24px; font-weight: 800"><input type="radio" name="p" aria-label="3 de 5" style="position: absolute; opacity: 0">3</label>
+        <label style="height: 60px; border-radius: 18px; background: #123B4A; color: #FFFFFF; display: flex; align-items: center; justify-content: center; gap: 4px; font-family: 'Baloo 2', sans-serif; font-size: 24px; font-weight: 800"><input type="radio" name="p" checked aria-label="4 de 5" style="position: absolute; opacity: 0">4</label>
+        <label style="height: 60px; border-radius: 18px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; gap: 4px; font-family: 'Baloo 2', sans-serif; font-size: 24px; font-weight: 800"><input type="radio" name="p" aria-label="5 de 5" style="position: absolute; opacity: 0">5</label>
+      </div>
+      <div aria-hidden="true" style="margin-top: 6px; display: flex; justify-content: space-between; font-size: 14px"><span>Mal</span><span>Excelente</span></div>
+    </fieldset>
+
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <label for="txt" style="font-size: 16px; font-weight: 700">Contale a los vecinos</label>
+      <textarea id="txt" rows="4" aria-describedby="txt-ayuda" style="height: 124px; box-sizing: border-box; padding: 12px 14px; border: 2px solid #123B4A; border-radius: 16px; resize: none; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px; line-height: 1.4">Prolija y puntual. Tardó un día más de lo que habíamos hablado.</textarea>
+      <span id="txt-ayuda" style="font-size: 14px">Se publica con tu nombre y tu barrio. No pongas teléfonos ni direcciones.</span>
+    </div>
+
+    <button style="min-height: 56px; border: 0; border-radius: 18px; background: #0E7C86; color: #FFFFFF; font: inherit; font-size: 18px; font-weight: 700">Publicar la reseña</button>
+    <a href="App-MisTrabajos.dc.html" style="align-self: center; min-height: 44px; display: flex; align-items: center; font-size: 16px; font-weight: 700">Más tarde</a>
+  </form>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

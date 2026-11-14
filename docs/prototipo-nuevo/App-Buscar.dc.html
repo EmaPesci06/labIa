@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Buscar profesionales</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;touch-action:manipulation}
+h1,h2{text-wrap:balance}
+a{color:#123B4A}a:hover{color:#0E7C86}
+:focus-visible{outline:3px solid #123B4A;outline-offset:2px}
+button:hover{filter:brightness(0.95)}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FFF3D6; color: #123B4A; font-family: 'Nunito Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <header style="padding: 12px 20px 18px; background: #0E7C86; color: #FFFFFF; border-radius: 0 0 28px 28px">
+    <a href="App-Inicio.dc.html" style="min-height: 44px; display: inline-flex; align-items: center; gap: 6px; color: #FFFFFF; text-decoration: none; font-size: 15px; font-weight: 700"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 12H4M11 5l-7 7 7 7"></path></svg>Volver al inicio</a>
+    <h1 style="margin: 0 0 12px; font-family: 'Baloo 2', sans-serif; font-size: 34px; line-height: 1; font-weight: 800">Plomería cerca de La Perla</h1>
+    <form style="margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+      <select aria-label="Oficio" style="height: 48px; padding: 0 12px; border: 0; border-radius: 24px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 16px; font-weight: 700"><option selected>Plomería</option><option>Gas</option><option>Electricidad</option><option>Cerrajería</option><option>Pintura</option><option>Carpintería</option><option>Mecánica</option></select>
+      <select aria-label="Distancia máxima" style="height: 48px; padding: 0 12px; border: 0; border-radius: 24px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 16px; font-weight: 700"><option>Hasta 2 km</option><option selected>Hasta 5 km</option><option>Hasta 10 km</option><option>Toda la ciudad</option></select>
+    </form>
+  </header>
+
+  <main style="flex: 1; padding: 14px 20px 0; display: flex; flex-direction: column; overflow: hidden">
+    <p style="margin: 0 0 10px; font-size: 15px">8 verificados, del más cercano al más lejano</p>
+    <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; font-variant-numeric: tabular-nums">
+      <li><a href="App-Perfil.dc.html" style="height: 96px; box-sizing: border-box; padding: 0 14px; border-radius: 22px; background: #FFFFFF; text-decoration: none; display: flex; align-items: center; gap: 14px"><span aria-hidden="true" style="width: 64px; height: 64px; flex: none; box-sizing: border-box; border-radius: 50%; background: #0E7C86; border: 4px solid #F7C948; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Baloo 2', sans-serif; font-size: 26px; font-weight: 800">M</span><span style="flex: 1; display: flex; flex-direction: column"><span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; line-height: 1.1; font-weight: 800">Marta R.</span><span style="font-size: 15px">Verificada · 4,8 en 23 reseñas</span></span><span style="padding: 6px 10px; border-radius: 14px; background: #F7C948; font-size: 15px; font-weight: 700">1,2&nbsp;km</span></a></li>
+      <li><a href="#" style="height: 96px; box-sizing: border-box; padding: 0 14px; border-radius: 22px; background: #FFFFFF; text-decoration: none; display: flex; align-items: center; gap: 14px"><span aria-hidden="true" style="width: 64px; height: 64px; flex: none; box-sizing: border-box; border-radius: 50%; background: #123B4A; border: 4px solid #F7C948; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Baloo 2', sans-serif; font-size: 26px; font-weight: 800">L</span><span style="flex: 1; display: flex; flex-direction: column"><span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; line-height: 1.1; font-weight: 800">Luis P.</span><span style="font-size: 15px">Verificado · 4,6 en 11 reseñas</span></span><span style="padding: 6px 10px; border-radius: 14px; background: #F7C948; font-size: 15px; font-weight: 700">2,4&nbsp;km</span></a></li>
+      <li><a href="#" style="height: 96px; box-sizing: border-box; padding: 0 14px; border-radius: 22px; background: #FFFFFF; text-decoration: none; display: flex; align-items: center; gap: 14px"><span aria-hidden="true" style="width: 64px; height: 64px; flex: none; box-sizing: border-box; border-radius: 50%; background: #0E7C86; border: 4px solid #F7C948; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Baloo 2', sans-serif; font-size: 26px; font-weight: 800">D</span><span style="flex: 1; display: flex; flex-direction: column"><span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; line-height: 1.1; font-weight: 800">Diego S.</span><span style="font-size: 15px">Verificado · 4,9 en 8 reseñas</span></span><span style="padding: 6px 10px; border-radius: 14px; background: #F7C948; font-size: 15px; font-weight: 700">3,1&nbsp;km</span></a></li>
+      <li><a href="#" style="height: 96px; box-sizing: border-box; padding: 0 14px; border-radius: 22px; background: #FFFFFF; text-decoration: none; display: flex; align-items: center; gap: 14px"><span aria-hidden="true" style="width: 64px; height: 64px; flex: none; box-sizing: border-box; border-radius: 50%; background: #123B4A; border: 4px solid #F7C948; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Baloo 2', sans-serif; font-size: 26px; font-weight: 800">A</span><span style="flex: 1; display: flex; flex-direction: column"><span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; line-height: 1.1; font-weight: 800">Ana G.</span><span style="font-size: 15px">Verificada · 4,7 en 15 reseñas</span></span><span style="padding: 6px 10px; border-radius: 14px; background: #F7C948; font-size: 15px; font-weight: 700">3,8&nbsp;km</span></a></li>
+    </ol>
+    <button style="margin-top: 12px; min-height: 48px; border: 3px solid #123B4A; border-radius: 18px; background: transparent; color: #123B4A; font: inherit; font-size: 16px; font-weight: 700">Ver más</button>
+    <a href="App-Publicar.dc.html" style="margin-top: 10px; min-height: 56px; box-sizing: border-box; padding: 0 16px; border: 3px dashed #123B4A; border-radius: 18px; text-decoration: none; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 15px; line-height: 1.25; font-weight: 700">¿No querés elegir? Publicá el trabajo y que te escriban</a>
+  </main>
+
+  <nav aria-label="Principal" style="height: 68px; box-sizing: border-box; padding: 0 12px 6px; background: #FFFFFF; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center">
+    <a href="App-Inicio.dc.html" aria-current="page" style="min-height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 16px; background: #FFF3D6; text-decoration: none; font-size: 15px; font-weight: 700">Inicio</a>
+    <a href="App-MisTrabajos.dc.html" style="min-height: 48px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 15px">Mis trabajos</a>
+    <a href="App-Cuenta.dc.html" style="min-height: 48px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 15px">Cuenta</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

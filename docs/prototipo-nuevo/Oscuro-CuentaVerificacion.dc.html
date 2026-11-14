@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Mi verificación, modo oscuro</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;touch-action:manipulation}
+h1,h2{text-wrap:balance}
+a{color:#FFF3D6}a:hover{color:#45C4CC}
+:focus-visible{outline:3px solid #F7C948;outline-offset:2px}
+button:hover{filter:brightness(1.1)}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #0B2730; color: #FFF3D6; font-family: 'Nunito Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <header style="padding: 12px 20px 0">
+    <a href="Oscuro-Cuenta.dc.html" style="min-height: 44px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-size: 15px; font-weight: 700"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 12H4M11 5l-7 7 7 7"></path></svg>Mi cuenta</a>
+    <h1 style="margin: 2px 0 0; font-family: 'Baloo 2', sans-serif; font-size: 38px; line-height: 1; font-weight: 800">Mi verificación</h1>
+    <p style="margin: 8px 0 0; font-size: 16px; line-height: 1.4">Subí de nuevo lo que haya sido rechazado. Solo lo ve nuestro equipo.</p>
+  </header>
+
+  <main style="flex: 1; padding: 16px 20px 0; display: flex; flex-direction: column; gap: 10px; overflow: hidden">
+    <div style="padding: 14px 16px; border-radius: 20px; background: #17485A; display: flex; align-items: center; gap: 12px">
+      <svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#45C4CC" stroke-width="3.5" style="flex: none"><path d="M4 12l5 5L20 6"></path></svg>
+      <span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 17px; font-weight: 700">DNI, frente y dorso</span><span style="font-size: 14px">Aprobado</span></span>
+    </div>
+    <div style="padding: 14px 16px; border: 3px solid #FF9A8F; border-radius: 20px; background: #17485A; display: flex; flex-direction: column; gap: 8px">
+      <span style="font-size: 17px; font-weight: 700">Certificado de antecedentes</span>
+      <span style="font-size: 15px; font-weight: 700; color: #FF9A8F">Rechazado: certificado vencido (más de 90 días)</span>
+      <span style="font-size: 15px; line-height: 1.4">Pedí uno nuevo y subilo acá. Tiene que estar emitido en los últimos 90 días.</span>
+      <button style="min-height: 50px; border: 0; border-radius: 16px; background: #F7C948; color: #123B4A; font: inherit; font-size: 16px; font-weight: 700">Subir el certificado nuevo</button>
+    </div>
+    <div style="padding: 14px 16px; border-radius: 20px; background: #F7C948; color: #123B4A; display: flex; align-items: center; gap: 12px">
+      <span aria-hidden="true" style="width: 14px; height: 14px; flex: none; margin: 0 6px; border-radius: 50%; background: #0B2730; color: #FFF3D6"></span>
+      <span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 17px; font-weight: 700">Matrícula de gasista</span><span style="font-size: 14px">En revisión desde hace 1 día</span></span>
+    </div>
+
+    <section aria-labelledby="v2" style="margin-top: 6px; padding: 14px 16px; border-radius: 20px; background: #17485A">
+      <h2 id="v2" style="margin: 0 0 4px; font-family: 'Baloo 2', sans-serif; font-size: 20px; font-weight: 800">Mientras tanto</h2>
+      <p style="margin: 0; font-size: 15px; line-height: 1.4">Tu perfil no aparece en las búsquedas y no podés postularte. Apenas aprobemos lo que falta, se publica solo y te avisamos por email.</p>
+    </section>
+    <p style="margin: 0; font-size: 14px; line-height: 1.4">Los archivos ya subidos no se pueden volver a ver ni descargar, ni siquiera desde tu cuenta.</p>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

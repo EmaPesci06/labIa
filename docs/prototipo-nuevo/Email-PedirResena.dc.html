@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Email: dejá tu reseña</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+h1,h2{text-wrap:balance}
+a{color:#123B4A}a:hover{color:#0E7C86}
+:focus-visible{outline:3px solid #123B4A;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 600px; height: 760px; box-sizing: border-box; padding: 24px; background: #FFF3D6; color: #123B4A; font-family: 'Nunito Sans', system-ui, sans-serif; display: flex; flex-direction: column; gap: 16px">
+  <span translate="no" style="align-self: center; font-family: 'Baloo 2', sans-serif; font-size: 30px; line-height: 1; font-weight: 800; color: #0E7C86">LabÍA</span>
+
+  <div style="flex: 1; border-radius: 28px; overflow: hidden; background: #FFFFFF; display: flex; flex-direction: column">
+    <span aria-hidden="true" style="height: 18px; flex: none; background: repeating-linear-gradient(90deg, #0E7C86 0 18px, #FFFFFF 18px 36px)"></span>
+    <div style="padding: 24px 32px 20px; background: #0E7C86; color: #FFFFFF">
+      <h1 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 40px; line-height: 0.98; font-weight: 800">¿Cómo te fue con Marta?</h1>
+      <p style="margin: 8px 0 0; font-size: 18px; line-height: 1.4">Carla, tu trabajo ya está terminado.</p>
+    </div>
+
+    <div style="flex: 1; padding: 24px 32px; display: flex; flex-direction: column; gap: 16px">
+      <div style="padding: 14px 20px; border-radius: 20px; background: #FFF3D6; display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 15px">Plomería · La Perla</span>
+        <span style="font-family: 'Baloo 2', sans-serif; font-size: 24px; line-height: 1.15; font-weight: 800">Pierde la canilla de la cocina</span>
+        <span style="font-size: 16px; line-height: 1.4">Lo hizo Marta R.</span>
+      </div>
+      <p style="margin: 0; font-size: 17px; line-height: 1.5">Tu opinión ayuda a otras personas a elegir bien y a los buenos profesionales a conseguir más trabajo. Lleva un minuto.</p>
+      <a href="#" style="min-height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 18px; background: #0E7C86; color: #FFFFFF; text-decoration: none; font-size: 19px; font-weight: 700">Dejar mi reseña</a>
+    </div>
+  </div>
+
+  <p style="margin: 0; text-align: center; font-size: 14px; line-height: 1.5">Te escribimos porque elegiste a Marta para este trabajo.<br><a href="#">Elegir qué emails recibo</a> · LabÍA, Mar del Plata</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":600,"height":760}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

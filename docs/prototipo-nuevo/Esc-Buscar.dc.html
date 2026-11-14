@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Buscar profesionales en escritorio</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+h1,h2{text-wrap:balance}
+a{color:#123B4A}a:hover{color:#0E7C86}
+:focus-visible{outline:3px solid #123B4A;outline-offset:2px}
+button:hover{filter:brightness(0.95)}
+</style>
+</helmet>
+<div style="min-height: 900px; box-sizing: border-box; background: #FFF3D6; color: #123B4A; font-family: 'Nunito Sans', system-ui, sans-serif; display: flex; flex-direction: column">
+  <header style="background: #FFFFFF">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 10px 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 28px">
+      <span translate="no" style="font-family: 'Baloo 2', sans-serif; font-size: 32px; font-weight: 800; color: #0E7C86">LabÍA</span>
+      <nav aria-label="Principal" style="flex: 1; display: flex; flex-wrap: wrap; gap: 4px">
+        <a href="App-Escritorio.dc.html" aria-current="page" style="min-height: 44px; padding: 0 16px; display: flex; align-items: center; border-radius: 22px; background: #FFF3D6; text-decoration: none; font-size: 16px; font-weight: 700">Inicio</a>
+        <a href="Esc-MiTrabajo.dc.html" style="min-height: 44px; padding: 0 16px; display: flex; align-items: center; text-decoration: none; font-size: 16px">Mis trabajos</a>
+        <a href="#" style="min-height: 44px; padding: 0 16px; display: flex; align-items: center; text-decoration: none; font-size: 16px">Cuenta</a>
+      </nav>
+      <button style="min-height: 44px; padding: 0 18px; border: 2px solid #123B4A; border-radius: 22px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 15px; font-weight: 700">Estás en La Perla</button>
+      <a href="#" style="min-height: 44px; padding: 0 20px; display: flex; align-items: center; border-radius: 22px; background: #0E7C86; color: #FFFFFF; text-decoration: none; font-size: 15px; font-weight: 700">Publicar un trabajo</a>
+    </div>
+  </header>
+
+  <section aria-labelledby="b1" style="background: #0E7C86; color: #FFFFFF; border-radius: 0 0 40px 40px">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 20px 32px 32px">
+      <a href="App-Escritorio.dc.html" style="min-height: 44px; display: inline-flex; align-items: center; gap: 6px; color: #FFFFFF; text-decoration: none; font-size: 15px; font-weight: 700"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 12H4M11 5l-7 7 7 7"></path></svg>Volver al inicio</a>
+      <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 40px">
+        <h1 id="b1" style="margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 3.5rem; line-height: 1; font-weight: 800">Plomería cerca de La Perla</h1>
+        <form style="margin: 0; display: flex; flex-wrap: wrap; gap: 10px">
+          <select aria-label="Oficio" style="height: 52px; min-width: 190px; padding: 0 16px; border: 0; border-radius: 26px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px; font-weight: 700"><option selected>Plomería</option><option>Gas</option><option>Electricidad</option><option>Cerrajería</option><option>Pintura</option><option>Carpintería</option><option>Mecánica</option></select>
+          <select aria-label="Distancia máxima" style="height: 52px; min-width: 190px; padding: 0 16px; border: 0; border-radius: 26px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px; font-weight: 700"><option>Hasta 2 km</option><option selected>Hasta 5 km</option><option>Hasta 10 km</option><option>Toda la ciudad</option></select>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <div style="max-width: 1200px; width: 100%; box-sizing: border-box; margin: 0 auto; padding: 28px 32px 48px; display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start">
+    <main style="flex: 999 1 560px; min-width: 0">
+      <p style="margin: 0 0 14px; font-size: 16px">8 verificados, del más cercano al más lejano</p>
+      <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; font-variant-numeric: tabular-nums">
+        <li><a href="Esc-Perfil.dc.html" style="min-height: 112px; box-sizing: border-box; padding: 16px 20px; border-radius: 22px; background: #FFFFFF; text-decoration: none; display: flex; align-items: center; gap: 18px"><span aria-hidden="true" style="width: 76px; height: 76px; flex: none; box-sizing: border-box; border-radius: 50%; background: #0E7C86; border: 4px solid #F7C948; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Baloo 2', sans-serif; font-size: 30px; font-weight: 800">M</span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Baloo 2', sans-serif; font-size: 26px; line-height: 1.1; font-weight: 800">Marta R.</span><span style="font-size: 15px; font-weight: 700">Verificada · 4,8 en 23 reseñas</span><span style="font-size: 16px">Pérdidas, destapaciones, termotanques y cambio de cañerías.</span></span><span style="flex: none; padding: 8px 14px; border-radius: 16px; background: #F7C948; font-size: 17px; font-weight: 700">a 1,2&nbsp;km</span></a></li>
+        <li><a href="#" style="min-height: 112px; box-sizing: border-box; padding: 16px 20px; border-radius: 22px; background: #FFFFFF; text-decoration: none; display: flex; align-items: center; gap: 18px"><span aria-hidden="true" style="width: 76px; height: 76px; flex: none; box-sizing: border-box; border-radius: 50%; background: #123B4A; border: 4px solid #F7C948; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Baloo 2', sans-serif; font-size: 30px; font-weight: 800">L</span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Baloo 2', sans-serif; font-size: 26px; line-height: 1.1; font-weight: 800">Luis P.</span><span style="font-size: 15px; font-weight: 700">Verificado · 4,6 en 11 reseñas</span><span style="font-size: 16px">Instalaciones de baño y cocina, bombas y tanques.</span></span><span style="flex: none; padding: 8px 14px; border-radius: 16px; background: #F7C948; font-size: 17px; font-weight: 700">a 2,4&nbsp;km</span></a></li>
+        <li><a href="#" style="min-height: 112px; box-sizing: border-box; padding: 16px 20px; border-radius: 22px; background: #FFFFFF; text-decoration: none; display: flex; align-items: center; gap: 18px"><span aria-hidden="true" style="width: 76px; height: 76px; flex: none; box-sizing: border-box; border-radius: 50%; background: #0E7C86; border: 4px solid #F7C948; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Baloo 2', sans-serif; font-size: 30px; font-weight: 800">D</span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Baloo 2', sans-serif; font-size: 26px; line-height: 1.1; font-weight: 800">Diego S.</span><span style="font-size: 15px; font-weight: 700">Verificado · 4,9 en 8 reseñas</span><span style="font-size: 16px">Destapaciones con máquina y arreglos de urgencia.</span></span><span style="flex: none; padding: 8px 14px; border-radius: 16px; background: #F7C948; font-size: 17px; font-weight: 700">a 3,1&nbsp;km</span></a></li>
+        <li><a href="#" style="min-height: 112px; box-sizing: border-box; padding: 16px 20px; border-radius: 22px; background: #FFFFFF; text-decoration: none; display: flex; align-items: center; gap: 18px"><span aria-hidden="true" style="width: 76px; height: 76px; flex: none; box-sizing: border-box; border-radius: 50%; background: #123B4A; border: 4px solid #F7C948; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Baloo 2', sans-serif; font-size: 30px; font-weight: 800">A</span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-family: 'Baloo 2', sans-serif; font-size: 26px; line-height: 1.1; font-weight: 800">Ana G.</span><span style="font-size: 15px; font-weight: 700">Verificada · 4,7 en 15 reseñas</span><span style="font-size: 16px">Griferías, cañerías de termofusión y calefones.</span></span><span style="flex: none; padding: 8px 14px; border-radius: 16px; background: #F7C948; font-size: 17px; font-weight: 700">a 3,8&nbsp;km</span></a></li>
+      </ol>
+      <button style="margin-top: 16px; width: 100%; min-height: 52px; border: 3px solid #123B4A; border-radius: 18px; background: transparent; color: #123B4A; font: inherit; font-size: 17px; font-weight: 700">Ver los 4 que faltan</button>
+    </main>
+
+    <aside style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+      <section aria-labelledby="b2" style="padding: 24px; border: 3px dashed #123B4A; border-radius: 28px; display: flex; flex-direction: column; gap: 10px">
+        <h2 id="b2" style="margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.75rem; line-height: 1.1; font-weight: 800">¿No querés elegir?</h2>
+        <p style="margin: 0; font-size: 16px; line-height: 1.45">Contá qué se rompió y que te escriban los plomeros que pueden ir.</p>
+        <a href="#" style="min-height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 18px; background: #0E7C86; color: #FFFFFF; text-decoration: none; font-size: 17px; font-weight: 700">Publicar el trabajo</a>
+      </section>
+      <section aria-labelledby="b3" style="padding: 24px; border-radius: 28px; background: #FFFFFF; display: flex; flex-direction: column; gap: 8px">
+        <h2 id="b3" style="margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.4rem; line-height: 1.1; font-weight: 800">Qué quiere decir “verificado”</h2>
+        <p style="margin: 0; font-size: 16px; line-height: 1.45">Revisamos su documento y su certificado de antecedentes antes de mostrarlo. A los gasistas, además, la matrícula.</p>
+        <p style="margin: 0; font-size: 16px; line-height: 1.45">La distancia es desde el centro de tu barrio: nunca te pedimos la dirección.</p>
+      </section>
+    </aside>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

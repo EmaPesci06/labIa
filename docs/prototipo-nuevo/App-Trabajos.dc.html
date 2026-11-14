@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Trabajos para vos</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;touch-action:manipulation}
+h1,h2{text-wrap:balance}
+a{color:#123B4A}a:hover{color:#0E7C86}
+:focus-visible{outline:3px solid #123B4A;outline-offset:2px}
+button:hover{filter:brightness(0.95)}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FFF3D6; color: #123B4A; font-family: 'Nunito Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <header style="padding: 18px 20px 16px; background: #F7C948; border-radius: 0 0 28px 28px">
+    <h1 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 38px; line-height: 1; font-weight: 800">Trabajos para vos</h1>
+    <p style="margin: 6px 0 12px; font-size: 16px">Plomería y gas, cerca de La Perla.</p>
+    <div role="group" aria-label="Filtrar por oficio" style="display: flex; gap: 8px">
+      <button aria-pressed="true" style="min-height: 44px; padding: 0 16px; border: 0; border-radius: 22px; background: #123B4A; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 700">Todos</button>
+      <button aria-pressed="false" style="min-height: 44px; padding: 0 16px; border: 0; border-radius: 22px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 15px">Plomería</button>
+      <button aria-pressed="false" style="min-height: 44px; padding: 0 16px; border: 0; border-radius: 22px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 15px">Gas</button>
+    </div>
+  </header>
+
+  <main style="flex: 1; padding: 14px 20px 0; display: flex; flex-direction: column; gap: 10px; overflow: hidden">
+    <a href="App-TrabajoDetalle.dc.html" style="padding: 14px 16px; border-radius: 22px; background: #FFFFFF; text-decoration: none; display: flex; flex-direction: column; gap: 4px">
+      <span style="display: flex; justify-content: space-between; align-items: center; font-size: 14px"><span>Plomería · La Perla · hace 20 min</span><span style="padding: 4px 10px; border-radius: 12px; background: #123B4A; color: #FFFFFF; font-weight: 700">Para hoy</span></span>
+      <span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; line-height: 1.1; font-weight: 800">Pierde la canilla de la cocina</span>
+      <span style="font-size: 15px; font-variant-numeric: tabular-nums">A 1,2&nbsp;km · 1 postulación</span>
+    </a>
+    <a href="#" style="padding: 14px 16px; border-radius: 22px; background: #FFFFFF; text-decoration: none; display: flex; flex-direction: column; gap: 4px">
+      <span style="display: flex; justify-content: space-between; align-items: center; font-size: 14px"><span>Gas · Centro · hace 2 h</span><span style="padding: 4px 10px; border-radius: 12px; background: #FFF3D6; font-weight: 700">Esta semana</span></span>
+      <span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; line-height: 1.1; font-weight: 800">Instalar un calefón nuevo</span>
+      <span style="font-size: 15px; font-variant-numeric: tabular-nums">A 2,9&nbsp;km · Sin postulaciones todavía</span>
+    </a>
+    <a href="#" style="padding: 14px 16px; border-radius: 22px; background: #FFFFFF; text-decoration: none; display: flex; flex-direction: column; gap: 4px">
+      <span style="display: flex; justify-content: space-between; align-items: center; font-size: 14px"><span>Plomería · Chauvin · ayer</span><span style="padding: 4px 10px; border-radius: 12px; background: #FFF3D6; font-weight: 700">Sin apuro</span></span>
+      <span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; line-height: 1.1; font-weight: 800">Cambiar la mochila del inodoro</span>
+      <span style="font-size: 15px; font-variant-numeric: tabular-nums">A 3,4&nbsp;km · 3 postulaciones</span>
+    </a>
+    <a href="#" style="padding: 14px 16px; border-radius: 22px; background: #FFFFFF; text-decoration: none; display: flex; flex-direction: column; gap: 4px">
+      <span style="display: flex; justify-content: space-between; align-items: center; font-size: 14px"><span>Plomería · Los Troncos · ayer</span><span style="padding: 4px 10px; border-radius: 12px; background: #FFF3D6; font-weight: 700">Esta semana</span></span>
+      <span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; line-height: 1.1; font-weight: 800">Humedad debajo de la bacha</span>
+      <span style="font-size: 15px; font-variant-numeric: tabular-nums">A 4,1&nbsp;km · 2 postulaciones</span>
+    </a>
+    <button style="min-height: 48px; border: 3px solid #123B4A; border-radius: 18px; background: transparent; color: #123B4A; font: inherit; font-size: 16px; font-weight: 700">Ver más</button>
+  </main>
+
+  <nav aria-label="Principal" style="height: 68px; box-sizing: border-box; padding: 0 12px 6px; background: #FFFFFF; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center">
+    <a href="#" aria-current="page" style="min-height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 16px; background: #FFF3D6; text-decoration: none; font-size: 15px; font-weight: 700">Trabajos</a>
+    <a href="App-Postulaciones.dc.html" style="min-height: 48px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 15px">Postulaciones</a>
+    <a href="App-Cuenta.dc.html" style="min-height: 48px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 15px">Cuenta</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

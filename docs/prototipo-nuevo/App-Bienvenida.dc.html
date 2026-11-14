@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Bienvenida</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;touch-action:manipulation}
+h1,h2{text-wrap:balance}
+a{color:#123B4A}a:hover{color:#0E7C86}
+:focus-visible{outline:3px solid #123B4A;outline-offset:2px}
+button:hover{filter:brightness(0.95)}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #0E7C86; color: #FFFFFF; font-family: 'Nunito Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <span aria-hidden="true" style="height: 26px; background: repeating-linear-gradient(90deg, #FFFFFF 0 26px, #F7C948 26px 52px)"></span>
+  <header style="padding: 12px 20px 0; display: flex; justify-content: space-between; align-items: center">
+    <span translate="no" style="font-family: 'Baloo 2', sans-serif; font-size: 32px; font-weight: 800">LabÍA</span>
+    <a href="App-Ingresar.dc.html" style="min-height: 44px; padding: 0 16px; display: flex; align-items: center; border: 2px solid #FFFFFF; border-radius: 22px; color: #FFFFFF; text-decoration: none; font-size: 15px; font-weight: 700">Ingresar</a>
+  </header>
+
+  <main style="flex: 1; padding: 22px 20px 0; display: flex; flex-direction: column">
+    <span style="font-size: 15px; font-weight: 700; letter-spacing: 0.08em">MAR DEL PLATA</span>
+    <h1 style="margin: 6px 0 0; font-family: 'Baloo 2', sans-serif; font-size: 50px; line-height: 0.98; font-weight: 800">Oficios de confianza, cerca tuyo.</h1>
+    <p style="margin: 14px 0 0; font-size: 18px; line-height: 1.4">Todos con identidad y antecedentes verificados.</p>
+  </main>
+
+  <section aria-label="Crear cuenta" style="padding: 22px 20px 16px; background: #FFF3D6; color: #123B4A; border-radius: 28px 28px 0 0; display: flex; flex-direction: column; gap: 12px">
+    <a href="App-RegistroCliente.dc.html" style="padding: 16px 18px; border-radius: 22px; background: #FFFFFF; text-decoration: none; display: flex; flex-direction: column; gap: 4px">
+      <span style="font-family: 'Baloo 2', sans-serif; font-size: 24px; line-height: 1.1; font-weight: 800">Necesito un profesional</span>
+      <span style="font-size: 16px; line-height: 1.35">Buscá profesionales o publicá un trabajo y que ellos te escriban.</span>
+    </a>
+    <a href="App-ProPerfil.dc.html" style="padding: 16px 18px; border-radius: 22px; background: #F7C948; text-decoration: none; display: flex; flex-direction: column; gap: 4px">
+      <span style="font-family: 'Baloo 2', sans-serif; font-size: 24px; line-height: 1.1; font-weight: 800">Ofrezco mis servicios</span>
+      <span style="font-size: 16px; line-height: 1.35">Mostrá tu oficio, conseguí clientes y postulate a trabajos de tu zona.</span>
+    </a>
+    <a href="App-Inicio.dc.html" style="min-height: 48px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700">Primero quiero mirar</a>
+    <nav aria-label="Legales" style="display: flex; justify-content: center; gap: 20px; font-size: 14px">
+      <a href="App-Normas.dc.html" style="min-height: 44px; display: flex; align-items: center">Normas</a>
+      <a href="App-Legal.dc.html" style="min-height: 44px; display: flex; align-items: center">Términos</a>
+      <a href="App-Legal.dc.html" style="min-height: 44px; display: flex; align-items: center">Privacidad</a>
+    </nav>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

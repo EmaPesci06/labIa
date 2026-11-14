@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Registro de cliente</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;touch-action:manipulation}
+h1,h2{text-wrap:balance}
+a{color:#123B4A}a:hover{color:#0E7C86}
+:focus-visible{outline:3px solid #123B4A;outline-offset:2px}
+button:hover{filter:brightness(0.95)}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FFF3D6; color: #123B4A; font-family: 'Nunito Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <span aria-hidden="true" style="height: 26px; background: repeating-linear-gradient(90deg, #0E7C86 0 26px, #FFFFFF 26px 52px)"></span>
+  <header style="padding: 8px 20px 0">
+    <a href="App-Bienvenida.dc.html" style="min-height: 44px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-size: 15px; font-weight: 700"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 12H4M11 5l-7 7 7 7"></path></svg>Volver</a>
+    <h1 style="margin: 2px 0 0; font-family: 'Baloo 2', sans-serif; font-size: 36px; line-height: 1; font-weight: 800">Creá tu cuenta</h1>
+  </header>
+
+  <form style="flex: 1; margin: 0; padding: 14px 20px 0; display: flex; flex-direction: column; gap: 12px; overflow: hidden">
+    <button type="button" style="min-height: 52px; border: 2px solid #123B4A; border-radius: 18px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px; font-weight: 700">Seguir con Google</button>
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <label for="nombre" style="font-size: 16px; font-weight: 700">Nombre</label>
+      <input id="nombre" type="text" autocomplete="given-name" value="Carla" style="height: 50px; box-sizing: border-box; padding: 0 14px; border: 2px solid #123B4A; border-radius: 16px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px">
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <label for="email" style="font-size: 16px; font-weight: 700">Email</label>
+      <input id="email" type="email" autocomplete="email" value="carla@ejemplo.com" style="height: 50px; box-sizing: border-box; padding: 0 14px; border: 2px solid #123B4A; border-radius: 16px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px">
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <label for="pass" style="font-size: 16px; font-weight: 700">Contraseña</label>
+      <input id="pass" type="password" autocomplete="new-password" aria-describedby="pass-ayuda" style="height: 50px; box-sizing: border-box; padding: 0 14px; border: 2px solid #123B4A; border-radius: 16px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px">
+      <span id="pass-ayuda" style="font-size: 14px">Al menos 8 caracteres.</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <label for="wa" style="font-size: 16px; font-weight: 700">Tu WhatsApp</label>
+      <input id="wa" type="tel" autocomplete="tel" placeholder="223 555 0123" aria-describedby="wa-ayuda" style="height: 50px; box-sizing: border-box; padding: 0 14px; border: 2px solid #123B4A; border-radius: 16px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px">
+      <span id="wa-ayuda" style="font-size: 14px">Lo ven solo los profesionales que elijas.</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <label for="barrio" style="font-size: 16px; font-weight: 700">Tu barrio</label>
+      <select id="barrio" aria-describedby="barrio-ayuda" style="height: 50px; padding: 0 14px; border: 2px solid #123B4A; border-radius: 16px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px"><option selected>La Perla</option><option>Centro</option><option>Chauvin</option><option>Los Troncos</option><option>Punta Mogotes</option></select>
+      <span id="barrio-ayuda" style="font-size: 14px">Nunca te pedimos la dirección.</span>
+    </div>
+    <label style="min-height: 44px; display: flex; align-items: center; gap: 12px; font-size: 15px; line-height: 1.3"><input type="checkbox" style="width: 24px; height: 24px; flex: none; margin: 0; accent-color: #0E7C86"><span>Soy mayor de 18 y acepto los <a href="App-Legal.dc.html">términos</a> y la <a href="App-Legal.dc.html">privacidad</a>.</span></label>
+  </form>
+
+  <footer style="padding: 10px 20px 14px; display: flex; flex-direction: column">
+    <button style="min-height: 56px; border: 0; border-radius: 18px; background: #0E7C86; color: #FFFFFF; font: inherit; font-size: 18px; font-weight: 700">Crear cuenta</button>
+    <a href="App-ProPerfil.dc.html" style="align-self: center; min-height: 44px; display: flex; align-items: center; font-size: 15px; font-weight: 700">¿Ofrecés un oficio? Registrate como profesional</a>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

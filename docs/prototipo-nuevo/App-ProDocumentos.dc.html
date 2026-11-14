@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Registro profesional, paso 2: tus documentos</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;touch-action:manipulation}
+h1,h2{text-wrap:balance}
+a{color:#123B4A}a:hover{color:#0E7C86}
+:focus-visible{outline:3px solid #123B4A;outline-offset:2px}
+button:hover{filter:brightness(0.95)}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FFF3D6; color: #123B4A; font-family: 'Nunito Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <header style="padding: 16px 20px 16px; background: #F7C948; border-radius: 0 0 28px 28px">
+    <ol aria-label="Pasos del registro" style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; font-size: 14px; font-weight: 700">
+      <li style="padding-top: 6px; border-top: 6px solid #123B4A">1 · Perfil</li>
+      <li aria-current="step" style="padding-top: 6px; border-top: 6px solid #123B4A">2 · Documentos</li>
+      <li style="padding-top: 6px; border-top: 6px solid #FFFFFF">3 · Normas</li>
+    </ol>
+    <h1 style="margin: 12px 0 0; font-family: 'Baloo 2', sans-serif; font-size: 34px; line-height: 1; font-weight: 800">Mostranos quién sos</h1>
+    <p style="margin: 6px 0 0; font-size: 16px; line-height: 1.35">Los ve solo nuestro equipo. En tu perfil aparece la insignia, nunca el documento.</p>
+  </header>
+
+  <main style="flex: 1; padding: 14px 20px 0; display: flex; flex-direction: column; gap: 10px; overflow: hidden">
+    <div style="padding: 12px 14px; border-radius: 20px; background: #FFFFFF; display: flex; align-items: center; gap: 12px">
+      <span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 17px; font-weight: 700">DNI, frente</span><span style="font-size: 14px; color: #0E7C86; font-weight: 700">Subido</span></span>
+      <button style="min-height: 44px; padding: 0 14px; border: 2px solid #123B4A; border-radius: 14px; background: transparent; color: #123B4A; font: inherit; font-size: 15px; font-weight: 700">Cambiar</button>
+    </div>
+    <div style="padding: 12px 14px; border-radius: 20px; background: #FFFFFF; display: flex; align-items: center; gap: 12px">
+      <span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 17px; font-weight: 700">DNI, dorso</span><span style="font-size: 14px; color: #0E7C86; font-weight: 700">Subido</span></span>
+      <button style="min-height: 44px; padding: 0 14px; border: 2px solid #123B4A; border-radius: 14px; background: transparent; color: #123B4A; font: inherit; font-size: 15px; font-weight: 700">Cambiar</button>
+    </div>
+    <div style="padding: 12px 14px; border: 3px dashed #123B4A; border-radius: 20px; display: flex; align-items: center; gap: 12px">
+      <span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 17px; font-weight: 700">Certificado de antecedentes</span><span style="font-size: 14px">Emitido en los últimos 90 días</span></span>
+      <button style="min-height: 44px; padding: 0 16px; border: 0; border-radius: 14px; background: #123B4A; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 700">Subir</button>
+    </div>
+    <div style="padding: 12px 14px; border: 3px dashed #123B4A; border-radius: 20px; display: flex; align-items: center; gap: 12px">
+      <span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 17px; font-weight: 700">Matrícula de gasista</span><span style="font-size: 14px">Porque elegiste gas</span></span>
+      <button style="min-height: 44px; padding: 0 16px; border: 0; border-radius: 14px; background: #123B4A; color: #FFFFFF; font: inherit; font-size: 15px; font-weight: 700">Subir</button>
+    </div>
+    <p style="margin: 2px 0 0; font-size: 14px; line-height: 1.4">Foto o PDF, hasta 2&nbsp;MB cada uno. Una vez subidos, ni vos podés volver a verlos: quedan guardados en privado.</p>
+    <label style="margin-top: 4px; padding: 12px 14px; border-radius: 20px; background: #FFFFFF; display: flex; align-items: flex-start; gap: 12px; font-size: 15px; line-height: 1.35"><input type="checkbox" style="width: 24px; height: 24px; flex: none; margin: 0; accent-color: #0E7C86"><span>Acepto que LabÍA trate mi DNI y mis antecedentes solo para verificarme, como dice la <a href="App-Legal.dc.html">política de privacidad</a>.</span></label>
+  </main>
+
+  <footer style="padding: 10px 20px 16px; background: #FFFFFF; border-radius: 28px 28px 0 0; display: flex; flex-direction: column">
+    <a href="App-ProNormas.dc.html" style="min-height: 56px; display: flex; align-items: center; justify-content: center; border-radius: 18px; background: #0E7C86; color: #FFFFFF; text-decoration: none; font-size: 18px; font-weight: 700">Seguir con las normas</a>
+    <a href="App-ProPerfil.dc.html" style="align-self: center; min-height: 44px; display: flex; align-items: center; font-size: 15px; font-weight: 700">Volver al perfil</a>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

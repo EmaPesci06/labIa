@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Admin: verificaciones pendientes, modo oscuro</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;touch-action:manipulation}
+h1,h2{text-wrap:balance}
+a{color:#FFF3D6}a:hover{color:#45C4CC}
+:focus-visible{outline:3px solid #F7C948;outline-offset:2px}
+button:hover{filter:brightness(1.1)}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #0B2730; color: #FFF3D6; font-family: 'Nunito Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <header style="padding: 14px 20px 16px; background: #17485A; color: #FFFFFF; border-radius: 0 0 28px 28px">
+    <div style="display: flex; justify-content: space-between; align-items: center">
+      <span style="font-size: 14px; font-weight: 700; letter-spacing: 0.08em"><span translate="no">LABÍA</span> · EQUIPO</span>
+      <nav aria-label="Administración" style="display: flex; gap: 6px">
+        <a href="#" aria-current="page" style="min-height: 44px; padding: 0 14px; display: flex; align-items: center; border-radius: 22px; background: #F7C948; color: #123B4A; text-decoration: none; font-size: 15px; font-weight: 700">Verificar</a>
+        <a href="Oscuro-AdminReportes.dc.html" style="min-height: 44px; padding: 0 14px; display: flex; align-items: center; border-radius: 22px; color: #FFFFFF; text-decoration: none; font-size: 15px">Reportes</a>
+      </nav>
+    </div>
+    <h1 style="margin: 10px 0 0; font-family: 'Baloo 2', sans-serif; font-size: 34px; line-height: 1; font-weight: 800">4 esperan revisión</h1>
+    <p style="margin: 6px 0 0; font-size: 15px; line-height: 1.4">Nadie aparece en las búsquedas hasta aprobar su DNI y sus antecedentes.</p>
+  </header>
+
+  <main style="flex: 1; padding: 14px 20px 0; display: flex; flex-direction: column; gap: 10px; overflow: hidden">
+    <a href="Oscuro-AdminRevision.dc.html" style="padding: 14px 16px; border-radius: 20px; background: #17485A; text-decoration: none; display: flex; flex-direction: column; gap: 4px">
+      <span style="display: flex; justify-content: space-between; align-items: center"><span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; line-height: 1.1; font-weight: 800">Marta Rodríguez</span><span style="padding: 4px 10px; border-radius: 12px; background: #FF9A8F; color: #0B2730; font-size: 14px; font-weight: 700">Hace 3 días</span></span>
+      <span style="font-size: 15px">Plomería y gas · La Perla</span>
+      <span style="font-size: 15px">DNI · Antecedentes · Matrícula</span>
+    </a>
+    <a href="#" style="padding: 14px 16px; border-radius: 20px; background: #17485A; text-decoration: none; display: flex; flex-direction: column; gap: 4px">
+      <span style="display: flex; justify-content: space-between; align-items: center"><span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; line-height: 1.1; font-weight: 800">Pablo Núñez</span><span style="padding: 4px 10px; border-radius: 12px; background: #F7C948; color: #123B4A; font-size: 14px; font-weight: 700">Hace 1 día</span></span>
+      <span style="font-size: 15px">Carpintería · Centro</span>
+      <span style="font-size: 15px">DNI · Antecedentes</span>
+    </a>
+    <a href="#" style="padding: 14px 16px; border-radius: 20px; background: #17485A; text-decoration: none; display: flex; flex-direction: column; gap: 4px">
+      <span style="display: flex; justify-content: space-between; align-items: center"><span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; line-height: 1.1; font-weight: 800">Nora Fernández</span><span style="padding: 4px 10px; border-radius: 12px; background: #F7C948; color: #123B4A; font-size: 14px; font-weight: 700">Hace 5 h</span></span>
+      <span style="font-size: 15px">Gas · Chauvin</span>
+      <span style="font-size: 15px">Volvió a subir: Antecedentes</span>
+    </a>
+    <a href="#" style="padding: 14px 16px; border-radius: 20px; background: #17485A; text-decoration: none; display: flex; flex-direction: column; gap: 4px">
+      <span style="display: flex; justify-content: space-between; align-items: center"><span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; line-height: 1.1; font-weight: 800">Hugo Díaz</span><span style="padding: 4px 10px; border-radius: 12px; background: #F7C948; color: #123B4A; font-size: 14px; font-weight: 700">Hace 20 min</span></span>
+      <span style="font-size: 15px">Cerrajería · Los Troncos</span>
+      <span style="font-size: 15px">DNI · Antecedentes</span>
+    </a>
+    <p style="margin: 4px 0 0; font-size: 14px">Ordenados del que más espera al más reciente.</p>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

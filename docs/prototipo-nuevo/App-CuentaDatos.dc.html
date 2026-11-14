@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Mis datos</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;touch-action:manipulation}
+h1,h2{text-wrap:balance}
+a{color:#123B4A}a:hover{color:#0E7C86}
+:focus-visible{outline:3px solid #123B4A;outline-offset:2px}
+button:hover{filter:brightness(0.95)}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FFF3D6; color: #123B4A; font-family: 'Nunito Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <header style="padding: 12px 20px 0">
+    <a href="App-Cuenta.dc.html" style="min-height: 44px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-size: 15px; font-weight: 700"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 12H4M11 5l-7 7 7 7"></path></svg>Mi cuenta</a>
+    <h1 style="margin: 2px 0 0; font-family: 'Baloo 2', sans-serif; font-size: 38px; line-height: 1; font-weight: 800">Mis datos</h1>
+  </header>
+
+  <main style="flex: 1; padding: 14px 20px 0; display: flex; flex-direction: column; gap: 12px; overflow: hidden">
+    <form style="margin: 0; padding: 16px; border-radius: 22px; background: #FFFFFF; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <label for="nombre" style="font-size: 16px; font-weight: 700">Nombre y apellido</label>
+        <input id="nombre" type="text" autocomplete="name" value="Marta Rodríguez" style="height: 50px; box-sizing: border-box; padding: 0 14px; border: 2px solid #123B4A; border-radius: 16px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px">
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <label for="wa" style="font-size: 16px; font-weight: 700">WhatsApp</label>
+        <input id="wa" type="tel" autocomplete="tel" value="223 555 0123" style="height: 50px; box-sizing: border-box; padding: 0 14px; border: 2px solid #123B4A; border-radius: 16px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px">
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <label for="barrio" style="font-size: 16px; font-weight: 700">Barrio</label>
+        <select id="barrio" style="height: 50px; padding: 0 14px; border: 2px solid #123B4A; border-radius: 16px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px"><option selected>La Perla</option><option>Centro</option><option>Chauvin</option><option>Los Troncos</option></select>
+      </div>
+      <button style="min-height: 50px; border: 0; border-radius: 16px; background: #0E7C86; color: #FFFFFF; font: inherit; font-size: 17px; font-weight: 700">Guardar</button>
+    </form>
+
+    <section aria-labelledby="d2" style="padding: 16px; border-radius: 22px; background: #FFFFFF; display: flex; flex-direction: column; gap: 10px">
+      <h2 id="d2" style="margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 22px; font-weight: 800">Cómo ingresás</h2>
+      <div style="display: flex; align-items: center; gap: 10px">
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 14px">Email</span><span style="font-size: 16px; font-weight: 700; overflow: hidden; text-overflow: ellipsis">marta@ejemplo.com</span></span>
+        <button style="min-height: 44px; padding: 0 14px; border: 2px solid #123B4A; border-radius: 14px; background: transparent; color: #123B4A; font: inherit; font-size: 15px; font-weight: 700">Cambiar</button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px">
+        <span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 14px">Contraseña</span><span style="font-size: 16px; font-weight: 700">Cambiada hace 2 meses</span></span>
+        <button style="min-height: 44px; padding: 0 14px; border: 2px solid #123B4A; border-radius: 14px; background: transparent; color: #123B4A; font: inherit; font-size: 15px; font-weight: 700">Cambiar</button>
+      </div>
+      <p style="margin: 0; font-size: 14px; line-height: 1.4">Si ingresás con Google, el email y la contraseña se manejan desde tu cuenta de Google.</p>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Cuenta, modo oscuro</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;touch-action:manipulation}
+h1,h2{text-wrap:balance}
+a{color:#FFF3D6}a:hover{color:#45C4CC}
+:focus-visible{outline:3px solid #F7C948;outline-offset:2px}
+button:hover{filter:brightness(1.1)}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #0B2730; color: #FFF3D6; font-family: 'Nunito Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <header style="padding: 20px 20px 20px; background: #0E7C86; color: #FFFFFF; border-radius: 0 0 28px 28px; display: flex; align-items: center; gap: 16px">
+    <div role="img" aria-label="Foto de Carla" style="width: 76px; height: 76px; flex: none; box-sizing: border-box; border-radius: 50%; background: #0B2730; border: 5px solid #F7C948; display: flex; align-items: center; justify-content: center; font-family: 'Baloo 2', sans-serif; font-size: 32px; font-weight: 800">C</div>
+    <div style="display: flex; flex-direction: column">
+      <h1 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 32px; line-height: 1; font-weight: 800">Carla</h1>
+      <span style="font-size: 16px">Cliente · La Perla</span>
+    </div>
+  </header>
+
+  <main style="flex: 1; padding: 14px 20px 0; display: flex; flex-direction: column; gap: 12px; overflow: hidden">
+    <nav aria-label="Mi cuenta" style="border-radius: 20px; background: #17485A; display: flex; flex-direction: column; padding: 0 16px">
+      <a href="#" style="min-height: 54px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #0B2730; text-decoration: none; font-size: 17px; font-weight: 700">Mis datos<span aria-hidden="true">›</span></a>
+      <a href="#" style="min-height: 54px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; font-size: 17px; font-weight: 700">Preferencias de email<span aria-hidden="true">›</span></a>
+    </nav>
+
+    <fieldset style="margin: 0; padding: 12px 16px; border: 0; border-radius: 20px; background: #17485A">
+      <legend style="float: left; width: 100%; padding: 0; margin-bottom: 8px; font-size: 17px; font-weight: 700">Aspecto</legend>
+      <div style="clear: both; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+        <label style="min-height: 44px; border-radius: 22px; background: #0B2730; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 15px"><input type="radio" name="tema" style="width: 18px; height: 18px; margin: 0; accent-color: #45C4CC">Claro</label>
+        <label style="min-height: 44px; border-radius: 22px; background: #F7C948; color: #123B4A; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 15px; font-weight: 700"><input type="radio" name="tema" checked style="width: 18px; height: 18px; margin: 0; accent-color: #123B4A">Oscuro</label>
+        <label style="min-height: 44px; border-radius: 22px; background: #0B2730; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 15px"><input type="radio" name="tema" style="width: 18px; height: 18px; margin: 0; accent-color: #45C4CC">Sistema</label>
+      </div>
+    </fieldset>
+
+    <nav aria-label="Legales" style="border-radius: 20px; background: #17485A; display: flex; flex-direction: column; padding: 0 16px">
+      <a href="#" style="min-height: 48px; display: flex; align-items: center; border-bottom: 2px solid #0B2730; text-decoration: none; font-size: 16px">Normas de seguridad</a>
+      <a href="#" style="min-height: 48px; display: flex; align-items: center; border-bottom: 2px solid #0B2730; text-decoration: none; font-size: 16px">Términos y privacidad</a>
+      <a href="#" style="min-height: 48px; display: flex; align-items: center; text-decoration: none; font-size: 16px">Descargar mis datos</a>
+    </nav>
+
+    <a href="#" style="padding: 14px 16px; border: 3px dashed #FFF3D6; border-radius: 20px; text-decoration: none; display: flex; flex-direction: column; gap: 2px">
+      <span style="font-size: 17px; font-weight: 700">¿Ofrecés un oficio?</span>
+      <span style="font-size: 15px">Para trabajar en LabÍA necesitás una cuenta de profesional.</span>
+    </a>
+
+    <div style="display: flex; justify-content: space-between">
+      <button style="min-height: 44px; padding: 0; border: 0; background: transparent; color: #FFF3D6; font: inherit; font-size: 16px; font-weight: 700; text-decoration: underline">Salir</button>
+      <a href="#" style="min-height: 44px; display: flex; align-items: center; font-size: 16px; font-weight: 700; color: #FF9A8F">Borrar mi cuenta</a>
+    </div>
+  </main>
+
+  <nav aria-label="Principal" style="height: 68px; box-sizing: border-box; padding: 0 12px 6px; background: #17485A; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center">
+    <a href="Oscuro-Inicio.dc.html" style="min-height: 48px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 15px">Inicio</a>
+    <a href="#" style="min-height: 48px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 15px">Mis trabajos</a>
+    <a href="#" aria-current="page" style="min-height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 16px; background: #0B2730; text-decoration: none; font-size: 15px; font-weight: 700">Cuenta</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

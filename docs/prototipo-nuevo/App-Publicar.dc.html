@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Publicar un trabajo</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;touch-action:manipulation}
+h1,h2{text-wrap:balance}
+a{color:#123B4A}a:hover{color:#0E7C86}
+:focus-visible{outline:3px solid #123B4A;outline-offset:2px}
+button:hover{filter:brightness(0.95)}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FFF3D6; color: #123B4A; font-family: 'Nunito Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <header style="padding: 12px 20px 0">
+    <a href="App-Inicio.dc.html" style="min-height: 44px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-size: 15px; font-weight: 700"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 12H4M11 5l-7 7 7 7"></path></svg>Volver</a>
+    <h1 style="margin: 2px 0 0; font-family: 'Baloo 2', sans-serif; font-size: 38px; line-height: 1; font-weight: 800">Contanos qué pasó</h1>
+    <p style="margin: 6px 0 0; font-size: 16px">Lo ven los profesionales verificados de tu zona y te escriben ellos.</p>
+  </header>
+
+  <form style="flex: 1; margin: 0; padding: 16px 20px 0; display: flex; flex-direction: column; gap: 16px; overflow: hidden">
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <label for="oficio" style="font-size: 16px; font-weight: 700">¿Qué oficio necesitás?</label>
+      <select id="oficio" style="height: 52px; padding: 0 14px; border: 2px solid #123B4A; border-radius: 16px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px">
+        <option selected>Plomería</option><option>Gas</option><option>Electricidad</option><option>Cerrajería</option><option>Pintura</option><option>Carpintería</option><option>Mecánica</option><option>No sé, ayudame a elegir</option>
+      </select>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <label for="que" style="font-size: 16px; font-weight: 700">Contalo con tus palabras</label>
+      <textarea id="que" rows="4" aria-describedby="que-ayuda" style="height: 116px; box-sizing: border-box; padding: 12px 14px; border: 2px solid #123B4A; border-radius: 16px; resize: none; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px; line-height: 1.4">Pierde la canilla de la cocina y moja el bajo mesada.</textarea>
+      <span id="que-ayuda" style="font-size: 14px">No pongas tu teléfono ni tu dirección: no hace falta.</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <label for="barrio" style="font-size: 16px; font-weight: 700">¿En qué barrio?</label>
+      <select id="barrio" style="height: 52px; padding: 0 14px; border: 2px solid #123B4A; border-radius: 16px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px">
+        <option selected>La Perla</option><option>Centro</option><option>Chauvin</option><option>Los Troncos</option><option>Punta Mogotes</option>
+      </select>
+    </div>
+
+    <fieldset style="margin: 0; padding: 0; border: 0">
+      <legend style="padding: 0; margin-bottom: 6px; font-size: 16px; font-weight: 700">¿Para cuándo?</legend>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+        <label style="min-height: 50px; border-radius: 25px; background: #F7C948; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 15px; font-weight: 700"><input type="radio" name="cuando" checked style="width: 18px; height: 18px; margin: 0; accent-color: #123B4A">Hoy</label>
+        <label style="min-height: 50px; border-radius: 25px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 15px"><input type="radio" name="cuando" style="width: 18px; height: 18px; margin: 0; accent-color: #123B4A">Esta semana</label>
+        <label style="min-height: 50px; border-radius: 25px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 15px"><input type="radio" name="cuando" style="width: 18px; height: 18px; margin: 0; accent-color: #123B4A">Sin apuro</label>
+      </div>
+    </fieldset>
+
+    <button type="button" style="align-self: flex-start; min-height: 48px; padding: 0 18px; border: 3px dashed #123B4A; border-radius: 18px; background: transparent; color: #123B4A; font: inherit; font-size: 16px; font-weight: 700">Sumar una foto</button>
+  </form>
+
+  <footer style="padding: 12px 20px 18px; background: #FFFFFF; border-radius: 28px 28px 0 0; display: flex; flex-direction: column; gap: 8px">
+    <button style="min-height: 56px; border: 0; border-radius: 18px; background: #0E7C86; color: #FFFFFF; font: inherit; font-size: 18px; font-weight: 700">Publicar el trabajo</button>
+    <p style="margin: 0; font-size: 14px; text-align: center">Lo reciben 8 plomeros verificados a menos de 5&nbsp;km.</p>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>
