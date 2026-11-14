@@ -36,7 +36,7 @@ export function TarjetaPublicar({
     >
       <span className="flex flex-col gap-1.5">
         <span className="text-lg font-bold">{titulo}</span>
-        <span className="text-sm leading-snug opacity-80 lg:text-[15px]">{descripcion}</span>
+        <span className="text-sm leading-snug lg:text-[15px]">{descripcion}</span>
       </span>
       <span
         className={cn(

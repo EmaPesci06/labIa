@@ -13,12 +13,12 @@ import { MetricasPostHog } from "@/components/MetricasPostHog";
 import { PieLegal } from "@/components/PieLegal";
 
 // viewport-fit=cover deja que la página llegue al borde en celulares con notch; las barras usan
-// env(safe-area-inset-*). theme-color cambia con el tema del sistema.
+// env(safe-area-inset-*). theme-color es el encabezado turquesa, que es igual en los dos temas.
 export const viewport: Viewport = {
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: PWA_COLORES.fondoClaro },
-    { media: "(prefers-color-scheme: dark)", color: PWA_COLORES.fondoOscuro },
+    { media: "(prefers-color-scheme: light)", color: PWA_COLORES.encabezado },
+    { media: "(prefers-color-scheme: dark)", color: PWA_COLORES.encabezado },
   ],
 };
 

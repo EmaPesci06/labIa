@@ -1,11 +1,11 @@
 /**
  * Colores del manifest y de <meta name="theme-color">. Son los tokens `fondo` (claro y oscuro) y
- * `azul` de globals.css, escritos como rgb() porque en el código no se admiten hex (los tokens
+ * `encabezado` de globals.css, escritos como rgb() porque en el código no se admiten hex (los tokens
  * son la única fuente); pwa.test.ts verifica que coincidan con globals.css.
  */
 export const PWA_COLORES = {
-  fondoClaro: "rgb(241 243 246)",
-  fondoOscuro: "rgb(18 24 38)",
-  /** Barra del sistema al abrir la app instalada. */
-  azul: "rgb(35 47 73)",
+  fondoClaro: "rgb(255 243 214)",
+  fondoOscuro: "rgb(11 39 48)",
+  /** Barra del sistema al abrir la app instalada: el encabezado turquesa de cada pantalla. */
+  encabezado: "rgb(14 124 134)",
 } as const;

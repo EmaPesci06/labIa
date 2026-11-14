@@ -18,7 +18,7 @@ export function BarraVisitante() {
         aria-label="LabÍA, inicio"
         className="flex min-h-11 items-center rounded-campo"
       >
-        <Logo alt="" prioritario />
+        <Logo alt="" />
       </Link>
       <nav aria-label="Cuenta" className="flex items-center gap-2 lg:gap-3">
         <Boton href="/ingresar" variante="fantasma">

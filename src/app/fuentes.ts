@@ -1,45 +1,27 @@
-import { Archivo, IBM_Plex_Mono } from "next/font/google";
-import localFont from "next/font/local";
+import { Baloo_2, Nunito_Sans } from "next/font/google";
 
-/** Títulos: Archivo variable con el eje de ancho (wdth) para el font-stretch 118 %. */
-export const archivo = Archivo({
+/**
+ * Títulos y marca: Baloo 2 (700 y 800). Se usa 800; el 700 queda disponible para etiquetas fuertes.
+ * Reemplaza a Archivo (LAB-68).
+ */
+export const baloo = Baloo_2({
   subsets: ["latin"],
-  axes: ["wdth"],
+  weight: ["700", "800"],
   display: "swap",
   adjustFontFallback: true,
-  variable: "--fuente-archivo",
+  variable: "--fuente-baloo",
 });
 
 /**
- * Texto: Atkinson Hyperlegible Next, variable (200 a 800; usamos 400 a 700).
- * Va con next/font/local porque next/font/google no tiene sus métricas y no genera la fuente de
- * reemplazo ajustada (habría salto de diseño al cargar). Archivos latin de Google Fonts, licencia OFL.
+ * Texto, etiquetas y datos: Nunito Sans (400 y 700). Reemplaza a Atkinson Hyperlegible Next y a
+ * IBM Plex Mono (LAB-68).
  */
-export const atkinson = localFont({
-  src: [
-    {
-      path: "./_fuentes/atkinson-hyperlegible-next-latin.woff2",
-      weight: "200 800",
-      style: "normal",
-    },
-    {
-      path: "./_fuentes/atkinson-hyperlegible-next-latin-italic.woff2",
-      weight: "200 800",
-      style: "italic",
-    },
-  ],
-  display: "swap",
-  adjustFontFallback: "Arial",
-  variable: "--fuente-atkinson",
-});
-
-/** Etiquetas, distancias, pasos y datos. */
-export const plexMono = IBM_Plex_Mono({
+export const nunito = Nunito_Sans({
   subsets: ["latin"],
-  weight: ["500", "600"],
+  weight: ["400", "700"],
   display: "swap",
   adjustFontFallback: true,
-  variable: "--fuente-plex-mono",
+  variable: "--fuente-nunito",
 });
 
-export const clasesFuentes = `${archivo.variable} ${atkinson.variable} ${plexMono.variable}`;
+export const clasesFuentes = `${baloo.variable} ${nunito.variable}`;

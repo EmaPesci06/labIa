@@ -30,7 +30,7 @@ export function EstructuraRegistro({ paso, children }: { paso: 1 | 2; children: 
           aria-label="LabÍA, inicio"
           className="hidden min-h-11 items-center rounded-campo lg:inline-flex"
         >
-          <Logo alt="" prioritario />
+          <Logo alt="" />
         </Link>
         <CintaPasos
           pasos={PASOS_REGISTRO_PROFESIONAL}

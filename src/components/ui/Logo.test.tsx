@@ -4,35 +4,32 @@ import { describe, expect, it } from "vitest";
 import { Logo } from "./Logo";
 
 describe("Logo", () => {
-  it("completo: una imagen para cada tema, la oscura oculta en claro", () => {
-    const { container } = render(<Logo />);
-    const imagenes = container.querySelectorAll("img");
-    expect(imagenes).toHaveLength(2);
-
-    const clara = container.querySelector('img[data-tema="claro"]');
-    const oscura = container.querySelector('img[data-tema="oscuro"]');
-    expect(clara).toHaveAttribute("src", expect.stringContaining("labia-logo.png"));
-    expect(clara).toHaveClass("dark:hidden");
-    expect(clara).not.toHaveClass("hidden");
-    expect(oscura).toHaveAttribute("src", expect.stringContaining("labia-logo-oscuro.png"));
-    expect(oscura).toHaveClass("hidden", "dark:block");
+  it("completo: es la palabra LabÍA con texto accesible", () => {
+    render(<Logo />);
+    const logo = screen.getByRole("img", { name: "LabÍA" });
+    expect(logo).toHaveTextContent("LabÍA");
+    expect(logo).toHaveClass("font-titulo", "text-accion");
   });
 
-  it("tiene texto alternativo LabÍA por defecto", () => {
+  it("sobre el encabezado usa blanco y no accion", () => {
+    render(<Logo sobre="encabezado" />);
+    const logo = screen.getByRole("img", { name: "LabÍA" });
+    expect(logo).toHaveClass("text-sobre-encabezado");
+    expect(logo).not.toHaveClass("text-accion");
+  });
+
+  it("icono: una L en un cuadrado de acción", () => {
     render(<Logo variante="icono" />);
-    expect(screen.getByRole("img", { name: "LabÍA" })).toHaveAttribute(
-      "src",
-      expect.stringContaining("labia-icono.png"),
-    );
+    const icono = screen.getByRole("img", { name: "LabÍA" });
+    expect(icono).toHaveTextContent("L");
+    expect(icono).toHaveClass("bg-accion", "text-sobre-accion");
   });
 
-  it("acepta alt vacío cuando es decorativo y clases propias", () => {
-    const { container } = render(<Logo alt="" className="h-8" />);
+  it("con alt vacío es decorativo y se oculta a lectores de pantalla", () => {
+    const { container } = render(<Logo alt="" className="text-2xl" />);
     expect(screen.queryByRole("img", { name: "LabÍA" })).toBeNull();
-    for (const img of container.querySelectorAll("img")) {
-      expect(img).toHaveAttribute("alt", "");
-      expect(img).toHaveClass("h-8");
-      expect(img).not.toHaveClass("h-10");
-    }
+    const decorativo = container.querySelector('[aria-hidden="true"]');
+    expect(decorativo).toHaveTextContent("LabÍA");
+    expect(decorativo).toHaveClass("text-2xl");
   });
 });
