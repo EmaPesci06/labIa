@@ -83,7 +83,7 @@ export function ListaPostulaciones({ postulaciones }: ListaPostulacionesProps) {
                 {p.estado === "elegida" ? (
                   <div className="flex flex-col gap-0.5">
                     <Insignia variante="exito">¡Te eligieron!</Insignia>
-                    <span className="text-xs font-semibold text-sobre-exito-suave">
+                    <span className="text-xs font-semibold text-texto">
                       El cliente te va a escribir por WhatsApp.
                     </span>
                   </div>

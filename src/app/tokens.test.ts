@@ -149,6 +149,27 @@ describe("contraste AA (≥ 4,5:1) de cada par texto/fondo, en claro y oscuro", 
   });
 });
 
+describe("alias partido texto/fondo (LAB-68, lo borra LAB-69)", () => {
+  // Los alias que caían en accion y se usan como texto (enlaces, mensajes) van a texto en
+  // --text-color-*. El fondo (--color-*) sigue en accion.
+  it.each(["azul", "azul-presionado", "naranja-accion", "exito", "acento"])(
+    "text-%s va en texto y el color base sigue en accion",
+    (alias) => {
+      expect(CSS_GLOBALS).toContain(`--text-color-${alias}: var(--color-texto);`);
+      for (const tema of ["claro", "oscuro"] as const) {
+        expect(hexDe(tema, alias)).toBe(hexDe(tema, "accion"));
+      }
+    },
+  );
+
+  it("el texto de los enlaces (texto) pasa AA sobre el fondo arena y la superficie", () => {
+    expect(contraste(hexDe("claro", "texto"), hexDe("claro", "fondo"))).toBeGreaterThanOrEqual(4.5);
+    expect(contraste(hexDe("claro", "texto"), hexDe("claro", "superficie"))).toBeGreaterThanOrEqual(
+      4.5,
+    );
+  });
+});
+
 describe("sin hex sueltos", () => {
   function archivos(dir: string): string[] {
     return readdirSync(dir).flatMap((nombre) => {

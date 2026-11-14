@@ -155,7 +155,7 @@ export function DetalleMiTrabajo({
       {mensajeError ? (
         <div
           role="alert"
-          className="rounded-[14px] border border-error/20 bg-error/10 p-4 text-sm font-semibold text-error"
+          className="rounded-[14px] border border-error bg-superficie p-4 text-sm font-semibold text-error"
         >
           {mensajeError}
         </div>

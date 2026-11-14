@@ -39,7 +39,7 @@ export function FilaReporte({ fila }: { fila: FilaReporteAdmin }) {
             {TEXTO_ESTADO[fila.estado]}
           </span>
           {fila.conteoAcumulado > 1 ? (
-            <span className="rounded-full bg-error/10 px-2.5 py-1 text-xs font-bold text-error">
+            <span className="rounded-full border border-error bg-superficie px-2.5 py-1 text-xs font-bold text-error">
               {fila.conteoAcumulado} reportes acumulados
             </span>
           ) : null}
@@ -85,7 +85,7 @@ export function FilaReporte({ fila }: { fila: FilaReporteAdmin }) {
             <span>Usuario objetivo:</span>
             <span className="font-bold text-texto">{fila.usuarioAfectadoNombre}</span>
             {fila.usuarioAfectadoEstado === "suspendida" ? (
-              <span className="rounded-full bg-error/15 px-2 py-0.5 text-xs font-bold text-error">
+              <span className="rounded-full border border-error bg-superficie px-2 py-0.5 text-xs font-bold text-error">
                 Cuenta suspendida
               </span>
             ) : null}
@@ -108,7 +108,7 @@ export function FilaReporte({ fila }: { fila: FilaReporteAdmin }) {
               <button
                 type="button"
                 onClick={() => setModalSuspenderAbierto(true)}
-                className="inline-flex min-h-11 items-center justify-center rounded-boton bg-error/10 px-4 text-sm font-bold text-error hover:bg-error/20 active:opacity-80"
+                className="inline-flex min-h-11 items-center justify-center rounded-boton border border-error bg-superficie px-4 text-sm font-bold text-error hover:bg-fondo active:opacity-80"
               >
                 Suspender cuenta…
               </button>

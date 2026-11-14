@@ -9,7 +9,7 @@ import { VisorDocumento } from "./VisorDocumento";
 const ESTILO_ESTADO = {
   pendiente: "bg-naranja-suave text-sobre-naranja-suave",
   aprobado: "bg-exito-suave text-sobre-exito-suave",
-  rechazado: "bg-error/10 text-error",
+  rechazado: "border border-error bg-superficie text-error",
 } as const;
 
 const TEXTO_ESTADO = {

@@ -234,7 +234,7 @@ function FormularioResena({
       {error ? (
         <div
           role="alert"
-          className="rounded-[14px] border border-error/20 bg-error/10 p-3 text-sm font-semibold text-error"
+          className="rounded-[14px] border border-error bg-superficie p-3 text-sm font-semibold text-error"
         >
           {error}
         </div>

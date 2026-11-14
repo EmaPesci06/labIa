@@ -39,13 +39,17 @@ Reemplazan a Archivo, Atkinson Hyperlegible Next e IBM Plex Mono.
 | `fondo` | `#FFF3D6` arena | `#0B2730` mar de noche | Fondo de página |
 | `superficie` | `#FFFFFF` | `#17485A` | Tarjetas, barra inferior, pies |
 | `texto` | `#123B4A` | `#FFF3D6` | Texto y bordes de campos |
-| `accion` | `#0E7C86` turquesa | `#45C4CC` | Botón principal, enlaces, tildes |
+| `accion` | `#0E7C86` turquesa | `#45C4CC` | Botón principal, tildes, marca. No para texto chico sobre arena (4,48:1): los enlaces van en `texto` en negrita |
 | `sobre-accion` | `#FFFFFF` | `#0B2730` | Texto sobre el botón principal |
 | `encabezado` | `#0E7C86` | `#0E7C86` (igual) | Encabezados de pantalla, texto blanco |
+| `sobre-encabezado` | `#FFFFFF` | `#FFFFFF` (igual) | Texto sobre `encabezado` y sobre `equipo` |
 | `sol` | `#F7C948` | `#F7C948` (igual) | Elegido, distancia, avisos; texto siempre `#123B4A` |
+| `sobre-sol` | `#123B4A` | `#123B4A` (igual) | Texto sobre `sol` |
 | `coral` | `#F25C54` | `#F25C54` | Solo adorno (toldos), nunca texto |
 | `error` | `#A62B24` | `#FF9A8F` | Errores, borrar, suspender |
 | `equipo` | `#123B4A` | `#17485A` | Encabezado del panel de administración |
+| `velo` | `#123B4A` | `#05161B` | Fondo detrás de las hojas inferiores |
+| `foco` | `#123B4A` | `#F7C948` | Outline de foco (3 px) |
 
 Piezas (ver `Sistema-Tokens.dc.html`):
 

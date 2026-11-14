@@ -40,7 +40,7 @@ async function Contenido() {
             </p>
           </div>
 
-          <div className="rounded-[14px] border border-error/20 bg-error/10 p-4">
+          <div className="rounded-[14px] border border-error bg-superficie p-4">
             <p className="text-xs font-bold tracking-wider text-error uppercase">
               Motivo de la suspensión
             </p>

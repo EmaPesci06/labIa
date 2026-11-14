@@ -154,7 +154,7 @@ export function FormularioPerfil({ valores, barrios, hrefPerfil }: Props) {
         </p>
       ) : null}
       {estado.exito ? (
-        <p role="status" className="text-sm font-semibold text-sobre-exito-suave">
+        <p role="status" className="text-sm font-semibold text-texto">
           {estado.exito}{" "}
           <Link href={hrefPerfil} className="underline">
             Ver mi perfil

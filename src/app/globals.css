@@ -148,6 +148,18 @@
   --color-cinta: var(--color-cinta);
   --color-cinta-marcas: var(--color-cinta-marcas);
 
+  /*
+   * Alias partido texto/fondo (LAB-68, lo borra LAB-69). Tailwind resuelve `text-*` primero en
+   * --text-color-* y después en --color-*. Los alias que apuntan a accion y se usan como TEXTO
+   * (enlaces, mensajes) van a texto: accion sobre fondo arena da 4,48:1 y no pasa AA. Los
+   * `bg-*` y `border-*` de esos mismos alias siguen en accion.
+   */
+  --text-color-azul: var(--color-texto);
+  --text-color-azul-presionado: var(--color-texto);
+  --text-color-naranja-accion: var(--color-texto);
+  --text-color-exito: var(--color-texto);
+  --text-color-acento: var(--color-texto);
+
   /* Las variables --fuente-* las define next/font en src/app/fuentes.ts. Etiquetas y datos usan
      Nunito Sans (ya no hay IBM Plex Mono): `font-mono` queda como alias. */
   --font-texto: var(--fuente-nunito), system-ui, sans-serif;

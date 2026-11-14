@@ -17,7 +17,7 @@ export function FilaResenaBaja({ fila }: { fila: FilaResenaBajaAdmin }) {
     <Tarjeta borde className="flex flex-col gap-3.5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <span className="rounded-full bg-error/10 px-2.5 py-1 text-xs font-bold text-error">
+          <span className="rounded-full border border-error bg-superficie px-2.5 py-1 text-xs font-bold text-error">
             ★ {fila.puntaje} / 5
           </span>
           {fila.reportada ? (
@@ -58,7 +58,7 @@ export function FilaResenaBaja({ fila }: { fila: FilaResenaBajaAdmin }) {
           <button
             type="button"
             onClick={() => setModalSuspenderAbierto(true)}
-            className="inline-flex min-h-11 items-center justify-center rounded-boton bg-error/10 px-4 text-sm font-bold text-error hover:bg-error/20 active:opacity-80"
+            className="inline-flex min-h-11 items-center justify-center rounded-boton border border-error bg-superficie px-4 text-sm font-bold text-error hover:bg-fondo active:opacity-80"
           >
             Suspender cliente…
           </button>

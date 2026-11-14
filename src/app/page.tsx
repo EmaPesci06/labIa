@@ -112,7 +112,7 @@ export default function Bienvenida() {
               <Search aria-hidden strokeWidth={2} className="size-7 shrink-0 lg:hidden" />
               <span className="flex flex-1 flex-col gap-0.5 lg:flex-none lg:gap-1.5">
                 <span className="text-lg font-bold lg:text-[22px]">Quiero contratar</span>
-                <span className="text-sm opacity-80 lg:text-[15px] lg:leading-[1.4]">
+                <span className="text-sm lg:text-[15px] lg:leading-[1.4]">
                   <span className="lg:hidden">Buscá profesionales o publicá un trabajo</span>
                   <span className="hidden lg:inline">
                     Buscá profesionales o publicá un trabajo y que ellos te escriban.
@@ -190,7 +190,7 @@ export default function Bienvenida() {
             <h2 id="seguridad" className="font-titulo text-[32px]">
               Tu seguridad primero
             </h2>
-            <p className="text-base leading-normal opacity-80">
+            <p className="text-base leading-normal">
               Cada profesional presenta DNI y certificado de antecedentes, y acepta nuestras normas
               de seguridad antes de publicar su perfil.
             </p>
