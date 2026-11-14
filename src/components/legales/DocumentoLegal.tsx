@@ -75,7 +75,7 @@ export function DocumentoLegal({
             <h2 id={`${s.id}-titulo`} className="mb-2 font-titulo text-[22px] leading-tight">
               {i + 1}. {s.titulo}
             </h2>
-            <div className="flex flex-col gap-2.5 text-[15px] leading-relaxed [&_a]:font-semibold [&_a]:text-azul [&_a]:underline [&_a]:underline-offset-2 [&_ol]:flex [&_ol]:list-decimal [&_ol]:flex-col [&_ol]:gap-1.5 [&_ol]:pl-5 [&_ul]:flex [&_ul]:list-disc [&_ul]:flex-col [&_ul]:gap-1.5 [&_ul]:pl-5">
+            <div className="flex flex-col gap-2.5 text-[15px] leading-relaxed wrap-break-word [&_a]:font-semibold [&_a]:text-azul [&_a]:underline [&_a]:underline-offset-2 [&_ol]:flex [&_ol]:list-decimal [&_ol]:flex-col [&_ol]:gap-1.5 [&_ol]:pl-5 [&_ul]:flex [&_ul]:list-disc [&_ul]:flex-col [&_ul]:gap-1.5 [&_ul]:pl-5">
               {s.contenido}
             </div>
           </section>
