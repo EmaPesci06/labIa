@@ -1,8 +1,29 @@
 import { clsx, type ClassValue } from "clsx";
 import { extendTailwindMerge } from "tailwind-merge";
 
-/** Nombres de los tokens de color de globals.css (sin el prefijo --color-). */
-export const TOKENS_COLOR = [
+/** Tokens de color "Verano en la costa" (globals.css, sin el prefijo --color-). */
+export const TOKENS_NUEVOS = [
+  "fondo",
+  "superficie",
+  "texto",
+  "accion",
+  "sobre-accion",
+  "encabezado",
+  "sobre-encabezado",
+  "sol",
+  "sobre-sol",
+  "coral",
+  "error",
+  "equipo",
+  "velo",
+  "foco",
+] as const;
+
+/**
+ * Alias temporales de los nombres viejos. Apuntan a un token nuevo en globals.css; los borra LAB-69.
+ * Listados en el PR de LAB-68.
+ */
+export const ALIAS_TEMPORALES = [
   "azul",
   "azul-presionado",
   "sobre-azul",
@@ -18,19 +39,17 @@ export const TOKENS_COLOR = [
   "exito-suave",
   "sobre-exito-suave",
   "acento",
-  "error",
-  "fondo",
-  "superficie",
   "superficie-elevada",
-  "texto",
   "texto-secundario",
   "texto-terciario",
   "borde",
   "divisor",
-  "foco",
   "cinta",
   "cinta-marcas",
 ] as const;
+
+/** Todos los tokens de color que existen en globals.css. */
+export const TOKENS_COLOR = [...TOKENS_NUEVOS, ...ALIAS_TEMPORALES] as const;
 
 export type TokenColor = (typeof TOKENS_COLOR)[number];
 
@@ -39,7 +58,7 @@ export type TokenColor = (typeof TOKENS_COLOR)[number];
 const twMerge = extendTailwindMerge({
   extend: {
     theme: {
-      color: [...TOKENS_COLOR, "velo"],
+      color: [...TOKENS_COLOR],
       font: ["titulo", "texto", "mono"],
       radius: ["campo", "boton", "tarjeta", "hoja"],
     },

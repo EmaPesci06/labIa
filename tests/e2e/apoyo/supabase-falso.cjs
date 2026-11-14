@@ -351,16 +351,8 @@ const VERIFICACIONES = [
 ];
 
 // LAB-52: fotos del trabajo de gas en el bucket privado `fotos-trabajos`. Se firman con createSignedUrls y
-// el falso sirve la imagen de prueba que ya está en el repo (public/marca/labia-icono.png).
-const FOTO_TRABAJO_PRUEBA = path.join(
-  __dirname,
-  "..",
-  "..",
-  "..",
-  "public",
-  "marca",
-  "labia-icono.png",
-);
+// el falso sirve la imagen de prueba que ya está en el repo (public/icon-192.png).
+const FOTO_TRABAJO_PRUEBA = path.join(__dirname, "..", "..", "..", "public", "icon-192.png");
 const FOTOS_TRABAJO_GAS = [
   `${ID_CLIENTE}/88888888-8888-4888-8888-888888888881/foto-1.png`,
   `${ID_CLIENTE}/88888888-8888-4888-8888-888888888881/foto-2.png`,

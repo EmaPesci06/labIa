@@ -59,7 +59,7 @@ export default function Bienvenida() {
           aria-label="LabÍA, inicio"
           className="inline-flex min-h-11 items-center rounded-campo"
         >
-          <Logo alt="" prioritario />
+          <Logo alt="" />
         </Link>
         <EtiquetaCiudad className="lg:hidden" />
         <div className="hidden items-center gap-4 lg:flex">

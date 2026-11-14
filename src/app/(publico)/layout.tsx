@@ -19,7 +19,7 @@ export default function LayoutPublico({ children }: { children: ReactNode }) {
           aria-label="LabÍA, inicio"
           className="inline-flex min-h-11 items-center rounded-campo"
         >
-          <Logo alt="" prioritario />
+          <Logo alt="" />
         </Link>
       </header>
       <main

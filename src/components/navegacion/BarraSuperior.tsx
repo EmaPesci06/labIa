@@ -29,7 +29,7 @@ export function BarraSuperior({ navegacion, rol, nombre }: Props) {
         aria-label="LabÍA, inicio"
         className="flex min-h-11 items-center rounded-campo"
       >
-        <Logo alt="" prioritario />
+        <Logo alt="" />
       </Link>
       <EnlacesSuperiores destinos={navegacion.escritorio} rol={rol} />
       <div className="flex items-center gap-4">

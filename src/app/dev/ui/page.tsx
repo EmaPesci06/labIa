@@ -40,7 +40,7 @@ export default function PaginaComponentes() {
     <main className="mx-auto w-full max-w-7xl flex-1 space-y-6 px-4 py-6 lg:px-8 lg:py-10">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div className="space-y-2">
-          <Logo prioritario />
+          <Logo />
           <h1 className="font-titulo text-3xl lg:text-4xl">Componentes base</h1>
           <p className="text-texto-secundario">
             Página interna (solo en desarrollo) para revisar la biblioteca de LAB-10.

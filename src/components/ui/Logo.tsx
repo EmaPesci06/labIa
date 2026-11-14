@@ -1,66 +1,47 @@
-import Image from "next/image";
-
 import { cn } from "@/lib/cn";
 
 type Props = {
-  /** "completo": ícono + "labia". "icono": solo la casita (sirve para los dos temas). */
+  /** "completo": la palabra LabÍA. "icono": una L en un cuadrado (marcas chicas del admin y avisos). */
   variante?: "completo" | "icono";
   /** Texto alternativo. Pasá "" si el logo está al lado del nombre y es decorativo. */
   alt?: string;
-  /** Usalo en el logo que se ve sin hacer scroll (bienvenida, encabezado). */
-  prioritario?: boolean;
+  /** Dónde va el logo: `accion` sobre fondo claro, blanco sobre el encabezado turquesa. */
+  sobre?: "fondo" | "encabezado";
   className?: string;
 };
 
-const COMPLETO = { ancho: 729, alto: 240 };
-const ICONO = 256;
-
 /**
- * Logo de LabÍA. En la variante "completo" hay dos imágenes y CSS muestra una sola según el tema
- * (`dark:hidden` / `hidden dark:block`); con carga diferida solo se descarga la visible.
+ * Logo de LabÍA: la palabra en Baloo 2 800 (font-titulo). Es texto, así que cambia de color con el
+ * tema sin imágenes separadas. El logo viejo (PNG) se retira en LAB-68.
  */
-export function Logo({
-  variante = "completo",
-  alt = "LabÍA",
-  prioritario = false,
-  className,
-}: Props) {
-  const carga = prioritario ? ({ fetchPriority: "high" } as const) : {};
+export function Logo({ variante = "completo", alt = "LabÍA", sobre = "fondo", className }: Props) {
+  const accesibilidad =
+    alt === "" ? { "aria-hidden": true } : { role: "img" as const, "aria-label": alt };
 
   if (variante === "icono") {
     return (
-      <Image
-        src="/marca/labia-icono.png"
-        alt={alt}
-        width={ICONO}
-        height={ICONO}
-        className={cn("size-10", className)}
-        {...carga}
-      />
+      <span
+        {...accesibilidad}
+        className={cn(
+          "inline-flex size-10 items-center justify-center rounded-campo bg-accion font-titulo text-2xl leading-none text-sobre-accion",
+          className,
+        )}
+      >
+        L
+      </span>
     );
   }
 
-  const clases = cn("h-10 w-auto", className);
   return (
-    <>
-      <Image
-        src="/marca/labia-logo.png"
-        alt={alt}
-        width={COMPLETO.ancho}
-        height={COMPLETO.alto}
-        className={cn(clases, "dark:hidden")}
-        data-tema="claro"
-        {...carga}
-      />
-      <Image
-        src="/marca/labia-logo-oscuro.png"
-        alt={alt}
-        width={COMPLETO.ancho}
-        height={COMPLETO.alto}
-        className={cn(clases, "hidden dark:block")}
-        data-tema="oscuro"
-        {...carga}
-      />
-    </>
+    <span
+      {...accesibilidad}
+      className={cn(
+        "font-titulo text-3xl leading-none",
+        sobre === "encabezado" ? "text-sobre-encabezado" : "text-accion",
+        className,
+      )}
+    >
+      LabÍA
+    </span>
   );
 }

@@ -1,106 +1,130 @@
 @import "tailwindcss";
 
 /*
- * Tokens de diseño de LabÍA (Guía para agentes §5).
+ * Tokens de diseño de LabÍA, "Verano en la costa" (docs/prototipo-nuevo/README.md).
  * Este es el ÚNICO archivo donde se escriben colores en hex. El resto del código usa las clases
- * de Tailwind que salen de acá (bg-azul, text-texto-secundario, border-borde…).
+ * de Tailwind que salen de acá (bg-accion, text-texto, bg-sol…).
  *
  * - Modo claro en :root (y en .claro, para forzarlo en un bloque, por ejemplo en /dev/paleta).
  * - Modo oscuro en .dark. La clase la pone el script de src/lib/tema.ts antes de pintar.
  * - "sobre-X" es el color del texto que va encima de X.
+ *
+ * Alias temporales (LAB-68): los nombres viejos (azul, naranja-accion, exito…) siguen existiendo
+ * apuntando a un token nuevo para que la app compile mientras las pantallas no se rehacen. LAB-69
+ * los borra. Están en el bloque "ALIAS TEMPORALES" de abajo y listados en el PR.
  */
 :root,
 .claro {
   color-scheme: light;
 
-  --color-azul: #232f49;
-  --color-azul-presionado: #182136;
-  --color-sobre-azul: #ffffff;
-  --color-azul-suave: #e6e9f0;
-  --color-sobre-azul-suave: #232f49;
-
-  --color-naranja-marca: #d45f3a;
-  --color-naranja-accion: #b84a25;
-  --color-sobre-naranja: #ffffff;
-  --color-naranja-suave: #fbe5dc;
-  --color-sobre-naranja-suave: #9a3a17;
-
-  --color-exito: #1d6b45;
-  --color-sobre-exito: #ffffff;
-  --color-exito-suave: #dcefe4;
-  --color-sobre-exito-suave: #14532d;
-
-  --color-acento: #b84a25;
-
-  /* Texto de error (LAB-10): 6,2:1 sobre blanco. La guía no define uno. */
-  --color-error: #b42318;
-
-  --color-fondo: #f1f3f6;
+  --color-fondo: #fff3d6;
   --color-superficie: #ffffff;
-  --color-superficie-elevada: #ffffff;
+  --color-texto: #123b4a;
+  --color-accion: #0e7c86;
+  --color-sobre-accion: #ffffff;
+  --color-encabezado: #0e7c86;
+  --color-sobre-encabezado: #ffffff;
+  --color-sol: #f7c948;
+  --color-sobre-sol: #123b4a;
+  --color-coral: #f25c54;
+  --color-error: #a62b24;
+  --color-equipo: #123b4a;
 
-  --color-texto: #1b2438;
-  --color-texto-secundario: #4b5468;
-  --color-texto-terciario: #5e6678;
-
-  --color-borde: #cdd2db;
-  --color-divisor: #dde0e6;
-
-  /* Fijos en los dos temas: foco, cinta métrica y logo. */
-  --color-foco: #d45f3a;
-  --color-cinta: #d45f3a;
-  --color-cinta-marcas: #232f49;
-
-  /* Fondo oscurecido detrás de las hojas y diálogos. */
-  --color-velo: rgb(27 36 56 / 0.55);
+  /* Fondo detrás de las hojas inferiores. */
+  --color-velo: #123b4a;
+  /* Foco: outline de 3 px en claro; en oscuro cambia a sol. */
+  --color-foco: #123b4a;
 }
 
 .dark {
   color-scheme: dark;
 
-  --color-azul: #b7c5e8;
-  --color-azul-presionado: #c9d4ee;
-  --color-sobre-azul: #121826;
-  --color-azul-suave: #2a3550;
-  --color-sobre-azul-suave: #c9d4ee;
+  --color-fondo: #0b2730;
+  --color-superficie: #17485a;
+  --color-texto: #fff3d6;
+  --color-accion: #45c4cc;
+  --color-sobre-accion: #0b2730;
+  --color-encabezado: #0e7c86;
+  --color-sobre-encabezado: #ffffff;
+  --color-sol: #f7c948;
+  --color-sobre-sol: #123b4a;
+  --color-coral: #f25c54;
+  --color-error: #ff9a8f;
+  --color-equipo: #17485a;
 
-  --color-naranja-marca: #d45f3a;
-  --color-naranja-accion: #e8714b;
-  --color-sobre-naranja: #121826;
-  --color-naranja-suave: #3a241b;
-  --color-sobre-naranja-suave: #f4b399;
+  --color-velo: #05161b;
+  --color-foco: #f7c948;
+}
 
-  --color-exito: #4cc38a;
-  --color-sobre-exito: #121826;
-  --color-exito-suave: #16362a;
-  --color-sobre-exito-suave: #6fd3a0;
+/*
+ * ALIAS TEMPORALES (LAB-68). Apuntan a un token nuevo y se resuelven en cada tema, porque
+ * var() se evalúa en el elemento donde se declara. LAB-69 los borra al rehacer los componentes.
+ *   azul → accion · azul-presionado → accion · sobre-azul → sobre-accion
+ *   azul-suave → superficie · sobre-azul-suave → texto
+ *   naranja-marca → coral · naranja-accion → accion · sobre-naranja → sobre-accion
+ *   naranja-suave → sol · sobre-naranja-suave → sobre-sol
+ *   exito → accion · sobre-exito → sobre-accion · exito-suave → sol · sobre-exito-suave → sobre-sol
+ *   acento → accion · superficie-elevada → superficie
+ *   texto-secundario → texto · texto-terciario → texto · borde → texto · divisor → fondo
+ *   cinta → coral · cinta-marcas → texto (la cinta métrica se retira en LAB-69)
+ */
+:root,
+.claro,
+.dark {
+  --color-azul: var(--color-accion);
+  --color-azul-presionado: var(--color-accion);
+  --color-sobre-azul: var(--color-sobre-accion);
+  --color-azul-suave: var(--color-superficie);
+  --color-sobre-azul-suave: var(--color-texto);
 
-  --color-acento: #f2a07f;
+  --color-naranja-marca: var(--color-coral);
+  --color-naranja-accion: var(--color-accion);
+  --color-sobre-naranja: var(--color-sobre-accion);
+  --color-naranja-suave: var(--color-sol);
+  --color-sobre-naranja-suave: var(--color-sobre-sol);
 
-  --color-error: #ff8f85;
+  --color-exito: var(--color-accion);
+  --color-sobre-exito: var(--color-sobre-accion);
+  --color-exito-suave: var(--color-sol);
+  --color-sobre-exito-suave: var(--color-sobre-sol);
 
-  --color-fondo: #121826;
-  --color-superficie: #1b2335;
-  --color-superficie-elevada: #243049;
+  --color-acento: var(--color-accion);
+  --color-superficie-elevada: var(--color-superficie);
+  --color-texto-secundario: var(--color-texto);
+  --color-texto-terciario: var(--color-texto);
+  --color-borde: var(--color-texto);
+  --color-divisor: var(--color-fondo);
 
-  --color-texto: #eef0f5;
-  --color-texto-secundario: #a9b2c6;
-  --color-texto-terciario: #8d97ad;
-
-  --color-borde: #334060;
-  --color-divisor: #334060;
+  --color-cinta: var(--color-coral);
+  --color-cinta-marcas: var(--color-texto);
 }
 
 /* `dark:` aplica dentro de .dark, salvo en un bloque forzado a claro con .claro. */
 @custom-variant dark (&:where(.dark, .dark *):where(:not(.claro, .claro *)));
 
 /*
- * Mapeo de tokens a Tailwind (bg-azul, text-texto…). Se borra la paleta por defecto: solo existen
+ * Mapeo de tokens a Tailwind (bg-accion, text-texto…). Se borra la paleta por defecto: solo existen
  * los colores de la marca. `inline reference`: las clases usan var(--color-x) directo y Tailwind no
  * vuelve a declarar las variables (ya están arriba).
  */
 @theme inline reference {
   --color-*: initial;
+  --color-fondo: var(--color-fondo);
+  --color-superficie: var(--color-superficie);
+  --color-texto: var(--color-texto);
+  --color-accion: var(--color-accion);
+  --color-sobre-accion: var(--color-sobre-accion);
+  --color-encabezado: var(--color-encabezado);
+  --color-sobre-encabezado: var(--color-sobre-encabezado);
+  --color-sol: var(--color-sol);
+  --color-sobre-sol: var(--color-sobre-sol);
+  --color-coral: var(--color-coral);
+  --color-error: var(--color-error);
+  --color-equipo: var(--color-equipo);
+  --color-velo: var(--color-velo);
+  --color-foco: var(--color-foco);
+
+  /* Alias temporales (LAB-68): los borra LAB-69. */
   --color-azul: var(--color-azul);
   --color-azul-presionado: var(--color-azul-presionado);
   --color-sobre-azul: var(--color-sobre-azul);
@@ -116,24 +140,19 @@
   --color-exito-suave: var(--color-exito-suave);
   --color-sobre-exito-suave: var(--color-sobre-exito-suave);
   --color-acento: var(--color-acento);
-  --color-error: var(--color-error);
-  --color-fondo: var(--color-fondo);
-  --color-superficie: var(--color-superficie);
   --color-superficie-elevada: var(--color-superficie-elevada);
-  --color-texto: var(--color-texto);
   --color-texto-secundario: var(--color-texto-secundario);
   --color-texto-terciario: var(--color-texto-terciario);
   --color-borde: var(--color-borde);
   --color-divisor: var(--color-divisor);
-  --color-foco: var(--color-foco);
   --color-cinta: var(--color-cinta);
   --color-cinta-marcas: var(--color-cinta-marcas);
-  --color-velo: var(--color-velo);
 
-  /* Las variables --fuente-* las define next/font en src/app/fuentes.ts. */
-  --font-texto: var(--fuente-atkinson), system-ui, sans-serif;
-  --font-sans: var(--fuente-atkinson), system-ui, sans-serif;
-  --font-mono: var(--fuente-plex-mono), ui-monospace, monospace;
+  /* Las variables --fuente-* las define next/font en src/app/fuentes.ts. Etiquetas y datos usan
+     Nunito Sans (ya no hay IBM Plex Mono): `font-mono` queda como alias. */
+  --font-texto: var(--fuente-nunito), system-ui, sans-serif;
+  --font-sans: var(--fuente-nunito), system-ui, sans-serif;
+  --font-mono: var(--fuente-nunito), system-ui, sans-serif;
 }
 
 @theme {
@@ -155,20 +174,19 @@
 }
 
 :root {
-  --font-titulo: var(--fuente-archivo), system-ui, sans-serif;
+  --font-titulo: var(--fuente-baloo), system-ui, sans-serif;
 }
 
-/* Títulos: Archivo 800 ensanchada al 118 % y con letter-spacing levemente negativo. */
+/* Títulos y marca: Baloo 2 800, con letter-spacing levemente negativo. */
 @utility font-titulo {
   font-family: var(--font-titulo);
   font-weight: 800;
-  font-stretch: 118%;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 /*
- * Cinta métrica (guía §5): naranja con marcas azul noche, finas cada 8 px (4 px de alto), gruesas
- * cada 40 px (7 px de alto) y un tope de 3 px a la derecha. Las marcas no cambian con el tema.
+ * Cinta métrica (alias temporal: la retira LAB-69). Mismas medidas de la guía §5; los colores
+ * salen de los alias cinta y cinta-marcas.
  */
 @utility cinta-regla {
   height: 12px;
@@ -200,6 +218,7 @@
     @apply bg-fondo font-texto text-texto;
   }
 
+  /* Foco: 3 px sólidos, color texto en claro y sol en oscuro (token foco). */
   :focus-visible {
     outline: 3px solid var(--color-foco);
     outline-offset: 2px;
