@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Sistema: colores y piezas en claro y oscuro</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+h1,h2{text-wrap:balance}
+</style>
+</helmet>
+<div style="width: 880px; height: 844px; box-sizing: border-box; font-family: 'Nunito Sans', system-ui, sans-serif; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr))">
+
+  <section style="padding: 28px; background: #FFF3D6; color: #123B4A; display: flex; flex-direction: column; gap: 16px">
+    <h2 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 34px; line-height: 1; font-weight: 800">Claro</h2>
+    <dl style="margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; font-size: 14px">
+      <div style="display: flex; align-items: center; gap: 10px"><span style="width: 44px; height: 44px; flex: none; border-radius: 12px; background: #FFF3D6; border: 2px solid #123B4A; box-sizing: border-box"></span><div><dt style="font-weight: 700">Fondo · arena</dt><dd style="margin: 0">#FFF3D6</dd></div></div>
+      <div style="display: flex; align-items: center; gap: 10px"><span style="width: 44px; height: 44px; flex: none; border-radius: 12px; background: #FFFFFF"></span><div><dt style="font-weight: 700">Superficie</dt><dd style="margin: 0">#FFFFFF</dd></div></div>
+      <div style="display: flex; align-items: center; gap: 10px"><span style="width: 44px; height: 44px; flex: none; border-radius: 12px; background: #123B4A"></span><div><dt style="font-weight: 700">Texto · azul noche</dt><dd style="margin: 0">#123B4A</dd></div></div>
+      <div style="display: flex; align-items: center; gap: 10px"><span style="width: 44px; height: 44px; flex: none; border-radius: 12px; background: #0E7C86"></span><div><dt style="font-weight: 700">Acción · turquesa</dt><dd style="margin: 0">#0E7C86</dd></div></div>
+      <div style="display: flex; align-items: center; gap: 10px"><span style="width: 44px; height: 44px; flex: none; border-radius: 12px; background: #F7C948"></span><div><dt style="font-weight: 700">Acento · sol</dt><dd style="margin: 0">#F7C948</dd></div></div>
+      <div style="display: flex; align-items: center; gap: 10px"><span style="width: 44px; height: 44px; flex: none; border-radius: 12px; background: #F25C54"></span><div><dt style="font-weight: 700">Adorno · coral</dt><dd style="margin: 0">#F25C54, sin texto</dd></div></div>
+      <div style="display: flex; align-items: center; gap: 10px"><span style="width: 44px; height: 44px; flex: none; border-radius: 12px; background: #A62B24"></span><div><dt style="font-weight: 700">Error y borrar</dt><dd style="margin: 0">#A62B24</dd></div></div>
+    </dl>
+
+    <span aria-hidden="true" style="height: 18px; border-radius: 9px; background: repeating-linear-gradient(90deg, #0E7C86 0 18px, #FFFFFF 18px 36px)"></span>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <button style="min-height: 56px; border: 0; border-radius: 18px; background: #0E7C86; color: #FFFFFF; font: inherit; font-size: 18px; font-weight: 700">Botón principal</button>
+      <button style="min-height: 52px; border: 3px solid #123B4A; border-radius: 18px; background: transparent; color: #123B4A; font: inherit; font-size: 17px; font-weight: 700">Botón secundario</button>
+      <div style="display: flex; gap: 8px">
+        <span style="min-height: 46px; padding: 0 16px; border-radius: 23px; background: #F7C948; display: flex; align-items: center; font-size: 16px; font-weight: 700">Chip elegido</span>
+        <span style="min-height: 46px; padding: 0 16px; border-radius: 23px; background: #FFFFFF; display: flex; align-items: center; font-size: 16px">Chip</span>
+      </div>
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 16px; font-weight: 700">Campo<input type="text" value="Texto escrito" style="height: 52px; box-sizing: border-box; padding: 0 14px; border: 2px solid #123B4A; border-radius: 16px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px; font-weight: 400"></label>
+      <div style="padding: 14px 16px; border-radius: 22px; background: #FFFFFF"><span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; font-weight: 800">Tarjeta</span><br><span style="font-size: 15px">Radio 22, sin sombra ni borde.</span></div>
+    </div>
+  </section>
+
+  <section style="padding: 28px; background: #0B2730; color: #FFF3D6; display: flex; flex-direction: column; gap: 16px">
+    <h2 style="margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 34px; line-height: 1; font-weight: 800">Oscuro</h2>
+    <dl style="margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; font-size: 14px">
+      <div style="display: flex; align-items: center; gap: 10px"><span style="width: 44px; height: 44px; flex: none; border-radius: 12px; background: #0B2730; border: 2px solid #FFF3D6; box-sizing: border-box"></span><div><dt style="font-weight: 700">Fondo · mar de noche</dt><dd style="margin: 0">#0B2730</dd></div></div>
+      <div style="display: flex; align-items: center; gap: 10px"><span style="width: 44px; height: 44px; flex: none; border-radius: 12px; background: #17485A"></span><div><dt style="font-weight: 700">Superficie</dt><dd style="margin: 0">#17485A</dd></div></div>
+      <div style="display: flex; align-items: center; gap: 10px"><span style="width: 44px; height: 44px; flex: none; border-radius: 12px; background: #FFF3D6"></span><div><dt style="font-weight: 700">Texto · arena</dt><dd style="margin: 0">#FFF3D6</dd></div></div>
+      <div style="display: flex; align-items: center; gap: 10px"><span style="width: 44px; height: 44px; flex: none; border-radius: 12px; background: #45C4CC"></span><div><dt style="font-weight: 700">Acción · turquesa claro</dt><dd style="margin: 0">#45C4CC</dd></div></div>
+      <div style="display: flex; align-items: center; gap: 10px"><span style="width: 44px; height: 44px; flex: none; border-radius: 12px; background: #F7C948"></span><div><dt style="font-weight: 700">Acento · sol</dt><dd style="margin: 0">#F7C948, igual</dd></div></div>
+      <div style="display: flex; align-items: center; gap: 10px"><span style="width: 44px; height: 44px; flex: none; border-radius: 12px; background: #0E7C86"></span><div><dt style="font-weight: 700">Encabezados</dt><dd style="margin: 0">#0E7C86, igual</dd></div></div>
+      <div style="display: flex; align-items: center; gap: 10px"><span style="width: 44px; height: 44px; flex: none; border-radius: 12px; background: #FF9A8F"></span><div><dt style="font-weight: 700">Error y borrar</dt><dd style="margin: 0">#FF9A8F</dd></div></div>
+    </dl>
+
+    <span aria-hidden="true" style="height: 18px; border-radius: 9px; background: repeating-linear-gradient(90deg, #45C4CC 0 18px, #17485A 18px 36px)"></span>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <button style="min-height: 56px; border: 0; border-radius: 18px; background: #45C4CC; color: #0B2730; font: inherit; font-size: 18px; font-weight: 700">Botón principal</button>
+      <button style="min-height: 52px; border: 3px solid #FFF3D6; border-radius: 18px; background: transparent; color: #FFF3D6; font: inherit; font-size: 17px; font-weight: 700">Botón secundario</button>
+      <div style="display: flex; gap: 8px">
+        <span style="min-height: 46px; padding: 0 16px; border-radius: 23px; background: #F7C948; color: #123B4A; display: flex; align-items: center; font-size: 16px; font-weight: 700">Chip elegido</span>
+        <span style="min-height: 46px; padding: 0 16px; border-radius: 23px; background: #17485A; display: flex; align-items: center; font-size: 16px">Chip</span>
+      </div>
+      <label style="display: flex; flex-direction: column; gap: 4px; font-size: 16px; font-weight: 700">Campo<input type="text" value="Texto escrito" style="height: 52px; box-sizing: border-box; padding: 0 14px; border: 2px solid #FFF3D6; border-radius: 16px; background: #0B2730; color: #FFF3D6; font: inherit; font-size: 17px; font-weight: 400"></label>
+      <div style="padding: 14px 16px; border-radius: 22px; background: #17485A"><span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; font-weight: 800">Tarjeta</span><br><span style="font-size: 15px">Radio 22, sin sombra ni borde.</span></div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":880,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

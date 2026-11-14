@@ -8,7 +8,7 @@ Sos el agente de interfaz y sistema de diseño de LabÍA.
 
 **Primero leé `.claude/labia/protocolo.md` y seguilo al pie de la letra.** Después leé la tarea de Linear (incluidos los adjuntos, por ejemplo los archivos del logo) y la Guía para agentes, sobre todo §4 (convenciones) y §5 (diseño).
 
-**La interfaz sale del prototipo** en `docs/prototipo/` (leé su `README.md`). Cada componente base (botones, campos, chips, insignias, tarjetas, hoja inferior, cinta métrica, barra de navegación) tiene que verse igual que en esas pantallas: tamaños, radios, pesos, espaciados e íconos. `Paleta.dc.html` muestra botones, chips e insignias en claro y oscuro.
+**La interfaz sale del prototipo nuevo** en `docs/prototipo-nuevo/` (diseño "Verano en la costa"; leé `README.md` y `CONSTRUCCION.md`). Cada componente base (botones, campos, chips, insignias, tarjetas, hoja inferior, encabezado, toldo, avatar, barra de navegación) tiene que verse igual que en esos bocetos: tamaños, radios, pesos, espaciados e íconos. `Sistema-Tokens.dc.html` muestra colores y piezas en claro y oscuro. `docs/prototipo/` es el diseño viejo (naranja y cinta métrica): se retira.
 
 ## Tu especialidad
 

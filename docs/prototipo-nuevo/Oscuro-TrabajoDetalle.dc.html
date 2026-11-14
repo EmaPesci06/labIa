@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Detalle del trabajo y postulación, modo oscuro</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;touch-action:manipulation}
+h1,h2{text-wrap:balance}
+a{color:#FFF3D6}a:hover{color:#45C4CC}
+:focus-visible{outline:3px solid #F7C948;outline-offset:2px}
+button:hover{filter:brightness(1.1)}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #0B2730; color: #FFF3D6; font-family: 'Nunito Sans', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+  <header style="padding: 12px 20px 18px; background: #F7C948; color: #123B4A; border-radius: 0 0 28px 28px">
+    <a href="Oscuro-Trabajos.dc.html" style="min-height: 44px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-size: 15px; font-weight: 700; color: #123B4A"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 12H4M11 5l-7 7 7 7"></path></svg>Trabajos</a>
+    <p style="margin: 0; font-size: 15px">Plomería · publicado hace 20 min</p>
+    <h1 style="margin: 4px 0 0; font-family: 'Baloo 2', sans-serif; font-size: 32px; line-height: 1.02; font-weight: 800">Pierde la canilla de la cocina</h1>
+  </header>
+
+  <main style="flex: 1; padding: 16px 20px 0; display: flex; flex-direction: column; gap: 14px; overflow: hidden">
+    <p style="margin: 0; font-size: 17px; line-height: 1.45">Pierde la canilla de la cocina y moja el bajo mesada.</p>
+    <dl style="margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+      <div style="padding: 10px 12px; border-radius: 16px; background: #17485A"><dt style="font-size: 14px">Barrio</dt><dd style="margin: 0; font-size: 16px; font-weight: 700">La Perla</dd></div>
+      <div style="padding: 10px 12px; border-radius: 16px; background: #17485A"><dt style="font-size: 14px">Distancia</dt><dd style="margin: 0; font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums">1,2&nbsp;km</dd></div>
+      <div style="padding: 10px 12px; border-radius: 16px; background: #17485A"><dt style="font-size: 14px">Para</dt><dd style="margin: 0; font-size: 16px; font-weight: 700">Hoy</dd></div>
+    </dl>
+    <div role="img" aria-label="Foto que subió el cliente" style="height: 130px; border-radius: 20px; background: #17485A; display: flex; align-items: flex-end; padding: 10px; box-sizing: border-box; font-size: 14px">Foto del cliente</div>
+    <p style="margin: 0; font-size: 15px">Lo publicó <strong>Carla</strong>. Ya se postuló 1 profesional.</p>
+
+    <form style="margin: 0; display: flex; flex-direction: column; gap: 6px">
+      <label for="msg" style="font-family: 'Baloo 2', sans-serif; font-size: 22px; font-weight: 800">Tu mensaje para Carla</label>
+      <textarea id="msg" rows="3" aria-describedby="msg-ayuda" style="height: 100px; box-sizing: border-box; padding: 12px 14px; border: 2px solid #FFF3D6; border-radius: 16px; resize: none; background: #0B2730; color: #FFF3D6; font: inherit; font-size: 17px; line-height: 1.4">Puedo pasar hoy a las 17. Por lo que contás es el cuerito o el vástago.</textarea>
+      <span id="msg-ayuda" style="font-size: 14px">No pongas teléfono ni precio final: eso se acuerda por WhatsApp, con presupuesto escrito.</span>
+    </form>
+  </main>
+
+  <footer style="padding: 10px 20px 14px; background: #17485A; border-radius: 28px 28px 0 0; display: flex; flex-direction: column">
+    <button style="min-height: 56px; border: 0; border-radius: 18px; background: #45C4CC; color: #0B2730; font: inherit; font-size: 18px; font-weight: 700">Postularme</button>
+    <a href="Oscuro-Reportar.dc.html" style="align-self: center; min-height: 44px; display: flex; align-items: center; font-size: 14px">Reportar este trabajo</a>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

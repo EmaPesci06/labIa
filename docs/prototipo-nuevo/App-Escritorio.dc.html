@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Inicio del cliente en escritorio</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+h1,h2{text-wrap:balance}
+a{color:#123B4A}a:hover{color:#0E7C86}
+:focus-visible{outline:3px solid #123B4A;outline-offset:2px}
+button:hover{filter:brightness(0.95)}
+</style>
+</helmet>
+<div style="min-height: 900px; box-sizing: border-box; background: #FFF3D6; color: #123B4A; font-family: 'Nunito Sans', system-ui, sans-serif; display: flex; flex-direction: column">
+  <header style="background: #FFFFFF">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 10px 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 28px">
+      <span translate="no" style="font-family: 'Baloo 2', sans-serif; font-size: 32px; font-weight: 800; color: #0E7C86">LabÍA</span>
+      <nav aria-label="Principal" style="flex: 1; display: flex; flex-wrap: wrap; gap: 4px">
+        <a href="#" aria-current="page" style="min-height: 44px; padding: 0 16px; display: flex; align-items: center; border-radius: 22px; background: #FFF3D6; text-decoration: none; font-size: 16px; font-weight: 700">Inicio</a>
+        <a href="#" style="min-height: 44px; padding: 0 16px; display: flex; align-items: center; text-decoration: none; font-size: 16px">Mis trabajos</a>
+        <a href="#" style="min-height: 44px; padding: 0 16px; display: flex; align-items: center; text-decoration: none; font-size: 16px">Cuenta</a>
+      </nav>
+      <button style="min-height: 44px; padding: 0 18px; border: 2px solid #123B4A; border-radius: 22px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 15px; font-weight: 700">Estás en La Perla</button>
+      <a href="App-Publicar.dc.html" style="min-height: 44px; padding: 0 20px; display: flex; align-items: center; border-radius: 22px; background: #0E7C86; color: #FFFFFF; text-decoration: none; font-size: 15px; font-weight: 700">Publicar un trabajo</a>
+    </div>
+  </header>
+
+  <section aria-labelledby="e1" style="background: #0E7C86; color: #FFFFFF; border-radius: 0 0 40px 40px">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 48px 32px 56px; display: flex; flex-wrap: wrap; gap: 40px; align-items: flex-start">
+      <div style="flex: 999 1 460px; min-width: 0">
+        <h1 id="e1" style="margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 4.5rem; line-height: 0.95; font-weight: 800">¿Qué se rompió?</h1>
+        <p style="margin: 12px 0 24px; font-size: 1.15rem; max-width: 34rem">Tocá lo que más se parezca. Te decimos qué oficio lo arregla y quién está cerca de tu barrio.</p>
+        <div role="group" aria-label="Problemas frecuentes" style="display: flex; flex-wrap: wrap; gap: 10px">
+          <button aria-pressed="true" style="min-height: 52px; padding: 0 20px; border: 0; border-radius: 26px; background: #F7C948; color: #123B4A; font: inherit; font-size: 17px; font-weight: 700">Pierde una canilla</button>
+          <button aria-pressed="false" style="min-height: 52px; padding: 0 20px; border: 0; border-radius: 26px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px">Saltó la térmica</button>
+          <button aria-pressed="false" style="min-height: 52px; padding: 0 20px; border: 0; border-radius: 26px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px">Me quedé afuera</button>
+          <button aria-pressed="false" style="min-height: 52px; padding: 0 20px; border: 0; border-radius: 26px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px">Hay olor a gas</button>
+          <button aria-pressed="false" style="min-height: 52px; padding: 0 20px; border: 0; border-radius: 26px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px">Se tapó el baño</button>
+          <button aria-pressed="false" style="min-height: 52px; padding: 0 20px; border: 0; border-radius: 26px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px">Humedad en la pared</button>
+          <button aria-pressed="false" style="min-height: 52px; padding: 0 20px; border: 0; border-radius: 26px; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px">No arranca el auto</button>
+          <button aria-pressed="false" style="min-height: 52px; padding: 0 20px; border: 2px solid #FFFFFF; border-radius: 26px; background: transparent; color: #FFFFFF; font: inherit; font-size: 17px; font-weight: 700">Es otra cosa</button>
+        </div>
+      </div>
+
+      <aside aria-live="polite" style="flex: 1 1 380px; min-width: 0; box-sizing: border-box; padding: 24px; border-radius: 28px; background: #FFF3D6; color: #123B4A; display: flex; flex-direction: column; gap: 4px">
+        <h2 style="margin: 0 0 6px; font-family: 'Baloo 2', sans-serif; font-size: 1.75rem; line-height: 1.1; font-weight: 800">Eso lo arregla una plomera</h2>
+        <a href="App-Perfil.dc.html" style="min-height: 64px; padding: 0 16px; border-radius: 18px; background: #FFFFFF; display: flex; align-items: center; justify-content: space-between; text-decoration: none; font-size: 17px"><span><strong>Marta R.</strong> · Verificada</span><span style="font-variant-numeric: tabular-nums">a 1,2&nbsp;km</span></a>
+        <a href="#" style="min-height: 56px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; font-size: 17px"><span><strong>Luis P.</strong> · Verificado</span><span style="font-variant-numeric: tabular-nums">a 2,4&nbsp;km</span></a>
+        <a href="#" style="min-height: 56px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; text-decoration: none; font-size: 17px"><span><strong>Diego S.</strong> · Verificado</span><span style="font-variant-numeric: tabular-nums">a 3,1&nbsp;km</span></a>
+        <button style="margin-top: 8px; min-height: 56px; border: 0; border-radius: 18px; background: #0E7C86; color: #FFFFFF; font: inherit; font-size: 18px; font-weight: 700">Escribirle a Marta por WhatsApp</button>
+        <a href="#" style="min-height: 44px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700">Ver a los 8 plomeros</a>
+      </aside>
+    </div>
+  </section>
+
+  <section aria-labelledby="e2" style="max-width: 1200px; width: 100%; box-sizing: border-box; margin: 0 auto; padding: 40px 32px 48px">
+    <h2 id="e2" style="margin: 0 0 16px; font-family: 'Baloo 2', sans-serif; font-size: 2rem; line-height: 1.1; font-weight: 800">¿Ya sabés a quién buscás?</h2>
+    <nav aria-label="Oficios" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px">
+      <a href="#" style="height: 124px; border-radius: 22px; overflow: hidden; background: #0E7C86; color: #FFFFFF; text-decoration: none; display: flex; flex-direction: column"><span aria-hidden="true" style="height: 18px; background: repeating-linear-gradient(90deg, #FFFFFF 0 16px, #0E7C86 16px 32px)"></span><span style="flex: 1; padding: 0 16px 12px; display: flex; flex-direction: column; justify-content: flex-end"><span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; line-height: 1.1; font-weight: 800">Plomería</span><span style="font-size: 15px">8 cerca</span></span></a>
+      <a href="#" style="height: 124px; border-radius: 22px; overflow: hidden; background: #F7C948; color: #123B4A; text-decoration: none; display: flex; flex-direction: column"><span aria-hidden="true" style="height: 18px; background: repeating-linear-gradient(90deg, #FFFFFF 0 16px, #F7C948 16px 32px)"></span><span style="flex: 1; padding: 0 16px 12px; display: flex; flex-direction: column; justify-content: flex-end"><span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; line-height: 1.1; font-weight: 800">Electricidad</span><span style="font-size: 15px">6 cerca</span></span></a>
+      <a href="#" style="height: 124px; border-radius: 22px; overflow: hidden; background: #123B4A; color: #FFFFFF; text-decoration: none; display: flex; flex-direction: column"><span aria-hidden="true" style="height: 18px; background: repeating-linear-gradient(90deg, #FFFFFF 0 16px, #123B4A 16px 32px)"></span><span style="flex: 1; padding: 0 16px 12px; display: flex; flex-direction: column; justify-content: flex-end"><span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; line-height: 1.1; font-weight: 800">Gas</span><span style="font-size: 15px">3 cerca</span></span></a>
+      <a href="#" style="height: 124px; border-radius: 22px; overflow: hidden; background: #FFFFFF; color: #123B4A; text-decoration: none; display: flex; flex-direction: column"><span aria-hidden="true" style="height: 18px; background: repeating-linear-gradient(90deg, #F25C54 0 16px, #FFFFFF 16px 32px)"></span><span style="flex: 1; padding: 0 16px 12px; display: flex; flex-direction: column; justify-content: flex-end"><span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; line-height: 1.1; font-weight: 800">Cerrajería</span><span style="font-size: 15px">3 cerca</span></span></a>
+      <a href="#" style="height: 124px; border-radius: 22px; overflow: hidden; background: #F7C948; color: #123B4A; text-decoration: none; display: flex; flex-direction: column"><span aria-hidden="true" style="height: 18px; background: repeating-linear-gradient(90deg, #FFFFFF 0 16px, #F7C948 16px 32px)"></span><span style="flex: 1; padding: 0 16px 12px; display: flex; flex-direction: column; justify-content: flex-end"><span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; line-height: 1.1; font-weight: 800">Pintura</span><span style="font-size: 15px">5 cerca</span></span></a>
+      <a href="#" style="height: 124px; border-radius: 22px; overflow: hidden; background: #0E7C86; color: #FFFFFF; text-decoration: none; display: flex; flex-direction: column"><span aria-hidden="true" style="height: 18px; background: repeating-linear-gradient(90deg, #FFFFFF 0 16px, #0E7C86 16px 32px)"></span><span style="flex: 1; padding: 0 16px 12px; display: flex; flex-direction: column; justify-content: flex-end"><span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; line-height: 1.1; font-weight: 800">Carpintería</span><span style="font-size: 15px">4 cerca</span></span></a>
+      <a href="#" style="height: 124px; border-radius: 22px; overflow: hidden; background: #FFFFFF; color: #123B4A; text-decoration: none; display: flex; flex-direction: column"><span aria-hidden="true" style="height: 18px; background: repeating-linear-gradient(90deg, #F25C54 0 16px, #FFFFFF 16px 32px)"></span><span style="flex: 1; padding: 0 16px 12px; display: flex; flex-direction: column; justify-content: flex-end"><span style="font-family: 'Baloo 2', sans-serif; font-size: 22px; line-height: 1.1; font-weight: 800">Mecánica</span><span style="font-size: 15px">2 cerca</span></span></a>
+    </nav>
+    <p style="margin: 16px 0 0; font-size: 15px">Todos pasaron la revisión de identidad y antecedentes. El número es cuántos hay a menos de 5&nbsp;km de La Perla.</p>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

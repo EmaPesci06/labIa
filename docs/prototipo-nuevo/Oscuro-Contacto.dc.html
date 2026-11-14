@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Contactar por WhatsApp, modo oscuro</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;touch-action:manipulation}
+h1,h2{text-wrap:balance}
+a{color:#FFF3D6}a:hover{color:#45C4CC}
+:focus-visible{outline:3px solid #F7C948;outline-offset:2px}
+button:hover{filter:brightness(1.1)}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #05161B; color: #FFF3D6; font-family: 'Nunito Sans', system-ui, sans-serif; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden">
+  <div aria-hidden="true" style="flex: 1; padding: 60px 20px 0; color: #7FA3AE; font-family: 'Baloo 2', sans-serif; font-size: 38px; font-weight: 800">Marta R.</div>
+
+  <section role="dialog" aria-modal="true" aria-labelledby="c1" style="padding: 10px 20px 18px; background: #0B2730; border-radius: 28px 28px 0 0; display: flex; flex-direction: column; gap: 14px">
+    <span aria-hidden="true" style="align-self: center; width: 48px; height: 5px; border-radius: 3px; background: #17485A"></span>
+    <h1 id="c1" style="margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 30px; line-height: 1.05; font-weight: 800">Escribile a Marta por WhatsApp</h1>
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <label for="msg" style="font-size: 16px; font-weight: 700">Tu mensaje</label>
+      <textarea id="msg" rows="5" style="height: 148px; box-sizing: border-box; padding: 12px 14px; border: 2px solid #FFF3D6; border-radius: 16px; resize: none; background: #0B2730; color: #FFF3D6; font: inherit; font-size: 17px; line-height: 1.4">Hola Marta, te encontré en LabÍA. Estoy en La Perla y me pierde la canilla de la cocina. ¿Podés pasar a verla?</textarea>
+      <span style="font-size: 14px">Podés cambiarlo. Se abre WhatsApp con el mensaje listo para enviar.</span>
+    </div>
+    <ul style="list-style: none; margin: 0; padding: 14px 16px; border-radius: 18px; background: #17485A; display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 1.35">
+      <li style="display: flex; gap: 10px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#45C4CC" stroke-width="3.5" style="flex: none; margin-top: 2px"><path d="M4 12l5 5L20 6"></path></svg>Pedile el presupuesto por escrito antes de empezar.</li>
+      <li style="display: flex; gap: 10px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#45C4CC" stroke-width="3.5" style="flex: none; margin-top: 2px"><path d="M4 12l5 5L20 6"></path></svg>Tu dirección se la das vos, recién cuando acuerden.</li>
+    </ul>
+    <button style="min-height: 56px; border: 0; border-radius: 18px; background: #45C4CC; color: #0B2730; font: inherit; font-size: 18px; font-weight: 700">Abrir WhatsApp</button>
+    <a href="Oscuro-Perfil.dc.html" style="align-self: center; min-height: 44px; display: flex; align-items: center; font-size: 16px; font-weight: 700">Ahora no</a>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

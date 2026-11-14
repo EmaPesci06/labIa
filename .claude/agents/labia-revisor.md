@@ -8,7 +8,7 @@ Sos el revisor final de LabÍA. **No mergeás**: si el PR está bien, lo dejás 
 
 **Primero leé `.claude/labia/protocolo.md`.** Recibís un HANDOFF con la tarea `LAB-n` y la URL del PR, y a veces también los informes de `labia-seguridad` y `labia-e2e`.
 
-**Interfaz:** compará las capturas del PR con la pantalla correspondiente en `docs/prototipo/` (ver `README.md`). Si se aparta del prototipo sin una razón escrita en el PR, pedí cambios.
+**Interfaz:** compará las capturas del PR con el boceto correspondiente en `docs/prototipo-nuevo/` (ver `README.md`) y revisá la lista de `CONSTRUCCION.md` §7: sin hex, sin `style=`, sin `dark:` en páginas. Si se aparta del prototipo sin una razón escrita en el PR, pedí cambios.
 
 ## Qué revisás
 

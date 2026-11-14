@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Reportar un perfil</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;touch-action:manipulation}
+h1,h2{text-wrap:balance}
+a{color:#123B4A}a:hover{color:#0E7C86}
+:focus-visible{outline:3px solid #123B4A;outline-offset:2px}
+button:hover{filter:brightness(0.95)}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #123B4A; color: #123B4A; font-family: 'Nunito Sans', system-ui, sans-serif; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden">
+  <div aria-hidden="true" style="flex: 1; padding: 60px 20px 0; color: #7FA3AE; font-family: 'Baloo 2', sans-serif; font-size: 38px; font-weight: 800">Marta R.</div>
+
+  <form role="dialog" aria-modal="true" aria-labelledby="r1" style="margin: 0; padding: 10px 20px 18px; background: #FFF3D6; border-radius: 28px 28px 0 0; display: flex; flex-direction: column; gap: 14px">
+    <span aria-hidden="true" style="align-self: center; width: 48px; height: 5px; border-radius: 3px; background: #123B4A"></span>
+    <h1 id="r1" style="margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 30px; line-height: 1.05; font-weight: 800">¿Qué pasó con este perfil?</h1>
+    <fieldset style="margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 8px">
+      <legend style="padding: 0; margin-bottom: 8px; font-size: 16px; font-weight: 700">Elegí el motivo</legend>
+      <label style="min-height: 50px; padding: 0 16px; border-radius: 16px; background: #FFFFFF; display: flex; align-items: center; gap: 12px; font-size: 17px"><input type="radio" name="motivo" style="width: 22px; height: 22px; margin: 0; accent-color: #0E7C86">Los datos son falsos</label>
+      <label style="min-height: 50px; padding: 0 16px; border-radius: 16px; background: #F7C948; display: flex; align-items: center; gap: 12px; font-size: 17px; font-weight: 700"><input type="radio" name="motivo" checked style="width: 22px; height: 22px; margin: 0; accent-color: #123B4A">Se portó mal</label>
+      <label style="min-height: 50px; padding: 0 16px; border-radius: 16px; background: #FFFFFF; display: flex; align-items: center; gap: 12px; font-size: 17px"><input type="radio" name="motivo" style="width: 22px; height: 22px; margin: 0; accent-color: #0E7C86">Intentó estafarme</label>
+      <label style="min-height: 50px; padding: 0 16px; border-radius: 16px; background: #FFFFFF; display: flex; align-items: center; gap: 12px; font-size: 17px"><input type="radio" name="motivo" style="width: 22px; height: 22px; margin: 0; accent-color: #0E7C86">Tiene contenido inapropiado</label>
+      <label style="min-height: 50px; padding: 0 16px; border-radius: 16px; background: #FFFFFF; display: flex; align-items: center; gap: 12px; font-size: 17px"><input type="radio" name="motivo" style="width: 22px; height: 22px; margin: 0; accent-color: #0E7C86">Otra cosa</label>
+    </fieldset>
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <label for="det" style="font-size: 16px; font-weight: 700">Contanos qué pasó</label>
+      <textarea id="det" rows="3" style="height: 96px; box-sizing: border-box; padding: 12px 14px; border: 2px solid #123B4A; border-radius: 16px; resize: none; background: #FFFFFF; color: #123B4A; font: inherit; font-size: 17px; line-height: 1.4"></textarea>
+      <span style="font-size: 14px">Lo lee nuestro equipo. La otra persona no ve quién reportó.</span>
+    </div>
+    <button style="min-height: 56px; border: 0; border-radius: 18px; background: #123B4A; color: #FFFFFF; font: inherit; font-size: 18px; font-weight: 700">Enviar reporte</button>
+    <a href="App-Perfil.dc.html" style="align-self: center; min-height: 44px; display: flex; align-items: center; font-size: 16px; font-weight: 700">Cancelar</a>
+  </form>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

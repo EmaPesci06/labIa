@@ -1,4 +1,7 @@
-# Prototipo de LabÍA (fuente de verdad de la interfaz)
+# Prototipo de LabÍA (diseño viejo)
+
+> **Reemplazado.** La interfaz se rehace con el diseño de `docs/prototipo-nuevo/` (Fase 7 · Interfaz nueva). Esta
+> carpeta queda como referencia de la interfaz actual hasta que LAB-81 la borre.
 
 Copia del canvas **"LabÍA · Prototipo MVP"** de Claude: https://claude.ai/artifact/W9zmAprvxnq1u7w9Ey3i4Q
 
