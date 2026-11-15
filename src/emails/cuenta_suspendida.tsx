@@ -1,10 +1,9 @@
-import { Text } from "@react-email/components";
-
 import {
   BotonAccion,
-  estilosTexto,
   Layout,
+  Parrafo,
   PIE_DE_PRUEBA,
+  Tarjeta,
   type DatosPie,
 } from "@/lib/emails/Layout";
 
@@ -21,22 +20,21 @@ export default function CuentaSuspendida({
   pie,
 }: DatosCuentaSuspendida & { pie: DatosPie }) {
   return (
-    <Layout previa="Tu cuenta de LabÍA fue suspendida." pie={pie}>
-      <Text style={estilosTexto.titulo}>Tu cuenta fue suspendida</Text>
-      <Text style={estilosTexto.parrafo}>
-        Hola {nombre}, te informamos que tu cuenta de LabÍA fue suspendida por el siguiente motivo:
-      </Text>
-      <Text style={{ ...estilosTexto.tarjeta, ...estilosTexto.parrafo }}>
-        <strong>Motivo:</strong> {motivo}
-      </Text>
-      <Text style={estilosTexto.parrafo}>
-        Mientras tu cuenta esté suspendida no vas a poder publicar trabajos, postularte ni recibir
-        contactos.
-      </Text>
-      <Text style={estilosTexto.parrafo}>
-        Si creés que se trata de un error o querés solicitar una revisión, podés escribirnos a{" "}
-        <strong>{emailContacto}</strong>.
-      </Text>
+    <Layout
+      previa="Tu cuenta de LabÍA fue suspendida."
+      titulo="Tu cuenta fue suspendida"
+      subtitulo={`${nombre}, te contamos por qué y qué podés hacer.`}
+      variante="suspendida"
+      motivo="Este aviso es sobre tu cuenta y no se puede desactivar."
+      pie={pie}
+    >
+      <Tarjeta etiqueta="Motivo" titulo={motivo} />
+      <Parrafo>
+        Mientras esté suspendida no vas a poder publicar trabajos, postularte ni recibir contactos.
+      </Parrafo>
+      <Parrafo>
+        Si creés que es un error, escribinos a <strong>{emailContacto}</strong> y lo revisamos.
+      </Parrafo>
       <BotonAccion href={`mailto:${emailContacto}?subject=Apelacion%20de%20cuenta%20suspendida`}>
         Escribir a soporte
       </BotonAccion>

@@ -1,12 +1,4 @@
-import { Text } from "@react-email/components";
-
-import {
-  BotonAccion,
-  estilosTexto,
-  Layout,
-  PIE_DE_PRUEBA,
-  type DatosPie,
-} from "@/lib/emails/Layout";
+import { BotonAccion, Layout, Parrafo, PIE_DE_PRUEBA, type DatosPie } from "@/lib/emails/Layout";
 
 export type DatosPedirResena = {
   nombre: string;
@@ -21,12 +13,19 @@ export default function PedirResena({
   pie,
 }: DatosPedirResena & { pie: DatosPie }) {
   return (
-    <Layout previa={`Contanos cómo te fue con ${nombreProfesional}.`} pie={pie}>
-      <Text style={estilosTexto.titulo}>¿Cómo te fue con {nombreProfesional}?</Text>
-      <Text style={estilosTexto.parrafo}>
-        Hola {nombre}, tu trabajo ya está terminado. Tu opinión ayuda a otras personas a elegir bien
-        y a los buenos profesionales a conseguir más trabajo. Lleva un minuto.
-      </Text>
+    <Layout
+      previa={`Contanos cómo te fue con ${nombreProfesional}.`}
+      titulo={`¿Cómo te fue con ${nombreProfesional}?`}
+      subtitulo={`${nombre}, tu trabajo ya está terminado.`}
+      motivo={`Te escribimos porque elegiste a ${nombreProfesional} para este trabajo.`}
+      pie={pie}
+      conPreferencias
+      conBaja
+    >
+      <Parrafo>
+        Tu opinión ayuda a otras personas a elegir bien y a los buenos profesionales a conseguir más
+        trabajo. Lleva un minuto.
+      </Parrafo>
       <BotonAccion href={urlResena}>Dejar mi reseña</BotonAccion>
     </Layout>
   );

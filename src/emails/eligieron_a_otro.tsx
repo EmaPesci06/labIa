@@ -1,10 +1,9 @@
-import { Text } from "@react-email/components";
-
 import {
   BotonAccion,
-  estilosTexto,
   Layout,
+  Parrafo,
   PIE_DE_PRUEBA,
+  Tarjeta,
   type DatosPie,
 } from "@/lib/emails/Layout";
 
@@ -17,15 +16,21 @@ export default function EligieronAOtro({
   pie,
 }: DatosEligieronAOtro & { pie: DatosPie }) {
   return (
-    <Layout previa="El cliente eligió a otro profesional. Hay más trabajos esperándote." pie={pie}>
-      <Text style={estilosTexto.titulo}>Esta vez eligieron a otro profesional</Text>
-      <Text style={estilosTexto.parrafo}>
-        Hola {nombre}, el cliente de <strong>{tituloTrabajo}</strong> eligió a otro profesional.
-        Gracias por postularte.
-      </Text>
-      <Text style={estilosTexto.parrafo}>
-        Todos los días se publican trabajos nuevos. Seguí mirando.
-      </Text>
+    <Layout
+      previa="El cliente eligió a otro profesional. Hay más trabajos esperándote."
+      titulo="Esta vez eligieron a otro profesional"
+      subtitulo={`${nombre}, gracias por postularte.`}
+      motivo="Te escribimos porque te postulaste a este trabajo."
+      pie={pie}
+      conPreferencias
+      conBaja
+    >
+      <Tarjeta
+        etiqueta="Trabajo"
+        titulo={tituloTrabajo}
+        detalle="El cliente ya eligió con quién trabajar."
+      />
+      <Parrafo>Todos los días se publican trabajos nuevos cerca tuyo. Seguí mirando.</Parrafo>
       <BotonAccion href={urlTrabajos}>Ver trabajos</BotonAccion>
     </Layout>
   );
