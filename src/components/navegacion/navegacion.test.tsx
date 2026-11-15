@@ -29,7 +29,7 @@ describe("BarraInferior", () => {
   const profesional = navegacionPara("profesional", "abc");
 
   it("muestra los 3 destinos del cliente en una navegación con nombre", () => {
-    render(<BarraInferior destinos={cliente.celular} rol="cliente" />);
+    render(<BarraInferior destinos={cliente.celular} />);
     const nav = screen.getByRole("navigation", { name: "Navegación" });
     const textos = within(nav)
       .getAllByRole("link")
@@ -37,25 +37,27 @@ describe("BarraInferior", () => {
     expect(textos).toEqual(["Inicio", "Mis trabajos", "Mi cuenta"]);
   });
 
-  it("marca solo el ítem de la ruta actual con aria-current y en azul", () => {
+  it("marca solo el ítem de la ruta actual con aria-current y la pastilla de fondo", () => {
     ruta.path = "/mis-trabajos";
-    render(<BarraInferior destinos={cliente.celular} rol="cliente" />);
+    render(<BarraInferior destinos={cliente.celular} />);
     const activo = screen.getByRole("link", { name: "Mis trabajos" });
     expect(activo).toHaveAttribute("aria-current", "page");
-    expect(activo).toHaveClass("text-texto", "font-bold");
-    expect(screen.getByRole("link", { name: "Inicio" })).not.toHaveAttribute("aria-current");
+    expect(activo).toHaveClass("bg-fondo", "font-bold");
+    const otro = screen.getByRole("link", { name: "Inicio" });
+    expect(otro).not.toHaveAttribute("aria-current");
+    expect(otro).not.toHaveClass("bg-fondo");
   });
 
-  it("en el profesional el activo va en naranja de acción", () => {
+  it("el profesional usa la misma pastilla que el cliente", () => {
     ruta.path = "/trabajos";
-    render(<BarraInferior destinos={profesional.celular} rol="profesional" />);
-    expect(screen.getByRole("link", { name: "Trabajos" })).toHaveClass("text-texto");
+    render(<BarraInferior destinos={profesional.celular} />);
+    expect(screen.getByRole("link", { name: "Trabajos" })).toHaveClass("bg-fondo", "font-bold");
   });
 
   it("distingue Trabajos de Postulaciones por ?vista=mias", () => {
     ruta.path = "/trabajos";
     ruta.query = "vista=mias";
-    render(<BarraInferior destinos={profesional.celular} rol="profesional" />);
+    render(<BarraInferior destinos={profesional.celular} />);
     expect(screen.getByRole("link", { name: "Postulaciones" })).toHaveAttribute(
       "aria-current",
       "page",
@@ -64,35 +66,31 @@ describe("BarraInferior", () => {
   });
 
   it("es solo de celular y respeta el área segura", () => {
-    render(<BarraInferior destinos={cliente.celular} rol="cliente" />);
+    render(<BarraInferior destinos={cliente.celular} />);
     const nav = screen.getByRole("navigation");
-    expect(nav).toHaveClass("lg:hidden", "fixed", "bottom-0");
+    expect(nav).toHaveClass("lg:hidden", "fixed", "bottom-0", "bg-superficie");
+    expect(nav.className).toContain("68px");
     expect(nav.className).toContain("env(safe-area-inset-bottom)");
     expect(screen.getAllByRole("link")[0]).toHaveClass("min-h-12");
   });
 });
 
 describe("BarraSuperior", () => {
-  it("cliente: links, botón Publicar trabajo y menú de cuenta; solo en escritorio", () => {
+  it("cliente: secciones, botón Publicar un trabajo y menú de cuenta; solo en escritorio", () => {
     ruta.path = "/buscar";
     const { container } = render(
-      <BarraSuperior
-        navegacion={navegacionPara("cliente", "x")}
-        rol="cliente"
-        nombre="Laura Fernández"
-      />,
+      <BarraSuperior navegacion={navegacionPara("cliente", "x")} nombre="Laura Fernández" />,
     );
-    expect(container.querySelector("header")).toHaveClass("hidden", "lg:flex", "h-[72px]");
+    expect(container.querySelector("header")).toHaveClass("hidden", "lg:block", "bg-superficie");
     const principal = screen.getByRole("navigation", { name: "Principal" });
     const textos = within(principal)
       .getAllByRole("link")
       .map((l) => l.textContent);
-    expect(textos).toEqual(["Buscar profesionales", "Publicar un trabajo", "Mis trabajos"]);
-    expect(screen.getByRole("link", { name: "Buscar profesionales" })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
-    expect(screen.getByRole("link", { name: "Publicar trabajo" })).toHaveAttribute(
+    expect(textos).toEqual(["Buscar profesionales", "Mis trabajos"]);
+    const actual = screen.getByRole("link", { name: "Buscar profesionales" });
+    expect(actual).toHaveAttribute("aria-current", "page");
+    expect(actual).toHaveClass("bg-fondo", "font-bold");
+    expect(screen.getByRole("link", { name: "Publicar un trabajo" })).toHaveAttribute(
       "href",
       "/trabajos/nuevo",
     );
@@ -102,11 +100,7 @@ describe("BarraSuperior", () => {
 
   it("profesional: botón Ver trabajos y Mi perfil con su id", () => {
     render(
-      <BarraSuperior
-        navegacion={navegacionPara("profesional", "abc")}
-        rol="profesional"
-        nombre="Martín Gómez"
-      />,
+      <BarraSuperior navegacion={navegacionPara("profesional", "abc")} nombre="Martín Gómez" />,
     );
     expect(screen.getByRole("link", { name: "Ver trabajos" })).toHaveAttribute("href", "/trabajos");
     expect(screen.getByRole("link", { name: "Mi perfil" })).toHaveAttribute(
@@ -120,7 +114,7 @@ describe("MenuAvatar", () => {
   const NOMBRE = "Cuenta de Laura Fernández";
 
   it("empieza cerrado y se abre con el botón", async () => {
-    render(<MenuAvatar nombre="Laura Fernández" rol="cliente" />);
+    render(<MenuAvatar nombre="Laura Fernández" />);
     const boton = screen.getByRole("button", { name: NOMBRE });
     expect(boton).toHaveAttribute("aria-expanded", "false");
     expect(screen.queryByRole("link", { name: "Mi cuenta" })).not.toBeInTheDocument();
@@ -135,7 +129,7 @@ describe("MenuAvatar", () => {
   });
 
   it("Escape lo cierra y devuelve el foco al botón", async () => {
-    render(<MenuAvatar nombre="Laura Fernández" rol="cliente" />);
+    render(<MenuAvatar nombre="Laura Fernández" />);
     const boton = screen.getByRole("button", { name: NOMBRE });
     await userEvent.click(boton);
     await userEvent.keyboard("{Escape}");
@@ -147,7 +141,7 @@ describe("MenuAvatar", () => {
     render(
       <div>
         <p>afuera</p>
-        <MenuAvatar nombre="Laura Fernández" rol="cliente" />
+        <MenuAvatar nombre="Laura Fernández" />
       </div>,
     );
     await userEvent.click(screen.getByRole("button", { name: NOMBRE }));
@@ -156,7 +150,7 @@ describe("MenuAvatar", () => {
   });
 
   it("elegir Mi cuenta lo cierra", async () => {
-    render(<MenuAvatar nombre="Laura Fernández" rol="cliente" />);
+    render(<MenuAvatar nombre="Laura Fernández" />);
     await userEvent.click(screen.getByRole("button", { name: NOMBRE }));
     await userEvent.click(screen.getByRole("link", { name: "Mi cuenta" }));
     expect(screen.queryByRole("link", { name: "Mi cuenta" })).not.toBeInTheDocument();

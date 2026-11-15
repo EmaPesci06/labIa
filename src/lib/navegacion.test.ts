@@ -10,13 +10,12 @@ describe("navegacionPara", () => {
       ["Mis trabajos", "/mis-trabajos"],
       ["Mi cuenta", "/cuenta"],
     ]);
-    expect(accion).toEqual({ etiqueta: "Publicar trabajo", href: "/trabajos/nuevo" });
+    expect(accion).toEqual({ etiqueta: "Publicar un trabajo", href: "/trabajos/nuevo" });
   });
 
-  it("cliente: tres links en escritorio", () => {
+  it("cliente: secciones de escritorio sin Publicar (va en el botón de la barra)", () => {
     expect(navegacionPara("cliente", "x").escritorio.map((d) => d.etiqueta)).toEqual([
       "Buscar profesionales",
-      "Publicar un trabajo",
       "Mis trabajos",
     ]);
   });

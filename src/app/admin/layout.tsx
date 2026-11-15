@@ -3,7 +3,6 @@ import { Suspense, type ReactNode } from "react";
 
 import { BotonSalir } from "@/components/auth/BotonSalir";
 import { SaltarAlContenido } from "@/components/navegacion/SaltarAlContenido";
-import { Logo } from "@/components/ui/Logo";
 import { NavegacionAdmin } from "@/components/admin/NavegacionAdmin";
 import { sesionAdmin } from "@/lib/admin/sesion";
 
@@ -27,28 +26,21 @@ async function MarcoAdmin({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col bg-fondo text-texto">
       <SaltarAlContenido />
-      <header className="border-b border-fondo bg-superficie">
-        <div className="mx-auto flex w-full max-w-[1200px] flex-wrap items-center justify-between gap-4 px-5 py-3 lg:px-10">
+      <header className="rounded-b-[28px] bg-equipo text-sobre-encabezado lg:rounded-b-[40px]">
+        <div className="mx-auto flex w-full max-w-[1264px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 py-3 lg:px-8">
           <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-            <div className="flex items-center gap-3">
-              <Logo variante="icono" alt="" />
-              <p className="font-texto text-xs font-semibold tracking-[0.4px] text-texto uppercase">
-                Panel interno · LabÍA
-              </p>
-            </div>
+            <p className="text-sm font-bold tracking-[0.08em] uppercase">
+              <span translate="no">LabÍA</span> · Equipo
+            </p>
             <NavegacionAdmin />
           </div>
           <div className="flex items-center gap-3">
-            <p className="hidden text-sm text-texto sm:block">{sesion.perfil.nombreVisible}</p>
-            <BotonSalir className="min-h-11 w-auto px-3" />
+            <p className="hidden text-sm sm:block">{sesion.perfil.nombreVisible}</p>
+            <BotonSalir className="min-h-11 w-auto px-3 text-sobre-encabezado hover:bg-transparent hover:underline" />
           </div>
         </div>
       </header>
-      <main
-        id="contenido"
-        tabIndex={-1}
-        className="mx-auto w-full max-w-[1200px] flex-1 px-4 py-6 focus:outline-none sm:px-5 lg:px-10 lg:py-8"
-      >
+      <main id="contenido" tabIndex={-1} className="marco flex-1 focus:outline-none">
         {children}
       </main>
     </div>

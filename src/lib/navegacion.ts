@@ -1,7 +1,5 @@
 import type { RolApp } from "@/lib/sesion";
 
-export type IconoNav = "inicio" | "trabajos" | "postulaciones" | "perfil" | "cuenta";
-
 /**
  * Un destino de la navegación.
  * - `href`: a dónde lleva.
@@ -11,7 +9,6 @@ export type IconoNav = "inicio" | "trabajos" | "postulaciones" | "perfil" | "cue
 export type Destino = {
   etiqueta: string;
   href: string;
-  icono: IconoNav;
   coincidencias?: readonly string[];
   vista?: "mias";
 };
@@ -21,7 +18,7 @@ export type NavegacionRol = {
   celular: readonly Destino[];
   /** Los links del centro de la barra superior de escritorio. */
   escritorio: readonly Destino[];
-  /** Botón principal de la barra superior. */
+  /** Botón principal de la barra superior de escritorio. */
   accion: { etiqueta: string; href: string };
 };
 
@@ -29,14 +26,9 @@ export type NavegacionRol = {
 export function navegacionPara(rol: RolApp, idUsuario: string): NavegacionRol {
   if (rol === "profesional") {
     const destinos: readonly Destino[] = [
-      { etiqueta: "Trabajos", href: "/trabajos", icono: "trabajos" },
-      {
-        etiqueta: "Postulaciones",
-        href: "/trabajos?vista=mias",
-        icono: "postulaciones",
-        vista: "mias",
-      },
-      { etiqueta: "Mi perfil", href: `/profesionales/${idUsuario}`, icono: "perfil" },
+      { etiqueta: "Trabajos", href: "/trabajos" },
+      { etiqueta: "Postulaciones", href: "/trabajos?vista=mias", vista: "mias" },
+      { etiqueta: "Mi perfil", href: `/profesionales/${idUsuario}` },
     ];
     return {
       celular: destinos,
@@ -50,28 +42,24 @@ export function navegacionPara(rol: RolApp, idUsuario: string): NavegacionRol {
       {
         etiqueta: "Inicio",
         href: "/inicio",
-        icono: "inicio",
         coincidencias: ["/inicio", "/buscar", "/profesionales"],
       },
       {
         etiqueta: "Mis trabajos",
         href: "/mis-trabajos",
-        icono: "trabajos",
         coincidencias: ["/mis-trabajos", "/trabajos"],
       },
-      { etiqueta: "Mi cuenta", href: "/cuenta", icono: "cuenta" },
+      { etiqueta: "Mi cuenta", href: "/cuenta" },
     ],
     escritorio: [
       {
         etiqueta: "Buscar profesionales",
         href: "/buscar",
-        icono: "inicio",
         coincidencias: ["/inicio", "/buscar", "/profesionales"],
       },
-      { etiqueta: "Publicar un trabajo", href: "/trabajos/nuevo", icono: "trabajos" },
-      { etiqueta: "Mis trabajos", href: "/mis-trabajos", icono: "trabajos" },
+      { etiqueta: "Mis trabajos", href: "/mis-trabajos" },
     ],
-    accion: { etiqueta: "Publicar trabajo", href: "/trabajos/nuevo" },
+    accion: { etiqueta: "Publicar un trabajo", href: "/trabajos/nuevo" },
   };
 }
 

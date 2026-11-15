@@ -7,23 +7,20 @@ import { useEffect, useId, useRef, useState } from "react";
 import { BotonSalir } from "@/components/auth/BotonSalir";
 import { SelectorTema } from "@/components/SelectorTema";
 import { Avatar } from "@/components/ui/Avatar";
-import { cn } from "@/lib/cn";
-import type { RolApp } from "@/lib/sesion";
 
 type Props = {
   nombre: string;
-  rol: RolApp;
 };
 
 const ITEM =
-  "flex min-h-11 w-full items-center gap-3 rounded-campo px-3 text-[15px] font-semibold text-texto hover:bg-superficie";
+  "flex min-h-11 w-full items-center gap-3 rounded-campo px-3 text-[15px] font-bold text-texto hover:bg-fondo";
 
 /**
  * Avatar de la barra superior con un panel desplegable: Mi cuenta, Tema y Salir.
  * Es un botón de despliegue (`aria-expanded`), no un `role="menu"`: adentro hay un grupo de
  * radios, así que se recorre con Tab. Escape o un clic afuera lo cierran.
  */
-export function MenuAvatar({ nombre, rol }: Props) {
+export function MenuAvatar({ nombre }: Props) {
   const [abierto, setAbierto] = useState(false);
   const idPanel = useId();
   const contenedor = useRef<HTMLDivElement>(null);
@@ -65,15 +62,12 @@ export function MenuAvatar({ nombre, rol }: Props) {
         onClick={() => setAbierto((valor) => !valor)}
         className="flex size-11 items-center justify-center rounded-full"
       >
-        <Avatar
-          nombre={nombre}
-          className={cn(rol === "profesional" && "bg-accion text-sobre-accion")}
-        />
+        <Avatar nombre={nombre} />
       </button>
       {abierto ? (
         <div
           id={idPanel}
-          className="absolute top-full right-0 z-50 mt-2 flex w-72 flex-col gap-3 rounded-tarjeta border border-texto bg-superficie p-3 shadow-lg"
+          className="absolute top-full right-0 z-50 mt-2 flex w-72 flex-col gap-3 rounded-tarjeta border-2 border-texto bg-superficie p-3"
         >
           <p className="truncate px-3 pt-1 text-sm font-bold text-texto">{nombre}</p>
           <Link href="/cuenta" className={ITEM} onClick={() => setAbierto(false)}>
