@@ -117,7 +117,7 @@ test.describe("registro de cliente con Supabase real", () => {
     await page.getByRole("button", { name: "Crear cuenta" }).click();
     await expect(page).toHaveURL(/\/inicio$/);
 
-    // El mismo email otra vez: aviso con link a ingresar.
+    // El mismo email otra vez: no revela si existe y responde igual que un alta pendiente.
     await page.context().clearCookies();
     await page.goto("/registro/cliente");
     await page.getByLabel("Nombre").fill("Laura Fernández");
@@ -126,7 +126,7 @@ test.describe("registro de cliente con Supabase real", () => {
     await page.getByLabel("Contraseña", { exact: true }).fill("clave-de-prueba-123");
     await page.getByLabel("Tu barrio").selectOption({ label: "Centro" });
     await page.getByRole("button", { name: "Crear cuenta" }).click();
-    await expect(page.getByText(/Ya hay una cuenta con ese email/)).toBeVisible();
-    await expect(page.getByRole("link", { name: "ingresar" })).toHaveAttribute("href", "/ingresar");
+    await expect(page.getByText(`Te mandamos un mail a ${email}.`)).toBeVisible();
+    await expect(page.getByText(/Ya hay una cuenta con ese email/)).toHaveCount(0);
   });
 });

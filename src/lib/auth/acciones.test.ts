@@ -4,7 +4,7 @@ import { cupoDisponible } from "@/lib/rate-limit-consulta";
 import { limitarPorIp, limitarPersistente } from "@/lib/rate-limit-persistente";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 
-import { ingresar } from "./acciones";
+import { ingresar, pedirRestablecer } from "./acciones";
 
 const { redirigir } = vi.hoisted(() => ({ redirigir: vi.fn() }));
 
@@ -137,5 +137,36 @@ describe("ingresar: tope de fallos por cuenta (LAB-54, B-11)", () => {
     expect(limitarPorIp).toHaveBeenCalledWith("ingreso", { maximo: 5, ventanaMs: 60_000 });
     expect(cupoDisponible).not.toHaveBeenCalled();
     expect(signIn).not.toHaveBeenCalled();
+  });
+});
+
+describe("pedirRestablecer: respuesta neutra sin enumeración (LAB-76)", () => {
+  const MENSAJE_NEUTRO =
+    "Si hay una cuenta con ese email, te enviamos un enlace para elegir una contraseña nueva.";
+  let resetPasswordForEmail: ReturnType<typeof vi.fn>;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    resetPasswordForEmail = vi.fn(async () => ({ error: null }));
+    vi.mocked(supabaseConfigurado).mockReturnValue(true);
+    vi.mocked(crearClienteServidor).mockResolvedValue({
+      auth: { resetPasswordForEmail },
+    } as never);
+  });
+
+  it("devuelve el mensaje neutro cuando Supabase responde sin error", async () => {
+    const estado = await pedirRestablecer({}, formulario({ email: EMAIL }));
+    expect(estado).toEqual({ exito: MENSAJE_NEUTRO, valores: { email: EMAIL } });
+  });
+
+  it("devuelve el mismo mensaje neutro ante over_email_send_rate_limit", async () => {
+    resetPasswordForEmail.mockResolvedValueOnce({
+      error: { code: "over_email_send_rate_limit", status: 429 },
+    });
+
+    const estado = await pedirRestablecer({}, formulario({ email: EMAIL }));
+
+    expect(estado).toEqual({ exito: MENSAJE_NEUTRO, valores: { email: EMAIL } });
+    expect(estado.mensaje).toBeUndefined();
   });
 });

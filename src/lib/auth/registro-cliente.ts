@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { registrarEventoServidor } from "@/lib/metricas-servidor";
 import { limitarPersistente, limitarPorIp, mensajeDeLimite } from "@/lib/rate-limit-persistente";
+import { rolDeLaSesion } from "@/lib/sesion";
 import { urlDelSitio } from "@/lib/sitio";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import { erroresPorCampo } from "@/lib/validaciones/auth";
@@ -16,11 +17,10 @@ import {
 
 import { guardarDatosDeCliente } from "./datos-de-cliente";
 import type { EstadoFormulario } from "./estado";
+import { inicioDelRol } from "./rutas";
 
 /** Estado de los formularios del registro de cliente (suma lo propio al estado común). */
 export type EstadoRegistroCliente = EstadoFormulario & {
-  /** Ya había una cuenta con ese email: se ofrece ingresar. */
-  emailExistente?: boolean;
   /** Hay que confirmar el email: pantalla "Te mandamos un mail a …". */
   confirmarEmail?: string;
   /** Resultado del reenvío del mail de confirmación. */
@@ -88,6 +88,9 @@ export async function registrarCliente(
 
   if (!supabaseConfigurado()) return { mensaje: MENSAJE_SIN_SUPABASE, valores };
   const supabase = await crearClienteServidor();
+  const { data: auth } = await supabase.auth.getUser();
+  if (auth.user) redirect(inicioDelRol(await rolDeLaSesion(supabase, auth.user.id)));
+
   const { nombreCompleto, whatsapp, email, contrasena, barrio } = resultado.data;
   const { nombre, apellido } = separarNombre(nombreCompleto);
 
@@ -107,7 +110,8 @@ export async function registrarCliente(
     error?.code === "email_exists" ||
     // Con confirmación de email activada, Supabase no revela el duplicado: devuelve un usuario sin identidades.
     (!error && data.user !== null && data.user.identities?.length === 0);
-  if (yaExiste) return { emailExistente: true, valores };
+  // Misma respuesta que un alta nueva pendiente de confirmación: no se revela si el email ya existe.
+  if (yaExiste) return { confirmarEmail: email, valores: { email } };
   if (error) return { mensaje: mensajeDeAuth(error.code, error.status), valores };
 
   const usuario = data.user;

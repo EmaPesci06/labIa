@@ -130,18 +130,6 @@ export function FormularioRegistroCliente({ barrios }: { barrios: BarrioOpcion[]
         </span>
       </label>
 
-      {estado.emailExistente ? (
-        <p role="alert" className="text-[15px] font-bold text-error">
-          Ya hay una cuenta con ese email. ¿Querés{" "}
-          <Link
-            href="/ingresar"
-            className="inline-block py-2 underline decoration-2 underline-offset-4"
-          >
-            ingresar
-          </Link>
-          ?
-        </p>
-      ) : null}
       {estado.mensaje ? (
         <p role="alert" className="text-[15px] font-bold text-error">
           {estado.mensaje}
