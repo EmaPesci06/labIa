@@ -77,7 +77,7 @@ describe("HojaResena", () => {
     await userEvent.click(boton5);
 
     expect(boton5).toBeChecked();
-    expect(screen.getByText("Excelente")).toBeInTheDocument();
+    expect(screen.getByText("Excelente", { selector: "p" })).toBeInTheDocument();
 
     // Ahora el botón de publicar se habilita
     expect(screen.getByRole("button", { name: "Publicar reseña" })).not.toBeDisabled();
