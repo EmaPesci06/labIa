@@ -1,10 +1,10 @@
-import { Text } from "@react-email/components";
-
 import {
   BotonAccion,
-  estilosTexto,
   Layout,
+  Nota,
+  Parrafo,
   PIE_DE_PRUEBA,
+  Tarjeta,
   type DatosPie,
 } from "@/lib/emails/Layout";
 
@@ -24,17 +24,24 @@ export default function TeEligieron({
   pie,
 }: DatosTeEligieron & { pie: DatosPie }) {
   return (
-    <Layout previa={`${nombreCliente} te va a escribir por WhatsApp.`} pie={pie}>
-      <Text style={estilosTexto.titulo}>¡Te eligieron, {nombre}!</Text>
-      <Text style={estilosTexto.parrafo}>
-        {nombreCliente} te eligió para <strong>{tituloTrabajo}</strong>. {nombreCliente} te va a
-        escribir por WhatsApp para coordinar.
-      </Text>
-      <Text style={estilosTexto.chico}>
-        Tené el celular a mano y acordá precio, seña y día por ahí. Cuando termines, el cliente
-        puede dejarte una reseña.
-      </Text>
+    <Layout
+      previa={`${nombreCliente} te va a escribir por WhatsApp.`}
+      titulo={`${nombre}, te eligieron`}
+      subtitulo={`${nombreCliente} quiere que hagas su trabajo.`}
+      motivo="Te escribimos porque te postulaste a este trabajo."
+      pie={pie}
+      conPreferencias
+    >
+      <Tarjeta etiqueta="Trabajo" titulo={tituloTrabajo} />
+      <Parrafo>
+        {nombreCliente} te va a escribir por WhatsApp para coordinar. Tené el celular a mano y
+        acordá precio, seña y día.
+      </Parrafo>
       <BotonAccion href={urlTrabajo}>Ver el trabajo</BotonAccion>
+      <Nota>
+        Cuando termines, {nombreCliente} puede dejarte una reseña. Las reseñas son lo primero que
+        miran los próximos clientes.
+      </Nota>
     </Layout>
   );
 }

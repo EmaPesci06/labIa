@@ -1,10 +1,9 @@
-import { Text } from "@react-email/components";
-
 import {
   BotonAccion,
-  estilosTexto,
   Layout,
+  Nota,
   PIE_DE_PRUEBA,
+  Tarjeta,
   type DatosPie,
 } from "@/lib/emails/Layout";
 
@@ -40,21 +39,28 @@ export default function NuevaPostulacion({
 }: DatosNuevaPostulacion & { pie: DatosPie }) {
   const asunto = asuntoNuevaPostulacion({ nombre, tituloTrabajo, postulaciones, urlTrabajo });
   return (
-    <Layout previa="Mirá las propuestas y elegí con quién hablar." pie={pie}>
-      <Text style={estilosTexto.titulo}>{asunto}</Text>
-      <Text style={estilosTexto.parrafo}>
-        Hola {nombre}, recibiste {postulaciones.length > 1 ? "nuevas propuestas" : "una propuesta"}{" "}
-        para tu trabajo.
-      </Text>
+    <Layout
+      previa="Mirá las propuestas y elegí con quién hablar."
+      titulo={asunto}
+      subtitulo={`${nombre}, llegaron propuestas para “${tituloTrabajo}”.`}
+      motivo="Te escribimos porque publicaste este trabajo."
+      pie={pie}
+      conPreferencias
+    >
       {postulaciones.map((p, i) => (
-        <Text key={i} style={{ ...estilosTexto.tarjeta, ...estilosTexto.parrafo }}>
-          <strong>{p.nombreProfesional}</strong> · {p.oficio}
-          <br />
-          {p.precio ? `Precio estimado: ${p.precio}` : "Precio a coordinar"}
-          {p.sena ? ` · Seña: ${p.sena}` : ""}
-        </Text>
+        <Tarjeta
+          key={i}
+          etiqueta={p.oficio}
+          titulo={p.nombreProfesional}
+          detalle={
+            p.precio
+              ? `Precio estimado: ${p.precio}${p.sena ? ` · Seña: ${p.sena}` : ""}`
+              : "Precio a coordinar"
+          }
+        />
       ))}
       <BotonAccion href={urlTrabajo}>Ver las propuestas</BotonAccion>
+      <Nota>Elegí con quién hablar. El contacto sigue por WhatsApp.</Nota>
     </Layout>
   );
 }

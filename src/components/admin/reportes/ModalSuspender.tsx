@@ -84,14 +84,9 @@ export function ModalSuspender({ abierta, onCambioAbierta, usuarioId, nombreUsua
           >
             Cancelar
           </Boton>
-          <button
-            type="button"
-            disabled={pendiente}
-            onClick={handleConfirmar}
-            className="inline-flex min-h-[44px] items-center justify-center rounded-boton bg-error px-5 text-sm font-bold text-sobre-accion hover:opacity-90 active:opacity-80 disabled:opacity-50"
-          >
+          <Boton type="button" variante="peligro" cargando={pendiente} onClick={handleConfirmar}>
             {pendiente ? "Suspendiendo…" : "Confirmar suspensión"}
-          </button>
+          </Boton>
         </div>
       </div>
     </HojaInferior>

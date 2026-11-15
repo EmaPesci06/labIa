@@ -1,11 +1,12 @@
-import { Link, Text } from "@react-email/components";
+import { Link } from "@react-email/components";
 
 import {
   BotonAccion,
-  COLOR_AZUL,
-  estilosTexto,
   Layout,
+  Parrafo,
   PIE_DE_PRUEBA,
+  Tarjeta,
+  TEXTO,
   type DatosPie,
 } from "@/lib/emails/Layout";
 
@@ -36,21 +37,28 @@ export default function TrabajosCerca({
   pie,
 }: DatosTrabajosCerca & { pie: DatosPie }) {
   return (
-    <Layout previa="Pedidos nuevos de tus oficios y tus zonas." pie={pie}>
-      <Text style={estilosTexto.titulo}>{asuntoTrabajosCerca(trabajos.length)}</Text>
-      <Text style={estilosTexto.parrafo}>
-        Buen día, {nombre}. Esto se publicó en las últimas 24 horas en tus oficios y zonas.
-      </Text>
+    <Layout
+      previa="Pedidos nuevos de tus oficios y tus zonas."
+      titulo={asuntoTrabajosCerca(trabajos.length)}
+      subtitulo={`Buen día, ${nombre}. Se publicaron en las últimas 24 horas.`}
+      motivo="Te escribimos porque pediste el resumen diario."
+      pie={pie}
+      conPreferencias
+      conBaja
+    >
       {trabajos.map((t, i) => (
-        <Text key={i} style={{ ...estilosTexto.tarjeta, ...estilosTexto.parrafo }}>
-          <Link href={t.url} style={{ color: COLOR_AZUL, fontWeight: 700 }}>
-            {t.titulo}
-          </Link>
-          <br />
-          {t.oficio} · {t.barrio} · {t.urgencia}
-        </Text>
+        <Tarjeta
+          key={i}
+          etiqueta={`${t.oficio} · ${t.barrio} · ${t.urgencia}`}
+          titulo={
+            <Link href={t.url} style={{ color: TEXTO, textDecoration: "none" }}>
+              {t.titulo}
+            </Link>
+          }
+        />
       ))}
       <BotonAccion href={urlTrabajos}>Ver todos los trabajos</BotonAccion>
+      <Parrafo>Llega una vez por día, solo si hay trabajos de tus oficios y tus zonas.</Parrafo>
     </Layout>
   );
 }
