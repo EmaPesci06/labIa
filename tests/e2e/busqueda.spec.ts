@@ -1,38 +1,51 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
-// LAB-23: inicio del cliente y resultados de búsqueda. Se ven sin cuenta, así que corre contra el
-// servidor base (sin sesión falsa). Las pruebas de datos necesitan un Supabase con profesionales
-// publicados (E2E_BUSQUEDA=1, por ejemplo con supabase/seed.sql en local).
+// LAB-23 y LAB-71: inicio del cliente y resultados de búsqueda. Se ven sin cuenta, así que corre
+// contra el servidor base (sin sesión falsa). Las pruebas de datos necesitan un Supabase con
+// profesionales publicados (E2E_BUSQUEDA=1, por ejemplo con supabase/seed.sql en local).
 
 const URL_CLIENTE = `http://localhost:${Number(process.env.PUERTO_E2E ?? 3000) + 200}`;
 
 const esCelular = (page: Page) => (page.viewportSize()?.width ?? 0) < 1024;
 
 test.describe("inicio", () => {
-  test("celular: la grilla lleva a la búsqueda con el barrio; escritorio: redirige a /buscar", async ({
+  test("celular: la grilla lleva a la búsqueda con el barrio; escritorio: se queda en el inicio", async ({
     page,
   }) => {
     await page.goto("/inicio");
+    await expect(page.getByRole("heading", { level: 1, name: "¿Qué se rompió?" })).toBeVisible();
     if (!esCelular(page)) {
-      await expect(page).toHaveURL(/\/buscar\?barrio=[a-z0-9-]+$/);
+      // LAB-71: el inicio de escritorio ya no redirige a /buscar.
+      await expect(page).toHaveURL(/\/inicio$/);
       return;
     }
-    await expect(
-      page.getByRole("heading", { level: 1, name: "¿Qué necesitás arreglar?" }),
-    ).toBeVisible();
     await expect(page.getByRole("link", { name: "Crear cuenta" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Gas", exact: true })).toHaveAttribute(
+    // El nombre de cada carpa incluye su número de verificados: se busca por el comienzo.
+    await expect(page.getByRole("link", { name: /^Gas/ })).toHaveAttribute(
       "href",
       /^\/buscar\?oficio=gas&barrio=[a-z0-9-]+$/,
     );
-    await expect(page.getByRole("link", { name: "Mecánica" })).toHaveAttribute(
+    await expect(page.getByRole("link", { name: /Mecánica/ })).toHaveAttribute(
       "href",
       /oficio=mecanica/,
     );
-    await expect(page.getByRole("link", { name: /Publicar/ }).first()).toHaveAttribute(
+    await expect(page.getByRole("link", { name: "Publicar un trabajo" })).toHaveAttribute(
       "href",
       "/trabajos/nuevo",
+    );
+  });
+
+  test("elegir un problema muestra el oficio que lo arregla", async ({ page }) => {
+    await page.goto("/inicio");
+    await page.getByRole("link", { name: "Hay olor a gas" }).click();
+    await expect(page).toHaveURL(/problema=olor-a-gas/);
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Eso lo arregla un gasista" }),
+    ).toBeVisible();
+    await expect(page.getByRole("link", { name: "Hay olor a gas" })).toHaveAttribute(
+      "aria-current",
+      "true",
     );
   });
 });
@@ -47,18 +60,18 @@ test.describe("barra según la sesión", () => {
     await expect(cuenta.getByRole("link", { name: "Crear cuenta" })).toBeVisible();
 
     await page.goto(`${URL_CLIENTE}/buscar?oficio=gas&barrio=centro`);
-    await expect(page.getByRole("heading", { level: 1, name: "Gasistas" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /^Gas cerca de/ })).toBeVisible();
     await expect(page.getByRole("link", { name: "Crear cuenta" })).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Ingresar" })).toHaveCount(0);
   });
 });
 
 test.describe("resultados", () => {
-  test("sin cuenta se ve la pantalla, con título en plural y filtros en la URL", async ({
+  test("sin cuenta se ve la pantalla, con título del oficio y filtros en la URL", async ({
     page,
   }) => {
     await page.goto("/buscar?oficio=gas&barrio=centro");
-    await expect(page.getByRole("heading", { level: 1, name: "Gasistas" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /^Gas cerca de/ })).toBeVisible();
     await expect(page).toHaveURL(/\/buscar/);
 
     await page.getByRole("button", { name: "Mejor calificados" }).click();
@@ -69,7 +82,8 @@ test.describe("resultados", () => {
       "true",
     );
 
-    await page.getByRole("button", { name: "Toda la ciudad" }).click();
+    // La distancia es un selector: "Toda la ciudad" es el valor `ciudad`.
+    await page.getByLabel("Distancia").selectOption("ciudad");
     await expect(page).toHaveURL(/toda_la_ciudad=1/);
     await page.goBack();
     await expect(page).not.toHaveURL(/toda_la_ciudad=1/);
@@ -82,26 +96,23 @@ test.describe("resultados", () => {
     await expect(page.locator("main [role=alert]")).toContainText("Ese oficio no existe.");
   });
 
-  test("solo matriculados se ofrece en celular únicamente para gas y electricidad", async ({
-    page,
-  }) => {
-    test.skip(!esCelular(page), "En escritorio el filtro está siempre en la columna lateral");
+  test("solo matriculados se ofrece únicamente para gas y electricidad", async ({ page }) => {
     await page.goto("/buscar?oficio=pintura&barrio=centro");
     await expect(page.getByRole("button", { name: "Solo matriculados" })).toHaveCount(0);
     await page.goto("/buscar?oficio=electricidad&barrio=centro");
     await expect(page.getByRole("button", { name: "Solo matriculados" })).toBeVisible();
   });
 
-  test("escritorio: columna de filtros con oficio y confianza", async ({ page }) => {
+  test("escritorio: el oficio se elige en el selector y la columna lateral explica 'verificado'", async ({
+    page,
+  }) => {
     test.skip(esCelular(page), "La columna lateral es de escritorio");
     await page.goto("/buscar?barrio=centro");
-    const filtros = page.getByRole("complementary", { name: "Filtros" });
-    await expect(filtros).toBeVisible();
-    await filtros.getByRole("button", { name: "Plomería" }).click();
+    await page.getByLabel("Oficio").selectOption("plomeria");
     await expect(page).toHaveURL(/oficio=plomeria/);
-    await expect(page.getByRole("heading", { level: 1, name: "Plomeros" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /^Plomería cerca de/ })).toBeVisible();
     await expect(
-      filtros.getByText("Todos los perfiles tienen identidad y antecedentes verificados."),
+      page.getByRole("heading", { level: 2, name: "Qué quiere decir “verificado”" }),
     ).toBeVisible();
   });
 
@@ -109,7 +120,7 @@ test.describe("resultados", () => {
     test(`no tiene problemas de accesibilidad (${esquema})`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: esquema });
       await page.goto("/buscar?oficio=gas&barrio=centro");
-      await expect(page.getByRole("heading", { level: 1, name: "Gasistas" })).toBeVisible();
+      await expect(page.getByRole("heading", { level: 1, name: /^Gas cerca de/ })).toBeVisible();
       const resultado = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
       expect(resultado.violations).toEqual([]);
     });
@@ -123,10 +134,10 @@ test.describe("con profesionales publicados", () => {
     page,
   }) => {
     await page.goto("/buscar?oficio=gas&barrio=centro");
-    const tarjetas = page.locator("main ul li a[href^='/profesionales/']");
+    const tarjetas = page.locator("main ol li a[href^='/profesionales/']");
     await expect(tarjetas.first()).toBeVisible();
 
-    const km = await page.locator("main ul li a[href^='/profesionales/']").evaluateAll((els) =>
+    const km = await page.locator("main ol li a[href^='/profesionales/']").evaluateAll((els) =>
       els.map((el) => {
         const texto = el.textContent?.match(/a (\d+,\d) km/)?.[1] ?? "0";
         return Number(texto.replace(",", "."));
@@ -143,11 +154,12 @@ test.describe("con profesionales publicados", () => {
       await expect(page.getByText("Matriculado", { exact: true })).toHaveCount(despues);
     }).toPass();
   });
+
   test("sin oficio, 'Ver más' acumula de a 20 por página y la URL guarda la página", async ({
     page,
   }) => {
     await page.goto("/buscar?barrio=centro");
-    const tarjetas = page.locator("main ul li a[href^='/profesionales/']");
+    const tarjetas = page.locator("main ol li a[href^='/profesionales/']");
     await expect(tarjetas).toHaveCount(20);
     await page.getByRole("link", { name: "Ver más" }).click();
     await expect(page).toHaveURL(/pagina=2/);
@@ -160,7 +172,7 @@ test.describe("con profesionales publicados", () => {
     page,
   }) => {
     await page.goto("/buscar?oficio=gas&barrio=centro");
-    await expect(page.getByRole("heading", { level: 1, name: "Gasistas" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: /^Gas cerca de/ })).toBeVisible();
     await page.getByRole("button", { name: "Solo matriculados" }).click();
     await expect(page).toHaveURL(/matriculados=1/);
     await page.reload();
@@ -180,7 +192,9 @@ test.describe("con profesionales publicados", () => {
   }) => {
     await page.goto("/buscar?oficio=carpinteria&barrio=centro&matriculados=1");
     await expect(page.getByText("No hay profesionales con esos filtros todavía.")).toBeVisible();
-    await expect(page.getByRole("link", { name: "Publicar un trabajo" })).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /Publicar el trabajo|Publicá el trabajo/ }),
+    ).toBeVisible();
   });
   for (const esquema of ["light", "dark"] as const) {
     test(`con resultados y con estado vacío no hay problemas de accesibilidad (${esquema})`, async ({
