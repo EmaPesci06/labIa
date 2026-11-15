@@ -66,7 +66,7 @@ export function VisorDocumento({
   if (vencido) {
     return (
       <div role="status" className="flex flex-col items-start gap-2">
-        <p className="text-sm text-texto-secundario">
+        <p className="text-sm text-texto">
           El enlace venció (dura 60 segundos). Recargalo para seguir viendo el documento.
         </p>
         <Boton variante="secundario" onClick={cargar} cargando={cargando}>
@@ -79,7 +79,7 @@ export function VisorDocumento({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-texto-secundario">Enlace válido por 60 segundos.</p>
+        <p className="text-sm text-texto">Enlace válido por 60 segundos.</p>
         <div className="flex gap-2">
           {visor.formato === "imagen" ? (
             <Boton
@@ -110,7 +110,7 @@ export function VisorDocumento({
         <iframe
           src={visor.url}
           title={`Documento: ${etiqueta}`}
-          className="h-[70vh] w-full rounded-[14px] border border-divisor bg-superficie"
+          className="h-[70vh] w-full rounded-[14px] border border-fondo bg-superficie"
         />
       )}
     </div>

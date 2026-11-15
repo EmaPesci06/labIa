@@ -54,7 +54,7 @@ export function BotonDejarResena({
           setAbierta(true);
         }}
       >
-        <Star aria-hidden className="size-4 text-naranja-marca" />
+        <Star aria-hidden className="size-4 text-accion" />
         {esEdicion ? "Editar mi reseña" : "Dejar reseña"}
       </Boton>
       <HojaResena

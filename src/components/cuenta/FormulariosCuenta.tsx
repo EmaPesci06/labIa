@@ -26,7 +26,7 @@ function Resultado({ estado }: { estado: EstadoFormulario }) {
   }
   if (estado.exito) {
     return (
-      <p role="status" className="text-sm font-semibold text-exito">
+      <p role="status" className="text-sm font-semibold text-texto">
         {estado.exito}
       </p>
     );

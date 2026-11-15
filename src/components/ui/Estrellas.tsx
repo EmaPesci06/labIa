@@ -27,19 +27,35 @@ export type EstrellasProps = (PropsLectura | PropsSeleccion) & {
 
 const TOTAL = [1, 2, 3, 4, 5] as const;
 
+// Ancho de la capa llena en pasos de 10 % (0 a 10). Sin style=: cada paso es una clase literal.
+const LLENADO = [
+  "w-0",
+  "w-[10%]",
+  "w-[20%]",
+  "w-[30%]",
+  "w-[40%]",
+  "w-1/2",
+  "w-[60%]",
+  "w-[70%]",
+  "w-[80%]",
+  "w-[90%]",
+  "w-full",
+] as const;
+
 function Estrella({ llena }: { llena: boolean }) {
   return (
     <Star
       aria-hidden
       strokeWidth={1.5}
-      className={cn("size-5 text-naranja-marca", llena ? "fill-current" : "fill-transparent")}
+      // Turquesa (accion): ícono, así que alcanza 3:1 sobre superficie y arena. El sol no alcanza.
+      className={cn("size-5 text-accion", llena ? "fill-current" : "fill-transparent")}
     />
   );
 }
 
 /**
- * Puntaje con estrellas (naranja de marca). Solo lectura por defecto (`role="img"`); con `onChange`
- * es un grupo de 5 botones de radio de 44 px: flechas para cambiar, Inicio/Fin para 1 y 5.
+ * Puntaje con estrellas turquesas. Solo lectura por defecto (`role="img"`); con `onChange` es un
+ * grupo de 5 botones de radio de 44 px: flechas para cambiar, Inicio/Fin para 1 y 5.
  */
 export function Estrellas(props: EstrellasProps) {
   const { valor, onChange, etiqueta = "Puntaje", className } = props;
@@ -60,8 +76,10 @@ export function Estrellas(props: EstrellasProps) {
           ))}
         </span>
         <span
-          className="absolute inset-y-0 left-0 flex overflow-hidden"
-          style={{ width: `${(redondeado / 5) * 100}%` }}
+          className={cn(
+            "absolute inset-y-0 left-0 flex overflow-hidden",
+            LLENADO[Math.round((redondeado / 5) * 10)],
+          )}
         >
           {TOTAL.map((n) => (
             <Estrella key={n} llena />
@@ -120,7 +138,7 @@ export function Estrellas(props: EstrellasProps) {
             title={etiquetasPuntaje?.[n]}
             tabIndex={n === (activa || 1) ? 0 : -1}
             onClick={() => onChange(n)}
-            className="flex size-11 items-center justify-center rounded-campo"
+            className="flex size-11 items-center justify-center rounded-full"
           >
             <Estrella llena={n <= activa} />
           </button>

@@ -15,7 +15,7 @@ export function ListaNormas({ dosColumnas = false }: { dosColumnas?: boolean }) 
         >
           <span
             aria-hidden
-            className="flex size-[26px] flex-none items-center justify-center rounded-full bg-azul-suave font-mono text-[13px] font-semibold text-sobre-azul-suave lg:size-7"
+            className="flex size-[26px] flex-none items-center justify-center rounded-full bg-superficie font-texto text-[13px] font-semibold text-texto lg:size-7"
           >
             {i + 1}
           </span>
@@ -33,7 +33,7 @@ export function QueHaceLabia() {
       <h2 id="que-hace-labia" className="font-titulo text-[22px] leading-tight">
         Qué hace LabÍA
       </h2>
-      <ul className="flex list-disc flex-col gap-1.5 pl-5 text-[15px] leading-snug text-texto-secundario">
+      <ul className="flex list-disc flex-col gap-1.5 pl-5 text-[15px] leading-snug text-texto">
         {QUE_HACE_LABIA.map((texto) => (
           <li key={texto}>{texto}</li>
         ))}

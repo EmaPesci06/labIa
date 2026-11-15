@@ -31,7 +31,7 @@ describe("Insignia", () => {
     }
   });
 
-  it("usa los tokens: azul suave y naranja suave", () => {
+  it("verificación con borde turquesa sobre superficie; matrícula en sol", () => {
     render(
       <>
         <Insignia variante="verificada" />
@@ -39,14 +39,12 @@ describe("Insignia", () => {
       </>,
     );
     expect(screen.getByText("Identidad verificada")).toHaveClass(
-      "bg-azul-suave",
+      "bg-superficie",
+      "border-accion",
       "font-bold",
       "text-xs",
     );
-    expect(screen.getByText("Matriculado")).toHaveClass(
-      "bg-naranja-suave",
-      "text-sobre-naranja-suave",
-    );
+    expect(screen.getByText("Matriculado")).toHaveClass("bg-sol", "text-sobre-sol");
   });
 
   it("admite texto propio", () => {
@@ -56,7 +54,7 @@ describe("Insignia", () => {
 });
 
 describe("Tarjeta", () => {
-  it("radio 18, padding 16 y variante con borde", () => {
+  it("radio 22, padding 16, superficie y sin borde por defecto", () => {
     render(
       <>
         <Tarjeta>Sola</Tarjeta>
@@ -65,10 +63,12 @@ describe("Tarjeta", () => {
         </Tarjeta>
       </>,
     );
-    expect(screen.getByText("Sola")).toHaveClass("rounded-[18px]", "p-4", "bg-superficie");
+    const sola = screen.getByText("Sola");
+    expect(sola).toHaveClass("rounded-tarjeta", "p-4", "bg-superficie");
+    expect(sola).not.toHaveClass("border-2");
     const conBorde = screen.getByText("Con borde");
     expect(conBorde.tagName).toBe("ARTICLE");
-    expect(conBorde).toHaveClass("border");
+    expect(conBorde).toHaveClass("border-2", "border-texto");
   });
 });
 
@@ -79,11 +79,11 @@ describe("Avatar", () => {
     expect(iniciales("  Ana María  López ")).toBe("AL");
   });
 
-  it("muestra las iniciales con el nombre como etiqueta", () => {
+  it("muestra las iniciales con el nombre como etiqueta, sobre turquesa con borde sol", () => {
     render(<Avatar nombre="Martín Gómez" tamano={84} />);
     const avatar = screen.getByRole("img", { name: "Martín Gómez" });
     expect(avatar).toHaveTextContent("MG");
-    expect(avatar).toHaveClass("size-[84px]", "bg-azul");
+    expect(avatar).toHaveClass("size-[84px]", "bg-accion", "border-sol");
   });
 
   it("con foto muestra la imagen", () => {
@@ -93,10 +93,10 @@ describe("Avatar", () => {
 });
 
 describe("EtiquetaMono", () => {
-  it("une las partes con puntos medios", () => {
+  it("une las partes con puntos medios en mayúsculas", () => {
     render(<EtiquetaMono partes={["Gas", "La Perla", "hace 20 min", "a 0,8 km"]} />);
     const etiqueta = screen.getByText("Gas · La Perla · hace 20 min · a 0,8 km");
-    expect(etiqueta).toHaveClass("font-mono", "uppercase", "tracking-[0.4px]");
+    expect(etiqueta).toHaveClass("uppercase", "tracking-[0.4px]", "font-bold");
   });
 });
 
@@ -116,10 +116,10 @@ describe("Vacio", () => {
   });
 });
 
-describe("Aviso", () => {
-  it("es una nota con el mensaje", () => {
+describe("Aviso (nota)", () => {
+  it("es una nota con el mensaje, con borde turquesa", () => {
     render(<Aviso>Se comprometió con las normas de seguridad de LabÍA.</Aviso>);
     expect(screen.getByRole("note")).toHaveTextContent("normas de seguridad de LabÍA");
-    expect(screen.getByRole("note")).toHaveClass("bg-azul-suave");
+    expect(screen.getByRole("note")).toHaveClass("bg-superficie", "border-accion");
   });
 });

@@ -116,22 +116,20 @@ export function BloqueVerificacion({
 
     if (local) {
       return (
-        <span className="flex items-center gap-1.5 font-bold text-azul">
-          <Check aria-hidden className="size-4 text-exito" />
+        <span className="flex items-center gap-1.5 font-bold text-texto">
+          <Check aria-hidden className="size-4 text-texto" />
           <span className="max-w-[120px] truncate text-xs sm:max-w-[160px]">{local.name}</span>
         </span>
       );
     }
 
-    const enRevision = (
-      <span className="font-semibold text-texto-secundario">Subido · en revisión</span>
-    );
+    const enRevision = <span className="font-semibold text-texto">Subido · en revisión</span>;
     if (subidosAhora[tipo]) return enRevision;
 
     if (remota) {
       if (remota.estado === "aprobado") {
         return (
-          <span className="flex items-center gap-1 font-bold text-exito">
+          <span className="flex items-center gap-1 font-bold text-texto">
             <Check aria-hidden className="size-4" /> Aprobado
           </span>
         );
@@ -142,17 +140,15 @@ export function BloqueVerificacion({
           <span className="text-xs font-semibold text-error">
             Rechazado{remota.motivoRechazo ? `: ${remota.motivoRechazo}` : ""}. Volvé a subirlo.
           </span>
-          <span className="font-bold text-sobre-azul-suave">Volver a subir</span>
+          <span className="font-bold text-texto">Volver a subir</span>
         </span>
       );
     }
 
     return (
       <span className="flex flex-col items-end text-right">
-        <span className="text-xs font-semibold whitespace-nowrap text-texto-secundario">
-          Falta subir
-        </span>
-        <span className="font-bold whitespace-nowrap text-sobre-azul-suave">{etiquetaVacia}</span>
+        <span className="text-xs font-semibold whitespace-nowrap text-texto">Falta subir</span>
+        <span className="font-bold whitespace-nowrap text-texto">{etiquetaVacia}</span>
       </span>
     );
   }
@@ -161,14 +157,14 @@ export function BloqueVerificacion({
     <section
       aria-labelledby={`${base}-titulo`}
       className={cn(
-        "flex flex-col gap-3 rounded-tarjeta bg-azul-suave p-4 lg:rounded-[20px] lg:p-5",
+        "flex flex-col gap-3 rounded-tarjeta bg-superficie p-4 lg:rounded-[20px] lg:p-5",
         className,
       )}
     >
       <div className="flex flex-col gap-1">
         <h2
           id={`${base}-titulo`}
-          className="flex items-center gap-2 text-base font-bold text-sobre-azul-suave lg:text-[17px]"
+          className="flex items-center gap-2 text-base font-bold text-texto lg:text-[17px]"
         >
           <ShieldCheck aria-hidden strokeWidth={2} className="size-5" />
           Verificación obligatoria
@@ -187,39 +183,39 @@ export function BloqueVerificacion({
 
       <div className="flex flex-col gap-2.5">
         {/* DNI: acordeón con frente y dorso */}
-        <div className="flex flex-col overflow-hidden rounded-campo border border-borde bg-superficie">
+        <div className="flex flex-col overflow-hidden rounded-campo border border-texto bg-superficie">
           <button
             type="button"
             onClick={() => setExpandirDni((prev) => !prev)}
             aria-expanded={expandirDni}
-            className="flex min-h-[52px] w-full items-center justify-between px-3.5 text-left text-[15px] font-semibold text-texto hover:bg-azul-suave/40 focus-visible:outline-[3px] focus-visible:outline-offset-[-2px] focus-visible:outline-foco"
+            className="flex min-h-[52px] w-full items-center justify-between px-3.5 text-left text-[15px] font-semibold text-texto hover:bg-superficie/40 focus-visible:outline-[3px] focus-visible:outline-offset-[-2px] focus-visible:outline-foco"
           >
             <span className="flex items-center gap-2">
               DNI, frente y dorso
               {cantidadDni > 0 ? (
-                <span className="rounded-full bg-azul-suave px-2 py-0.5 text-xs font-bold text-sobre-azul-suave">
+                <span className="rounded-full bg-superficie px-2 py-0.5 text-xs font-bold text-texto">
                   {cantidadDni}/2
                 </span>
               ) : null}
             </span>
             <span className="flex items-center gap-2">
               {cantidadDni === 2 ? (
-                <span className="flex items-center gap-1 font-bold text-exito">
+                <span className="flex items-center gap-1 font-bold text-texto">
                   <Check aria-hidden className="size-4" /> Listo
                 </span>
               ) : (
-                <span className="font-bold text-sobre-azul-suave">Subir</span>
+                <span className="font-bold text-texto">Subir</span>
               )}
               {expandirDni ? (
-                <ChevronUp aria-hidden className="size-4 text-texto-secundario" />
+                <ChevronUp aria-hidden className="size-4 text-texto" />
               ) : (
-                <ChevronDown aria-hidden className="size-4 text-texto-secundario" />
+                <ChevronDown aria-hidden className="size-4 text-texto" />
               )}
             </span>
           </button>
 
           {expandirDni ? (
-            <div className="flex flex-col gap-2 border-t border-borde bg-fondo p-3">
+            <div className="flex flex-col gap-2 border-t border-texto bg-fondo p-3">
               <FilaArchivo
                 id={`${base}-dni-frente`}
                 etiqueta="Frente del DNI"
@@ -258,13 +254,13 @@ export function BloqueVerificacion({
           onSeleccionar={(arch) => void manejarArchivo("antecedentes", arch)}
           onQuitar={() => onQuitarDocumento?.("antecedentes")}
         />
-        <p className="-mt-1 text-xs leading-snug text-texto-secundario">
+        <p className="-mt-1 text-xs leading-snug text-texto">
           Lo sacás online en el sitio del{" "}
           <a
             href={URL_REINCIDENCIA}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-semibold text-azul underline"
+            className="font-semibold text-texto underline"
           >
             Registro Nacional de Reincidencia
           </a>
@@ -297,7 +293,7 @@ export function BloqueVerificacion({
             value={progreso.hechos}
             max={progreso.total}
             aria-label="Avance de la subida"
-            className="h-2 w-full overflow-hidden rounded-full accent-azul"
+            className="accent-azul h-2 w-full overflow-hidden rounded-full"
           />
         </div>
       ) : null}
@@ -338,8 +334,8 @@ function FilaArchivo({
   return (
     <div
       className={cn(
-        "flex min-h-[52px] items-center justify-between rounded-campo border border-borde bg-superficie px-3.5",
-        envolturaBoton && "hover:bg-azul-suave/40",
+        "flex min-h-[52px] items-center justify-between rounded-campo border border-texto bg-superficie px-3.5",
+        envolturaBoton && "hover:bg-superficie/40",
       )}
     >
       <label
@@ -347,13 +343,13 @@ function FilaArchivo({
         className="flex flex-1 cursor-pointer items-center justify-between gap-2 py-3 text-[15px] font-semibold text-texto focus-within:outline-[3px] focus-within:outline-offset-2 focus-within:outline-foco"
       >
         <span className="flex min-w-0 items-center gap-2">
-          <FileText aria-hidden className="size-4.5 shrink-0 text-azul" />
+          <FileText aria-hidden className="size-4.5 shrink-0 text-texto" />
           {etiqueta}
         </span>
         {/* El estado no se parte: a 390 px la etiqueta es la que tiene que envolver (LAB-43). */}
         <div className="flex shrink-0 items-center gap-2">
           {estadoTexto}
-          {!tieneArchivo ? <Upload aria-hidden className="size-4 shrink-0 text-azul" /> : null}
+          {!tieneArchivo ? <Upload aria-hidden className="size-4 shrink-0 text-texto" /> : null}
         </div>
         <input
           id={id}
@@ -375,7 +371,7 @@ function FilaArchivo({
           type="button"
           onClick={onQuitar}
           aria-label={`Quitar archivo de ${etiqueta}`}
-          className="-mr-3 ml-1 flex size-11 shrink-0 items-center justify-center rounded-full text-texto-secundario hover:bg-divisor hover:text-texto focus-visible:outline-[3px] focus-visible:outline-offset-[-2px] focus-visible:outline-foco"
+          className="-mr-3 ml-1 flex size-11 shrink-0 items-center justify-center rounded-full text-texto hover:bg-fondo hover:text-texto focus-visible:outline-[3px] focus-visible:outline-offset-[-2px] focus-visible:outline-foco"
         >
           <X aria-hidden className="size-4" />
         </button>

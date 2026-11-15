@@ -12,7 +12,8 @@ type Props = {
 };
 
 /**
- * Etiqueta de datos en IBM Plex Mono 13/600, mayúsculas, `letter-spacing` .4 px.
+ * Etiqueta de datos (distancia, estado, tiempo): Nunito Sans 700, 13 px, mayúsculas, `letter-spacing`
+ * .4 px. Reemplaza a la antigua etiqueta en IBM Plex Mono.
  *
  * @example
  * <EtiquetaMono partes={["Gas", "La Perla", "hace 20 min", "a 0,8 km"]} />
@@ -20,10 +21,7 @@ type Props = {
 export function EtiquetaMono({ como: Elemento = "p", partes, children, className }: Props) {
   return (
     <Elemento
-      className={cn(
-        "font-mono text-[13px] font-semibold tracking-[0.4px] text-texto-secundario uppercase",
-        className,
-      )}
+      className={cn("text-[13px] font-bold tracking-[0.4px] text-texto uppercase", className)}
     >
       {partes ? partes.join(" · ") : children}
     </Elemento>

@@ -70,7 +70,7 @@ function Seccion({ titulo, children }: { titulo: string; children: ReactNode }) 
     <section aria-labelledby={id} className="flex flex-col gap-2.5">
       <h2
         id={id}
-        className="font-mono text-[13px] font-semibold tracking-[0.6px] text-texto-terciario uppercase lg:font-sans lg:text-lg lg:font-bold lg:tracking-normal lg:text-texto lg:normal-case"
+        className="font-texto text-[13px] font-semibold tracking-[0.6px] text-texto uppercase lg:font-sans lg:text-lg lg:font-bold lg:tracking-normal lg:text-texto lg:normal-case"
       >
         {titulo}
       </h2>
@@ -373,7 +373,7 @@ export function FormularioPerfilProfesional({
     return (
       <p
         role="status"
-        className="rounded-campo bg-exito-suave p-4 text-[15px] font-semibold text-sobre-exito-suave"
+        className="rounded-campo bg-sol p-4 text-[15px] font-semibold text-sobre-sol"
       >
         {estado.exito}
       </p>
@@ -387,7 +387,7 @@ export function FormularioPerfilProfesional({
           <h1 className="font-titulo text-[30px] leading-tight lg:text-[40px]">
             Contanos qué sabés hacer
           </h1>
-          <p className="text-[15px] text-texto-secundario lg:text-[17px]">
+          <p className="text-[15px] text-texto lg:text-[17px]">
             Esto es lo que van a ver los clientes en tu perfil.
           </p>
         </div>
@@ -483,7 +483,7 @@ export function FormularioPerfilProfesional({
           </Seccion>
 
           <Seccion titulo="Tus oficios">
-            <p className="text-sm text-texto-secundario">Elegí uno o varios.</p>
+            <p className="text-sm text-texto">Elegí uno o varios.</p>
             <div
               data-grupo-invalido={errores.oficios ? "" : undefined}
               tabIndex={errores.oficios ? -1 : undefined}

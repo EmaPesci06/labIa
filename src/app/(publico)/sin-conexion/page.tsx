@@ -15,11 +15,9 @@ export const metadata: Metadata = {
 export default function SinConexion() {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-4 py-10 text-center">
-      <WifiOff aria-hidden strokeWidth={2} className="size-12 text-naranja-marca" />
+      <WifiOff aria-hidden strokeWidth={2} className="size-12 text-accion" />
       <h1 className="font-titulo text-[28px]">Sin conexión</h1>
-      <p className="text-base text-texto-secundario">
-        Sin conexión. Revisá tu internet y volvé a intentar.
-      </p>
+      <p className="text-base text-texto">Sin conexión. Revisá tu internet y volvé a intentar.</p>
       <Boton href="/inicio" variante="cliente" tamano="grande">
         Reintentar
       </Boton>

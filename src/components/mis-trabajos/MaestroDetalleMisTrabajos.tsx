@@ -78,9 +78,9 @@ export function MaestroDetalleMisTrabajos({
       </div>
 
       {trabajos.length === 0 ? (
-        <div className="flex min-h-[280px] flex-col items-center justify-center gap-4 rounded-[22px] border border-dashed border-borde bg-superficie p-8 text-center">
+        <div className="flex min-h-[280px] flex-col items-center justify-center gap-4 rounded-[22px] border border-dashed border-texto bg-superficie p-8 text-center">
           <p className="text-lg font-bold text-texto">{textoVacio.titulo}</p>
-          <p className="max-w-md text-sm text-texto-secundario">{textoVacio.detalle}</p>
+          <p className="max-w-md text-sm text-texto">{textoVacio.detalle}</p>
           {tabActiva === "abiertos" ? (
             <Boton href="/trabajos/nuevo" variante="cliente" tamano="grande">
               Publicar un trabajo
@@ -121,7 +121,7 @@ export function MaestroDetalleMisTrabajos({
             {/* Botón "+ Publicar otro trabajo" de escritorio */}
             <Link
               href="/trabajos/nuevo"
-              className="hidden min-h-[48px] items-center justify-center gap-2 rounded-[12px] border-[1.5px] border-dashed border-borde text-[15px] font-bold text-azul transition-colors hover:border-azul hover:bg-azul-suave/20 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco lg:flex"
+              className="hidden min-h-[48px] items-center justify-center gap-2 rounded-[12px] border-[1.5px] border-dashed border-texto text-[15px] font-bold text-texto transition-colors hover:border-accion hover:bg-superficie/20 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco lg:flex"
             >
               <Plus aria-hidden className="size-4" />
               Publicar otro trabajo
@@ -136,7 +136,7 @@ export function MaestroDetalleMisTrabajos({
             {trabajoSeleccionado ? (
               <DetalleMiTrabajo trabajo={trabajoSeleccionado} mostrarTituloCompleto={true} />
             ) : (
-              <div className="flex min-h-[360px] items-center justify-center rounded-[22px] border border-divisor bg-superficie p-8 text-center text-[17px] text-texto-secundario">
+              <div className="flex min-h-[360px] items-center justify-center rounded-[22px] border border-fondo bg-superficie p-8 text-center text-[17px] text-texto">
                 Elegí un trabajo de la lista para ver los postulantes.
               </div>
             )}

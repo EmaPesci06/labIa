@@ -17,9 +17,7 @@ function EnlaceInvalido() {
       <p role="alert" className="font-semibold text-error">
         Este enlace no es válido o está incompleto.
       </p>
-      <p className="text-texto-secundario">
-        Ingresá a tu cuenta y cambiá tus preferencias desde Mi cuenta.
-      </p>
+      <p className="text-texto">Ingresá a tu cuenta y cambiá tus preferencias desde Mi cuenta.</p>
       <Boton href="/ingresar" variante="cliente" tamano="grande" bloque>
         Ingresar
       </Boton>
@@ -40,13 +38,10 @@ async function Contenido({ searchParams }: { searchParams: Promise<Params> }) {
   if (listo && Object.hasOwn(TEXTO_CATEGORIA, listo)) {
     return (
       <>
-        <p
-          role="status"
-          className="rounded-campo bg-exito-suave p-4 font-semibold text-sobre-exito-suave"
-        >
+        <p role="status" className="rounded-campo bg-sol p-4 font-semibold text-sobre-sol">
           Listo. Ya no vas a recibir {TEXTO_CATEGORIA[listo as keyof typeof TEXTO_CATEGORIA]}.
         </p>
-        <p className="text-texto-secundario">
+        <p className="text-texto">
           Podés volver a activarlos cuando quieras desde Mi cuenta, en Preferencias de email.
         </p>
         <Boton href="/ingresar" variante="secundario" bloque>

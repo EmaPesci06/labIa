@@ -44,14 +44,14 @@ export function InicioBusqueda({ barrios, barrioInicial }: Props) {
 
   return (
     <>
-      <label className="flex min-h-[52px] items-center gap-2.5 rounded-[14px] border border-borde bg-superficie px-3.5 text-texto">
-        <MapPin aria-hidden strokeWidth={2} className="size-5 shrink-0 text-texto-secundario" />
-        <span className="shrink-0 text-sm text-texto-secundario">Tu barrio</span>
+      <label className="flex min-h-[52px] items-center gap-2.5 rounded-[14px] border border-texto bg-superficie px-3.5 text-texto">
+        <MapPin aria-hidden strokeWidth={2} className="size-5 shrink-0 text-texto" />
+        <span className="shrink-0 text-sm text-texto">Tu barrio</span>
         <select
           value={barrio}
           onChange={(evento) => setBarrio(evento.target.value)}
           disabled={barrios.length === 0}
-          className="min-h-[50px] min-w-0 flex-1 appearance-none bg-transparent text-right text-base font-semibold text-azul"
+          className="min-h-[50px] min-w-0 flex-1 appearance-none bg-transparent text-right text-base font-semibold text-texto"
         >
           {barrios.length === 0 ? <option value={barrio}>Centro</option> : null}
           {barrios.map((b) => (
@@ -60,7 +60,7 @@ export function InicioBusqueda({ barrios, barrioInicial }: Props) {
             </option>
           ))}
         </select>
-        <ChevronDown aria-hidden strokeWidth={2} className="size-4 shrink-0 text-azul" />
+        <ChevronDown aria-hidden strokeWidth={2} className="size-4 shrink-0 text-texto" />
       </label>
 
       <ul className="grid grid-cols-2 gap-2.5">
@@ -70,9 +70,9 @@ export function InicioBusqueda({ barrios, barrioInicial }: Props) {
             <li key={oficio} className="flex">
               <Link
                 href={urlBusqueda({ oficio, barrio })}
-                className="flex min-h-14 w-full items-center gap-2.5 rounded-[14px] bg-superficie px-4 text-[15px] font-bold text-texto no-underline hover:bg-azul-suave hover:text-texto"
+                className="flex min-h-14 w-full items-center gap-2.5 rounded-[14px] bg-superficie px-4 text-[15px] font-bold text-texto no-underline hover:bg-superficie hover:text-texto"
               >
-                <Icono aria-hidden strokeWidth={2} className="size-5 shrink-0 text-azul" />
+                <Icono aria-hidden strokeWidth={2} className="size-5 shrink-0 text-texto" />
                 {nombreOficio(oficio)}
               </Link>
             </li>

@@ -25,8 +25,8 @@ export function NavegacionAdmin() {
             className={cn(
               "inline-flex min-h-11 items-center rounded-full px-3.5 py-1.5 text-sm font-bold transition-colors",
               activo
-                ? "bg-azul text-sobre-azul"
-                : "text-texto-secundario hover:bg-azul-suave hover:text-texto",
+                ? "bg-accion text-sobre-accion"
+                : "text-texto hover:bg-superficie hover:text-texto",
             )}
           >
             {seccion.etiqueta}

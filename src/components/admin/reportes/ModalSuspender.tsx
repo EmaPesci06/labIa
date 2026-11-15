@@ -50,7 +50,7 @@ export function ModalSuspender({ abierta, onCambioAbierta, usuarioId, nombreUsua
       descripcion="La cuenta no podrá operar en la plataforma. Sus trabajos abiertos se cancelarán y sus postulaciones serán retiradas."
     >
       <div className="flex flex-col gap-4">
-        <div className="rounded-[14px] bg-naranja-suave p-3.5 text-sm text-sobre-naranja-suave">
+        <div className="rounded-[14px] bg-sol p-3.5 text-sm text-sobre-sol">
           <p className="font-semibold">Esta acción:</p>
           <ul className="mt-1 list-inside list-disc space-y-0.5">
             <li>Cambia el estado de la cuenta a suspendida inmediatamente.</li>
@@ -70,7 +70,7 @@ export function ModalSuspender({ abierta, onCambioAbierta, usuarioId, nombreUsua
           required
           error={error ?? undefined}
         />
-        <p className="-mt-2 text-xs text-texto-secundario">
+        <p className="-mt-2 text-xs text-texto">
           La persona suspendida ve este motivo. No incluyas datos personales de otras personas
           (nombres, teléfonos ni direcciones).
         </p>
@@ -88,7 +88,7 @@ export function ModalSuspender({ abierta, onCambioAbierta, usuarioId, nombreUsua
             type="button"
             disabled={pendiente}
             onClick={handleConfirmar}
-            className="inline-flex min-h-[44px] items-center justify-center rounded-boton bg-error px-5 text-sm font-bold text-sobre-azul hover:opacity-90 active:opacity-80 disabled:opacity-50"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-boton bg-error px-5 text-sm font-bold text-sobre-accion hover:opacity-90 active:opacity-80 disabled:opacity-50"
           >
             {pendiente ? "Suspendiendo…" : "Confirmar suspensión"}
           </button>

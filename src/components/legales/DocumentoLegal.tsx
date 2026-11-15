@@ -13,7 +13,7 @@ export interface SeccionLegal {
 /** Valor pendiente de completar por Emanuel (`[RAZÓN SOCIAL]`…): resaltado para no pasarlo por alto. */
 export function Marcador({ children }: { children: ReactNode }) {
   return (
-    <mark className="rounded-sm bg-naranja-suave px-1 font-mono text-[0.92em] text-sobre-naranja-suave">
+    <mark className="rounded-sm bg-sol px-1 font-texto text-[0.92em] text-sobre-sol">
       {children}
     </mark>
   );
@@ -40,7 +40,7 @@ export function DocumentoLegal({
     <article className="flex flex-col gap-5 pt-2">
       <header className="flex flex-col gap-2">
         <h1 className="font-titulo text-[30px] leading-tight lg:text-[36px]">{titulo}</h1>
-        <p className="text-[15px] leading-snug text-texto-secundario">{introduccion}</p>
+        <p className="text-[15px] leading-snug text-texto">{introduccion}</p>
       </header>
 
       {revisado ? null : (
@@ -51,7 +51,7 @@ export function DocumentoLegal({
       )}
 
       <nav aria-label="Índice" className="rounded-tarjeta bg-superficie p-4">
-        <h2 className="mb-2 font-mono text-xs font-semibold tracking-wider text-texto-terciario uppercase">
+        <h2 className="mb-2 font-texto text-xs font-semibold tracking-wider text-texto uppercase">
           Índice
         </h2>
         <ol className="flex flex-col text-[15px]">
@@ -59,9 +59,9 @@ export function DocumentoLegal({
             <li key={s.id}>
               <a
                 href={`#${s.id}`}
-                className="flex min-h-11 items-center gap-2.5 rounded-campo font-semibold text-azul underline-offset-2 hover:underline"
+                className="flex min-h-11 items-center gap-2.5 rounded-campo font-semibold text-texto underline-offset-2 hover:underline"
               >
-                <span className="w-6 font-mono text-[13px] text-texto-terciario">{i + 1}.</span>
+                <span className="w-6 font-texto text-[13px] text-texto">{i + 1}.</span>
                 {s.titulo}
               </a>
             </li>
@@ -75,21 +75,21 @@ export function DocumentoLegal({
             <h2 id={`${s.id}-titulo`} className="mb-2 font-titulo text-[22px] leading-tight">
               {i + 1}. {s.titulo}
             </h2>
-            <div className="flex flex-col gap-2.5 text-[15px] leading-relaxed wrap-break-word [&_a]:font-semibold [&_a]:text-azul [&_a]:underline [&_a]:underline-offset-2 [&_ol]:flex [&_ol]:list-decimal [&_ol]:flex-col [&_ol]:gap-1.5 [&_ol]:pl-5 [&_ul]:flex [&_ul]:list-disc [&_ul]:flex-col [&_ul]:gap-1.5 [&_ul]:pl-5">
+            <div className="flex flex-col gap-2.5 text-[15px] leading-relaxed wrap-break-word [&_a]:font-semibold [&_a]:text-texto [&_a]:underline [&_a]:underline-offset-2 [&_ol]:flex [&_ol]:list-decimal [&_ol]:flex-col [&_ol]:gap-1.5 [&_ol]:pl-5 [&_ul]:flex [&_ul]:list-disc [&_ul]:flex-col [&_ul]:gap-1.5 [&_ul]:pl-5">
               {s.contenido}
             </div>
           </section>
         ))}
       </div>
 
-      <footer className="flex flex-col gap-1 border-t border-divisor pt-4 text-[13px] leading-snug text-texto-terciario">
+      <footer className="flex flex-col gap-1 border-t border-fondo pt-4 text-[13px] leading-snug text-texto">
         <p data-testid="version-legal">
           Versión {VERSION_LEGALES}
           {revisado ? "" : " (borrador)"} · Última actualización: {FECHA_LEGALES}
         </p>
         <Link
           href={otroDocumento.href}
-          className="inline-block py-2 font-semibold text-azul underline"
+          className="inline-block py-2 font-semibold text-texto underline"
         >
           {otroDocumento.etiqueta}
         </Link>

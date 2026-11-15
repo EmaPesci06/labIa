@@ -91,17 +91,17 @@ export default async function PaginaDetalleTrabajo({ params }: PaginaDetalleTrab
 
       {/* Presupuesto estimado si lo puso */}
       {trabajo.presupuestoEstimado !== null ? (
-        <div className="rounded-xl border border-divisor bg-superficie p-3.5 text-sm font-semibold text-texto-secundario">
+        <div className="rounded-xl border border-fondo bg-superficie p-3.5 text-sm font-semibold text-texto">
           El cliente estima {formatearPesos(trabajo.presupuestoEstimado)}
         </div>
       ) : null}
 
       {/* Tarjeta del cliente */}
-      <div className="flex items-center gap-3 rounded-2xl border border-divisor bg-superficie p-3.5">
+      <div className="flex items-center gap-3 rounded-2xl border border-fondo bg-superficie p-3.5">
         <Avatar nombre={clienteNombreVisible} tamano={44} />
         <div className="flex min-w-0 flex-col gap-0.5">
           <span className="truncate text-[15px] font-bold text-texto">{clienteNombreVisible}</span>
-          <span className="truncate text-[13px] text-texto-secundario">
+          <span className="truncate text-[13px] text-texto">
             Cliente · {trabajo.barrioNombre} · La dirección se comparte al acordar
           </span>
         </div>

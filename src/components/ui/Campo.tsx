@@ -15,7 +15,7 @@ import { cn } from "@/lib/cn";
 type PropsBase = {
   /** Texto de la etiqueta (siempre visible, arriba del campo). */
   etiqueta: string;
-  /** Ayuda en texto terciario debajo del campo. */
+  /** Ayuda debajo del campo. */
   ayuda?: string;
   /** Mensaje de error en castellano. Marca el campo con `aria-invalid` y lo asocia con `aria-describedby`. */
   error?: string;
@@ -44,14 +44,17 @@ type PropsSeleccion = PropsBase & {
 
 export type CampoProps = PropsTexto | PropsArea | PropsSeleccion;
 
+// Borde de 2 px color texto (3 px con error, como en el prototipo), radio 16, fondo `campo`
+// (blanco en claro, fondo de página en oscuro). Texto 17 px: evita el zoom de iOS.
 const CONTROL =
-  "w-full rounded-boton border border-borde bg-superficie px-3.5 text-base text-texto " +
-  "placeholder:text-texto-terciario aria-invalid:border-error aria-invalid:border-2 " +
+  "w-full rounded-campo border-2 border-texto bg-campo px-3.5 text-[17px] text-texto " +
+  "placeholder:text-texto placeholder:opacity-60 " +
+  "aria-invalid:border-3 aria-invalid:border-error " +
   "disabled:cursor-not-allowed disabled:opacity-60";
 
 /**
- * Campo de formulario con etiqueta, ayuda y error asociados. Texto 16 px (evita el zoom de iOS),
- * alto 52 px (radio 14, como el buscador del prototipo). Variantes: texto, teléfono, pesos (prefijo `$`), área (con contador) y selección.
+ * Campo de formulario con etiqueta, ayuda y error asociados. Alto 52 px, radio 16, borde de 2 px
+ * color texto. Variantes: texto, teléfono, pesos (prefijo `$`), área (con contador) y selección.
  *
  * @example
  * <Campo etiqueta="Nombre" name="nombre" error={errores.nombre} />
@@ -133,8 +136,8 @@ export function Campo(props: CampoProps) {
         </select>
         <ChevronDown
           aria-hidden
-          strokeWidth={2}
-          className="pointer-events-none absolute top-1/2 right-3 size-5 -translate-y-1/2 text-texto-secundario"
+          strokeWidth={2.5}
+          className="pointer-events-none absolute top-1/2 right-3.5 size-5 -translate-y-1/2 text-texto"
         />
       </div>
     );
@@ -159,7 +162,7 @@ export function Campo(props: CampoProps) {
         {esPesos ? (
           <span
             aria-hidden
-            className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 font-bold text-texto-secundario"
+            className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 font-bold text-texto"
           >
             $
           </span>
@@ -181,22 +184,22 @@ export function Campo(props: CampoProps) {
 
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
-      <label htmlFor={id} className="text-sm font-semibold text-texto">
+      <label htmlFor={id} className="text-base font-bold text-texto">
         {etiqueta}
       </label>
       {control}
       {error ? (
-        <p id={idError} className="text-sm font-semibold text-error">
+        <p id={idError} className="text-[15px] font-bold text-error">
           {error}
         </p>
       ) : null}
       {ayuda ? (
-        <p id={idAyuda} className="text-sm text-texto-terciario">
+        <p id={idAyuda} className="text-[15px] text-texto">
           {ayuda}
         </p>
       ) : null}
       {maxLength ? (
-        <p id={idContador} className="self-end font-mono text-xs font-medium text-texto-terciario">
+        <p id={idContador} className="self-end text-xs font-bold text-texto">
           {largo}/{maxLength}
         </p>
       ) : null}

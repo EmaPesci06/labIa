@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { CintaDistancia } from "@/components/ui/cinta-metrica";
+import { Distancia } from "@/components/ui/Distancia";
 import { EtiquetaMono } from "@/components/ui/EtiquetaMono";
 import { Insignia } from "@/components/ui/Insignia";
 import { Tarjeta } from "@/components/ui/Tarjeta";
@@ -37,7 +37,7 @@ export function textoPostulantes(n: number): string {
 
 /**
  * Tarjeta de un trabajo publicado (lo ven los profesionales y el cliente en "Mis trabajos").
- * Etiqueta mono "GAS · LA PERLA", tiempo relativo, título, descripción a 2 líneas, cinta de
+ * Etiqueta mono "GAS · LA PERLA", tiempo relativo, título, descripción a 2 líneas,
  * distancia, urgencia y cantidad de postulantes.
  */
 export function TarjetaTrabajo({
@@ -58,16 +58,16 @@ export function TarjetaTrabajo({
     <>
       <div className="flex items-start justify-between gap-3">
         <EtiquetaMono partes={[ETIQUETA_OFICIO[oficio], barrio]} />
-        <span className="shrink-0 text-sm text-texto-terciario">{cuando}</span>
+        <span className="shrink-0 text-sm text-texto">{cuando}</span>
       </div>
       <h3 className="mt-2 text-[17px] leading-snug font-bold break-words text-texto">
         {titulo || "Tu título va acá"}
       </h3>
-      <p className="mt-1 line-clamp-2 text-[15px] leading-snug break-words text-texto-secundario">
+      <p className="mt-1 line-clamp-2 text-[15px] leading-snug break-words text-texto">
         {descripcion || "Acá se va a ver cómo contás lo que pasa."}
       </p>
       {distanciaKm !== null && distanciaKm !== undefined ? (
-        <CintaDistancia km={distanciaKm} className="mt-3" />
+        <Distancia km={distanciaKm} className="mt-3" />
       ) : null}
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap items-center gap-1.5">
@@ -76,9 +76,7 @@ export function TarjetaTrabajo({
           </Insignia>
           {yaMePostule ? <Insignia variante="verificada">Te postulaste</Insignia> : null}
         </div>
-        <span className="text-sm font-semibold text-texto-secundario">
-          {textoPostulantes(postulantes)}
-        </span>
+        <span className="text-sm font-semibold text-texto">{textoPostulantes(postulantes)}</span>
       </div>
     </>
   );

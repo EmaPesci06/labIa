@@ -75,7 +75,7 @@ export function FiltrosTrabajos({
         ))}
       </div>
 
-      <div className="h-6 w-px bg-divisor" aria-hidden="true" />
+      <div className="h-6 w-px bg-fondo" aria-hidden="true" />
 
       <Chip
         seleccionado={soloMisZonas}

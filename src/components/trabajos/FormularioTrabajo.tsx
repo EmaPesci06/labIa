@@ -222,7 +222,7 @@ export function FormularioTrabajo({
               {errores.barrioId}
             </p>
           ) : (
-            <p className="text-sm text-texto-terciario">
+            <p className="text-sm text-texto">
               Tu dirección exacta la pasás recién cuando elijas a alguien.
             </p>
           )}
@@ -255,9 +255,9 @@ export function FormularioTrabajo({
             <button
               type="button"
               onClick={() => entradaFotos.current?.click()}
-              className="flex min-h-[72px] items-center justify-center gap-2 rounded-boton border-[1.5px] border-dashed border-borde bg-superficie text-[15px] font-semibold text-texto hover:bg-azul-suave"
+              className="flex min-h-[72px] items-center justify-center gap-2 rounded-boton border-[1.5px] border-dashed border-texto bg-superficie text-[15px] font-semibold text-texto hover:bg-superficie"
             >
-              <ImagePlus aria-hidden strokeWidth={2} className="size-[22px] text-azul" />
+              <ImagePlus aria-hidden strokeWidth={2} className="size-[22px] text-texto" />
               Agregar fotos (opcional)
             </button>
           ) : null}
@@ -277,7 +277,7 @@ export function FormularioTrabajo({
                     type="button"
                     aria-label={`Quitar foto ${i + 1}`}
                     onClick={() => setFotos((f) => f.filter((x) => x.clave !== foto.clave))}
-                    className="absolute -top-2 -right-2 flex size-8 items-center justify-center rounded-full bg-azul text-sobre-azul"
+                    className="absolute -top-2 -right-2 flex size-8 items-center justify-center rounded-full bg-accion text-sobre-accion"
                   >
                     <X aria-hidden strokeWidth={2} className="size-4" />
                   </button>
@@ -285,7 +285,7 @@ export function FormularioTrabajo({
               ))}
             </ul>
           ) : null}
-          <p className="text-sm text-texto-terciario">Hasta 4 fotos del problema.</p>
+          <p className="text-sm text-texto">Hasta 4 fotos del problema.</p>
           {errorFotos ? (
             <p role="alert" className="text-sm font-semibold text-error">
               {errorFotos}
@@ -322,7 +322,7 @@ export function FormularioTrabajo({
 
       <aside className="hidden min-w-0 flex-col gap-4 lg:flex lg:w-[380px] lg:shrink-0">
         <div className="flex flex-col gap-3">
-          <h2 className="text-lg font-bold text-azul">Así lo van a ver los profesionales</h2>
+          <h2 className="text-lg font-bold text-texto">Así lo van a ver los profesionales</h2>
           <TarjetaTrabajo
             oficio={(oficio as Oficio | null) ?? "gas"}
             barrio={barrioElegido?.nombre ?? "Tu barrio"}
@@ -334,14 +334,14 @@ export function FormularioTrabajo({
         </div>
         <div className="flex flex-col gap-2.5 rounded-[20px] bg-superficie p-[22px]">
           <h2 className="text-lg font-bold text-texto">Consejos para un buen pedido</h2>
-          <ul className="flex list-disc flex-col gap-2 pl-5 text-[15px] leading-snug text-texto-secundario">
+          <ul className="flex list-disc flex-col gap-2 pl-5 text-[15px] leading-snug text-texto">
             <li>Sumá fotos del problema.</li>
             <li>Contá desde cuándo pasa.</li>
             <li>No pongas tu dirección exacta: solo el barrio.</li>
           </ul>
         </div>
-        <div className="flex flex-col gap-3 rounded-[20px] bg-azul-suave p-[22px]">
-          <h2 className="text-lg font-bold text-sobre-azul-suave">Qué pasa después</h2>
+        <div className="flex flex-col gap-3 rounded-[20px] bg-superficie p-[22px]">
+          <h2 className="text-lg font-bold text-texto">Qué pasa después</h2>
           <ol className="flex list-decimal flex-col gap-2 pl-5 text-[15px] leading-snug text-texto">
             <li>Los profesionales de tu zona ven el trabajo.</li>
             <li>Se postulan con un mensaje y un precio estimado.</li>

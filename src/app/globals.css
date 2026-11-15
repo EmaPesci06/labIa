@@ -8,10 +8,8 @@
  * - Modo claro en :root (y en .claro, para forzarlo en un bloque, por ejemplo en /dev/paleta).
  * - Modo oscuro en .dark. La clase la pone el script de src/lib/tema.ts antes de pintar.
  * - "sobre-X" es el color del texto que va encima de X.
- *
- * Alias temporales (LAB-68): los nombres viejos (azul, naranja-accion, exito…) siguen existiendo
- * apuntando a un token nuevo para que la app compile mientras las pantallas no se rehacen. LAB-69
- * los borra. Están en el bloque "ALIAS TEMPORALES" de abajo y listados en el PR.
+ * - "campo" no está en la tabla del README: es el fondo de los campos de formulario (blanco en
+ *   claro, fondo de página en oscuro). Se agregó para que el componente Campo no use `dark:`.
  */
 :root,
 .claro {
@@ -19,6 +17,7 @@
 
   --color-fondo: #fff3d6;
   --color-superficie: #ffffff;
+  --color-campo: #ffffff;
   --color-texto: #123b4a;
   --color-accion: #0e7c86;
   --color-sobre-accion: #ffffff;
@@ -30,7 +29,7 @@
   --color-error: #a62b24;
   --color-equipo: #123b4a;
 
-  /* Fondo detrás de las hojas inferiores. */
+  /* Fondo detrás de las hojas inferiores (se usa con opacidad en el componente). */
   --color-velo: #123b4a;
   /* Foco: outline de 3 px en claro; en oscuro cambia a sol. */
   --color-foco: #123b4a;
@@ -41,6 +40,7 @@
 
   --color-fondo: #0b2730;
   --color-superficie: #17485a;
+  --color-campo: #0b2730;
   --color-texto: #fff3d6;
   --color-accion: #45c4cc;
   --color-sobre-accion: #0b2730;
@@ -56,49 +56,6 @@
   --color-foco: #f7c948;
 }
 
-/*
- * ALIAS TEMPORALES (LAB-68). Apuntan a un token nuevo y se resuelven en cada tema, porque
- * var() se evalúa en el elemento donde se declara. LAB-69 los borra al rehacer los componentes.
- *   azul → accion · azul-presionado → accion · sobre-azul → sobre-accion
- *   azul-suave → superficie · sobre-azul-suave → texto
- *   naranja-marca → coral · naranja-accion → accion · sobre-naranja → sobre-accion
- *   naranja-suave → sol · sobre-naranja-suave → sobre-sol
- *   exito → accion · sobre-exito → sobre-accion · exito-suave → sol · sobre-exito-suave → sobre-sol
- *   acento → accion · superficie-elevada → superficie
- *   texto-secundario → texto · texto-terciario → texto · borde → texto · divisor → fondo
- *   cinta → coral · cinta-marcas → texto (la cinta métrica se retira en LAB-69)
- */
-:root,
-.claro,
-.dark {
-  --color-azul: var(--color-accion);
-  --color-azul-presionado: var(--color-accion);
-  --color-sobre-azul: var(--color-sobre-accion);
-  --color-azul-suave: var(--color-superficie);
-  --color-sobre-azul-suave: var(--color-texto);
-
-  --color-naranja-marca: var(--color-coral);
-  --color-naranja-accion: var(--color-accion);
-  --color-sobre-naranja: var(--color-sobre-accion);
-  --color-naranja-suave: var(--color-sol);
-  --color-sobre-naranja-suave: var(--color-sobre-sol);
-
-  --color-exito: var(--color-accion);
-  --color-sobre-exito: var(--color-sobre-accion);
-  --color-exito-suave: var(--color-sol);
-  --color-sobre-exito-suave: var(--color-sobre-sol);
-
-  --color-acento: var(--color-accion);
-  --color-superficie-elevada: var(--color-superficie);
-  --color-texto-secundario: var(--color-texto);
-  --color-texto-terciario: var(--color-texto);
-  --color-borde: var(--color-texto);
-  --color-divisor: var(--color-fondo);
-
-  --color-cinta: var(--color-coral);
-  --color-cinta-marcas: var(--color-texto);
-}
-
 /* `dark:` aplica dentro de .dark, salvo en un bloque forzado a claro con .claro. */
 @custom-variant dark (&:where(.dark, .dark *):where(:not(.claro, .claro *)));
 
@@ -111,6 +68,7 @@
   --color-*: initial;
   --color-fondo: var(--color-fondo);
   --color-superficie: var(--color-superficie);
+  --color-campo: var(--color-campo);
   --color-texto: var(--color-texto);
   --color-accion: var(--color-accion);
   --color-sobre-accion: var(--color-sobre-accion);
@@ -124,65 +82,18 @@
   --color-velo: var(--color-velo);
   --color-foco: var(--color-foco);
 
-  /* Alias temporales (LAB-68): los borra LAB-69. */
-  --color-azul: var(--color-azul);
-  --color-azul-presionado: var(--color-azul-presionado);
-  --color-sobre-azul: var(--color-sobre-azul);
-  --color-azul-suave: var(--color-azul-suave);
-  --color-sobre-azul-suave: var(--color-sobre-azul-suave);
-  --color-naranja-marca: var(--color-naranja-marca);
-  --color-naranja-accion: var(--color-naranja-accion);
-  --color-sobre-naranja: var(--color-sobre-naranja);
-  --color-naranja-suave: var(--color-naranja-suave);
-  --color-sobre-naranja-suave: var(--color-sobre-naranja-suave);
-  --color-exito: var(--color-exito);
-  --color-sobre-exito: var(--color-sobre-exito);
-  --color-exito-suave: var(--color-exito-suave);
-  --color-sobre-exito-suave: var(--color-sobre-exito-suave);
-  --color-acento: var(--color-acento);
-  --color-superficie-elevada: var(--color-superficie-elevada);
-  --color-texto-secundario: var(--color-texto-secundario);
-  --color-texto-terciario: var(--color-texto-terciario);
-  --color-borde: var(--color-borde);
-  --color-divisor: var(--color-divisor);
-  --color-cinta: var(--color-cinta);
-  --color-cinta-marcas: var(--color-cinta-marcas);
-
-  /*
-   * Alias partido texto/fondo (LAB-68, lo borra LAB-69). Tailwind resuelve `text-*` primero en
-   * --text-color-* y después en --color-*. Los alias que apuntan a accion y se usan como TEXTO
-   * (enlaces, mensajes) van a texto: accion sobre fondo arena da 4,48:1 y no pasa AA. Los
-   * `bg-*` y `border-*` de esos mismos alias siguen en accion.
-   */
-  --text-color-azul: var(--color-texto);
-  --text-color-azul-presionado: var(--color-texto);
-  --text-color-naranja-accion: var(--color-texto);
-  --text-color-exito: var(--color-texto);
-  --text-color-acento: var(--color-texto);
-
-  /* Las variables --fuente-* las define next/font en src/app/fuentes.ts. Etiquetas y datos usan
-     Nunito Sans (ya no hay IBM Plex Mono): `font-mono` queda como alias. */
+  /* Las variables --fuente-* las define next/font en src/app/fuentes.ts. Texto y datos usan
+     Nunito Sans; títulos y marca, Baloo 2. */
   --font-texto: var(--fuente-nunito), system-ui, sans-serif;
   --font-sans: var(--fuente-nunito), system-ui, sans-serif;
-  --font-mono: var(--fuente-nunito), system-ui, sans-serif;
 }
 
 @theme {
-  --radius-campo: 12px;
-  --radius-boton: 14px;
-  --radius-tarjeta: 16px;
-  --radius-hoja: 24px;
-
-  --animate-cinta: cinta 900ms ease-out both;
-
-  @keyframes cinta {
-    from {
-      transform: scaleX(0);
-    }
-    to {
-      transform: scaleX(1);
-    }
-  }
+  /* Radios del prototipo: campo 16, botón 18, tarjeta 22, hoja y encabezado 28. Chips: rounded-full. */
+  --radius-campo: 16px;
+  --radius-boton: 18px;
+  --radius-tarjeta: 22px;
+  --radius-hoja: 28px;
 }
 
 :root {
@@ -197,32 +108,16 @@
 }
 
 /*
- * Cinta métrica (alias temporal: la retira LAB-69). Mismas medidas de la guía §5; los colores
- * salen de los alias cinta y cinta-marcas.
+ * Toldo: franja rayada de adorno (repeating-linear-gradient). El componente Toldo fija
+ * --toldo-alto (14 a 26 px, igual al ancho de cada franja) y --toldo-color; alterna con superficie.
  */
-@utility cinta-regla {
-  height: 12px;
-  border-right: 3px solid var(--color-cinta-marcas);
-  border-radius: 2px;
-  background:
-    repeating-linear-gradient(90deg, var(--color-cinta-marcas) 0 1.5px, transparent 1.5px 40px) 0
-      0 / 100% 7px no-repeat,
-    repeating-linear-gradient(90deg, var(--color-cinta-marcas) 0 1px, transparent 1px 8px) 0 0 /
-      100% 4px no-repeat,
-    var(--color-cinta);
-}
-
-/* Versión grande (bienvenida): 22 px de alto, marcas gruesas de 13 px y finas de 7 px. */
-@utility cinta-regla-grande {
-  height: 22px;
-  border-right: 3px solid var(--color-cinta-marcas);
-  border-radius: 2px;
-  background:
-    repeating-linear-gradient(90deg, var(--color-cinta-marcas) 0 1.5px, transparent 1.5px 40px) 0
-      0 / 100% 13px no-repeat,
-    repeating-linear-gradient(90deg, var(--color-cinta-marcas) 0 1px, transparent 1px 8px) 0 0 /
-      100% 7px no-repeat,
-    var(--color-cinta);
+@utility toldo {
+  height: var(--toldo-alto, 14px);
+  background: repeating-linear-gradient(
+    90deg,
+    var(--toldo-color, var(--color-accion)) 0 var(--toldo-alto, 14px),
+    var(--color-superficie) var(--toldo-alto, 14px) calc(var(--toldo-alto, 14px) * 2)
+  );
 }
 
 @layer base {

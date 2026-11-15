@@ -17,18 +17,18 @@ type Props = {
   children?: ReactNode;
   className?: string;
   /**
-   * Elemento al que vuelve el foco al cerrar (LAB-25: el botón que abrió la hoja). Sin esta prop, Radix
+   * Elemento al que vuelve el foco al cerrar (el botón que abrió la hoja). Sin esta prop, Radix
    * lo devuelve solo si hay un `Dialog.Trigger`, así que el foco quedaba en el body.
    */
   devolverFocoA?: { current: HTMLElement | null };
-  /** Esconde la X de cierre en escritorio (el prototipo de escritorio no la trae). Esc y el velo siguen cerrando. */
+  /** Esconde la X de cierre en escritorio. Esc y el velo siguen cerrando. */
   ocultarCierreEnEscritorio?: boolean;
 };
 
 /**
- * Hoja inferior en celular y diálogo centrado desde `lg`. Usa Radix Dialog: foco atrapado,
- * cierra con Esc y al tocar el velo, `role="dialog"` con título. Radio superior 24 px y velo
- * `bg-velo` (rgba(27,36,56,.55)).
+ * Hoja inferior en celular y diálogo centrado desde `lg` (hasta 560 px). Usa Radix Dialog: atrapa el
+ * foco, cierra con Esc y al tocar el velo, y devuelve el foco. Fondo `fondo` (arena), radio 28 arriba,
+ * velo `velo` al 60 % detrás.
  *
  * @example
  * <HojaInferior abierta={abierta} onCambioAbierta={setAbierta} titulo="Antes de contactar">…</HojaInferior>
@@ -46,7 +46,7 @@ export function HojaInferior({
   return (
     <Dialog.Root open={abierta} onOpenChange={onCambioAbierta}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-40 bg-velo" />
+        <Dialog.Overlay className="fixed inset-0 z-40 bg-velo/60" />
         <Dialog.Content
           onCloseAutoFocus={(evento) => {
             const destino = devolverFocoA?.current;
@@ -57,27 +57,25 @@ export function HojaInferior({
           // Sin descripción, se avisa a Radix que no hay `aria-describedby` a propósito.
           {...(descripcion ? {} : { "aria-describedby": undefined })}
           className={cn(
-            "fixed inset-x-0 bottom-0 z-50 flex max-h-[90dvh] w-full flex-col gap-3.5 overflow-y-auto rounded-t-hoja bg-superficie-elevada p-6 text-texto",
-            "lg:inset-auto lg:top-1/2 lg:left-1/2 lg:max-w-md lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-hoja",
+            "fixed inset-x-0 bottom-0 z-50 flex max-h-[90dvh] w-full flex-col gap-4 overflow-y-auto rounded-t-hoja bg-fondo p-5 pb-7 text-texto",
+            "lg:inset-auto lg:top-1/2 lg:left-1/2 lg:w-full lg:max-w-[560px] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:rounded-hoja lg:p-7",
             className,
           )}
         >
           <div className="flex items-start justify-between gap-3">
-            <Dialog.Title className="font-titulo text-[22px] leading-tight">{titulo}</Dialog.Title>
+            <Dialog.Title className="font-titulo text-[28px] leading-none">{titulo}</Dialog.Title>
             <Dialog.Close
               aria-label="Cerrar"
               className={cn(
-                "-mt-2 -mr-2 flex size-11 shrink-0 items-center justify-center rounded-campo text-texto-secundario hover:bg-azul-suave",
+                "-mt-2 -mr-2 flex size-11 shrink-0 items-center justify-center rounded-full text-texto hover:bg-sol/40",
                 ocultarCierreEnEscritorio && "lg:hidden",
               )}
             >
-              <X aria-hidden strokeWidth={2} className="size-5" />
+              <X aria-hidden strokeWidth={2.5} className="size-5" />
             </Dialog.Close>
           </div>
           {descripcion ? (
-            <Dialog.Description className="text-[15px] text-texto-secundario">
-              {descripcion}
-            </Dialog.Description>
+            <Dialog.Description className="text-base text-texto">{descripcion}</Dialog.Description>
           ) : null}
           {children}
         </Dialog.Content>

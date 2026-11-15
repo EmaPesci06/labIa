@@ -13,7 +13,7 @@ export function BotonSalir({ className, onClick }: { className?: string; onClick
         type="submit"
         onClick={onClick}
         className={cn(
-          "flex min-h-11 w-full items-center gap-3 rounded-campo px-3 text-[15px] font-semibold text-texto hover:bg-azul-suave",
+          "flex min-h-11 w-full items-center gap-3 rounded-campo px-3 text-[15px] font-semibold text-texto hover:bg-superficie",
           className,
         )}
       >

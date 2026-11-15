@@ -4,31 +4,60 @@ import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode, Ref } from 
 
 import { cn } from "@/lib/cn";
 
+/**
+ * Variantes del prototipo "Verano en la costa":
+ * - principal: turquesa con texto sobre-accion. Una por pantalla, abajo.
+ * - secundario: borde de 3 px color texto, fondo transparente.
+ * - peligro: borde y texto en error (cancelar, borrar, suspender).
+ * - enlace: texto en negrita con subrayado. Nunca accion sobre arena (4,48:1).
+ *
+ * Los nombres viejos siguen funcionando para no romper las pantallas que todavía no se rehacen:
+ * cliente, profesional y exito son "principal"; fantasma es "enlace".
+ */
 export type VarianteBoton =
-  "cliente" | "profesional" | "exito" | "secundario" | "fantasma" | "peligro";
+  | "principal"
+  | "secundario"
+  | "peligro"
+  | "enlace"
+  | "cliente"
+  | "profesional"
+  | "exito"
+  | "fantasma";
 export type TamanoBoton = "grande" | "normal";
 
-const VARIANTES: Record<VarianteBoton, string> = {
-  cliente: "bg-azul text-sobre-azul hover:bg-azul/90 active:bg-azul-presionado",
-  profesional:
-    "bg-naranja-accion text-sobre-naranja hover:bg-naranja-accion/90 active:brightness-90",
-  exito: "bg-exito text-sobre-exito hover:bg-exito/90 active:brightness-90",
-  secundario:
-    "border-[1.5px] border-borde bg-superficie text-texto hover:bg-azul-suave active:bg-azul-suave",
-  fantasma: "bg-transparent text-azul hover:bg-azul-suave active:bg-azul-suave",
-  // Acciones destructivas (cancelar trabajo). Usa el token de error, igual que el texto de error.
-  peligro: "bg-error text-sobre-azul hover:opacity-90 active:opacity-80",
+type VarianteReal = "principal" | "secundario" | "peligro" | "enlace";
+
+const VARIANTE_REAL: Record<VarianteBoton, VarianteReal> = {
+  principal: "principal",
+  secundario: "secundario",
+  peligro: "peligro",
+  enlace: "enlace",
+  cliente: "principal",
+  profesional: "principal",
+  exito: "principal",
+  fantasma: "enlace",
 };
 
+const VARIANTES: Record<VarianteReal, string> = {
+  principal: "bg-accion text-sobre-accion hover:bg-accion/90 active:opacity-90",
+  secundario:
+    "border-[3px] border-texto bg-transparent text-texto hover:bg-superficie active:bg-superficie",
+  peligro:
+    "border-[3px] border-error bg-transparent text-error hover:bg-error/10 active:bg-error/15",
+  enlace:
+    "min-h-11 bg-transparent px-1 font-bold text-texto underline decoration-2 underline-offset-4",
+};
+
+// Alto y radio del prototipo: grande 56 (texto 18), normal 52 (texto 17). Radio 18 en todos.
 const TAMANOS: Record<TamanoBoton, string> = {
-  grande: "min-h-[52px] rounded-boton px-5 text-base font-bold",
-  normal: "min-h-[46px] rounded-campo px-[18px] text-[15px] font-bold",
+  grande: "min-h-14 rounded-boton px-6 text-lg font-bold",
+  normal: "min-h-[52px] rounded-boton px-5 text-[17px] font-bold",
 };
 
 type PropsComunes = {
-  /** Aspecto del botón. "cliente" azul, "profesional" naranja, "exito" verde (WhatsApp). */
+  /** Aspecto del botón: principal, secundario, peligro o enlace. */
   variante?: VarianteBoton;
-  /** "grande" (alto 52 px, radio 14) o "normal" (alto 46 px, radio 12). */
+  /** "grande" (alto 56 px, texto 18) o "normal" (alto 52 px, texto 17). Los enlaces no usan tamaño. */
   tamano?: TamanoBoton;
   /** Muestra un spinner, pone `aria-busy` y bloquea los clics. */
   cargando?: boolean;
@@ -54,11 +83,11 @@ export type BotonProps = PropsComunes &
  * Estados: hover, presionado, deshabilitado (`disabled`) y cargando (spinner + `aria-busy`).
  *
  * @example
- * <Boton variante="cliente" tamano="grande" bloque>Buscar</Boton>
+ * <Boton tamano="grande" bloque>Buscar</Boton>
  * <Boton href="/registro" variante="secundario">Crear cuenta</Boton>
  */
 export function Boton({
-  variante = "cliente",
+  variante = "principal",
   tamano = "normal",
   cargando = false,
   bloque = false,
@@ -68,11 +97,12 @@ export function Boton({
   ref,
   ...resto
 }: BotonProps) {
+  const real = VARIANTE_REAL[variante];
   const clases = cn(
     "inline-flex items-center justify-center gap-2 text-center transition-colors select-none",
     "disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:cursor-not-allowed",
-    VARIANTES[variante],
-    TAMANOS[tamano],
+    VARIANTES[real],
+    real !== "enlace" && TAMANOS[tamano],
     bloque && "w-full",
     className,
   );

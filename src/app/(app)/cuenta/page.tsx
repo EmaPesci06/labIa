@@ -14,7 +14,7 @@ import { resumenBannerVerificacion } from "@/lib/verificacion/logica";
 
 export const metadata: Metadata = { title: "Mi cuenta · LabÍA" };
 
-const ICONO = "size-5 shrink-0 text-azul";
+const ICONO = "size-5 shrink-0 text-texto";
 
 async function datosDeEncabezado(uid: string) {
   if (!supabaseConfigurado()) return { barrio: null, foto: null };
@@ -56,7 +56,7 @@ export default async function Cuenta() {
           <p className="truncate font-titulo text-2xl lg:text-[28px]">
             {sesion.perfil.nombreVisible}
           </p>
-          <p className="text-[15px] text-texto-secundario">
+          <p className="text-[15px] text-texto">
             {esProfesional ? "Profesional" : "Cliente"}
             {barrio ? ` · ${barrio}` : ""}
           </p>
@@ -97,7 +97,7 @@ export default async function Cuenta() {
                 Escribinos a{" "}
                 <a
                   href={`mailto:${soporte}`}
-                  className="font-semibold text-azul underline underline-offset-2"
+                  className="font-semibold text-texto underline underline-offset-2"
                 >
                   {soporte}
                 </a>
@@ -128,7 +128,7 @@ export default async function Cuenta() {
         </FilaEnlace>
       </GrupoCuenta>
 
-      <div className="rounded-[18px] border border-divisor bg-superficie p-1">
+      <div className="rounded-[18px] border border-fondo bg-superficie p-1">
         <BotonSalir />
       </div>
     </div>

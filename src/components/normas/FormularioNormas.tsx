@@ -27,7 +27,7 @@ export function FormularioNormas({
   return (
     <form action={despachar} noValidate className={className ?? "flex flex-col gap-3"}>
       <input type="hidden" name="version" value={VERSION_NORMAS} />
-      <label className="flex min-h-[52px] cursor-pointer items-center gap-3 rounded-[14px] border-[1.5px] border-borde bg-superficie px-3.5 py-2 text-[15px] font-semibold">
+      <label className="flex min-h-[52px] cursor-pointer items-center gap-3 rounded-[14px] border-[1.5px] border-texto bg-superficie px-3.5 py-2 text-[15px] font-semibold">
         <input
           type="checkbox"
           name="acepto"
@@ -37,7 +37,7 @@ export function FormularioNormas({
             if (e.target.checked) setAyuda(false);
           }}
           aria-describedby="ayuda-normas"
-          className="size-[22px] flex-none accent-azul"
+          className="accent-azul size-[22px] flex-none"
         />
         Leí y acepto las normas de LabÍA
       </label>
@@ -49,9 +49,7 @@ export function FormularioNormas({
         bloque
         cargando={pendiente}
         aria-disabled={!acepto}
-        className={
-          acepto ? undefined : "bg-divisor text-texto-secundario hover:bg-divisor active:bg-divisor"
-        }
+        className={acepto ? undefined : "bg-fondo text-texto hover:bg-fondo active:bg-fondo"}
         onClick={(e) => {
           if (!acepto) {
             e.preventDefault();

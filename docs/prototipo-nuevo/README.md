@@ -38,6 +38,7 @@ Reemplazan a Archivo, Atkinson Hyperlegible Next e IBM Plex Mono.
 | --- | --- | --- | --- |
 | `fondo` | `#FFF3D6` arena | `#0B2730` mar de noche | Fondo de página |
 | `superficie` | `#FFFFFF` | `#17485A` | Tarjetas, barra inferior, pies |
+| `campo` | `#FFFFFF` | `#0B2730` | Fondo de campos (texto, área, selección). Agregado en LAB-69 para que el campo no dependa de `dark:` |
 | `texto` | `#123B4A` | `#FFF3D6` | Texto y bordes de campos |
 | `accion` | `#0E7C86` turquesa | `#45C4CC` | Botón principal, tildes, marca. No para texto chico sobre arena (4,48:1): los enlaces van en `texto` en negrita |
 | `sobre-accion` | `#FFFFFF` | `#0B2730` | Texto sobre el botón principal |
@@ -57,8 +58,10 @@ Piezas (ver `Sistema-Tokens.dc.html`):
 - Chip: alto 46, radio 23. Elegido en `sol`, sin elegir en `superficie`.
 - Campo: alto 52, radio 16, borde de 2 px color `texto`, fondo `superficie` en claro y `fondo` en oscuro.
 - Tarjeta: radio 22, sin sombra ni borde.
-- Encabezado de pantalla: bloque `encabezado` con esquinas inferiores de radio 28 (40 en escritorio).
-- Toldo: franja rayada de 14 a 26 px (`repeating-linear-gradient`) arriba de las tarjetas de oficio y de los avisos.
+- Encabezado de pantalla: componente `<Encabezado>`, variantes `turquesa` (por defecto, bloque `encabezado`), `equipo` (admin), `sol` (texto azul noche) y `plano` (sin bloque, sobre arena). Esquinas inferiores de radio 28 (40 en escritorio) salvo `plano`.
+- Toldo: componente `<Toldo color="accion|sol|texto|coral" alto={14|18|22|26}>`, franja rayada (`repeating-linear-gradient`) que alterna con `superficie`. Es adorno: nunca lleva texto.
+- Distancia: componente `<Distancia km={1.2} />`, pastilla `sol` con texto azul noche ("a 1,2 km").
+- Aviso de pantalla completa: componente `<AvisoPantalla titulo texto accion icono />`. `<Aviso>` es solo la nota dentro de una pantalla.
 - Avatar: círculo con inicial y borde `sol`.
 - Foco: `outline: 3px solid`, color `texto` en claro y `sol` en oscuro, `outline-offset: 2px`.
 - Íconos: SVG de trazo de 3 a 3,5 px. Sin emojis.

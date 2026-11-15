@@ -18,7 +18,7 @@ function Panel({ tema }: { tema: "claro" | "dark" }) {
     <section
       id={id}
       aria-labelledby={`${id}-titulo`}
-      className={cn(tema, "rounded-hoja border border-borde bg-fondo p-5 text-texto lg:p-7")}
+      className={cn(tema, "rounded-hoja border border-texto bg-fondo p-5 text-texto lg:p-7")}
     >
       <h2 id={`${id}-titulo`} className="mb-5 font-titulo text-2xl">
         {tema === "claro" ? "Modo claro" : "Modo oscuro"}
@@ -42,8 +42,9 @@ export default function PaginaComponentes() {
         <div className="space-y-2">
           <Logo />
           <h1 className="font-titulo text-3xl lg:text-4xl">Componentes base</h1>
-          <p className="text-texto-secundario">
-            Página interna (solo en desarrollo) para revisar la biblioteca de LAB-10.
+          <p className="text-texto">
+            Página interna (solo en desarrollo) para revisar la biblioteca de componentes base
+            (LAB-69).
           </p>
         </div>
         <SelectorTema />

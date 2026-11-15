@@ -146,17 +146,17 @@ export function SelectorBarrio({
             onFocus={() => setListaVisible(true)}
             onBlur={() => setListaVisible(false)}
             onKeyDown={alTeclear}
-            className="h-[52px] w-full rounded-boton border border-borde bg-superficie px-3.5 text-base text-texto placeholder:text-texto-terciario"
+            className="h-[52px] w-full rounded-boton border border-texto bg-superficie px-3.5 text-base text-texto placeholder:text-texto"
           />
           <ul
             id={idLista}
             role="listbox"
             aria-label="Barrios"
             hidden={!listaVisible}
-            className="absolute top-full z-10 mt-1 max-h-64 w-full overflow-auto rounded-campo border border-borde bg-superficie-elevada py-1 shadow-lg"
+            className="absolute top-full z-10 mt-1 max-h-64 w-full overflow-auto rounded-campo border border-texto bg-superficie py-1 shadow-lg"
           >
             {resultados.length === 0 ? (
-              <li role="presentation" className="px-3.5 py-3 text-sm text-texto-secundario">
+              <li role="presentation" className="px-3.5 py-3 text-sm text-texto">
                 No encontramos ese barrio.
               </li>
             ) : (
@@ -173,7 +173,7 @@ export function SelectorBarrio({
                   }}
                   className={cn(
                     "flex min-h-11 cursor-pointer items-center justify-between px-3.5 text-[15px] text-texto",
-                    i === indiceActivo && "bg-azul-suave",
+                    i === indiceActivo && "bg-superficie",
                   )}
                 >
                   {barrio.nombre}
@@ -192,11 +192,8 @@ export function SelectorBarrio({
           {error}
         </p>
       ) : null}
-      <p
-        id={idAviso}
-        className="flex items-start gap-2 text-[13px] leading-snug text-texto-secundario"
-      >
-        <Lock aria-hidden strokeWidth={2} className="mt-px size-[18px] shrink-0 text-azul" />
+      <p id={idAviso} className="flex items-start gap-2 text-[13px] leading-snug text-texto">
+        <Lock aria-hidden strokeWidth={2} className="mt-px size-[18px] shrink-0 text-texto" />
         Tu dirección exacta nunca se muestra. Solo tu barrio.
       </p>
     </fieldset>

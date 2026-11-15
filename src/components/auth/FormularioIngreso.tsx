@@ -37,7 +37,7 @@ export function FormularioIngreso({ volver }: { volver?: string }) {
       />
       <Link
         href="/restablecer"
-        className="inline-flex min-h-11 items-center self-start text-[15px] font-bold text-azul underline underline-offset-2"
+        className="inline-flex min-h-11 items-center self-start text-[15px] font-bold text-texto underline underline-offset-2"
       >
         ¿Olvidaste tu contraseña?
       </Link>

@@ -59,13 +59,13 @@ export default async function BorrarCuenta() {
       <div className="flex flex-col gap-1">
         <Link
           href="/cuenta"
-          className="inline-flex min-h-11 items-center gap-1 self-start rounded-campo pr-3 text-[15px] font-bold text-azul"
+          className="inline-flex min-h-11 items-center gap-1 self-start rounded-campo pr-3 text-[15px] font-bold text-texto"
         >
           <ChevronLeft aria-hidden strokeWidth={2} className="size-5" />
           Mi cuenta
         </Link>
         <h1 className="font-titulo text-[28px] lg:text-4xl">Borrar mi cuenta</h1>
-        <p className="text-texto-secundario">
+        <p className="text-texto">
           Esto no se puede deshacer. Borramos todo de verdad, incluidos tus archivos.
         </p>
       </div>
@@ -73,7 +73,7 @@ export default async function BorrarCuenta() {
       {enCurso.length > 0 ? (
         <div
           role="alert"
-          className="flex items-start gap-2.5 rounded-[14px] bg-naranja-suave p-3.5 text-sm leading-snug text-sobre-naranja-suave"
+          className="flex items-start gap-2.5 rounded-[14px] bg-sol p-3.5 text-sm leading-snug text-sobre-sol"
         >
           <TriangleAlert aria-hidden strokeWidth={2} className="size-[22px] shrink-0" />
           <ul className="flex flex-col gap-1 font-semibold">
@@ -96,9 +96,7 @@ export default async function BorrarCuenta() {
           ))}
         </ul>
         {!esProfesional ? null : (
-          <p className="text-sm text-texto-secundario">
-            Los trabajos en curso con clientes se cancelan.
-          </p>
+          <p className="text-sm text-texto">Los trabajos en curso con clientes se cancelan.</p>
         )}
         <p className="text-[15px] leading-snug">
           <strong>Las reseñas que escribiste</strong> quedan, pero anónimas (“Cliente de LabÍA”),

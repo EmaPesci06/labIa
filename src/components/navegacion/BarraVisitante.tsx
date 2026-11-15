@@ -11,7 +11,7 @@ export function BarraVisitante() {
   return (
     <header
       data-barra-superior=""
-      className="flex h-16 shrink-0 items-center justify-between gap-3 border-b border-divisor bg-superficie px-5 lg:h-[72px] lg:px-10"
+      className="flex h-16 shrink-0 items-center justify-between gap-3 border-b border-fondo bg-superficie px-5 lg:h-[72px] lg:px-10"
     >
       <Link
         href="/"

@@ -35,7 +35,7 @@ async function Contenido() {
             <h1 className="font-titulo text-2xl font-extrabold sm:text-3xl">
               Tu cuenta fue suspendida
             </h1>
-            <p className="text-sm text-texto-secundario">
+            <p className="text-sm text-texto">
               Se detectó una infracción a las normas de la comunidad de LabÍA.
             </p>
           </div>
@@ -49,7 +49,7 @@ async function Contenido() {
             </p>
           </div>
 
-          <div className="flex flex-col gap-3 text-sm text-texto-secundario">
+          <div className="flex flex-col gap-3 text-sm text-texto">
             <p>
               Mientras tu cuenta esté suspendida, no podés publicar trabajos, postularte ni recibir
               o enviar mensajes.
@@ -59,7 +59,7 @@ async function Contenido() {
               escribinos a{" "}
               <a
                 href={`mailto:${emailContacto}?subject=Apelaci%C3%B3n%20de%20cuenta%20suspendida`}
-                className="font-bold text-azul hover:underline"
+                className="font-bold text-texto hover:underline"
               >
                 {emailContacto}
               </a>
@@ -67,8 +67,8 @@ async function Contenido() {
             </p>
           </div>
 
-          <div className="border-t border-divisor pt-4">
-            <BotonSalir className="justify-center border border-borde bg-superficie hover:bg-azul-suave" />
+          <div className="border-t border-fondo pt-4">
+            <BotonSalir className="justify-center border border-texto bg-superficie hover:bg-superficie" />
           </div>
         </Tarjeta>
       </main>

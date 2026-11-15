@@ -62,7 +62,7 @@ export function FormularioBorrar({ pedirContrasena }: { pedirContrasena: boolean
           required
         />
       ) : (
-        <p className="text-sm text-texto-secundario">
+        <p className="text-sm text-texto">
           Ingresaste con Google. Si hace mucho que ingresaste, te vamos a pedir que vuelvas a
           ingresar antes de borrar.
         </p>
@@ -75,7 +75,7 @@ export function FormularioBorrar({ pedirContrasena }: { pedirContrasena: boolean
       <button
         type="submit"
         aria-busy={pendiente || undefined}
-        className="inline-flex min-h-[52px] items-center justify-center rounded-boton bg-error px-5 text-base font-bold text-sobre-azul hover:opacity-90 active:opacity-80 disabled:opacity-50 aria-busy:pointer-events-none"
+        className="inline-flex min-h-[52px] items-center justify-center rounded-boton bg-error px-5 text-base font-bold text-sobre-accion hover:opacity-90 active:opacity-80 disabled:opacity-50 aria-busy:pointer-events-none"
       >
         {pendiente ? "Borrando…" : "Borrar mi cuenta para siempre"}
       </button>

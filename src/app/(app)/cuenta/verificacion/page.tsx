@@ -14,7 +14,7 @@ export default async function Verificacion() {
     return (
       <div className="flex max-w-xl flex-col gap-4">
         <h1 className="font-titulo text-[28px] lg:text-4xl">Verificación</h1>
-        <p role="status" className="text-texto-secundario">
+        <p role="status" className="text-texto">
           La verificación de documentos es para cuentas de profesional.
         </p>
         <Boton href="/cuenta" variante="secundario" className="max-w-xs">
@@ -28,7 +28,7 @@ export default async function Verificacion() {
     <div className="flex flex-col gap-4">
       <div className="flex max-w-xl flex-col gap-1">
         <h1 className="font-titulo text-[28px] lg:text-4xl">Verificación</h1>
-        <p className="text-texto-secundario">
+        <p className="text-texto">
           Subí de nuevo lo que haya sido rechazado. Solo lo ve nuestro equipo.
         </p>
       </div>

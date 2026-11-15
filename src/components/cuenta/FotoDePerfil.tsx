@@ -51,7 +51,7 @@ export function FotoDePerfil({ uid, nombre, fotoUrl }: Props) {
     <div className="flex items-center gap-4">
       <Avatar nombre={nombre} src={fotoUrl} tamano={84} />
       <div className="flex flex-col items-start gap-1">
-        <label className="inline-flex min-h-11 cursor-pointer items-center rounded-campo border-[1.5px] border-borde bg-superficie px-4 text-[15px] font-bold text-texto hover:bg-azul-suave has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-foco">
+        <label className="inline-flex min-h-11 cursor-pointer items-center rounded-campo border-[1.5px] border-texto bg-superficie px-4 text-[15px] font-bold text-texto hover:bg-superficie has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-foco">
           {ocupado ? "Procesando…" : fotoUrl ? "Cambiar foto" : "Subir foto"}
           <input
             ref={entrada}
@@ -72,7 +72,7 @@ export function FotoDePerfil({ uid, nombre, fotoUrl }: Props) {
             type="button"
             onClick={quitar}
             disabled={ocupado}
-            className="min-h-11 rounded-campo px-2 text-sm font-bold text-azul underline underline-offset-2"
+            className="min-h-11 rounded-campo px-2 text-sm font-bold text-texto underline underline-offset-2"
           >
             Quitar foto
           </button>

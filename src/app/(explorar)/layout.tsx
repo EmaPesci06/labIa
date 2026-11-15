@@ -15,7 +15,7 @@ export default function LayoutExplorar({ children }: { children: ReactNode }) {
         fallback={
           // Mismo alto que las barras reales, para que no salte el contenido al cargar.
           <>
-            <div className="hidden h-[72px] border-b border-divisor bg-superficie lg:block" />
+            <div className="hidden h-[72px] border-b border-fondo bg-superficie lg:block" />
             <main
               id="contenido"
               tabIndex={-1}

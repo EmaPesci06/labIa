@@ -86,9 +86,9 @@ export function VisorFotos({ fotos, contexto, miniaturas = "cuadradas" }: VisorF
               }}
               aria-label={`Ver foto ${i + 1} de ${total} de ${contexto}`}
               className={cn(
-                "relative block w-full overflow-hidden bg-divisor focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco",
+                "relative block w-full overflow-hidden bg-fondo focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco",
                 apaisadas
-                  ? "aspect-4/3 rounded-xl border border-divisor bg-superficie-elevada"
+                  ? "aspect-4/3 rounded-xl border border-fondo bg-superficie"
                   : "aspect-square rounded-xl lg:rounded-[14px]",
               )}
             >
@@ -127,13 +127,13 @@ export function VisorFotos({ fotos, contexto, miniaturas = "cuadradas" }: VisorF
             <div className="flex items-center justify-between gap-3 p-4">
               <span
                 aria-hidden
-                className="rounded-full bg-superficie px-3 py-1.5 font-mono text-[13px] font-semibold text-texto"
+                className="rounded-full bg-superficie px-3 py-1.5 font-texto text-[13px] font-semibold text-texto"
               >
                 {actual + 1} / {total}
               </span>
               <Dialog.Close
                 aria-label="Cerrar"
-                className="flex size-11 items-center justify-center rounded-full bg-superficie text-texto transition-colors hover:bg-superficie-elevada focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
+                className="flex size-11 items-center justify-center rounded-full bg-superficie text-texto transition-colors hover:bg-superficie focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
               >
                 <X aria-hidden strokeWidth={2} className="size-5" />
               </Dialog.Close>

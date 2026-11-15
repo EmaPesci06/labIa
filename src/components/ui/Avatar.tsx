@@ -5,7 +5,7 @@ import { cn } from "@/lib/cn";
 type Props = {
   /** Nombre completo; se usa para las iniciales y como texto alternativo. */
   nombre: string;
-  /** URL de la foto. Sin foto se muestran las iniciales sobre azul. */
+  /** URL de la foto. Sin foto se muestran las iniciales sobre turquesa. */
   src?: string | null;
   /** Diámetro en px: 44 (listas, encabezado) o 84 (perfil). */
   tamano?: 44 | 84;
@@ -20,10 +20,10 @@ export function iniciales(nombre: string): string {
   return (primera + ultima).toUpperCase();
 }
 
-/** Avatar redondo con foto (`next/image`) o iniciales sobre azul. */
+/** Avatar redondo con foto (`next/image`) o iniciales sobre turquesa, con borde sol. */
 export function Avatar({ nombre, src, tamano = 44, className }: Props) {
   const base = cn(
-    "relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-azul text-sobre-azul",
+    "relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full border-[3px] border-sol bg-accion text-sobre-accion",
     tamano === 84 ? "size-[84px] font-titulo text-[30px]" : "size-11 text-base font-bold",
     className,
   );

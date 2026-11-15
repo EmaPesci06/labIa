@@ -30,9 +30,9 @@ function Lista({ destinos, rol, esActivo }: PropsLista) {
                 activo
                   ? cn(
                       "underline decoration-2 underline-offset-[6px]",
-                      rol === "profesional" ? "text-naranja-accion" : "text-azul",
+                      rol === "profesional" ? "text-texto" : "text-texto",
                     )
-                  : "text-texto hover:text-azul",
+                  : "text-texto hover:text-texto",
               )}
             >
               {destino.etiqueta}

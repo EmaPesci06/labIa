@@ -42,7 +42,7 @@ export function EsqueletoResultados() {
 }
 
 function TituloFiltro({ children }: { children: ReactNode }) {
-  return <EtiquetaMono className="text-texto-terciario">{children}</EtiquetaMono>;
+  return <EtiquetaMono className="text-texto">{children}</EtiquetaMono>;
 }
 
 /**
@@ -159,7 +159,7 @@ export function PanelBusqueda({
                   onClick={() => aplicar({ oficio: o })}
                   className={cn(
                     "min-h-11 w-full rounded-[10px] px-3 text-left text-[15px] font-semibold",
-                    oficio === o ? "bg-azul text-sobre-azul" : "text-texto hover:bg-azul-suave",
+                    oficio === o ? "bg-accion text-sobre-accion" : "text-texto hover:bg-superficie",
                   )}
                 >
                   {o ? nombreOficio(o) : "Todos"}
@@ -175,7 +175,7 @@ export function PanelBusqueda({
             {chipMatriculados}
             {chipCalificados}
           </div>
-          <p className="text-[13px] leading-snug text-texto-terciario">
+          <p className="text-[13px] leading-snug text-texto">
             Todos los perfiles tienen identidad y antecedentes verificados.
           </p>
         </div>

@@ -46,11 +46,11 @@ export default async function PaginaReportesAdmin({ searchParams }: Props) {
       <div className="flex flex-col gap-1">
         <h1 className="font-titulo text-[28px] font-extrabold lg:text-4xl">
           Reportes y moderación
-          <span className="ml-3 text-lg font-semibold text-texto-secundario lg:text-xl">
+          <span className="ml-3 text-lg font-semibold text-texto lg:text-xl">
             {abiertos.length} {abiertos.length === 1 ? "abierto" : "abiertos"}
           </span>
         </h1>
-        <p className="text-texto-secundario">
+        <p className="text-texto">
           Revisá reportes de perfiles, trabajos o reseñas, y moderá reseñas bajas o cuentas
           infractoras.
         </p>
@@ -69,8 +69,8 @@ export default async function PaginaReportesAdmin({ searchParams }: Props) {
                   className={cn(
                     "inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-bold transition-colors",
                     activa
-                      ? "bg-azul text-sobre-azul"
-                      : "border border-borde bg-superficie text-texto hover:bg-azul-suave",
+                      ? "bg-accion text-sobre-accion"
+                      : "border border-texto bg-superficie text-texto hover:bg-superficie",
                   )}
                 >
                   <span>{p.etiqueta}</span>
@@ -78,9 +78,7 @@ export default async function PaginaReportesAdmin({ searchParams }: Props) {
                     <span
                       className={cn(
                         "rounded-full px-2 py-0.5 text-xs font-semibold",
-                        activa
-                          ? "bg-white/20 text-white"
-                          : "bg-superficie-elevada text-texto-secundario",
+                        activa ? "bg-white/20 text-white" : "bg-superficie text-texto",
                       )}
                     >
                       {conteo}

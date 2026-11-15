@@ -33,7 +33,7 @@ export function ConfirmarEmail({ email }: { email: string }) {
     <div className="flex flex-col gap-4">
       <p
         role="status"
-        className="rounded-campo bg-exito-suave p-4 text-[15px] font-semibold text-sobre-exito-suave"
+        className="rounded-campo bg-sol p-4 text-[15px] font-semibold text-sobre-sol"
       >
         Te mandamos un mail a {email}. Tocá el link para activar tu cuenta.
       </p>
@@ -50,7 +50,7 @@ export function ConfirmarEmail({ email }: { email: string }) {
           {restan > 0 ? `Reenviar mail (en ${restan} s)` : "Reenviar mail"}
         </Boton>
         {estado.reenvio === "enviado" ? (
-          <p role="status" className="text-sm font-semibold text-sobre-exito-suave">
+          <p role="status" className="text-sm font-semibold text-sobre-sol">
             Listo, te lo mandamos de nuevo.
           </p>
         ) : null}

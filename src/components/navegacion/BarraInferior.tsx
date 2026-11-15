@@ -30,8 +30,8 @@ function Lista({ destinos, rol, esActivo }: PropsLista) {
               className={cn(
                 "flex min-h-12 w-full flex-col items-center justify-center gap-1 rounded-campo text-xs",
                 activo
-                  ? cn("font-bold", rol === "profesional" ? "text-naranja-accion" : "text-azul")
-                  : "font-semibold text-texto-secundario",
+                  ? cn("font-bold", rol === "profesional" ? "text-texto" : "text-texto")
+                  : "font-semibold text-texto",
               )}
             >
               <IconoDestino icono={destino.icono} className="size-[22px]" />
@@ -60,7 +60,7 @@ export function BarraInferior({ destinos, rol }: Props) {
     <nav
       aria-label="Navegación"
       data-barra-inferior=""
-      className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-3 border-t border-divisor bg-superficie px-2 pt-2 pb-[calc(8px+env(safe-area-inset-bottom))] lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-3 border-t border-fondo bg-superficie px-2 pt-2 pb-[calc(8px+env(safe-area-inset-bottom))] lg:hidden"
     >
       {/* useSearchParams necesita Suspense; mientras tanto se dibuja sin ítem activo. */}
       <Suspense fallback={<Lista destinos={destinos} rol={rol} esActivo={() => false} />}>

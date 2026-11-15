@@ -4,7 +4,7 @@
 export function ValorToken({ variable }: { variable: string }) {
   return (
     <span
-      className="font-mono text-xs font-medium text-texto-secundario uppercase"
+      className="font-texto text-xs font-medium text-texto uppercase"
       ref={(nodo) => {
         if (nodo) nodo.textContent = getComputedStyle(nodo).getPropertyValue(variable).trim();
       }}

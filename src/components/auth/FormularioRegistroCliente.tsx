@@ -115,12 +115,12 @@ export function FormularioRegistroCliente({ barrios }: { barrios: BarrioOpcion[]
       <Boton type="submit" variante="cliente" tamano="grande" bloque cargando={pendiente}>
         Crear cuenta
       </Boton>
-      <p className="text-center text-[13px] leading-snug text-texto-secundario">
+      <p className="text-center text-[13px] leading-snug text-texto">
         Al crear tu cuenta aceptás los{" "}
         <Link
           href="/terminos"
           prefetch={false}
-          className="inline-block py-2 font-bold text-azul underline underline-offset-2"
+          className="inline-block py-2 font-bold text-texto underline underline-offset-2"
         >
           Términos
         </Link>{" "}
@@ -128,7 +128,7 @@ export function FormularioRegistroCliente({ barrios }: { barrios: BarrioOpcion[]
         <Link
           href="/privacidad"
           prefetch={false}
-          className="inline-block py-2 font-bold text-azul underline underline-offset-2"
+          className="inline-block py-2 font-bold text-texto underline underline-offset-2"
         >
           Política de privacidad
         </Link>

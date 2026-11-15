@@ -42,13 +42,13 @@ export default async function RevisarVerificacion({ params }: Props) {
       <div className="flex flex-col gap-3">
         <Link
           href="/admin/verificaciones"
-          className="inline-flex min-h-11 w-fit items-center text-sm font-bold text-azul hover:underline"
+          className="inline-flex min-h-11 w-fit items-center text-sm font-bold text-texto hover:underline"
         >
           ← Volver a verificaciones
         </Link>
         <div className="flex flex-col gap-2">
           <h1 className="font-titulo text-[28px] font-extrabold lg:text-4xl">{nombre}</h1>
-          <p className="text-texto-secundario">
+          <p className="text-texto">
             {detalle.oficios.map(nombreOficio).join(" · ") || "Sin oficios cargados"}
             {detalle.barrio ? ` · ${detalle.barrio}` : ""}
           </p>
@@ -56,7 +56,7 @@ export default async function RevisarVerificacion({ params }: Props) {
             {detalle.identidadVerificada ? <Insignia variante="verificada" /> : null}
             {detalle.antecedentesOk ? <Insignia variante="antecedentes" /> : null}
             {detalle.matriculado ? <Insignia variante="matriculado" /> : null}
-            <span className="text-sm font-semibold text-texto-secundario">
+            <span className="text-sm font-semibold text-texto">
               {detalle.publicado
                 ? "Perfil publicado"
                 : pendientes > 0
@@ -72,17 +72,17 @@ export default async function RevisarVerificacion({ params }: Props) {
           <Tarjeta borde className="flex flex-col gap-3">
             <h2 className="font-titulo text-lg font-extrabold">Datos del perfil</h2>
             <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2.5 text-sm">
-              <dt className="font-semibold text-texto-secundario">Nombre</dt>
+              <dt className="font-semibold text-texto">Nombre</dt>
               <dd>{nombre}</dd>
-              <dt className="font-semibold text-texto-secundario">WhatsApp</dt>
+              <dt className="font-semibold text-texto">WhatsApp</dt>
               <dd className="break-all">{detalle.whatsapp ?? "Sin cargar"}</dd>
-              <dt className="font-semibold text-texto-secundario">Email</dt>
+              <dt className="font-semibold text-texto">Email</dt>
               <dd className="break-all">{detalle.email ?? "No disponible"}</dd>
-              <dt className="font-semibold text-texto-secundario">Oficios</dt>
+              <dt className="font-semibold text-texto">Oficios</dt>
               <dd>{detalle.oficios.map(nombreOficio).join(", ") || "Sin cargar"}</dd>
-              <dt className="font-semibold text-texto-secundario">Matrícula declarada</dt>
+              <dt className="font-semibold text-texto">Matrícula declarada</dt>
               <dd>{detalle.matricula ?? "No declarada"}</dd>
-              <dt className="font-semibold text-texto-secundario">Normas aceptadas</dt>
+              <dt className="font-semibold text-texto">Normas aceptadas</dt>
               <dd>
                 {detalle.normasAceptadasAt
                   ? `Versión ${detalle.normasVersion ?? "—"} · ${fecha(detalle.normasAceptadasAt)}`
@@ -93,21 +93,19 @@ export default async function RevisarVerificacion({ params }: Props) {
 
           <Tarjeta borde className="flex flex-col gap-3">
             <h2 className="font-titulo text-lg font-extrabold">Checklist de revisión</h2>
-            <p className="text-sm text-texto-secundario">
-              Lo marcás mientras revisás. No se guarda.
-            </p>
+            <p className="text-sm text-texto">Lo marcás mientras revisás. No se guarda.</p>
             <ul className="flex flex-col gap-2.5">
               {CHECKLIST.map((texto) => (
                 <li key={texto}>
                   <label className="flex min-h-11 cursor-pointer items-start gap-3 text-sm leading-snug">
-                    <input type="checkbox" className="mt-0.5 size-5 shrink-0 accent-azul" />
+                    <input type="checkbox" className="accent-azul mt-0.5 size-5 shrink-0" />
                     <span>{texto}</span>
                   </label>
                 </li>
               ))}
             </ul>
           </Tarjeta>
-          <p className="text-sm text-texto-secundario">
+          <p className="text-sm text-texto">
             Los documentos no se muestran en ninguna pantalla pública: solo las insignias. Cada vez
             que abrís un archivo queda registrado.
           </p>

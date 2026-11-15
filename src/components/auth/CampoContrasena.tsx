@@ -25,7 +25,7 @@ export function CampoContrasena(props: Props) {
           onClick={() => setVisible((v) => !v)}
           aria-label={visible ? "Ocultar contraseña" : "Mostrar contraseña"}
           aria-pressed={visible}
-          className="flex size-11 items-center justify-center rounded-campo text-texto-secundario hover:bg-azul-suave"
+          className="flex size-11 items-center justify-center rounded-campo text-texto hover:bg-superficie"
         >
           <Icono aria-hidden strokeWidth={2} className="size-5" />
         </button>

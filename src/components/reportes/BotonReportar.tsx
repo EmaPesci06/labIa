@@ -39,7 +39,7 @@ export function BotonReportar({
         aria-haspopup="dialog"
         className={
           className ??
-          "inline-flex min-h-11 items-center justify-center gap-1.5 text-sm text-texto-terciario underline transition-colors hover:text-texto focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
+          "inline-flex min-h-11 items-center justify-center gap-1.5 text-sm text-texto underline transition-colors hover:text-texto focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
         }
       >
         {conIcono ? <Flag aria-hidden className="size-3.5" /> : null}

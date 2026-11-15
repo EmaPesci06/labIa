@@ -2,7 +2,7 @@ import { BadgeCheck, UserRoundCog } from "lucide-react";
 
 import { FilaEnlace } from "@/components/cuenta/FilaCuenta";
 
-const ICONO = "size-5 shrink-0 text-azul";
+const ICONO = "size-5 shrink-0 text-texto";
 
 /**
  * Filas de /cuenta solo para profesionales (LAB-43): su perfil público (/cuenta/perfil) y la

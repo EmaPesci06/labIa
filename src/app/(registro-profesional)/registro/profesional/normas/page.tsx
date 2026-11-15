@@ -22,7 +22,7 @@ async function Contenido() {
     return (
       <div className="mx-auto flex max-w-[480px] flex-col gap-4 pt-4">
         <h1 className="font-titulo text-[30px] leading-tight">Tu cuenta no es de profesional</h1>
-        <p role="status" className="text-[15px] text-texto-secundario">
+        <p role="status" className="text-[15px] text-texto">
           Las normas de seguridad son para quienes ofrecen sus servicios en LabÍA.
         </p>
         <Boton href={inicioDelRol(rol)} variante="cliente" tamano="grande" bloque>
@@ -59,23 +59,23 @@ async function Contenido() {
           <h1 className="font-titulo text-[30px] leading-tight lg:text-[40px]">
             Normas de seguridad
           </h1>
-          <p className="text-[15px] leading-snug text-texto-secundario lg:text-[17px]">
+          <p className="text-[15px] leading-snug text-texto lg:text-[17px]">
             Los clientes te abren la puerta de su casa. Para que confíen en vos, te comprometés a:
           </p>
         </div>
         <ListaNormas dosColumnas />
         <QueHaceLabia />
         <FormularioNormas textoBoton="Enviar mi perfil a revisión" />
-        <p className="text-center text-[13px] leading-snug text-texto-terciario lg:text-left lg:text-sm">
+        <p className="text-center text-[13px] leading-snug text-texto lg:text-left lg:text-sm">
           Tu perfil se publica cuando revisemos tu DNI y tu certificado de antecedentes. Te avisamos
           por email.
         </p>
-        <p className="text-center text-[13px] leading-snug text-texto-terciario lg:text-left lg:text-sm">
+        <p className="text-center text-[13px] leading-snug text-texto lg:text-left lg:text-sm">
           Al continuar aceptás los{" "}
           <Link
             href="/terminos"
             prefetch={false}
-            className="inline-block py-2 font-bold text-azul underline underline-offset-2"
+            className="inline-block py-2 font-bold text-texto underline underline-offset-2"
           >
             Términos
           </Link>{" "}
@@ -83,7 +83,7 @@ async function Contenido() {
           <Link
             href="/privacidad"
             prefetch={false}
-            className="inline-block py-2 font-bold text-azul underline underline-offset-2"
+            className="inline-block py-2 font-bold text-texto underline underline-offset-2"
           >
             Política de privacidad
           </Link>
@@ -109,7 +109,7 @@ async function Contenido() {
 export default function RegistroProfesionalNormas() {
   return (
     <EstructuraRegistro paso={2}>
-      <Suspense fallback={<p className="text-texto-secundario">Cargando…</p>}>
+      <Suspense fallback={<p className="text-texto">Cargando…</p>}>
         <Contenido />
       </Suspense>
     </EstructuraRegistro>

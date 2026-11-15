@@ -37,7 +37,7 @@ export function ListaResenas({ profesionalId, iniciales, total }: Props) {
   const yaDesplego = resenas.length > iniciales.length;
 
   if (resenas.length === 0) {
-    return <p className="text-[15px] text-texto-secundario">Todavía no tiene reseñas.</p>;
+    return <p className="text-[15px] text-texto">Todavía no tiene reseñas.</p>;
   }
 
   function verMas() {
@@ -67,15 +67,13 @@ export function ListaResenas({ profesionalId, iniciales, total }: Props) {
               <span>
                 {resena.autor} · {textoPuntaje(resena.puntaje)}
               </span>
-              <span className="text-[13px] font-normal text-texto-terciario">
-                · {resena.cuando}
-              </span>
+              <span className="text-[13px] font-normal text-texto">· {resena.cuando}</span>
               <BotonReportar
                 objetivoTipo="resena"
                 objetivoId={resena.id}
                 tituloObjetivo={`Reseña de ${resena.autor}`}
                 texto="Reportar"
-                className="text-xs text-texto-terciario underline hover:text-texto"
+                className="text-xs text-texto underline hover:text-texto"
               />
             </div>
             {resena.texto ? (

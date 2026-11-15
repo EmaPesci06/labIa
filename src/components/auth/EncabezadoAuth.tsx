@@ -22,13 +22,11 @@ export function EncabezadoAuth({ titulo, bajada, contexto, volverA = "/" }: Prop
         >
           <ChevronLeft aria-hidden strokeWidth={2} className="size-[22px]" />
         </Link>
-        {contexto ? (
-          <span className="text-sm font-semibold text-texto-secundario">{contexto}</span>
-        ) : null}
+        {contexto ? <span className="text-sm font-semibold text-texto">{contexto}</span> : null}
       </div>
       <div className="flex flex-col gap-1.5">
         <h1 className="font-titulo text-[30px] leading-tight lg:text-4xl">{titulo}</h1>
-        {bajada ? <p className="text-[15px] text-texto-secundario">{bajada}</p> : null}
+        {bajada ? <p className="text-[15px] text-texto">{bajada}</p> : null}
       </div>
     </div>
   );

@@ -1,27 +1,28 @@
 "use client";
 
-import { Hammer, MessageCircle, Star } from "lucide-react";
+import { Hammer, MessageCircle, ShieldCheck } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
 import { Aviso } from "@/components/ui/Aviso";
+import { AvisoPantalla } from "@/components/ui/AvisoPantalla";
 import { Avatar } from "@/components/ui/Avatar";
 import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
+import { Distancia } from "@/components/ui/Distancia";
+import { Encabezado } from "@/components/ui/Encabezado";
 import { GrupoChips } from "@/components/ui/Chip";
-import { CintaBienvenida, CintaDistancia, CintaPasos } from "@/components/ui/cinta-metrica";
 import { EtiquetaMono } from "@/components/ui/EtiquetaMono";
 import { Estrellas } from "@/components/ui/Estrellas";
 import { HojaInferior } from "@/components/ui/HojaInferior";
 import { Insignia } from "@/components/ui/Insignia";
 import { Tarjeta } from "@/components/ui/Tarjeta";
+import { Toldo } from "@/components/ui/Toldo";
 import { Vacio } from "@/components/ui/Vacio";
 
 function Seccion({ titulo, children }: { titulo: string; children: ReactNode }) {
   return (
     <section className="space-y-3">
-      <h3 className="font-mono text-[13px] font-semibold tracking-[0.4px] text-texto-secundario uppercase">
-        {titulo}
-      </h3>
+      <h3 className="text-[13px] font-bold tracking-[0.4px] text-texto uppercase">{titulo}</h3>
       {children}
     </section>
   );
@@ -31,6 +32,12 @@ const OFICIOS = [
   { valor: "gas", etiqueta: "Gas" },
   { valor: "pintura", etiqueta: "Pintura" },
   { valor: "electricidad", etiqueta: "Electricidad" },
+];
+
+const FILTROS = [
+  { valor: "matriculados", etiqueta: "Solo matriculados" },
+  { valor: "calificados", etiqueta: "Mejor calificados" },
+  { valor: "ciudad", etiqueta: "Toda la ciudad" },
 ];
 
 /** Todos los componentes base en sus variantes. Se dibuja una vez por tema. */
@@ -43,33 +50,32 @@ export function MuestraComponentes() {
   return (
     <div className="space-y-7">
       <Seccion titulo="Botones">
+        <Boton tamano="grande" bloque onClick={() => setHoja(true)}>
+          Contactar por WhatsApp
+        </Boton>
         <div className="flex flex-wrap gap-2.5">
-          <Boton variante="cliente">Buscar profesionales</Boton>
-          <Boton variante="profesional">Postularme</Boton>
-          <Boton variante="exito">
-            <MessageCircle aria-hidden strokeWidth={2} className="size-5" />
-            WhatsApp
-          </Boton>
+          <Boton>Principal normal</Boton>
           <Boton variante="secundario">Secundario</Boton>
-          <Boton variante="fantasma">Fantasma</Boton>
+          <Boton variante="peligro">Cancelar trabajo</Boton>
+          <Boton variante="enlace">Enlace de texto</Boton>
         </div>
         <div className="flex flex-wrap gap-2.5">
-          <Boton variante="cliente" tamano="grande">
-            Crear cuenta
-          </Boton>
-          <Boton variante="cliente" cargando>
-            Guardando
-          </Boton>
-          <Boton variante="cliente" disabled>
-            Deshabilitado
-          </Boton>
+          <Boton tamano="grande">Crear cuenta</Boton>
+          <Boton cargando>Guardando</Boton>
+          <Boton disabled>Deshabilitado</Boton>
           <Boton href="/dev/ui" variante="secundario">
             Como enlace
           </Boton>
+          <Boton href="/dev/ui" variante="enlace">
+            Enlace de texto
+          </Boton>
         </div>
-        <Boton variante="exito" tamano="grande" bloque onClick={() => setHoja(true)}>
-          Contactar por WhatsApp
-        </Boton>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <Boton variante="principal" tamano="grande" aria-label="Escribir por WhatsApp">
+            <MessageCircle aria-hidden strokeWidth={2.5} className="size-5" />
+            WhatsApp
+          </Boton>
+        </div>
       </Seccion>
 
       <Seccion titulo="Campos">
@@ -111,14 +117,53 @@ export function MuestraComponentes() {
         <GrupoChips
           tipo="multiple"
           etiqueta="Filtros"
-          opciones={[
-            { valor: "matriculados", etiqueta: "Solo matriculados" },
-            { valor: "calificados", etiqueta: "Mejor calificados" },
-            { valor: "ciudad", etiqueta: "Toda la ciudad" },
-          ]}
+          opciones={FILTROS}
           valor={filtros}
           onChange={setFiltros}
         />
+        <Encabezado
+          nivel={2}
+          variante="sol"
+          titulo="Chips dentro de un encabezado sol"
+          className="rounded-tarjeta"
+        >
+          <GrupoChips
+            tipo="unica"
+            etiqueta="Oficio sobre sol"
+            opciones={OFICIOS}
+            valor={oficio}
+            onChange={setOficio}
+          />
+        </Encabezado>
+      </Seccion>
+
+      <Seccion titulo="Encabezados">
+        <Encabezado
+          nivel={2}
+          titulo="Turquesa"
+          descripcion="Por defecto, con volver."
+          volver={{ href: "/dev/ui" }}
+        />
+        <Encabezado
+          nivel={2}
+          variante="equipo"
+          titulo="Equipo"
+          descripcion="Panel de administración."
+        />
+        <Encabezado nivel={2} variante="sol" titulo="Sol" descripcion="Texto azul noche." />
+        <Encabezado
+          nivel={2}
+          variante="plano"
+          titulo="Plano"
+          descripcion="Sin bloque de color, sobre arena."
+        />
+      </Seccion>
+
+      <Seccion titulo="Toldos">
+        <Toldo color="accion" alto={14} />
+        <Toldo color="sol" alto={18} />
+        <Toldo color="texto" alto={22} />
+        <Toldo color="coral" alto={26} />
       </Seccion>
 
       <Seccion titulo="Insignias">
@@ -135,24 +180,19 @@ export function MuestraComponentes() {
         </div>
       </Seccion>
 
-      <Seccion titulo="Tarjeta, avatar, estrellas y cinta de distancia">
+      <Seccion titulo="Tarjeta, avatar, distancia y estrellas">
         <Tarjeta como="article" className="flex flex-col gap-2.5">
           <div className="flex items-center gap-3">
             <Avatar nombre="Martín Gómez" />
             <div className="min-w-0 flex-1">
               <p className="text-[17px] font-bold">Martín Gómez</p>
-              <p className="text-sm text-texto-secundario">Gasista · 12 años · La Perla</p>
+              <p className="text-sm text-texto">Gasista · 12 años · La Perla</p>
             </div>
-            <span className="flex items-center gap-1 text-sm font-bold">
-              <Star
-                aria-hidden
-                strokeWidth={1.5}
-                className="size-4 fill-current text-naranja-marca"
-              />
-              4,9
-            </span>
+            <span className="text-sm font-bold">4,9</span>
           </div>
-          <CintaDistancia km={1.2} />
+          <div>
+            <Distancia km={1.2} />
+          </div>
           <div className="flex flex-wrap gap-1.5">
             <Insignia variante="verificada" />
             <Insignia variante="antecedentes" />
@@ -167,49 +207,47 @@ export function MuestraComponentes() {
           </div>
         </Tarjeta>
         <div className="space-y-1">
-          <p className="text-sm font-semibold">Tu puntaje</p>
+          <p className="text-sm font-bold">Tu puntaje</p>
           <Estrellas valor={puntaje} onChange={setPuntaje} etiqueta="Tu puntaje" />
         </div>
       </Seccion>
 
-      <Seccion titulo="Cinta métrica">
-        <div className="space-y-3">
-          <CintaDistancia km={0.1} />
-          <CintaDistancia km={2.8} />
-          <CintaDistancia km={9} />
-        </div>
-        <CintaPasos pasos={["Datos", "Oficios", "Documentos", "Normas"]} actual={2} />
-        <div className="space-y-2.5">
-          <CintaBienvenida />
-          <EtiquetaMono className="text-xs tracking-[0.6px]">
-            Carpintería · Plomería · Cerrajería · Gas
-          </EtiquetaMono>
-        </div>
-      </Seccion>
-
-      <Seccion titulo="Aviso y estado vacío">
+      <Seccion titulo="Avisos y estado vacío">
         <Aviso>Se comprometió con las normas de seguridad de LabÍA.</Aviso>
         <Tarjeta>
           <Vacio
             icono={Hammer}
             titulo="Todavía no publicaste trabajos"
             descripcion="Contá qué necesitás y los profesionales de tu zona se postulan."
-            accion={<Boton variante="cliente">Publicar un trabajo</Boton>}
+            accion={<Boton>Publicar un trabajo</Boton>}
+          />
+        </Tarjeta>
+        <Tarjeta borde>
+          <AvisoPantalla
+            nivel={2}
+            icono={ShieldCheck}
+            titulo="Te quedaste sin conexión"
+            texto="Revisá tu internet y volvé a intentar. Lo que estabas escribiendo no se perdió."
+            accion={
+              <Boton tamano="grande" bloque>
+                Reintentar
+              </Boton>
+            }
           />
         </Tarjeta>
       </Seccion>
 
       <HojaInferior abierta={hoja} onCambioAbierta={setHoja} titulo="Antes de contactar">
-        <ul className="list-disc space-y-2 pl-5 text-[15px] leading-snug">
+        <ul className="list-disc space-y-2 pl-5 text-base leading-snug">
           <li>Pedí el presupuesto por escrito.</li>
           <li>Pasá tu dirección exacta recién cuando haya acuerdo.</li>
           <li>Al llegar, confirmá que es la persona del perfil.</li>
           <li>Acordá la seña y dejala escrita.</li>
         </ul>
-        <Boton variante="exito" tamano="grande" bloque onClick={() => setHoja(false)}>
+        <Boton tamano="grande" bloque onClick={() => setHoja(false)}>
           Abrir WhatsApp
         </Boton>
-        <Boton variante="fantasma" bloque onClick={() => setHoja(false)}>
+        <Boton variante="enlace" bloque onClick={() => setHoja(false)}>
           Cancelar
         </Boton>
       </HojaInferior>
