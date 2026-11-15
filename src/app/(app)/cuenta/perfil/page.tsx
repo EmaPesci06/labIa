@@ -62,7 +62,7 @@ function Aviso({ mensaje }: { mensaje: string }) {
   return (
     <div className="flex flex-col gap-3">
       <h1 className="font-titulo text-[28px] lg:text-4xl">Editar perfil</h1>
-      <p className="text-texto-secundario">{mensaje}</p>
+      <p className="text-texto">{mensaje}</p>
     </div>
   );
 }

@@ -145,7 +145,7 @@ export function DetalleMiTrabajo({
       {publicado ? (
         <div
           role="status"
-          className="flex items-center gap-2.5 rounded-[14px] bg-exito-suave p-4 text-[15px] font-semibold text-sobre-exito-suave"
+          className="flex items-center gap-2.5 rounded-[14px] bg-sol p-4 text-[15px] font-semibold text-sobre-sol"
         >
           <CheckCircle aria-hidden className="size-5 shrink-0" />
           <span>¡Publicado! Te avisamos por email cuando alguien se postule.</span>
@@ -164,17 +164,17 @@ export function DetalleMiTrabajo({
       {/* Encabezado del trabajo */}
       <section
         aria-label="Detalles de mi trabajo"
-        className="flex flex-col gap-3.5 rounded-[18px] border border-divisor bg-superficie p-4 text-texto lg:p-6"
+        className="flex flex-col gap-3.5 rounded-[18px] border border-fondo bg-superficie p-4 text-texto lg:p-6"
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
           <EtiquetaMono partes={[ETIQUETA_OFICIO[trabajo.oficio], trabajo.barrioNombre]} />
           <span
             className={
               trabajo.estado === "asignado"
-                ? "rounded-full bg-exito-suave px-2.5 py-1 text-xs font-bold text-sobre-exito-suave"
+                ? "rounded-full bg-sol px-2.5 py-1 text-xs font-bold text-sobre-sol"
                 : trabajo.estado === "abierto"
-                  ? "rounded-full bg-azul-suave px-2.5 py-1 text-xs font-bold text-sobre-azul-suave"
-                  : "rounded-full bg-divisor px-2.5 py-1 text-xs font-bold text-texto-secundario"
+                  ? "rounded-full bg-superficie px-2.5 py-1 text-xs font-bold text-texto"
+                  : "rounded-full bg-fondo px-2.5 py-1 text-xs font-bold text-texto"
             }
           >
             {trabajo.estado === "abierto"
@@ -191,7 +191,7 @@ export function DetalleMiTrabajo({
           {trabajo.titulo}
         </h1>
 
-        <p className="text-sm text-texto-secundario">
+        <p className="text-sm text-texto">
           Publicado {cuando} · {ETIQUETA_URGENCIA[trabajo.urgencia]} ·{" "}
           {trabajo.postulantes.length === 0
             ? "Sin postulantes"
@@ -213,14 +213,14 @@ export function DetalleMiTrabajo({
         ) : null}
 
         {trabajo.presupuestoEstimado !== null ? (
-          <p className="text-sm font-semibold text-texto-secundario">
+          <p className="text-sm font-semibold text-texto">
             Presupuesto estimado: {formatearPesos(trabajo.presupuestoEstimado)}
           </p>
         ) : null}
 
         {/* Acciones principales según estado */}
         {trabajo.estado === "abierto" ? (
-          <div className="mt-2 flex flex-wrap items-center justify-end gap-2 border-t border-divisor pt-3">
+          <div className="mt-2 flex flex-wrap items-center justify-end gap-2 border-t border-fondo pt-3">
             <Boton
               ref={botonCancelarRef}
               variante="peligro"
@@ -249,11 +249,11 @@ export function DetalleMiTrabajo({
       {trabajo.estado === "asignado" ? (
         <section
           aria-label="Profesional contratado"
-          className="flex flex-col gap-4 rounded-[18px] border border-exito/30 bg-exito-suave p-4 text-texto lg:p-5"
+          className="flex flex-col gap-4 rounded-[18px] border border-accion/30 bg-sol p-4 text-texto lg:p-5"
         >
           <div className="flex items-start gap-3">
-            <CheckCircle aria-hidden className="size-6 shrink-0 text-exito" />
-            <p className="text-[15px] leading-relaxed text-sobre-exito-suave lg:text-base">
+            <CheckCircle aria-hidden className="size-6 shrink-0 text-texto" />
+            <p className="text-[15px] leading-relaxed text-sobre-sol lg:text-base">
               Elegiste a <strong>{nombreElegido}</strong>. Escribile por WhatsApp para coordinar.
               Cuando termine, dejale una reseña.
             </p>
@@ -266,7 +266,7 @@ export function DetalleMiTrabajo({
                   ref={botonWhatsAppRef}
                   type="button"
                   onClick={() => setHojaContactoAbierta(true)}
-                  className="inline-flex min-h-[44px] cursor-pointer items-center justify-center gap-2 rounded-boton bg-exito px-5 text-sm font-bold text-sobre-exito transition-opacity hover:opacity-95 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco active:opacity-90"
+                  className="inline-flex min-h-[44px] cursor-pointer items-center justify-center gap-2 rounded-boton bg-accion px-5 text-sm font-bold text-sobre-accion transition-opacity hover:opacity-95 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco active:opacity-90"
                 >
                   <MessageCircle aria-hidden className="size-4" />
                   Escribir por WhatsApp
@@ -287,7 +287,7 @@ export function DetalleMiTrabajo({
               type="button"
               disabled={pendiente}
               onClick={() => setModalTerminarAbierto(true)}
-              className="inline-flex min-h-[44px] cursor-pointer items-center justify-center gap-1.5 rounded-boton bg-azul px-4 text-sm font-bold text-sobre-azul transition-colors hover:bg-azul-presionado focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco dark:bg-azul-suave dark:text-sobre-azul-suave"
+              className="inline-flex min-h-[44px] cursor-pointer items-center justify-center gap-1.5 rounded-boton bg-accion px-4 text-sm font-bold text-sobre-accion transition-colors hover:bg-accion focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
             >
               <CheckCircle aria-hidden className="size-4" />
               Marcar como terminado
@@ -309,7 +309,7 @@ export function DetalleMiTrabajo({
               type="button"
               disabled={pendiente}
               onClick={() => setModalCambiarAbierto(true)}
-              className="inline-flex min-h-[44px] cursor-pointer items-center justify-center gap-1.5 rounded-boton border border-borde bg-superficie px-3.5 text-sm font-semibold text-texto hover:border-azul focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
+              className="inline-flex min-h-[44px] cursor-pointer items-center justify-center gap-1.5 rounded-boton border border-texto bg-superficie px-3.5 text-sm font-semibold text-texto hover:border-accion focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
             >
               <ArrowLeftRight aria-hidden className="size-4" />
               Cambiar de profesional
@@ -333,9 +333,9 @@ export function DetalleMiTrabajo({
       {trabajo.estado === "cerrado" ? (
         <section
           aria-label="Trabajo terminado"
-          className="flex flex-col gap-3 rounded-[18px] border border-divisor bg-superficie p-4 text-texto lg:p-5"
+          className="flex flex-col gap-3 rounded-[18px] border border-fondo bg-superficie p-4 text-texto lg:p-5"
         >
-          <div className="flex items-center gap-2.5 text-exito">
+          <div className="flex items-center gap-2.5 text-texto">
             <CheckCircle aria-hidden className="size-5" />
             <span className="font-bold">Este trabajo fue completado.</span>
           </div>
@@ -347,7 +347,7 @@ export function DetalleMiTrabajo({
                   e.preventDefault();
                   setHojaResenaAbierta(true);
                 }}
-                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-boton bg-naranja-accion px-5 text-sm font-bold text-sobre-naranja hover:opacity-95 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
+                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-boton bg-accion px-5 text-sm font-bold text-sobre-accion hover:opacity-95 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
               >
                 <Star aria-hidden className="size-4" />
                 Dejar reseña al profesional
@@ -386,7 +386,7 @@ export function DetalleMiTrabajo({
         </div>
 
         {postulantesOrdenados.length === 0 ? (
-          <div className="flex min-h-[160px] flex-col items-center justify-center rounded-[18px] border border-dashed border-divisor bg-superficie p-6 text-center text-texto-secundario">
+          <div className="flex min-h-[160px] flex-col items-center justify-center rounded-[18px] border border-dashed border-fondo bg-superficie p-6 text-center text-texto">
             <p className="text-[15px] font-medium">Todavía nadie se postuló.</p>
             <p className="text-sm">Te avisamos por email cuando pase.</p>
           </div>

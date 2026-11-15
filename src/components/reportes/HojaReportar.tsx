@@ -78,7 +78,7 @@ export function HojaReportar({
     >
       {!estaAutenticado ? (
         <div className="flex flex-col gap-4 py-1">
-          <p className="text-[15px] leading-relaxed text-texto-secundario">
+          <p className="text-[15px] leading-relaxed text-texto">
             Para reportar un {objetivoTipo === "resena" ? "comentario" : objetivoTipo} necesitás
             iniciar sesión en tu cuenta de LabÍA.
           </p>
@@ -89,10 +89,10 @@ export function HojaReportar({
       ) : estado.exito ? (
         <div className="flex flex-col gap-4 py-1">
           <div className="flex items-start gap-3 rounded-2xl bg-superficie p-4 text-texto">
-            <CheckCircle2 aria-hidden className="mt-0.5 size-5 shrink-0 text-sobre-azul-suave" />
+            <CheckCircle2 aria-hidden className="mt-0.5 size-5 shrink-0 text-texto" />
             <div className="flex flex-col gap-1 text-[15px] leading-relaxed">
               <p className="font-semibold text-texto">Gracias por avisarnos.</p>
-              <p className="text-texto-secundario">
+              <p className="text-texto">
                 Lo revisamos y, si hace falta, tomamos medidas. No le avisamos a la otra persona que
                 la reportaste.
               </p>
@@ -108,7 +108,7 @@ export function HojaReportar({
           <input type="hidden" name="objetivoId" value={objetivoId} />
 
           {tituloObjetivo ? (
-            <p className="text-sm font-semibold text-texto-secundario">
+            <p className="text-sm font-semibold text-texto">
               Reportando: <span className="text-texto">{tituloObjetivo}</span>
             </p>
           ) : null}
@@ -117,7 +117,7 @@ export function HojaReportar({
           {motivoSeleccionado === "comportamiento" ? (
             <div
               role="alert"
-              className="flex items-center gap-2.5 rounded-[14px] border border-naranja-suave bg-naranja-suave/40 p-3.5 text-sm font-bold text-sobre-naranja-suave"
+              className="border-naranja-suave flex items-center gap-2.5 rounded-[14px] border bg-sol/40 p-3.5 text-sm font-bold text-sobre-sol"
             >
               <AlertTriangle aria-hidden className="size-5 shrink-0 text-error" />
               <span>Si estás en peligro, llamá al 911.</span>
@@ -138,8 +138,8 @@ export function HojaReportar({
                   className={cn(
                     "flex min-h-[44px] cursor-pointer items-start gap-3 rounded-campo border p-3.5 transition-colors",
                     seleccionado
-                      ? "border-borde-fuerte bg-azul-suave/30"
-                      : "border-borde hover:bg-superficie",
+                      ? "border-borde-fuerte bg-superficie/30"
+                      : "border-texto hover:bg-superficie",
                   )}
                 >
                   <input
@@ -149,7 +149,7 @@ export function HojaReportar({
                     value={motivo}
                     checked={seleccionado}
                     onChange={() => setMotivoSeleccionado(motivo)}
-                    className="mt-0.5 size-4 text-azul focus:ring-foco"
+                    className="mt-0.5 size-4 text-texto focus:ring-foco"
                   />
                   <span className="text-[15px] leading-snug font-medium text-texto">
                     {ETIQUETAS_MOTIVO[motivo]}
@@ -177,9 +177,9 @@ export function HojaReportar({
               value={detalle}
               onChange={(e) => setDetalle(e.target.value)}
               placeholder="Contanos qué pasó con el mayor detalle posible..."
-              className="focus:border-borde-fuerte w-full rounded-campo border border-borde bg-superficie p-3 text-[15px] text-texto placeholder:text-texto-terciario focus:ring-2 focus:ring-foco focus:outline-none"
+              className="focus:border-borde-fuerte w-full rounded-campo border border-texto bg-superficie p-3 text-[15px] text-texto placeholder:text-texto focus:ring-2 focus:ring-foco focus:outline-none"
             />
-            <div className="flex justify-end text-xs text-texto-secundario">
+            <div className="flex justify-end text-xs text-texto">
               <span>
                 {detalle.length} / {MAX_CARACTERES_DETALLE}
               </span>
@@ -194,7 +194,7 @@ export function HojaReportar({
           {estado.mensaje ? (
             <div
               role="alert"
-              className="rounded-campo bg-naranja-suave/60 p-3 text-sm font-semibold text-sobre-naranja-suave"
+              className="rounded-campo bg-sol/60 p-3 text-sm font-semibold text-sobre-sol"
             >
               {estado.mensaje}
             </div>

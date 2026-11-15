@@ -23,8 +23,8 @@ const ACEPTADOS = TIPOS_IMAGEN_ACEPTADOS.join(",");
 
 const BASE_MOSAICO =
   "relative flex min-h-[104px] cursor-pointer flex-col items-center justify-center gap-1.5 overflow-hidden " +
-  "rounded-[14px] border-[1.5px] border-dashed border-borde bg-superficie text-center text-sm font-semibold " +
-  "text-texto hover:bg-azul-suave has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2 " +
+  "rounded-[14px] border-[1.5px] border-dashed border-texto bg-superficie text-center text-sm font-semibold " +
+  "text-texto hover:bg-superficie has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2 " +
   "has-[:focus-visible]:outline-foco lg:min-h-24 lg:text-[15px]";
 
 type PropsPerfil = {
@@ -52,7 +52,7 @@ export function CargaFotoPerfil({ foto, onElegir, onQuitar, ocupado, error }: Pr
           />
         ) : (
           <>
-            <User aria-hidden strokeWidth={2} className="size-6 text-azul" />
+            <User aria-hidden strokeWidth={2} className="size-6 text-texto" />
             <span>
               Foto de perfil
               <span className="hidden lg:inline"> (recomendada)</span>
@@ -77,7 +77,7 @@ export function CargaFotoPerfil({ foto, onElegir, onQuitar, ocupado, error }: Pr
         <button
           type="button"
           onClick={onQuitar}
-          className="min-h-11 self-start rounded-campo px-2 text-sm font-bold text-azul underline underline-offset-2"
+          className="min-h-11 self-start rounded-campo px-2 text-sm font-bold text-texto underline underline-offset-2"
         >
           Quitar foto de perfil
         </button>
@@ -106,14 +106,12 @@ export function CargaFotosTrabajos({ fotos, onElegir, onQuitar, ocupado, error }
   return (
     <>
       <label className={cn(BASE_MOSAICO, (ocupado || lleno) && "cursor-not-allowed opacity-60")}>
-        <ImageIcon aria-hidden strokeWidth={2} className="size-6 text-azul" />
+        <ImageIcon aria-hidden strokeWidth={2} className="size-6 text-texto" />
         <span>
           Fotos de trabajos
           <span className="hidden lg:inline"> (hasta {MAX_FOTOS_TRABAJOS})</span>
         </span>
-        <span className="text-xs font-normal text-texto-terciario lg:hidden">
-          Hasta {MAX_FOTOS_TRABAJOS}
-        </span>
+        <span className="text-xs font-normal text-texto lg:hidden">Hasta {MAX_FOTOS_TRABAJOS}</span>
         <input
           type="file"
           accept={ACEPTADOS}
@@ -147,7 +145,7 @@ export function CargaFotosTrabajos({ fotos, onElegir, onQuitar, ocupado, error }
                   aria-label={`Quitar foto de trabajo ${indice + 1}`}
                   className="absolute top-0.5 right-0.5 flex size-11 items-start justify-end p-1.5"
                 >
-                  <span className="flex size-6 items-center justify-center rounded-full bg-azul text-sobre-azul">
+                  <span className="flex size-6 items-center justify-center rounded-full bg-accion text-sobre-accion">
                     <X aria-hidden strokeWidth={2.5} className="size-3.5" />
                   </span>
                 </button>
@@ -155,7 +153,7 @@ export function CargaFotosTrabajos({ fotos, onElegir, onQuitar, ocupado, error }
             ))}
           </ul>
         ) : null}
-        <p className="text-sm text-texto-terciario" role="status">
+        <p className="text-sm text-texto" role="status">
           {fotos.length} de {MAX_FOTOS_TRABAJOS} fotos
         </p>
         {error ? (

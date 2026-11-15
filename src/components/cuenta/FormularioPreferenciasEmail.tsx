@@ -28,11 +28,11 @@ function Interruptor({
   return (
     <label
       htmlFor={id}
-      className="flex min-h-11 cursor-pointer items-start justify-between gap-4 rounded-boton border border-borde bg-superficie p-4"
+      className="flex min-h-11 cursor-pointer items-start justify-between gap-4 rounded-boton border border-texto bg-superficie p-4"
     >
       <span className="flex flex-col gap-0.5">
         <span className="text-base font-bold">{titulo}</span>
-        <span id={`${id}-d`} className="text-sm text-texto-secundario">
+        <span id={`${id}-d`} className="text-sm text-texto">
           {descripcion}
         </span>
       </span>
@@ -43,7 +43,7 @@ function Interruptor({
         role="switch"
         defaultChecked={marcado}
         aria-describedby={`${id}-d`}
-        className="relative mt-0.5 h-7 w-12 shrink-0 cursor-pointer appearance-none rounded-full bg-borde transition-colors after:absolute after:top-0.5 after:left-0.5 after:size-6 after:rounded-full after:bg-superficie after:shadow-sm after:transition-transform checked:bg-azul checked:after:translate-x-5 motion-reduce:transition-none motion-reduce:after:transition-none"
+        className="bg-borde relative mt-0.5 h-7 w-12 shrink-0 cursor-pointer appearance-none rounded-full transition-colors after:absolute after:top-0.5 after:left-0.5 after:size-6 after:rounded-full after:bg-superficie after:shadow-sm after:transition-transform checked:bg-accion checked:after:translate-x-5 motion-reduce:transition-none motion-reduce:after:transition-none"
       />
     </label>
   );
@@ -72,7 +72,7 @@ export function FormularioPreferenciasEmail({
         descripcion="Pedidos de reseña y avisos cuando eligen a otro profesional."
         marcado={novedades}
       />
-      <p className="text-sm text-texto-secundario">
+      <p className="text-sm text-texto">
         Los avisos de tu cuenta y de tus trabajos en curso (perfil aprobado, postulaciones, te
         eligieron) te llegan siempre.
       </p>
@@ -82,7 +82,7 @@ export function FormularioPreferenciasEmail({
         </p>
       ) : null}
       {estado.exito ? (
-        <p role="status" className="text-sm font-semibold text-exito">
+        <p role="status" className="text-sm font-semibold text-texto">
           {estado.exito}
         </p>
       ) : null}

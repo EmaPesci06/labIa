@@ -13,7 +13,7 @@ export function BannerVerificacion({ resumen }: { resumen: ResumenBanner | null 
     return (
       <div
         role="status"
-        className="rounded-[14px] bg-azul-suave p-3.5 text-sm leading-snug text-sobre-azul-suave"
+        className="rounded-[14px] bg-superficie p-3.5 text-sm leading-snug text-texto"
       >
         Estamos revisando tu DNI y tus antecedentes. Ya podés ver trabajos.
       </div>
@@ -23,7 +23,7 @@ export function BannerVerificacion({ resumen }: { resumen: ResumenBanner | null 
   return (
     <div
       role="status"
-      className="flex flex-col gap-2 rounded-[14px] bg-naranja-suave p-3.5 text-sm leading-snug text-sobre-naranja-suave sm:flex-row sm:items-center sm:justify-between"
+      className="flex flex-col gap-2 rounded-[14px] bg-sol p-3.5 text-sm leading-snug text-sobre-sol sm:flex-row sm:items-center sm:justify-between"
     >
       <p>
         Revisá tus documentos: {resumen.documento} · {resumen.motivo}

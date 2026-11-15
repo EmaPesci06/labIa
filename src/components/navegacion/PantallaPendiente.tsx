@@ -12,7 +12,7 @@ export function PantallaPendiente({
   return (
     <div className="flex flex-col gap-3">
       <h1 className="font-titulo text-[28px] lg:text-4xl">{titulo}</h1>
-      <p className="text-texto-secundario">Esta pantalla llega pronto.</p>
+      <p className="text-texto">Esta pantalla llega pronto.</p>
       {children}
     </div>
   );

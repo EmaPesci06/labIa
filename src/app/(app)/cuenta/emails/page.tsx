@@ -25,7 +25,7 @@ export default async function PreferenciasEmail() {
   return (
     <div className="flex max-w-xl flex-col gap-4">
       <h1 className="font-titulo text-[28px] lg:text-4xl">Preferencias de email</h1>
-      <p className="text-texto-secundario">Elegí qué avisos querés recibir en tu correo.</p>
+      <p className="text-texto">Elegí qué avisos querés recibir en tu correo.</p>
       <FormularioPreferenciasEmail
         trabajosCerca={trabajosCerca}
         novedades={novedades}

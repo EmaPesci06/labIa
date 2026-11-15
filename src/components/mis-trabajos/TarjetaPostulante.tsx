@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 
 import { Avatar } from "@/components/ui/Avatar";
-import { CintaDistancia } from "@/components/ui/cinta-metrica";
+import { Distancia } from "@/components/ui/Distancia";
 import { formatearPesos } from "@/lib/formato";
 import type { PostulanteParaCliente } from "@/lib/trabajos/consulta";
 import { ETIQUETA_OFICIO } from "@/lib/validaciones/trabajo";
@@ -83,7 +83,7 @@ export function TarjetaPostulante({
   return (
     <article
       aria-label={`Postulación de ${nombreCompleto}`}
-      className="flex flex-col gap-3 rounded-[18px] border border-divisor bg-superficie p-4 text-texto lg:flex-row lg:items-center lg:gap-6 lg:p-5"
+      className="flex flex-col gap-3 rounded-[18px] border border-fondo bg-superficie p-4 text-texto lg:flex-row lg:items-center lg:gap-6 lg:p-5"
     >
       {/* En escritorio, datos del postulante a la izquierda y acciones a la derecha (prototipo Desk). */}
       <div className="flex min-w-0 flex-1 flex-col gap-3">
@@ -98,10 +98,10 @@ export function TarjetaPostulante({
             <span className="font-titulo text-base font-bold tracking-tight text-texto lg:text-[17px]">
               {nombreCompleto}
             </span>
-            <span className="text-[13px] text-texto-secundario lg:text-sm">{subtitulo}</span>
+            <span className="text-[13px] text-texto lg:text-sm">{subtitulo}</span>
             {postulante.profesional.distanciaKm !== null ? (
               <div className="mt-1">
-                <CintaDistancia km={postulante.profesional.distanciaKm} />
+                <Distancia km={postulante.profesional.distanciaKm} />
               </div>
             ) : null}
           </div>
@@ -112,20 +112,20 @@ export function TarjetaPostulante({
         </div>
 
         {textoPresupuesto ? (
-          <div className="text-sm font-semibold text-texto-secundario">{textoPresupuesto}</div>
+          <div className="text-sm font-semibold text-texto">{textoPresupuesto}</div>
         ) : null}
       </div>
 
       <div className="mt-1 grid grid-cols-2 gap-2 pt-1 sm:flex sm:justify-end lg:mt-0 lg:shrink-0 lg:pt-0">
         <Link
           href={`/profesionales/${postulante.profesionalId}`}
-          className="inline-flex min-h-[44px] items-center justify-center rounded-boton border-[1.5px] border-azul px-4 text-center text-sm font-bold text-azul transition-colors hover:bg-azul-suave focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco sm:w-auto"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-boton border-[1.5px] border-accion px-4 text-center text-sm font-bold text-texto transition-colors hover:bg-superficie focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco sm:w-auto"
         >
           Ver perfil
         </Link>
 
         {esElegido ? (
-          <span className="inline-flex min-h-[44px] items-center justify-center rounded-boton bg-exito px-4 text-center text-sm font-bold text-sobre-exito sm:w-auto">
+          <span className="inline-flex min-h-[44px] items-center justify-center rounded-boton bg-accion px-4 text-center text-sm font-bold text-sobre-accion sm:w-auto">
             Elegido
           </span>
         ) : trabajoEstado === "abierto" ? (
@@ -135,7 +135,7 @@ export function TarjetaPostulante({
               type="button"
               disabled={pendiente}
               onClick={() => setModalAbierto(true)}
-              className="inline-flex min-h-[44px] cursor-pointer items-center justify-center rounded-boton bg-naranja-accion px-4 text-center text-sm font-bold text-sobre-naranja transition-opacity hover:opacity-95 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco active:opacity-90 disabled:opacity-50 sm:w-auto"
+              className="inline-flex min-h-[44px] cursor-pointer items-center justify-center rounded-boton bg-accion px-4 text-center text-sm font-bold text-sobre-accion transition-opacity hover:opacity-95 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco active:opacity-90 disabled:opacity-50 sm:w-auto"
             >
               Elegir
             </button>
@@ -153,7 +153,7 @@ export function TarjetaPostulante({
             />
           </>
         ) : (
-          <span className="inline-flex min-h-[44px] items-center justify-center rounded-boton bg-divisor px-4 text-center text-sm font-bold text-texto-secundario opacity-60 sm:w-auto">
+          <span className="inline-flex min-h-[44px] items-center justify-center rounded-boton bg-fondo px-4 text-center text-sm font-bold text-texto opacity-60 sm:w-auto">
             {hayElegido ? "Descartado" : "No disponible"}
           </span>
         )}

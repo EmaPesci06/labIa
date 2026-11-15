@@ -48,7 +48,7 @@ export function FormularioDecision({ verificacionId }: { verificacionId: string 
       {rechazando ? (
         <div
           id="panel-rechazo"
-          className="flex flex-col gap-3 rounded-[14px] border border-divisor p-3.5"
+          className="flex flex-col gap-3 rounded-[14px] border border-fondo p-3.5"
         >
           <Campo
             variante="seleccion"
@@ -79,7 +79,7 @@ export function FormularioDecision({ verificacionId }: { verificacionId: string 
             name="accion"
             value="rechazar"
             aria-busy={pendiente || undefined}
-            className="inline-flex min-h-[52px] items-center justify-center rounded-boton bg-error px-5 text-base font-bold text-sobre-azul hover:opacity-90 active:opacity-80 disabled:opacity-50 aria-busy:pointer-events-none"
+            className="inline-flex min-h-[52px] items-center justify-center rounded-boton bg-error px-5 text-base font-bold text-sobre-accion hover:opacity-90 active:opacity-80 disabled:opacity-50 aria-busy:pointer-events-none"
           >
             {pendiente ? "Guardando…" : "Confirmar rechazo"}
           </button>
@@ -92,7 +92,7 @@ export function FormularioDecision({ verificacionId }: { verificacionId: string 
         </p>
       ) : null}
       {estado.exito ? (
-        <p role="status" className="text-sm font-semibold text-exito">
+        <p role="status" className="text-sm font-semibold text-texto">
           {estado.exito}
         </p>
       ) : null}

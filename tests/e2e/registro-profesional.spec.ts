@@ -9,7 +9,7 @@ const siguiente = (page: import("@playwright/test").Page) =>
   page.getByRole("button", { name: "Siguiente: normas de seguridad" }).locator("visible=true");
 
 test.describe("registro de profesional · paso 1", () => {
-  test("muestra la cinta de pasos, el título y las secciones", async ({ page }) => {
+  test("muestra los pasos, el título y las secciones", async ({ page }) => {
     await page.goto("/registro/profesional");
     await expect(page.getByRole("group", { name: /Paso 1 de 2/ })).toBeVisible();
     await expect(
@@ -94,7 +94,7 @@ test.describe("registro de profesional · paso 1", () => {
     }
   });
 
-  test("el paso 2 existe y muestra la cinta en el paso 2", async ({ page }) => {
+  test("el paso 2 existe y marca el paso 2 como actual", async ({ page }) => {
     await page.goto("/registro/profesional/normas");
     await expect(page.getByRole("group", { name: /Paso 2 de 2/ })).toBeVisible();
   });

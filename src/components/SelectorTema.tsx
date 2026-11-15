@@ -26,14 +26,14 @@ export function SelectorTema({ className }: { className?: string }) {
 
   return (
     <fieldset className={className}>
-      <legend className="mb-2 font-mono text-sm font-medium tracking-[0.4px] text-texto-secundario uppercase">
+      <legend className="mb-2 font-texto text-sm font-medium tracking-[0.4px] text-texto uppercase">
         Tema
       </legend>
-      <div className="inline-flex rounded-full border border-borde bg-superficie p-1">
+      <div className="inline-flex rounded-full border border-texto bg-superficie p-1">
         {PREFERENCIAS_TEMA.map((opcion) => (
           <label
             key={opcion}
-            className="flex min-h-11 min-w-11 cursor-pointer items-center rounded-full px-4 text-sm font-bold text-texto-secundario has-checked:bg-azul has-checked:text-sobre-azul has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-foco"
+            className="flex min-h-11 min-w-11 cursor-pointer items-center rounded-full px-4 text-sm font-bold text-texto has-checked:bg-accion has-checked:text-sobre-accion has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-foco"
           >
             <input
               type="radio"

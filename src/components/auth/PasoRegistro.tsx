@@ -30,7 +30,7 @@ async function Cuerpo({ rol }: { rol: "cliente" | "profesional" }) {
       <div className="flex flex-col gap-4">
         <p
           role="status"
-          className="rounded-campo bg-exito-suave p-4 text-[15px] font-semibold text-sobre-exito-suave"
+          className="rounded-campo bg-sol p-4 text-[15px] font-semibold text-sobre-sol"
         >
           Tu cuenta ya está creada. Muy pronto vas a poder completar tus datos desde acá.
         </p>
@@ -63,11 +63,11 @@ export function PasoRegistro({ rol }: { rol: "cliente" | "profesional" }) {
       <Suspense fallback={null}>
         <Cuerpo rol={rol} />
       </Suspense>
-      <p className="text-center text-[15px] text-texto-secundario">
+      <p className="text-center text-[15px] text-texto">
         ¿Ya tenés cuenta?{" "}
         <Link
           href="/ingresar"
-          className="inline-block py-3 font-bold text-azul underline underline-offset-2"
+          className="inline-block py-3 font-bold text-texto underline underline-offset-2"
         >
           Ingresar
         </Link>

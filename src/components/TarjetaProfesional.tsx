@@ -2,7 +2,7 @@ import { Star } from "lucide-react";
 import Link from "next/link";
 
 import { Avatar } from "@/components/ui/Avatar";
-import { CintaDistancia } from "@/components/ui/cinta-metrica";
+import { Distancia } from "@/components/ui/Distancia";
 import { Insignia } from "@/components/ui/Insignia";
 import type { ResultadoProfesional } from "@/lib/busqueda";
 import { cn } from "@/lib/cn";
@@ -33,7 +33,7 @@ type Props = {
 
 /**
  * Tarjeta de un profesional en los resultados (Resultados / Desk-Buscar del prototipo): avatar,
- * nombre con inicial del apellido, oficio · años · zonas, puntaje, cinta de distancia e insignias.
+ * nombre con inicial del apellido, oficio · años · zonas, puntaje, distancia e insignias.
  * Toda la tarjeta es un link al perfil público. Sin datos de contacto: el WhatsApp se pide al
  * servidor desde el perfil (LAB-25).
  *
@@ -50,7 +50,7 @@ export function TarjetaProfesional({ profesional: p, className }: Props) {
     <Link
       href={`/profesionales/${p.usuarioId}`}
       className={cn(
-        "flex flex-col gap-2.5 rounded-[18px] bg-superficie p-4 text-texto no-underline hover:bg-superficie-elevada lg:border lg:border-divisor lg:p-5",
+        "flex flex-col gap-2.5 rounded-[18px] bg-superficie p-4 text-texto no-underline hover:bg-superficie lg:border lg:border-fondo lg:p-5",
         className,
       )}
     >
@@ -58,27 +58,23 @@ export function TarjetaProfesional({ profesional: p, className }: Props) {
         <Avatar
           nombre={nombre}
           src={urlFoto(p.fotoPath)}
-          className="size-[52px] bg-azul-suave text-lg font-extrabold text-sobre-azul-suave"
+          className="size-[52px] bg-superficie text-lg font-extrabold text-texto"
         />
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="text-[17px] font-bold">{nombre}</span>
-          <span className="text-sm text-texto-secundario">{linea}</span>
+          <span className="text-sm text-texto">{linea}</span>
         </div>
         {p.promedio === null ? (
-          <span className="text-sm font-bold text-texto-secundario">Nuevo</span>
+          <span className="text-sm font-bold text-texto">Nuevo</span>
         ) : (
           <span className="flex items-center gap-1 text-sm font-bold">
-            <Star
-              aria-hidden
-              strokeWidth={1.5}
-              className="size-4 fill-naranja-marca text-naranja-marca"
-            />
+            <Star aria-hidden strokeWidth={1.5} className="size-4 fill-accion text-accion" />
             <span className="sr-only">Calificación </span>
             {promedioAr.format(p.promedio)}
           </span>
         )}
       </div>
-      <CintaDistancia km={p.distanciaKm} />
+      <Distancia km={p.distanciaKm} />
       <div className="flex flex-wrap gap-1.5">
         {p.identidadVerificada ? <Insignia variante="verificada" /> : null}
         {p.antecedentesOk ? <Insignia variante="antecedentes" /> : null}

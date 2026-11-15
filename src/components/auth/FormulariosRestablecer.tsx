@@ -16,7 +16,7 @@ export function FormularioPedirRestablecer() {
     return (
       <p
         role="status"
-        className="rounded-campo bg-exito-suave p-4 text-[15px] font-semibold text-sobre-exito-suave"
+        className="rounded-campo bg-sol p-4 text-[15px] font-semibold text-sobre-sol"
       >
         {estado.exito}
       </p>

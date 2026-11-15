@@ -43,7 +43,7 @@ export function BajaDesdeFragmento({
   if (!montado) {
     return (
       <noscript>
-        <p className="text-texto-secundario">
+        <p className="text-texto">
           Activá JavaScript o ingresá a Mi cuenta para administrar los avisos.
         </p>
       </noscript>

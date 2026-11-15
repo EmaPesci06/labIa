@@ -49,7 +49,7 @@ export default async function MisDatos() {
       <div className="flex flex-col gap-1">
         <Link
           href="/cuenta"
-          className="inline-flex min-h-11 items-center gap-1 self-start rounded-campo pr-3 text-[15px] font-bold text-azul"
+          className="inline-flex min-h-11 items-center gap-1 self-start rounded-campo pr-3 text-[15px] font-bold text-texto"
         >
           <ChevronLeft aria-hidden strokeWidth={2} className="size-5" />
           Mi cuenta
@@ -62,7 +62,7 @@ export default async function MisDatos() {
       <FormularioDatos barrios={barrios} inicial={{ nombreCompleto, whatsapp, barrio }} />
 
       <section
-        className="flex flex-col gap-3.5 border-t border-divisor pt-6"
+        className="flex flex-col gap-3.5 border-t border-fondo pt-6"
         aria-labelledby="acceso"
       >
         <h2 id="acceso" className="font-titulo text-xl">

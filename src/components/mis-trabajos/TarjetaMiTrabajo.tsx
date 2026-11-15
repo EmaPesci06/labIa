@@ -20,22 +20,22 @@ function textoYClasesEstado(estado: TrabajoClienteItem["estado"]): {
     case "abierto":
       return {
         texto: "Abierto",
-        clases: "bg-azul-suave text-sobre-azul-suave",
+        clases: "bg-superficie text-texto",
       };
     case "asignado":
       return {
         texto: "Contratado",
-        clases: "bg-exito-suave text-sobre-exito-suave",
+        clases: "bg-sol text-sobre-sol",
       };
     case "cerrado":
       return {
         texto: "Terminado",
-        clases: "bg-divisor text-texto-secundario",
+        clases: "bg-fondo text-texto",
       };
     case "cancelado":
       return {
         texto: "Cancelado",
-        clases: "bg-divisor text-texto-secundario",
+        clases: "bg-fondo text-texto",
       };
   }
 }
@@ -58,9 +58,7 @@ export function TarjetaMiTrabajo({ trabajo, seleccionado = false, href }: Props)
       href={href}
       className={cn(
         "group flex flex-col gap-2 rounded-[18px] bg-superficie p-4 transition-all focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco lg:p-[18px]",
-        seleccionado
-          ? "border-2 border-azul shadow-sm dark:border-azul-suave"
-          : "border border-divisor hover:border-borde",
+        seleccionado ? "border-2 border-accion" : "border border-fondo hover:border-texto",
       )}
     >
       <div className="flex items-center justify-between gap-2">
@@ -75,11 +73,11 @@ export function TarjetaMiTrabajo({ trabajo, seleccionado = false, href }: Props)
         </span>
       </div>
 
-      <span className="font-titulo text-[17px] font-bold tracking-tight text-texto group-hover:text-azul lg:text-lg">
+      <span className="font-titulo text-[17px] font-bold tracking-tight text-texto group-hover:text-texto lg:text-lg">
         {trabajo.titulo}
       </span>
 
-      <span className="text-sm text-texto-secundario">
+      <span className="text-sm text-texto">
         {cuando} · {ETIQUETA_URGENCIA[trabajo.urgencia]} · {textoPostulantes}
       </span>
     </Link>

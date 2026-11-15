@@ -175,16 +175,14 @@ function FormularioResena({
           etiquetasPuntaje={ETIQUETAS_PUNTAJE}
           etiqueta="Calificación del profesional"
         />
-        <p aria-live="polite" className="min-h-5 text-sm font-semibold text-texto-secundario">
+        <p aria-live="polite" className="min-h-5 text-sm font-semibold text-texto">
           {ETIQUETAS_PUNTAJE[puntaje] ?? "Tocá una estrella para calificar"}
         </p>
       </div>
 
       {/* Chips rápidos */}
       <div className="flex flex-col gap-1.5">
-        <p className="text-xs font-bold text-texto-secundario">
-          Opciones rápidas para sumar al comentario
-        </p>
+        <p className="text-xs font-bold text-texto">Opciones rápidas para sumar al comentario</p>
         <div className="flex flex-wrap gap-1.5">
           {CHIPS_RAPIDOS.map((chip) => {
             const seleccionado = texto.includes(chip);
@@ -214,14 +212,14 @@ function FormularioResena({
           aria-invalid={errorTexto ? true : undefined}
           aria-describedby={errorTexto ? "error-comentario-resena" : undefined}
           placeholder="Contá cómo fue: puntualidad, prolijidad, si respetó el presupuesto."
-          className="w-full resize-none rounded-campo border border-borde bg-superficie p-3 text-[15px] leading-relaxed text-texto placeholder:text-texto-terciario focus:border-azul focus:ring-1 focus:ring-azul focus:outline-none"
+          className="w-full resize-none rounded-campo border border-texto bg-superficie p-3 text-[15px] leading-relaxed text-texto placeholder:text-texto focus:border-accion focus:ring-1 focus:ring-accion focus:outline-none"
         />
         {errorTexto ? (
           <p id="error-comentario-resena" role="alert" className="text-sm font-semibold text-error">
             {errorTexto}
           </p>
         ) : null}
-        <div className="flex justify-between text-xs text-texto-secundario">
+        <div className="flex justify-between text-xs text-texto">
           <span>Máximo 500 caracteres</span>
           <span>{texto.length}/500</span>
         </div>

@@ -3,15 +3,16 @@ import { join } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { ALIAS_TEMPORALES, TOKENS_COLOR, TOKENS_NUEVOS } from "@/lib/cn";
+import { TOKENS_COLOR } from "@/lib/cn";
 import { contraste, CSS_GLOBALS, hexDe } from "@/lib/tokens-css";
 
 const RAIZ_SRC = join(__dirname, "..");
 
-/** Valores de la tabla de tokens de docs/prototipo-nuevo/README.md. */
+/** Valores de la tabla de tokens de docs/prototipo-nuevo/README.md. `campo` no está en la tabla. */
 const CLARO_README = {
   fondo: "#FFF3D6",
   superficie: "#FFFFFF",
+  campo: "#FFFFFF",
   texto: "#123B4A",
   accion: "#0E7C86",
   "sobre-accion": "#FFFFFF",
@@ -29,6 +30,7 @@ const CLARO_README = {
 const OSCURO_README = {
   fondo: "#0B2730",
   superficie: "#17485A",
+  campo: "#0B2730",
   texto: "#FFF3D6",
   accion: "#45C4CC",
   "sobre-accion": "#0B2730",
@@ -41,32 +43,6 @@ const OSCURO_README = {
   equipo: "#17485A",
   velo: "#05161B",
   foco: "#F7C948",
-};
-
-/** Qué token nuevo usa cada alias temporal (LAB-69 los borra). */
-const ALIAS_A: Record<string, string> = {
-  azul: "accion",
-  "azul-presionado": "accion",
-  "sobre-azul": "sobre-accion",
-  "azul-suave": "superficie",
-  "sobre-azul-suave": "texto",
-  "naranja-marca": "coral",
-  "naranja-accion": "accion",
-  "sobre-naranja": "sobre-accion",
-  "naranja-suave": "sol",
-  "sobre-naranja-suave": "sobre-sol",
-  exito: "accion",
-  "sobre-exito": "sobre-accion",
-  "exito-suave": "sol",
-  "sobre-exito-suave": "sobre-sol",
-  acento: "accion",
-  "superficie-elevada": "superficie",
-  "texto-secundario": "texto",
-  "texto-terciario": "texto",
-  borde: "texto",
-  divisor: "fondo",
-  cinta: "coral",
-  "cinta-marcas": "texto",
 };
 
 describe("tokens de la paleta nueva", () => {
@@ -82,11 +58,15 @@ describe("tokens de la paleta nueva", () => {
     }
   });
 
-  it("todos los tokens nuevos y los alias resuelven a un hex en los dos temas", () => {
+  it("todos los tokens resuelven a un hex en los dos temas", () => {
     for (const nombre of TOKENS_COLOR) {
       expect(() => hexDe("claro", nombre), `claro ${nombre}`).not.toThrow();
       expect(() => hexDe("oscuro", nombre), `oscuro ${nombre}`).not.toThrow();
     }
+  });
+
+  it("los nombres de TOKENS_COLOR son los del README más campo", () => {
+    expect([...TOKENS_COLOR].sort()).toEqual(Object.keys(CLARO_README).sort());
   });
 
   it("cada token de TOKENS_COLOR está mapeado en el @theme de Tailwind", () => {
@@ -95,17 +75,24 @@ describe("tokens de la paleta nueva", () => {
     }
   });
 
-  it("cada alias temporal apunta al token nuevo previsto", () => {
-    expect(Object.keys(ALIAS_A).sort()).toEqual([...ALIAS_TEMPORALES].sort());
-    for (const [alias, destino] of Object.entries(ALIAS_A)) {
-      for (const tema of ["claro", "oscuro"] as const) {
-        expect(hexDe(tema, alias), `${tema} ${alias}`).toBe(hexDe(tema, destino));
-      }
+  it("no quedan alias de nombres viejos en globals.css", () => {
+    const viejos = [
+      "azul",
+      "naranja",
+      "exito",
+      "acento",
+      "superficie-elevada",
+      "texto-secundario",
+      "texto-terciario",
+      "borde",
+      "divisor",
+      "cinta",
+    ];
+    for (const viejo of viejos) {
+      expect(CSS_GLOBALS, viejo).not.toMatch(new RegExp(`--(color|text-color)-${viejo}\\b`));
     }
-  });
-
-  it("los nombres nuevos son los del README", () => {
-    expect([...TOKENS_NUEVOS].sort()).toEqual(Object.keys(CLARO_README).sort());
+    expect(CSS_GLOBALS).not.toContain("--font-mono");
+    expect(CSS_GLOBALS).not.toContain("--text-color-");
   });
 });
 
@@ -114,7 +101,7 @@ describe("contraste AA (≥ 4,5:1) de cada par texto/fondo, en claro y oscuro", 
   const PARES: Array<[texto: string, fondo: string]> = [
     ["texto", "fondo"],
     ["texto", "superficie"],
-    ["accion", "superficie"],
+    ["texto", "campo"],
     ["sobre-accion", "accion"],
     ["sobre-encabezado", "encabezado"],
     ["sobre-encabezado", "equipo"],
@@ -147,20 +134,6 @@ describe("contraste AA (≥ 4,5:1) de cada par texto/fondo, en claro y oscuro", 
     // Blanco sobre turquesa de encabezado: 4,95:1, apto para texto normal.
     expect(contraste("#FFFFFF", "#0E7C86")).toBeCloseTo(4.95, 1);
   });
-});
-
-describe("alias partido texto/fondo (LAB-68, lo borra LAB-69)", () => {
-  // Los alias que caían en accion y se usan como texto (enlaces, mensajes) van a texto en
-  // --text-color-*. El fondo (--color-*) sigue en accion.
-  it.each(["azul", "azul-presionado", "naranja-accion", "exito", "acento"])(
-    "text-%s va en texto y el color base sigue en accion",
-    (alias) => {
-      expect(CSS_GLOBALS).toContain(`--text-color-${alias}: var(--color-texto);`);
-      for (const tema of ["claro", "oscuro"] as const) {
-        expect(hexDe(tema, alias)).toBe(hexDe(tema, "accion"));
-      }
-    },
-  );
 
   it("el texto de los enlaces (texto) pasa AA sobre el fondo arena y la superficie", () => {
     expect(contraste(hexDe("claro", "texto"), hexDe("claro", "fondo"))).toBeGreaterThanOrEqual(4.5);

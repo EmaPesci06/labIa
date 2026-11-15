@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { Avatar } from "@/components/ui/Avatar";
 import { Aviso } from "@/components/ui/Aviso";
 import { Boton } from "@/components/ui/Boton";
-import { CintaDistancia } from "@/components/ui/cinta-metrica";
+import { Distancia } from "@/components/ui/Distancia";
 import { Insignia } from "@/components/ui/Insignia";
 import { BotonDejarResena } from "@/components/resenas/BotonDejarResena";
 import { cn } from "@/lib/cn";
@@ -75,7 +75,7 @@ function Fila({
 }) {
   return (
     <div className={cn("flex justify-between gap-4 text-[15px]", className)}>
-      <dt className="text-texto-secundario">{etiqueta}</dt>
+      <dt className="text-texto">{etiqueta}</dt>
       <dd className="text-right font-semibold">{children}</dd>
     </div>
   );
@@ -100,17 +100,17 @@ function DatosPerfil({ perfil, className }: { perfil: PerfilPublico; className?:
 
 function Puntaje({ perfil }: { perfil: PerfilPublico }) {
   if (perfil.cantidadResenas === 0 || perfil.promedio === null) {
-    return <span className="text-sm text-texto-secundario">Todavía sin reseñas</span>;
+    return <span className="text-sm text-texto">Todavía sin reseñas</span>;
   }
   return (
     <span className="flex items-center gap-1 text-sm font-bold lg:text-[15px]">
       <Star
         aria-hidden
         strokeWidth={1.5}
-        className="size-4 fill-naranja-marca text-naranja-marca lg:size-[18px]"
+        className="size-4 fill-accion text-accion lg:size-[18px]"
       />
       {formatearPromedio(perfil.promedio)}
-      <span className="font-normal text-texto-secundario">
+      <span className="font-normal text-texto">
         <span className="lg:hidden">· {textoCantidadResenas(perfil.cantidadResenas)}</span>
         <span className="hidden lg:inline">({textoCantidadResenas(perfil.cantidadResenas)})</span>
       </span>
@@ -124,9 +124,7 @@ function BannerDuenio({ publicado }: { publicado: boolean }) {
       role="status"
       className={cn(
         "rounded-[14px] p-3.5 text-[15px] leading-snug font-semibold",
-        publicado
-          ? "bg-exito-suave text-sobre-exito-suave"
-          : "bg-naranja-suave text-sobre-naranja-suave",
+        publicado ? "bg-sol text-sobre-sol" : "bg-sol text-sobre-sol",
       )}
     >
       {publicado
@@ -181,14 +179,14 @@ export function PerfilProfesional({
                 <h1 className="font-titulo text-[26px] leading-tight lg:text-[40px] lg:tracking-[-1px]">
                   {perfil.nombre}
                 </h1>
-                <p className="text-[15px] text-texto-secundario lg:text-[17px]">
+                <p className="text-[15px] text-texto lg:text-[17px]">
                   {lineaOficio(perfil.oficios, perfil.aniosExperiencia)}
                   {perfil.zonasTexto ? (
                     <span className="hidden lg:inline"> · {perfil.zonasTexto}</span>
                   ) : null}
                 </p>
                 {distanciaKm !== null ? (
-                  <CintaDistancia km={distanciaKm} sufijo="de vos" className="lg:hidden" />
+                  <Distancia km={distanciaKm} sufijo="de vos" className="lg:hidden" />
                 ) : null}
                 <Puntaje perfil={perfil} />
               </div>
@@ -207,7 +205,7 @@ export function PerfilProfesional({
                   {especialidades.map((e) => (
                     <li
                       key={e}
-                      className="rounded-full border border-borde bg-superficie px-3.5 py-2 text-sm font-semibold"
+                      className="rounded-full border border-texto bg-superficie px-3.5 py-2 text-sm font-semibold"
                     >
                       {e}
                     </li>
@@ -216,9 +214,9 @@ export function PerfilProfesional({
               ) : null}
             </section>
           ) : esPropio ? (
-            <p className="rounded-[14px] bg-superficie p-3.5 text-[15px] text-texto-secundario">
+            <p className="rounded-[14px] bg-superficie p-3.5 text-[15px] text-texto">
               Contá cómo trabajás: sumá una descripción en{" "}
-              <Link href="/cuenta/perfil" className="font-bold text-azul underline">
+              <Link href="/cuenta/perfil" className="font-bold text-texto underline">
                 Editar perfil
               </Link>
               .
@@ -244,7 +242,7 @@ export function PerfilProfesional({
               <div className="flex items-center gap-2">
                 <h2 className="text-[17px] font-bold lg:text-xl">Reseñas</h2>
                 {perfil.promedio !== null && perfil.cantidadResenas > 0 ? (
-                  <span className="text-sm font-semibold text-texto-secundario">
+                  <span className="text-sm font-semibold text-texto">
                     · {formatearPromedio(perfil.promedio)} (
                     {textoCantidadResenas(perfil.cantidadResenas)})
                   </span>
@@ -274,15 +272,15 @@ export function PerfilProfesional({
               texto="Reportar perfil"
               estaAutenticado={!hrefIngreso}
               hrefIngreso={hrefIngreso}
-              className="flex min-h-11 items-center justify-center text-sm text-texto-terciario underline lg:hidden"
+              className="flex min-h-11 items-center justify-center text-sm text-texto underline lg:hidden"
             />
           )}
         </div>
 
         <aside className="hidden flex-col gap-4 lg:sticky lg:top-24 lg:flex lg:flex-1 lg:basis-80">
-          <div className="flex flex-col gap-3.5 rounded-[20px] border border-divisor bg-superficie p-[22px]">
+          <div className="flex flex-col gap-3.5 rounded-[20px] border border-fondo bg-superficie p-[22px]">
             <Insignias perfil={perfil} />
-            {distanciaKm !== null ? <CintaDistancia km={distanciaKm} sufijo="de vos" /> : null}
+            {distanciaKm !== null ? <Distancia km={distanciaKm} sufijo="de vos" /> : null}
             <DatosPerfil perfil={perfil} />
             {esPropio ? (
               <Boton href="/cuenta/perfil" variante="cliente" tamano="grande" bloque>
@@ -300,7 +298,7 @@ export function PerfilProfesional({
                   texto="Reportar perfil"
                   estaAutenticado={!hrefIngreso}
                   hrefIngreso={hrefIngreso}
-                  className="flex min-h-11 items-center justify-center text-sm text-texto-terciario underline"
+                  className="flex min-h-11 items-center justify-center text-sm text-texto underline"
                 />
               </>
             )}
@@ -322,7 +320,7 @@ export function PerfilProfesional({
           Editar perfil
         </Boton>
       ) : hayContacto ? (
-        <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 border-t border-divisor bg-fondo px-5 py-3 lg:hidden">
+        <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 border-t border-fondo bg-fondo px-5 py-3 lg:hidden">
           <BotonContactar hrefIngreso={hrefIngreso} profesionalId={idContacto} />
         </div>
       ) : null}

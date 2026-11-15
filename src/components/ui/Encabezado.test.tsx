@@ -1,0 +1,101 @@
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+
+import { formatearDistancia } from "@/lib/formato";
+
+import { Chip, GrupoChips } from "./Chip";
+import { Distancia } from "./Distancia";
+import { Encabezado } from "./Encabezado";
+
+describe("Encabezado", () => {
+  it("por defecto es turquesa, con h1 y bordes inferiores redondeados", () => {
+    render(<Encabezado titulo="Mi perfil" />);
+    const encabezado = screen.getByRole("banner");
+    expect(encabezado).toHaveAttribute("data-encabezado", "turquesa");
+    expect(encabezado).toHaveClass("bg-encabezado", "text-sobre-encabezado", "rounded-b-[28px]");
+    expect(screen.getByRole("heading", { level: 1, name: "Mi perfil" })).toBeInTheDocument();
+  });
+
+  it("variante equipo para el panel de admin", () => {
+    render(<Encabezado variante="equipo" titulo="Verificaciones" />);
+    expect(screen.getByRole("banner")).toHaveClass("bg-equipo", "text-sobre-encabezado");
+  });
+
+  it("variante sol: texto azul noche", () => {
+    render(<Encabezado variante="sol" titulo="Trabajos para vos" />);
+    const encabezado = screen.getByRole("banner");
+    expect(encabezado).toHaveAttribute("data-encabezado", "sol");
+    expect(encabezado).toHaveClass("bg-sol", "text-sobre-sol");
+  });
+
+  it("variante plano: sin bloque de color ni redondeo", () => {
+    render(<Encabezado variante="plano" titulo="Mis postulaciones" />);
+    const encabezado = screen.getByRole("banner");
+    expect(encabezado).toHaveAttribute("data-encabezado", "plano");
+    expect(encabezado).toHaveClass("bg-transparent", "text-texto");
+    expect(encabezado).not.toHaveClass("rounded-b-[28px]");
+  });
+
+  it("volver es un enlace de al menos 44 px, con 'Volver' por defecto", () => {
+    render(<Encabezado titulo="Trabajo" volver={{ href: "/trabajos" }} />);
+    const enlace = screen.getByRole("link", { name: "Volver" });
+    expect(enlace).toHaveAttribute("href", "/trabajos");
+    expect(enlace).toHaveClass("min-h-11");
+  });
+
+  it("acepta descripción y contenido (chips, filtros)", () => {
+    render(
+      <Encabezado variante="sol" titulo="Trabajos" descripcion="Cerca de vos">
+        <p>Contenido extra</p>
+      </Encabezado>,
+    );
+    expect(screen.getByText("Cerca de vos")).toBeInTheDocument();
+    expect(screen.getByText("Contenido extra")).toBeInTheDocument();
+  });
+
+  it("un chip elegido dentro de un encabezado sol pasa a azul noche con texto blanco", () => {
+    render(
+      <Encabezado variante="sol" titulo="Trabajos">
+        <GrupoChips
+          tipo="unica"
+          etiqueta="Oficio"
+          valor="todos"
+          onChange={() => {}}
+          opciones={[
+            { valor: "todos", etiqueta: "Todos" },
+            { valor: "gas", etiqueta: "Gas" },
+          ]}
+        />
+      </Encabezado>,
+    );
+    const elegido = screen.getByRole("radio", { name: "Todos" }).querySelector("span");
+    expect(elegido).toHaveClass(
+      "bg-sol",
+      "in-data-[encabezado=sol]:bg-sobre-sol",
+      "in-data-[encabezado=sol]:text-sobre-encabezado",
+    );
+    const sinElegir = screen.getByRole("radio", { name: "Gas" }).querySelector("span");
+    expect(sinElegir).toHaveClass("bg-superficie");
+  });
+
+  it("un chip suelto (fuera de un encabezado) elegido queda sol con texto azul noche", () => {
+    render(<Chip seleccionado>Gas</Chip>);
+    expect(screen.getByRole("button", { name: "Gas" }).querySelector("span")).toHaveClass(
+      "bg-sol",
+      "text-sobre-sol",
+    );
+  });
+});
+
+describe("Distancia", () => {
+  it("muestra la distancia con el formato de la app en una pastilla sol", () => {
+    render(<Distancia km={1.2} />);
+    const texto = screen.getByText(formatearDistancia(1.2));
+    expect(texto).toHaveClass("bg-sol", "text-sobre-sol", "rounded-full");
+  });
+
+  it("admite sufijo", () => {
+    render(<Distancia km={0.8} sufijo="de vos" />);
+    expect(screen.getByText(`${formatearDistancia(0.8)} de vos`)).toBeInTheDocument();
+  });
+});

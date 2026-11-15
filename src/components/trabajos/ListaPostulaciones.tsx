@@ -44,25 +44,25 @@ export function ListaPostulaciones({ postulaciones }: ListaPostulacionesProps) {
           <Tarjeta key={p.id} borde className="flex flex-col gap-3 p-5">
             <div className="flex items-start justify-between gap-3">
               <EtiquetaMono partes={[oficioEtiqueta, barrioTrabajo]} />
-              <span className="shrink-0 text-sm text-texto-secundario">{cuando}</span>
+              <span className="shrink-0 text-sm text-texto">{cuando}</span>
             </div>
 
             <div>
               <Link
                 href={`/trabajos/${p.trabajoId}`}
-                className="rounded text-[17px] leading-snug font-bold text-texto hover:underline focus-visible:ring-2 focus-visible:ring-naranja-accion focus-visible:outline-none"
+                className="rounded text-[17px] leading-snug font-bold text-texto hover:underline focus-visible:ring-2 focus-visible:ring-accion focus-visible:outline-none"
               >
                 {tituloTrabajo}
               </Link>
             </div>
 
             {p.mensaje ? (
-              <p className="line-clamp-2 text-[15px] leading-snug text-texto-secundario">
+              <p className="line-clamp-2 text-[15px] leading-snug text-texto">
                 &ldquo;{p.mensaje}&rdquo;
               </p>
             ) : null}
 
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-texto-secundario">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-texto">
               {p.precioEstimado ? (
                 <span>
                   Presupuesto:{" "}
@@ -77,7 +77,7 @@ export function ListaPostulaciones({ postulaciones }: ListaPostulacionesProps) {
               ) : null}
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-divisor pt-2">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-fondo pt-2">
               <div className="flex flex-wrap items-center gap-2">
                 {p.estado === "enviada" ? <Insignia variante="verificada">Enviada</Insignia> : null}
                 {p.estado === "elegida" ? (
@@ -89,12 +89,12 @@ export function ListaPostulaciones({ postulaciones }: ListaPostulacionesProps) {
                   </div>
                 ) : null}
                 {p.estado === "descartada" ? (
-                  <span className="inline-flex items-center rounded-full bg-superficie-elevada px-2.5 py-1 text-xs font-bold text-texto-secundario">
+                  <span className="inline-flex items-center rounded-full bg-superficie px-2.5 py-1 text-xs font-bold text-texto">
                     Eligieron a otro profesional
                   </span>
                 ) : null}
                 {p.estado === "retirada" ? (
-                  <span className="inline-flex items-center rounded-full bg-superficie-elevada px-2.5 py-1 text-xs font-bold text-texto-secundario">
+                  <span className="inline-flex items-center rounded-full bg-superficie px-2.5 py-1 text-xs font-bold text-texto">
                     Retirada
                   </span>
                 ) : null}

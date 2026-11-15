@@ -61,7 +61,7 @@ export default async function Trabajos({ searchParams }: PaginaTrabajosProps) {
               <h1 className="font-titulo text-2xl font-extrabold tracking-tight text-texto lg:text-[34px]">
                 Mis postulaciones
               </h1>
-              <p className="text-sm text-texto-secundario lg:text-[15px]">
+              <p className="text-sm text-texto lg:text-[15px]">
                 Seguí el estado de los trabajos a los que te postulaste.
               </p>
             </div>
@@ -127,7 +127,7 @@ export default async function Trabajos({ searchParams }: PaginaTrabajosProps) {
             <h1 className="font-titulo text-2xl font-extrabold tracking-tight text-texto lg:text-[34px]">
               Trabajos para vos
             </h1>
-            <p className="text-sm text-texto-secundario lg:text-[15px]">{bajada}</p>
+            <p className="text-sm text-texto lg:text-[15px]">{bajada}</p>
           </div>
           <div className="shrink-0 lg:hidden">
             <Avatar nombre={sesion.perfil.nombreVisible} tamano={44} />
@@ -155,7 +155,7 @@ export default async function Trabajos({ searchParams }: PaginaTrabajosProps) {
           Ver más
         </Boton>
       ) : alcanzoElTopeDePaginas(trabajos.length, total, pagina) ? (
-        <p className="text-center text-[15px] text-texto-secundario">
+        <p className="text-center text-[15px] text-texto">
           Refiná los filtros para ver menos trabajos.
         </p>
       ) : null}

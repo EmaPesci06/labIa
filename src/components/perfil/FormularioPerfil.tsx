@@ -46,7 +46,7 @@ export function FormularioPerfil({ valores, barrios, hrefPerfil }: Props) {
           {OFICIOS.map((oficio) => (
             <label
               key={oficio}
-              className="flex min-h-11 items-center gap-2.5 rounded-campo border border-borde bg-superficie px-3 text-[15px]"
+              className="flex min-h-11 items-center gap-2.5 rounded-campo border border-texto bg-superficie px-3 text-[15px]"
             >
               <input
                 type="checkbox"
@@ -59,9 +59,7 @@ export function FormularioPerfil({ valores, barrios, hrefPerfil }: Props) {
             </label>
           ))}
         </div>
-        <p className="text-sm text-texto-terciario">
-          Para ofrecer gas necesitás la matrícula verificada.
-        </p>
+        <p className="text-sm text-texto">Para ofrecer gas necesitás la matrícula verificada.</p>
         {errores.oficios ? (
           <p id="e-oficios" className="text-sm font-semibold text-error">
             {errores.oficios}
@@ -121,7 +119,7 @@ export function FormularioPerfil({ valores, barrios, hrefPerfil }: Props) {
             tabIndex={0}
             role="group"
             aria-label="Barrios"
-            className="grid max-h-64 grid-cols-1 gap-1 overflow-y-auto rounded-campo border border-borde bg-superficie p-2 sm:grid-cols-2"
+            className="grid max-h-64 grid-cols-1 gap-1 overflow-y-auto rounded-campo border border-texto bg-superficie p-2 sm:grid-cols-2"
           >
             {barrios.map((barrio) => (
               <label
@@ -140,7 +138,7 @@ export function FormularioPerfil({ valores, barrios, hrefPerfil }: Props) {
             ))}
           </div>
         )}
-        <p className="text-sm text-texto-terciario">Hasta 10 barrios.</p>
+        <p className="text-sm text-texto">Hasta 10 barrios.</p>
         {errores.zonas ? (
           <p id="e-zonas" className="text-sm font-semibold text-error">
             {errores.zonas}

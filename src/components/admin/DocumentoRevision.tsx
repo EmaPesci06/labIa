@@ -7,8 +7,8 @@ import { FormularioDecision } from "./FormularioDecision";
 import { VisorDocumento } from "./VisorDocumento";
 
 const ESTILO_ESTADO = {
-  pendiente: "bg-naranja-suave text-sobre-naranja-suave",
-  aprobado: "bg-exito-suave text-sobre-exito-suave",
+  pendiente: "bg-sol text-sobre-sol",
+  aprobado: "bg-sol text-sobre-sol",
   rechazado: "border border-error bg-superficie text-error",
 } as const;
 
@@ -35,19 +35,19 @@ export function DocumentoRevision({ documento }: { documento: DocumentoAdmin }) 
         </span>
       </div>
 
-      <p className="text-sm text-texto-secundario">
+      <p className="text-sm text-texto">
         Enviado {haceCuanto(documento.createdAt)}
         {documento.revisadoAt ? ` · revisado ${haceCuanto(documento.revisadoAt)}` : ""}
       </p>
 
       {documento.estado === "rechazado" && documento.motivoRechazo ? (
-        <p className="rounded-[12px] bg-naranja-suave p-3 text-sm text-sobre-naranja-suave">
+        <p className="rounded-[12px] bg-sol p-3 text-sm text-sobre-sol">
           Motivo: {documento.motivoRechazo}
         </p>
       ) : null}
 
       {documento.archivoBorrado ? (
-        <p className="text-sm text-texto-secundario">
+        <p className="text-sm text-texto">
           El archivo se borró según la política de retención. Queda el registro de la decisión.
         </p>
       ) : (

@@ -1,5 +1,5 @@
 import { textoPostulantes } from "@/components/TarjetaTrabajo";
-import { CintaDistancia } from "@/components/ui/cinta-metrica";
+import { Distancia } from "@/components/ui/Distancia";
 import { EtiquetaMono } from "@/components/ui/EtiquetaMono";
 import { Insignia } from "@/components/ui/Insignia";
 import { formatearPesos, haceCuanto } from "@/lib/formato";
@@ -31,7 +31,7 @@ export function DetalleTrabajoEscritorio({
     return (
       <section
         aria-label="Detalle del trabajo"
-        className="flex min-h-[380px] flex-1 items-center justify-center rounded-[22px] border border-divisor bg-superficie p-8 text-center text-[17px] text-texto-secundario"
+        className="flex min-h-[380px] flex-1 items-center justify-center rounded-[22px] border border-fondo bg-superficie p-8 text-center text-[17px] text-texto"
       >
         Elegí un trabajo para ver el detalle.
       </section>
@@ -47,18 +47,18 @@ export function DetalleTrabajoEscritorio({
   return (
     <section
       aria-label={`Detalle: ${trabajo.titulo}`}
-      className="flex flex-1 flex-col gap-5 rounded-[22px] border border-divisor bg-superficie p-7"
+      className="flex flex-1 flex-col gap-5 rounded-[22px] border border-fondo bg-superficie p-7"
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <EtiquetaMono partes={[ETIQUETA_OFICIO[trabajo.oficio], trabajo.barrioNombre]} />
-        <span className="text-sm text-texto-secundario">{cuando}</span>
+        <span className="text-sm text-texto">{cuando}</span>
       </div>
 
       <div className="flex flex-col gap-2">
         <h2 className="font-titulo text-2xl font-extrabold tracking-tight text-texto lg:text-[28px]">
           {trabajo.titulo}
         </h2>
-        {trabajo.distanciaKm !== null ? <CintaDistancia km={trabajo.distanciaKm} /> : null}
+        {trabajo.distanciaKm !== null ? <Distancia km={trabajo.distanciaKm} /> : null}
       </div>
 
       <p className="text-[17px] leading-relaxed whitespace-pre-line text-texto">
@@ -70,12 +70,12 @@ export function DetalleTrabajoEscritorio({
       ) : null}
 
       {trabajo.presupuestoEstimado !== null ? (
-        <p className="text-sm font-semibold text-texto-secundario">
+        <p className="text-sm font-semibold text-texto">
           El cliente estima {formatearPesos(trabajo.presupuestoEstimado)}
         </p>
       ) : null}
 
-      <div className="flex flex-wrap items-center gap-3 pt-2 text-sm text-texto-secundario">
+      <div className="flex flex-wrap items-center gap-3 pt-2 text-sm text-texto">
         <span className="font-medium text-texto">Cliente: {clienteNombreVisible}</span>
         <span>·</span>
         <span>La dirección se comparte al acordar</span>
@@ -85,12 +85,12 @@ export function DetalleTrabajoEscritorio({
         <Insignia variante={trabajo.urgencia === "lo_antes_posible" ? "urgencia" : "verificada"}>
           {ETIQUETA_URGENCIA[trabajo.urgencia]}
         </Insignia>
-        <span className="text-sm font-semibold text-texto-secundario">
+        <span className="text-sm font-semibold text-texto">
           {textoPostulantes(trabajo.cantidadPostulaciones)}
         </span>
       </div>
 
-      <div className="mt-2 border-t border-divisor pt-4">
+      <div className="mt-2 border-t border-fondo pt-4">
         <FormularioPostulacion
           key={trabajo.id}
           trabajoId={trabajo.id}

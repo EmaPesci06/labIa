@@ -89,9 +89,7 @@ export function MaestroDetalleTrabajos({
                 distanciaKm={t.distanciaKm}
                 yaMePostule={t.yaMePostule}
                 href={`/trabajos/${t.id}`}
-                className={
-                  seleccionado ? "shadow-sm ring-2 ring-naranja-accion transition-all" : undefined
-                }
+                className={seleccionado ? "shadow-sm ring-2 ring-accion transition-all" : undefined}
               />
             </li>
           );

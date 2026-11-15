@@ -65,13 +65,13 @@ const TEXTO_ESTADO: Record<
 };
 
 const COLOR_TONO: Record<TonoEstado, string> = {
-  azul: "bg-azul-suave text-sobre-azul-suave",
-  exito: "bg-exito-suave text-sobre-exito-suave",
-  neutro: "border border-divisor bg-superficie-elevada text-texto",
+  azul: "bg-superficie text-texto",
+  exito: "bg-sol text-sobre-sol",
+  neutro: "border border-fondo bg-superficie text-texto",
 };
 
 const CLASE_VER_MAS =
-  "mt-2 flex min-h-[48px] items-center justify-center rounded-xl bg-superficie text-[15px] font-bold text-texto transition-colors hover:bg-superficie-elevada focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco";
+  "mt-2 flex min-h-[48px] items-center justify-center rounded-xl bg-superficie text-[15px] font-bold text-texto transition-colors hover:bg-superficie focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco";
 
 /**
  * Formulario para que el profesional se postule a un trabajo, y el resumen de su postulación
@@ -94,8 +94,8 @@ export function FormularioPostulacion({
   // 1. Trabajo no abierto
   if (trabajoEstado !== "abierto") {
     return (
-      <div className="flex flex-col gap-4 rounded-[18px] border border-divisor bg-superficie p-5">
-        <p className="text-center text-sm font-semibold text-texto-secundario">
+      <div className="flex flex-col gap-4 rounded-[18px] border border-fondo bg-superficie p-5">
+        <p className="text-center text-sm font-semibold text-texto">
           Este trabajo ya no recibe postulaciones.
         </p>
         {postulacionInicial ? (
@@ -108,9 +108,9 @@ export function FormularioPostulacion({
   // 2. Profesional en revisión (no publicado)
   if (!publicado) {
     return (
-      <div className="flex flex-col gap-3 rounded-[18px] border border-borde bg-superficie p-5">
+      <div className="flex flex-col gap-3 rounded-[18px] border border-texto bg-superficie p-5">
         <h2 className="font-titulo text-lg font-bold text-texto">Postularme</h2>
-        <p className="text-sm font-semibold text-texto-secundario">
+        <p className="text-sm font-semibold text-texto">
           Vas a poder postularte cuando aprobemos tus documentos.
         </p>
       </div>
@@ -151,7 +151,7 @@ export function FormularioPostulacion({
       action={accion}
       noValidate
       aria-describedby={estado.mensaje ? idError : undefined}
-      className="flex flex-col gap-4 rounded-[18px] border border-borde bg-superficie p-5"
+      className="flex flex-col gap-4 rounded-[18px] border border-texto bg-superficie p-5"
     >
       <h2 className="font-titulo text-lg font-bold text-texto">Postularme</h2>
 
@@ -159,7 +159,7 @@ export function FormularioPostulacion({
         <p
           id={idError}
           role="alert"
-          className="rounded-lg bg-naranja-suave p-3 text-sm font-semibold text-sobre-naranja-suave"
+          className="rounded-lg bg-sol p-3 text-sm font-semibold text-sobre-sol"
         >
           {estado.mensaje}
         </p>
@@ -195,7 +195,7 @@ export function FormularioPostulacion({
         />
       </div>
 
-      <p className="text-xs leading-relaxed text-texto-terciario">
+      <p className="text-xs leading-relaxed text-texto">
         La seña se acuerda con el cliente y queda escrita en el presupuesto. LabÍA no cobra ni
         retiene pagos.
       </p>
@@ -247,16 +247,14 @@ function DatosPostulacion({
   const tienePrecio = postulacion.precioEstimado !== null;
   const tieneSena = postulacion.senaPropuesta !== null;
   return (
-    <div className="rounded-xl border border-borde/50 bg-superficie p-4 text-texto">
-      <p className="text-xs font-semibold tracking-wider text-texto-secundario uppercase">
-        {titulo}
-      </p>
+    <div className="rounded-xl border border-texto/50 bg-superficie p-4 text-texto">
+      <p className="text-xs font-semibold tracking-wider text-texto uppercase">{titulo}</p>
       <p className="mt-1.5 text-sm whitespace-pre-line text-texto">{postulacion.mensaje}</p>
       {tienePrecio || tieneSena ? (
-        <div className="mt-3 flex flex-wrap gap-4 border-t border-divisor pt-2 text-xs">
+        <div className="mt-3 flex flex-wrap gap-4 border-t border-fondo pt-2 text-xs">
           {postulacion.precioEstimado !== null ? (
             <div>
-              <span className="text-texto-secundario">Precio estimado: </span>
+              <span className="text-texto">Precio estimado: </span>
               <span className="font-bold text-texto">
                 {formatearPesos(postulacion.precioEstimado)}
               </span>
@@ -264,7 +262,7 @@ function DatosPostulacion({
           ) : null}
           {postulacion.senaPropuesta !== null ? (
             <div>
-              <span className="text-texto-secundario">Seña propuesta: </span>
+              <span className="text-texto">Seña propuesta: </span>
               <span className="font-bold text-texto">
                 {formatearPesos(postulacion.senaPropuesta)}
               </span>

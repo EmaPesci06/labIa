@@ -123,7 +123,7 @@ export function HojaContacto({
             variante="fantasma"
             bloque
             onClick={() => onCambioAbierta(false)}
-            className="lg:border-[1.5px] lg:border-borde lg:bg-superficie lg:text-texto lg:hover:bg-azul-suave"
+            className="lg:border-[1.5px] lg:border-texto lg:bg-superficie lg:text-texto lg:hover:bg-superficie"
           >
             Cancelar
           </Boton>

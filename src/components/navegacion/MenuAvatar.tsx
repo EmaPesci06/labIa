@@ -16,7 +16,7 @@ type Props = {
 };
 
 const ITEM =
-  "flex min-h-11 w-full items-center gap-3 rounded-campo px-3 text-[15px] font-semibold text-texto hover:bg-azul-suave";
+  "flex min-h-11 w-full items-center gap-3 rounded-campo px-3 text-[15px] font-semibold text-texto hover:bg-superficie";
 
 /**
  * Avatar de la barra superior con un panel desplegable: Mi cuenta, Tema y Salir.
@@ -67,23 +67,23 @@ export function MenuAvatar({ nombre, rol }: Props) {
       >
         <Avatar
           nombre={nombre}
-          className={cn(rol === "profesional" && "bg-naranja-accion text-sobre-naranja")}
+          className={cn(rol === "profesional" && "bg-accion text-sobre-accion")}
         />
       </button>
       {abierto ? (
         <div
           id={idPanel}
-          className="absolute top-full right-0 z-50 mt-2 flex w-72 flex-col gap-3 rounded-tarjeta border border-borde bg-superficie p-3 shadow-lg"
+          className="absolute top-full right-0 z-50 mt-2 flex w-72 flex-col gap-3 rounded-tarjeta border border-texto bg-superficie p-3 shadow-lg"
         >
-          <p className="truncate px-3 pt-1 text-sm font-bold text-texto-secundario">{nombre}</p>
+          <p className="truncate px-3 pt-1 text-sm font-bold text-texto">{nombre}</p>
           <Link href="/cuenta" className={ITEM} onClick={() => setAbierto(false)}>
             <UserRound aria-hidden strokeWidth={2} className="size-5" />
             Mi cuenta
           </Link>
-          <div className="border-t border-divisor px-3 pt-3">
+          <div className="border-t border-fondo px-3 pt-3">
             <SelectorTema />
           </div>
-          <div className="border-t border-divisor pt-2">
+          <div className="border-t border-fondo pt-2">
             <BotonSalir />
           </div>
         </div>

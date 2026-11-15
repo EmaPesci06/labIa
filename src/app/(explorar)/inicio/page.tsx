@@ -38,7 +38,7 @@ export default async function Inicio() {
       ) : null}
 
       <div className="flex flex-col gap-1">
-        <p className="text-[15px] text-texto-secundario">{nombre ? `Hola, ${nombre}` : "Hola"}</p>
+        <p className="text-[15px] text-texto">{nombre ? `Hola, ${nombre}` : "Hola"}</p>
         <h1 className="font-titulo text-[30px] leading-[1.1] tracking-[-0.5px]">
           ¿Qué necesitás arreglar?
         </h1>

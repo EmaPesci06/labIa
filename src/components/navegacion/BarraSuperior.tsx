@@ -22,7 +22,7 @@ export function BarraSuperior({ navegacion, rol, nombre }: Props) {
   return (
     <header
       data-barra-superior=""
-      className="hidden h-[72px] shrink-0 items-center justify-between gap-6 border-b border-divisor bg-superficie px-10 lg:flex"
+      className="hidden h-[72px] shrink-0 items-center justify-between gap-6 border-b border-fondo bg-superficie px-10 lg:flex"
     >
       <Link
         href="/inicio"

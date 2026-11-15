@@ -31,7 +31,7 @@ describe("TarjetaTrabajo", () => {
     expect(screen.getByText("a 1,2 km")).toBeInTheDocument();
   });
 
-  it("sin fecha dice recién y sin distancia no dibuja la cinta", () => {
+  it("sin fecha dice recién y sin distancia no muestra la distancia", () => {
     render(
       <TarjetaTrabajo
         oficio="pintura"

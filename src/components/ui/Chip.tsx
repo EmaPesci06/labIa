@@ -5,7 +5,7 @@ import { useId, type KeyboardEvent, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
 type PropsChip = {
-  /** Si el chip está activo (relleno de azul). */
+  /** Si el chip está elegido (sol; azul noche dentro de un encabezado sol). */
   seleccionado: boolean;
   onClick?: () => void;
   /**
@@ -20,8 +20,12 @@ type PropsChip = {
 };
 
 /**
- * Chip de filtro seleccionable: píldora de 40 px de alto dentro de un objetivo táctil de 44 px.
- * Inactivo: superficie con borde de 1,5 px. Activo: relleno de azul.
+ * Chip de filtro: pastilla de 46 px de alto dentro de un objetivo táctil de 44 px mínimo.
+ * Sin elegir: superficie blanca. Elegido: sol con texto azul noche.
+ *
+ * Dentro de un `<Encabezado variante="sol">` (ese encabezado marca `data-encabezado="sol"`), el chip
+ * elegido pasa a azul noche (token sobre-sol) con texto blanco en los dos modos: sobre sol el amarillo no
+ * se distingue. Se resuelve con la variante `in-data-*` de Tailwind, sin prop extra.
  */
 export function Chip({
   seleccionado,
@@ -42,14 +46,17 @@ export function Chip({
       disabled={disabled}
       tabIndex={tabIndex}
       onClick={onClick}
-      className={cn("group flex min-h-11 items-center rounded-full disabled:opacity-50", className)}
+      className={cn(
+        "group inline-flex min-h-11 items-center rounded-full disabled:opacity-50",
+        className,
+      )}
     >
       <span
         className={cn(
-          "flex h-10 items-center rounded-full border-[1.5px] px-3.5 text-sm font-semibold whitespace-nowrap transition-colors",
+          "flex h-[46px] items-center rounded-full px-4 text-base font-bold whitespace-nowrap transition-colors",
           seleccionado
-            ? "border-azul bg-azul text-sobre-azul"
-            : "border-borde bg-superficie text-texto group-hover:bg-azul-suave",
+            ? "bg-sol text-sobre-sol in-data-[encabezado=sol]:bg-sobre-sol in-data-[encabezado=sol]:text-sobre-encabezado"
+            : "bg-superficie text-texto group-hover:bg-sol/40",
         )}
       >
         {children}

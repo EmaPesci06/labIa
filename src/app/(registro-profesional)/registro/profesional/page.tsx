@@ -17,7 +17,7 @@ async function Contenido() {
     return (
       <div className="mx-auto flex max-w-[480px] flex-col gap-4 pt-4">
         <h1 className="font-titulo text-[30px] leading-tight">Tu cuenta no es de profesional</h1>
-        <p role="status" className="text-[15px] text-texto-secundario">
+        <p role="status" className="text-[15px] text-texto">
           Para ofrecer tus servicios necesitás una cuenta de profesional. Salí de esta sesión y creá
           una nueva con otro email.
         </p>
@@ -45,7 +45,7 @@ async function Contenido() {
 export default function RegistroProfesional() {
   return (
     <EstructuraRegistro paso={1}>
-      <Suspense fallback={<p className="text-texto-secundario">Cargando…</p>}>
+      <Suspense fallback={<p className="text-texto">Cargando…</p>}>
         <Contenido />
       </Suspense>
     </EstructuraRegistro>

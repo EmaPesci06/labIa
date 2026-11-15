@@ -11,9 +11,9 @@ export default function RegistroProfesionalListo() {
   return (
     <EstructuraRegistro paso={2}>
       <div className="mx-auto flex max-w-[480px] flex-col items-center gap-4 pt-8 text-center">
-        <CheckCircle2 aria-hidden strokeWidth={2} className="size-14 text-exito" />
+        <CheckCircle2 aria-hidden strokeWidth={2} className="size-14 text-texto" />
         <h1 className="font-titulo text-[30px] leading-tight">¡Listo!</h1>
-        <p className="text-[17px] leading-snug text-texto-secundario">
+        <p className="text-[17px] leading-snug text-texto">
           Estamos revisando tus documentos. Mientras tanto ya podés ver trabajos.
         </p>
         <Boton href="/trabajos" variante="profesional" tamano="grande" bloque>

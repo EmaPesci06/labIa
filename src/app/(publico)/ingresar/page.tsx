@@ -28,21 +28,18 @@ async function Contenido({ searchParams }: PageProps<"/ingresar">) {
   return (
     <>
       {error ? (
-        <p
-          role="alert"
-          className="rounded-campo bg-naranja-suave p-3.5 text-sm font-semibold text-sobre-naranja-suave"
-        >
+        <p role="alert" className="rounded-campo bg-sol p-3.5 text-sm font-semibold text-sobre-sol">
           {error}
         </p>
       ) : null}
       <BotonGoogle volver={volver} />
       <SeparadorO />
       <FormularioIngreso volver={volver} />
-      <p className="pt-2 text-center text-[15px] text-texto-secundario">
+      <p className="pt-2 text-center text-[15px] text-texto">
         ¿Todavía no tenés cuenta?{" "}
         <Link
           href="/"
-          className="inline-block py-3 font-bold text-azul underline underline-offset-2"
+          className="inline-block py-3 font-bold text-texto underline underline-offset-2"
         >
           Crear cuenta
         </Link>

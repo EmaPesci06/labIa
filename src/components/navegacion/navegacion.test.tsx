@@ -42,14 +42,14 @@ describe("BarraInferior", () => {
     render(<BarraInferior destinos={cliente.celular} rol="cliente" />);
     const activo = screen.getByRole("link", { name: "Mis trabajos" });
     expect(activo).toHaveAttribute("aria-current", "page");
-    expect(activo).toHaveClass("text-azul", "font-bold");
+    expect(activo).toHaveClass("text-texto", "font-bold");
     expect(screen.getByRole("link", { name: "Inicio" })).not.toHaveAttribute("aria-current");
   });
 
   it("en el profesional el activo va en naranja de acción", () => {
     ruta.path = "/trabajos";
     render(<BarraInferior destinos={profesional.celular} rol="profesional" />);
-    expect(screen.getByRole("link", { name: "Trabajos" })).toHaveClass("text-naranja-accion");
+    expect(screen.getByRole("link", { name: "Trabajos" })).toHaveClass("text-texto");
   });
 
   it("distingue Trabajos de Postulaciones por ?vista=mias", () => {
@@ -168,7 +168,7 @@ describe("Esqueleto", () => {
     const { container } = render(<Bloque className="h-4" />);
     const bloque = container.firstElementChild;
     expect(bloque).toHaveAttribute("aria-hidden", "true");
-    expect(bloque).toHaveClass("bg-divisor", "motion-safe:animate-pulse");
+    expect(bloque).toHaveClass("bg-fondo", "motion-safe:animate-pulse");
   });
 
   it("la página de carga avisa que está cargando", () => {

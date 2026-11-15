@@ -27,7 +27,7 @@ export function TarjetaPublicar({
     <Link
       href="/trabajos/nuevo"
       className={cn(
-        "flex gap-4 rounded-[18px] bg-azul text-sobre-azul no-underline hover:bg-azul-presionado hover:text-sobre-azul",
+        "flex gap-4 rounded-[18px] bg-accion text-sobre-accion no-underline hover:bg-accion hover:text-sobre-accion",
         disposicion === "columna"
           ? "flex-col p-[18px]"
           : "flex-col px-[18px] py-[18px] sm:flex-row sm:items-center sm:justify-between lg:px-6 lg:py-[22px]",
@@ -40,7 +40,7 @@ export function TarjetaPublicar({
       </span>
       <span
         className={cn(
-          "inline-flex min-h-11 items-center self-start rounded-full bg-sobre-azul px-4 text-sm font-bold text-azul lg:text-[15px]",
+          "inline-flex min-h-11 items-center self-start rounded-full bg-sobre-accion px-4 text-sm font-bold text-texto lg:text-[15px]",
           disposicion === "columna" && "mt-1.5",
         )}
       >

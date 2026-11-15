@@ -21,7 +21,7 @@ async function ContenidoAceptarNormas() {
     <div className="flex flex-col gap-5 pt-2">
       <div className="flex flex-col gap-1.5">
         <h1 className="font-titulo text-[30px] leading-tight">Actualizamos las normas</h1>
-        <p className="text-[15px] leading-snug text-texto-secundario">
+        <p className="text-[15px] leading-snug text-texto">
           Para seguir usando LabÍA, leé y aceptá las normas de seguridad vigentes.
         </p>
       </div>
@@ -34,7 +34,7 @@ async function ContenidoAceptarNormas() {
 /** Re-aceptación cuando cambia la versión de las normas (LAB-20). */
 export default function AceptarNormas() {
   return (
-    <Suspense fallback={<p className="text-texto-secundario">Cargando…</p>}>
+    <Suspense fallback={<p className="text-texto">Cargando…</p>}>
       <ContenidoAceptarNormas />
     </Suspense>
   );

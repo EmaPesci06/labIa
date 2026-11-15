@@ -11,9 +11,9 @@ import { BotonAccionModeracion } from "./BotonAccionModeracion";
 import { ModalSuspender } from "./ModalSuspender";
 
 const ESTILO_ESTADO = {
-  abierto: "bg-naranja-suave text-sobre-naranja-suave",
-  en_revision: "bg-azul-suave text-sobre-azul-suave",
-  resuelto: "bg-exito-suave text-sobre-exito-suave",
+  abierto: "bg-sol text-sobre-sol",
+  en_revision: "bg-superficie text-texto",
+  resuelto: "bg-sol text-sobre-sol",
 } as const;
 
 const TEXTO_ESTADO = {
@@ -30,7 +30,7 @@ export function FilaReporte({ fila }: { fila: FilaReporteAdmin }) {
       {/* Cabecera del reporte */}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-superficie px-3 py-1 font-mono text-xs font-bold tracking-wider text-texto-secundario uppercase">
+          <span className="rounded-full bg-superficie px-3 py-1 font-texto text-xs font-bold tracking-wider text-texto uppercase">
             {fila.objetivoTipo}
           </span>
           <span
@@ -44,26 +44,24 @@ export function FilaReporte({ fila }: { fila: FilaReporteAdmin }) {
             </span>
           ) : null}
         </div>
-        <span className="text-xs font-medium text-texto-secundario">
-          {haceCuanto(fila.createdAt)}
-        </span>
+        <span className="text-xs font-medium text-texto">{haceCuanto(fila.createdAt)}</span>
       </div>
 
       {/* Detalle y motivo */}
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-baseline gap-2">
-          <span className="font-semibold text-texto-secundario">Motivo:</span>
+          <span className="font-semibold text-texto">Motivo:</span>
           <span className="font-bold text-texto">{fila.motivoTexto}</span>
         </div>
 
         {fila.detalle ? (
           <div className="rounded-[12px] bg-superficie p-3 text-sm text-texto">
-            <span className="font-semibold text-texto-secundario">Detalle del usuario: </span>
+            <span className="font-semibold text-texto">Detalle del usuario: </span>
             {fila.detalle}
           </div>
         ) : null}
 
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-texto-secundario">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-texto">
           <p>
             Reportado por: <span className="font-medium text-texto">{fila.autorNombre}</span>
           </p>
@@ -73,7 +71,7 @@ export function FilaReporte({ fila }: { fila: FilaReporteAdmin }) {
               href={fila.objetivoLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-bold text-azul hover:underline"
+              className="font-bold text-texto hover:underline"
             >
               {fila.objetivoTitulo} ↗
             </Link>
@@ -81,7 +79,7 @@ export function FilaReporte({ fila }: { fila: FilaReporteAdmin }) {
         </div>
 
         {fila.usuarioAfectadoId && fila.usuarioAfectadoNombre ? (
-          <div className="flex flex-wrap items-center gap-2 text-sm text-texto-secundario">
+          <div className="flex flex-wrap items-center gap-2 text-sm text-texto">
             <span>Usuario objetivo:</span>
             <span className="font-bold text-texto">{fila.usuarioAfectadoNombre}</span>
             {fila.usuarioAfectadoEstado === "suspendida" ? (
@@ -94,7 +92,7 @@ export function FilaReporte({ fila }: { fila: FilaReporteAdmin }) {
       </div>
 
       {/* Acciones de moderación */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-divisor pt-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-fondo pt-3">
         {/* Acciones sobre el objetivo */}
         <div className="flex flex-wrap items-center gap-2">
           {fila.usuarioAfectadoId && fila.usuarioAfectadoNombre ? (

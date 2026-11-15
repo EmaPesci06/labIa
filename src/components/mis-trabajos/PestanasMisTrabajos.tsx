@@ -33,8 +33,8 @@ export function PestanasMisTrabajos({ tabActiva }: Props) {
             className={cn(
               "rounded-chip inline-flex min-h-[44px] items-center justify-center px-4 text-sm font-bold transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco",
               activa
-                ? "bg-azul text-sobre-azul dark:bg-azul-suave dark:text-sobre-azul-suave"
-                : "border border-borde bg-superficie text-texto hover:border-azul dark:border-borde dark:bg-superficie dark:hover:border-azul-suave",
+                ? "bg-accion text-sobre-accion"
+                : "border border-texto bg-superficie text-texto hover:border-accion",
             )}
           >
             {tab.etiqueta}

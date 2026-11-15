@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
 const FILA =
-  "flex min-h-14 w-full items-center gap-3 px-4 text-left text-[15px] font-semibold text-texto hover:bg-azul-suave";
+  "flex min-h-14 w-full items-center gap-3 px-4 text-left text-[15px] font-semibold text-texto hover:bg-superficie";
 
 /** Grupo de filas de ajustes: tarjeta con divisores y un título pequeño arriba. */
 export function GrupoCuenta({
@@ -20,14 +20,14 @@ export function GrupoCuenta({
   return (
     <section className="flex flex-col gap-2">
       {titulo ? (
-        <h2 className="px-1 font-mono text-sm font-medium tracking-[0.4px] text-texto-secundario uppercase">
+        <h2 className="px-1 font-texto text-sm font-medium tracking-[0.4px] text-texto uppercase">
           {titulo}
         </h2>
       ) : null}
       <ul
         className={cn(
-          "divide-y divide-divisor overflow-hidden rounded-[18px] border bg-superficie",
-          peligro ? "border-error/40" : "border-divisor",
+          "divide-divisor divide-y overflow-hidden rounded-[18px] border bg-superficie",
+          peligro ? "border-error/40" : "border-fondo",
         )}
       >
         {children}
@@ -57,10 +57,8 @@ export function FilaEnlace({
     <>
       {icono}
       <span className="flex-1">{children}</span>
-      {detalle ? (
-        <span className="text-sm font-normal text-texto-secundario">{detalle}</span>
-      ) : null}
-      <ChevronRight aria-hidden strokeWidth={2} className="size-5 shrink-0 text-texto-terciario" />
+      {detalle ? <span className="text-sm font-normal text-texto">{detalle}</span> : null}
+      <ChevronRight aria-hidden strokeWidth={2} className="size-5 shrink-0 text-texto" />
     </>
   );
   const clases = cn(FILA, peligro && "text-error");

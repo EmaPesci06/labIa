@@ -39,20 +39,20 @@ export default function RegistroCliente() {
         <Suspense fallback={null}>
           <Formulario />
         </Suspense>
-        <p className="text-center text-[15px] text-texto-secundario">
+        <p className="text-center text-[15px] text-texto">
           ¿Ya tenés cuenta?{" "}
           <Link
             href="/ingresar"
-            className="inline-block py-3 font-bold text-azul underline underline-offset-2"
+            className="inline-block py-3 font-bold text-texto underline underline-offset-2"
           >
             Ingresar
           </Link>
         </p>
-        <p className="hidden text-center text-[15px] text-texto-secundario lg:block">
+        <p className="hidden text-center text-[15px] text-texto lg:block">
           ¿Ofrecés un servicio?{" "}
           <Link
             href="/registro/profesional"
-            className="inline-block py-3 font-bold text-azul underline underline-offset-2"
+            className="inline-block py-3 font-bold text-texto underline underline-offset-2"
           >
             Registrate como profesional
           </Link>

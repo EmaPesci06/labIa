@@ -35,7 +35,7 @@ export function EnlaceVolver({ href, etiquetaEscritorio }: Props) {
       href={href}
       onClick={volver}
       aria-label="Volver"
-      className="-ml-2.5 flex min-h-11 w-fit items-center justify-center gap-1 rounded-campo px-2.5 text-texto lg:ml-0 lg:px-0 lg:text-sm lg:font-semibold lg:text-azul"
+      className="-ml-2.5 flex min-h-11 w-fit items-center justify-center gap-1 rounded-campo px-2.5 text-texto lg:ml-0 lg:px-0 lg:text-sm lg:font-semibold lg:text-texto"
     >
       <ChevronLeft aria-hidden strokeWidth={2} className="size-[22px] lg:hidden" />
       <span aria-hidden className="hidden lg:inline">

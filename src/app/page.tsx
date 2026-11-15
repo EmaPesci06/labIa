@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { SaltarAlContenido } from "@/components/navegacion/SaltarAlContenido";
 import { Boton } from "@/components/ui/Boton";
-import { CintaBienvenida } from "@/components/ui/cinta-metrica";
+import { Toldo } from "@/components/ui/Toldo";
 import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/lib/cn";
 
@@ -35,7 +35,7 @@ function EtiquetaCiudad({ className }: { className?: string }) {
   return (
     <p
       className={cn(
-        "flex items-center gap-1.5 font-mono text-[13px] font-semibold tracking-[0.4px] text-texto-secundario uppercase",
+        "flex items-center gap-1.5 font-texto text-[13px] font-semibold tracking-[0.4px] text-texto uppercase",
         className,
       )}
     >
@@ -53,7 +53,7 @@ export default function Bienvenida() {
   return (
     <>
       <SaltarAlContenido />
-      <header className="flex items-center justify-between gap-6 px-6 pt-7 lg:border-b lg:border-divisor lg:bg-superficie lg:px-10 lg:py-[18px]">
+      <header className="flex items-center justify-between gap-6 px-6 pt-7 lg:border-b lg:border-fondo lg:bg-superficie lg:px-10 lg:py-[18px]">
         <Link
           href="/"
           aria-label="LabÍA, inicio"
@@ -65,7 +65,7 @@ export default function Bienvenida() {
         <div className="hidden items-center gap-4 lg:flex">
           <Link
             href="/ingresar"
-            className="inline-flex min-h-11 items-center text-[15px] font-bold text-azul"
+            className="inline-flex min-h-11 items-center text-[15px] font-bold text-texto"
           >
             Ingresar
           </Link>
@@ -87,7 +87,7 @@ export default function Bienvenida() {
               <h1 className="font-titulo text-[40px] leading-[1.05] lg:text-[64px] lg:leading-[1.02]">
                 Oficios de confianza, cerca tuyo.
               </h1>
-              <p className="max-w-[560px] text-[17px] leading-[1.45] text-texto-secundario lg:text-xl lg:leading-normal">
+              <p className="max-w-[560px] text-[17px] leading-[1.45] text-texto lg:text-xl lg:leading-normal">
                 Encontrá gasistas, electricistas, cerrajeros y más en tu barrio.{" "}
                 <span className="lg:hidden">O conseguí trabajo con tu oficio.</span>
                 <span className="hidden lg:inline">
@@ -96,18 +96,18 @@ export default function Bienvenida() {
               </p>
             </div>
             <div className="flex max-w-[640px] flex-col gap-2.5 lg:gap-3">
-              <CintaBienvenida className="lg:h-7" />
-              <p className="font-mono text-xs leading-[1.7] font-semibold tracking-[0.6px] text-texto-secundario uppercase lg:text-[13px]">
+              <Toldo color="sol" alto={26} />
+              <p className="font-texto text-xs leading-[1.7] font-semibold tracking-[0.6px] text-texto uppercase lg:text-[13px]">
                 {OFICIOS}
               </p>
             </div>
           </div>
 
           <div className="mt-auto flex flex-col gap-3 lg:mt-0 lg:flex-[1_1_360px] lg:gap-3.5">
-            <h2 className="text-[15px] font-bold text-texto-secundario">¿Qué querés hacer?</h2>
+            <h2 className="text-[15px] font-bold text-texto">¿Qué querés hacer?</h2>
             <Link
               href="/registro/cliente"
-              className="flex items-center gap-3.5 rounded-[18px] bg-azul p-[18px] text-sobre-azul lg:flex-col lg:items-stretch lg:gap-1.5 lg:rounded-[20px] lg:p-6"
+              className="flex items-center gap-3.5 rounded-[18px] bg-accion p-[18px] text-sobre-accion lg:flex-col lg:items-stretch lg:gap-1.5 lg:rounded-[20px] lg:p-6"
             >
               <Search aria-hidden strokeWidth={2} className="size-7 shrink-0 lg:hidden" />
               <span className="flex flex-1 flex-col gap-0.5 lg:flex-none lg:gap-1.5">
@@ -123,16 +123,16 @@ export default function Bienvenida() {
             </Link>
             <Link
               href="/registro/profesional"
-              className="flex items-center gap-3.5 rounded-[18px] border-2 border-naranja-accion bg-superficie p-[18px] text-texto lg:flex-col lg:items-stretch lg:gap-1.5 lg:rounded-[20px] lg:p-6"
+              className="flex items-center gap-3.5 rounded-[18px] border-2 border-accion bg-superficie p-[18px] text-texto lg:flex-col lg:items-stretch lg:gap-1.5 lg:rounded-[20px] lg:p-6"
             >
               <Wrench
                 aria-hidden
                 strokeWidth={2}
-                className="size-7 shrink-0 text-naranja-accion lg:hidden"
+                className="size-7 shrink-0 text-texto lg:hidden"
               />
               <span className="flex flex-1 flex-col gap-0.5 lg:flex-none lg:gap-1.5">
                 <span className="text-lg font-bold lg:text-[22px]">Ofrezco mis servicios</span>
-                <span className="text-sm text-texto-secundario lg:text-[15px] lg:leading-[1.4]">
+                <span className="text-sm text-texto lg:text-[15px] lg:leading-[1.4]">
                   <span className="lg:hidden">Mostrá tu oficio y encontrá trabajos</span>
                   <span className="hidden lg:inline">
                     Mostrá tu oficio, conseguí clientes y postulate a trabajos de tu zona.
@@ -142,14 +142,14 @@ export default function Bienvenida() {
               <ChevronRight
                 aria-hidden
                 strokeWidth={2}
-                className="size-5 shrink-0 text-naranja-accion lg:hidden"
+                className="size-5 shrink-0 text-texto lg:hidden"
               />
             </Link>
-            <p className="pt-1.5 text-center text-[15px] text-texto-secundario lg:hidden">
+            <p className="pt-1.5 text-center text-[15px] text-texto lg:hidden">
               ¿Ya tenés cuenta?{" "}
               <Link
                 href="/ingresar"
-                className="inline-block py-3 font-bold text-azul underline underline-offset-2"
+                className="inline-block py-3 font-bold text-texto underline underline-offset-2"
               >
                 Ingresar
               </Link>
@@ -169,14 +169,12 @@ export default function Bienvenida() {
               >
                 <span
                   aria-hidden
-                  className="flex size-9 items-center justify-center rounded-full bg-azul-suave font-extrabold text-sobre-azul-suave"
+                  className="flex size-9 items-center justify-center rounded-full bg-superficie font-extrabold text-texto"
                 >
                   {i + 1}
                 </span>
                 <span className="text-lg font-bold">{paso.titulo}</span>
-                <span className="text-[15px] leading-normal text-texto-secundario">
-                  {paso.texto}
-                </span>
+                <span className="text-[15px] leading-normal text-texto">{paso.texto}</span>
               </li>
             ))}
           </ol>
@@ -184,7 +182,7 @@ export default function Bienvenida() {
 
         <section
           aria-labelledby="seguridad"
-          className="hidden items-center gap-8 rounded-3xl bg-azul p-10 text-sobre-azul lg:flex"
+          className="hidden items-center gap-8 rounded-3xl bg-accion p-10 text-sobre-accion lg:flex"
         >
           <div className="flex flex-1 flex-col gap-2.5">
             <h2 id="seguridad" className="font-titulo text-[32px]">
@@ -203,7 +201,7 @@ export default function Bienvenida() {
                   className={cn(
                     "rounded-full px-4 py-2.5 text-[15px] font-bold",
                     insignia === "Matriculado"
-                      ? "bg-naranja-suave text-sobre-naranja-suave"
+                      ? "bg-sol text-sobre-sol"
                       : "bg-superficie text-texto",
                   )}
                 >

@@ -11,7 +11,7 @@ export function PanelBeneficios() {
   return (
     <aside
       aria-label="Beneficios de crear tu cuenta"
-      className="hidden flex-col gap-5 rounded-[20px] bg-azul p-8 text-sobre-azul lg:flex"
+      className="hidden flex-col gap-5 rounded-[20px] bg-accion p-8 text-sobre-accion lg:flex"
     >
       <h2 className="font-titulo text-[28px] leading-tight">Contratá con tranquilidad</h2>
       <ul className="flex flex-col gap-3.5 text-[17px] leading-snug">

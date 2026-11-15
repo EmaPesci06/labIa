@@ -5,7 +5,7 @@ export function Bloque({ className }: { className?: string }) {
   return (
     <div
       aria-hidden
-      className={cn("rounded-tarjeta bg-divisor motion-safe:animate-pulse", className)}
+      className={cn("rounded-tarjeta bg-fondo motion-safe:animate-pulse", className)}
     />
   );
 }

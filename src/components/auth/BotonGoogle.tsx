@@ -24,7 +24,7 @@ export function BotonGoogle({ rol, volver, className }: Props) {
       <button
         type="submit"
         aria-busy={pendiente || undefined}
-        className="flex min-h-12 w-full items-center justify-center gap-2.5 rounded-campo border border-borde bg-superficie text-[15px] font-semibold text-texto hover:bg-azul-suave"
+        className="flex min-h-12 w-full items-center justify-center gap-2.5 rounded-campo border border-texto bg-superficie text-[15px] font-semibold text-texto hover:bg-superficie"
       >
         <svg
           width="18"
@@ -53,10 +53,10 @@ export function BotonGoogle({ rol, volver, className }: Props) {
 /** Separador "o con tu email" entre Google y el formulario. */
 export function SeparadorO({ texto = "o con tu email" }: { texto?: string }) {
   return (
-    <div className="flex items-center gap-2.5 text-[13px] text-texto-terciario">
-      <span aria-hidden className="h-px flex-1 bg-divisor" />
+    <div className="flex items-center gap-2.5 text-[13px] text-texto">
+      <span aria-hidden className="h-px flex-1 bg-fondo" />
       {texto}
-      <span aria-hidden className="h-px flex-1 bg-divisor" />
+      <span aria-hidden className="h-px flex-1 bg-fondo" />
     </div>
   );
 }

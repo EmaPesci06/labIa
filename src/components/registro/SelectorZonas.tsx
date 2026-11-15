@@ -135,7 +135,7 @@ export function SelectorZonas({ valor, onChange, barrios, error }: Props) {
                 ))}
               </ul>
             ) : (
-              <p role="status" className="text-sm text-texto-secundario">
+              <p role="status" className="text-sm text-texto">
                 No encontramos ese barrio. Probá con otra parte del nombre.
               </p>
             )
@@ -144,7 +144,7 @@ export function SelectorZonas({ valor, onChange, barrios, error }: Props) {
       ) : null}
 
       {llegoAlMaximo ? (
-        <p role="status" className="text-sm text-texto-terciario">
+        <p role="status" className="text-sm text-texto">
           Llegaste al máximo de {MAX_BARRIOS} barrios. Para sumar otro, sacá uno.
         </p>
       ) : null}

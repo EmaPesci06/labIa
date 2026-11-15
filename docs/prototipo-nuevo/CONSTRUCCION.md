@@ -30,14 +30,18 @@ como plano de medidas, no lo copies.
 | En el boceto | En el código |
 | --- | --- |
 | `background: #FFF3D6`, `color: #123B4A`… | Clase del token (`bg-fondo`, `text-texto`…). Nunca el hex. |
-| `<header style="background: #0E7C86 …">` | `<Encabezado>` de `src/components/ui/` |
+| `<header style="background: #0E7C86 …">` | `<Encabezado>` de `src/components/ui/` (variantes en la tabla de abajo) |
 | Botón turquesa de 56 px | `<Boton>` principal |
 | Botón con borde de 3 px | `<Boton variante="secundario">` |
 | `<input>`, `<select>`, `<textarea>` con borde de 2 px | `<Campo>` (trae `label`, ayuda y error) |
 | Pastilla amarilla o blanca | `<Chip>` |
 | Bloque blanco de radio 22 | `<Tarjeta>` |
 | Círculo con inicial y borde amarillo | `<Avatar>` |
-| Franja `repeating-linear-gradient` | `<Toldo>` |
+| Franja `repeating-linear-gradient` | `<Toldo color="accion|sol|texto|coral" alto={14|18|22|26}>` |
+| Header con bloque de color, volver y título | `<Encabezado variante="turquesa|equipo|sol|plano" titulo volver>`; los chips elegidos dentro de `sol` cambian solos a azul noche |
+| Pantalla completa de aviso (ícono, título, texto, botón) | `<AvisoPantalla titulo texto accion>` |
+| Pastilla amarilla con la distancia ("a 1,2 km") | `<Distancia km sufijo>` |
+| Cinta de distancia o cinta de pasos | No existe más: `<Distancia>` para la distancia; los pasos se muestran como lista de texto |
 | `<section role="dialog">` que sube desde abajo | `<HojaInferior>` |
 | `<nav aria-label="Principal">` de abajo | Ya está en el layout: no la repitas en la página |
 | Recuadro con la palabra "Foto" | `next/image` |

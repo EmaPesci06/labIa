@@ -165,7 +165,7 @@ export default async function Buscar({ searchParams }: Props) {
           {pluralOficio(validos.oficio)}
         </h1>
         {pagina ? (
-          <p className="text-sm text-texto-secundario lg:text-[15px]">
+          <p className="text-sm text-texto lg:text-[15px]">
             {textoResultados(total, nombreBarrio, validos)}
           </p>
         ) : null}
@@ -201,7 +201,7 @@ export default async function Buscar({ searchParams }: Props) {
             </ul>
           )}
           {hayMas && pagina.pagina >= MAX_PAGINAS_ACUMULADAS ? (
-            <p className="text-center text-[15px] text-texto-secundario">
+            <p className="text-center text-[15px] text-texto">
               Refiná la búsqueda con los filtros para ver menos resultados.
             </p>
           ) : hayMas ? (

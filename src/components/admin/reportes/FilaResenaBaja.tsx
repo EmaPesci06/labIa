@@ -21,24 +21,22 @@ export function FilaResenaBaja({ fila }: { fila: FilaResenaBajaAdmin }) {
             ★ {fila.puntaje} / 5
           </span>
           {fila.reportada ? (
-            <span className="rounded-full bg-naranja-suave px-2.5 py-1 text-xs font-bold text-sobre-naranja-suave">
+            <span className="rounded-full bg-sol px-2.5 py-1 text-xs font-bold text-sobre-sol">
               Reportada
             </span>
           ) : null}
         </div>
-        <span className="text-xs font-medium text-texto-secundario">
-          {haceCuanto(fila.createdAt)}
-        </span>
+        <span className="text-xs font-medium text-texto">{haceCuanto(fila.createdAt)}</span>
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <p className="text-sm text-texto-secundario">
+        <p className="text-sm text-texto">
           Por <span className="font-semibold text-texto">{fila.autorNombre}</span> para{" "}
           <Link
             href={`/profesionales/${fila.profesionalId}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-semibold text-azul hover:underline"
+            className="font-semibold text-texto hover:underline"
           >
             {fila.profesionalNombre} ↗
           </Link>
@@ -49,11 +47,11 @@ export function FilaResenaBaja({ fila }: { fila: FilaResenaBajaAdmin }) {
             &ldquo;{fila.texto}&rdquo;
           </p>
         ) : (
-          <p className="text-sm text-texto-secundario italic">Sin comentario escrito.</p>
+          <p className="text-sm text-texto italic">Sin comentario escrito.</p>
         )}
       </div>
 
-      <div className="flex flex-wrap items-center justify-end gap-2 border-t border-divisor pt-3">
+      <div className="flex flex-wrap items-center justify-end gap-2 border-t border-fondo pt-3">
         {fila.autorId ? (
           <button
             type="button"

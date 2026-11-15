@@ -27,21 +27,19 @@ async function MarcoAdmin({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col bg-fondo text-texto">
       <SaltarAlContenido />
-      <header className="border-b border-divisor bg-superficie">
+      <header className="border-b border-fondo bg-superficie">
         <div className="mx-auto flex w-full max-w-[1200px] flex-wrap items-center justify-between gap-4 px-5 py-3 lg:px-10">
           <div className="flex flex-wrap items-center gap-4 sm:gap-6">
             <div className="flex items-center gap-3">
               <Logo variante="icono" alt="" />
-              <p className="font-mono text-xs font-semibold tracking-[0.4px] text-texto-secundario uppercase">
+              <p className="font-texto text-xs font-semibold tracking-[0.4px] text-texto uppercase">
                 Panel interno · LabÍA
               </p>
             </div>
             <NavegacionAdmin />
           </div>
           <div className="flex items-center gap-3">
-            <p className="hidden text-sm text-texto-secundario sm:block">
-              {sesion.perfil.nombreVisible}
-            </p>
+            <p className="hidden text-sm text-texto sm:block">{sesion.perfil.nombreVisible}</p>
             <BotonSalir className="min-h-11 w-auto px-3" />
           </div>
         </div>

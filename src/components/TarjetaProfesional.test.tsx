@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import type { ResultadoProfesional } from "@/lib/busqueda";
+import { formatearDistancia } from "@/lib/formato";
 
 import { nombreCorto, TarjetaProfesional } from "./TarjetaProfesional";
 
@@ -40,14 +41,11 @@ describe("TarjetaProfesional", () => {
     expect(screen.getByText("Nuevo")).toBeInTheDocument();
   });
 
-  it("la cinta es proporcional a la distancia (mínimo 12 px, máximo 120 px)", () => {
-    const { container, rerender } = render(<TarjetaProfesional profesional={base} />);
-    const ancho = () => container.querySelector<HTMLElement>("[data-cinta]")?.style.width;
-    expect(ancho()).toBe("36px");
-    rerender(<TarjetaProfesional profesional={{ ...base, distanciaKm: 0.1 }} />);
-    expect(ancho()).toBe("12px");
+  it("la distancia se muestra con el formato de la app y cambia con el dato", () => {
+    const { rerender } = render(<TarjetaProfesional profesional={base} />);
+    expect(screen.getByText(formatearDistancia(1.2))).toBeInTheDocument();
     rerender(<TarjetaProfesional profesional={{ ...base, distanciaKm: 9 }} />);
-    expect(ancho()).toBe("120px");
+    expect(screen.getByText(formatearDistancia(9))).toBeInTheDocument();
   });
 });
 
