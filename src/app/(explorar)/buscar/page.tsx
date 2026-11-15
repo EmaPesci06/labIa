@@ -1,10 +1,8 @@
-import { ChevronLeft } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
 import { PanelBusqueda } from "@/components/busqueda/PanelBusqueda";
 import { RegistrarBusqueda } from "@/components/busqueda/RegistrarBusqueda";
-import { TarjetaPublicar } from "@/components/busqueda/TarjetaPublicar";
 import { TarjetaProfesional } from "@/components/TarjetaProfesional";
 import { Boton } from "@/components/ui/Boton";
 import { Vacio } from "@/components/ui/Vacio";
@@ -13,14 +11,14 @@ import {
   buscarProfesionales,
   ErrorBusqueda,
   leerParametrosBusqueda,
+  type Oficio,
   type PaginaResultados,
   type ParametrosBusqueda,
-  type ResultadoProfesional,
 } from "@/lib/busqueda";
 import { barrioDeLaCuenta, obtenerBarrios } from "@/lib/busqueda-servidor";
 import { urlBusqueda } from "@/lib/busqueda-url";
 import { bloqueoLecturaPublica } from "@/lib/limites";
-import { pluralOficio } from "@/lib/oficios";
+import { nombreOficio, pluralOficio } from "@/lib/oficios";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 
@@ -85,11 +83,11 @@ async function cargarResultados(
       buscarProfesionales(supabase, { ...crudo, barrio: slug, pagina: String(i + 2) }, barrioId),
     ),
   );
-  const profesionales: ResultadoProfesional[] = [
-    ...primera.profesionales,
-    ...siguientes.flatMap((p) => p.profesionales),
-  ];
-  return { ...primera, profesionales, pagina: ultima };
+  return {
+    ...primera,
+    profesionales: [...primera.profesionales, ...siguientes.flatMap((p) => p.profesionales)],
+    pagina: ultima,
+  };
 }
 
 const MENSAJE_FALLA = "No pudimos buscar en este momento. Probá de nuevo.";
@@ -109,11 +107,58 @@ function ErrorEnBusqueda({ mensaje }: { mensaje: string }) {
   );
 }
 
-function textoResultados(total: number, nombreBarrio: string, p: ParametrosBusqueda): string {
-  const donde = p.todaLaCiudad ? "En toda la ciudad" : `Cerca de ${nombreBarrio}`;
-  const cantidad = `${total} ${total === 1 ? "resultado" : "resultados"}`;
-  const orden = p.orden === "calificacion" ? "mejor calificados primero" : "más cerca primero";
-  return `${donde} · ${cantidad}, ${orden}`;
+/** "Plomería cerca de La Perla", o "Profesionales en toda la ciudad" sin oficio. */
+function tituloBusqueda(oficio: Oficio | undefined, nombreBarrio: string, todaLaCiudad: boolean) {
+  const donde = todaLaCiudad ? "en toda la ciudad" : `cerca de ${nombreBarrio}`;
+  return oficio ? `${nombreOficio(oficio)} ${donde}` : `Profesionales ${donde}`;
+}
+
+/** "8 verificados, del más cercano al más lejano" (boceto `Esc-Buscar`). */
+function textoResultados(total: number, p: ParametrosBusqueda): string {
+  const cantidad = `${total} ${total === 1 ? "verificado" : "verificados"}`;
+  const orden =
+    p.orden === "calificacion" ? "de mejor a peor calificación" : "del más cercano al más lejano";
+  return `${cantidad}, ${orden}`;
+}
+
+/** Columna de escritorio: publicar, y qué quiere decir "verificado" (boceto `Esc-Buscar`). */
+function AsideBusqueda() {
+  return (
+    <>
+      <section
+        aria-labelledby="no-querer-elegir"
+        className="flex flex-col gap-2.5 rounded-[28px] border-[3px] border-dashed border-texto p-6"
+      >
+        <h2 id="no-querer-elegir" className="font-titulo text-[28px] leading-tight font-extrabold">
+          ¿No querés elegir?
+        </h2>
+        <p className="text-base leading-snug">
+          Contá qué se rompió y que te escriban los profesionales que pueden ir.
+        </p>
+        <Link
+          href="/trabajos/nuevo"
+          className="mt-1 flex min-h-14 items-center justify-center rounded-[18px] bg-accion px-4 text-[17px] font-bold text-sobre-accion no-underline hover:bg-accion hover:text-sobre-accion"
+        >
+          Publicar el trabajo
+        </Link>
+      </section>
+      <section
+        aria-labelledby="que-es-verificado"
+        className="flex flex-col gap-2 rounded-[28px] bg-superficie p-6"
+      >
+        <h2 id="que-es-verificado" className="font-titulo text-[22px] leading-tight font-extrabold">
+          Qué quiere decir “verificado”
+        </h2>
+        <p className="text-base leading-snug">
+          Revisamos su documento y su certificado de antecedentes antes de mostrarlo. A los
+          gasistas, además, la matrícula.
+        </p>
+        <p className="text-base leading-snug">
+          La distancia es desde el centro de tu barrio: nunca te pedimos la dirección.
+        </p>
+      </section>
+    </>
+  );
 }
 
 export default async function Buscar({ searchParams }: Props) {
@@ -151,28 +196,6 @@ export default async function Buscar({ searchParams }: Props) {
   const hayMas = pagina ? pagina.pagina < pagina.paginas : false;
   const vacio = pagina !== null && pagina.profesionales.length === 0;
 
-  const encabezado = (
-    <div className="flex items-center gap-1.5 lg:items-baseline lg:justify-between lg:gap-3">
-      <Link
-        href="/inicio"
-        aria-label="Volver"
-        className="-ml-2.5 flex size-11 shrink-0 items-center justify-center rounded-campo text-texto lg:hidden"
-      >
-        <ChevronLeft aria-hidden strokeWidth={2} className="size-[22px]" />
-      </Link>
-      <div className="flex min-w-0 flex-1 flex-col lg:flex-row lg:flex-wrap lg:items-baseline lg:justify-between lg:gap-3">
-        <h1 className="font-titulo text-2xl lg:text-[32px] lg:tracking-[-0.5px]">
-          {pluralOficio(validos.oficio)}
-        </h1>
-        {pagina ? (
-          <p className="text-sm text-texto lg:text-[15px]">
-            {textoResultados(total, nombreBarrio, validos)}
-          </p>
-        ) : null}
-      </div>
-    </div>
-  );
-
   return (
     <PanelBusqueda
       oficio={validos.oficio}
@@ -181,7 +204,9 @@ export default async function Buscar({ searchParams }: Props) {
       matriculados={validos.matriculados}
       orden={validos.orden}
       todaLaCiudad={validos.todaLaCiudad}
-      encabezado={encabezado}
+      titulo={tituloBusqueda(validos.oficio, nombreBarrio, validos.todaLaCiudad)}
+      descripcion={pagina ? textoResultados(total, validos) : undefined}
+      aside={<AsideBusqueda />}
     >
       {mensajeError ? <ErrorEnBusqueda mensaje={mensajeError} /> : null}
       {pagina ? (
@@ -192,13 +217,13 @@ export default async function Buscar({ searchParams }: Props) {
               No hay profesionales con esos filtros todavía.
             </p>
           ) : (
-            <ul className="grid gap-3 lg:grid-cols-2 lg:gap-4">
+            <ol className="flex flex-col gap-2.5 lg:gap-3">
               {pagina.profesionales.map((profesional) => (
-                <li key={profesional.usuarioId} className="flex flex-col">
-                  <TarjetaProfesional profesional={profesional} className="flex-1" />
+                <li key={profesional.usuarioId}>
+                  <TarjetaProfesional profesional={profesional} />
                 </li>
               ))}
-            </ul>
+            </ol>
           )}
           {hayMas && pagina.pagina >= MAX_PAGINAS_ACUMULADAS ? (
             <p className="text-center text-[15px] text-texto">
@@ -220,14 +245,13 @@ export default async function Buscar({ searchParams }: Props) {
               Ver más
             </Boton>
           ) : null}
-          <div className={vacio ? undefined : "hidden lg:block"}>
-            <TarjetaPublicar
-              titulo="¿No encontrás a quién llamar?"
-              descripcion="Publicá un trabajo y los profesionales de tu zona se postulan."
-              accion="Publicar un trabajo"
-              disposicion="fila"
-            />
-          </div>
+          {/* En celular, el aviso de publicar va al final de la lista (el boceto de celular). */}
+          <Link
+            href="/trabajos/nuevo"
+            className="flex min-h-14 items-center justify-center rounded-[18px] border-[3px] border-dashed border-texto px-4 text-center text-[15px] leading-snug font-bold text-texto no-underline lg:hidden"
+          >
+            ¿No querés elegir? Publicá el trabajo y que te escriban
+          </Link>
         </>
       ) : null}
     </PanelBusqueda>
