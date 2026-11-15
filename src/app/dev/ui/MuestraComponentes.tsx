@@ -221,6 +221,7 @@ export function MuestraComponentes() {
         </Tarjeta>
         <Tarjeta borde>
           <AvisoPantalla
+            nivel={2}
             icono={ShieldCheck}
             titulo="Te quedaste sin conexión"
             texto="Revisá tu internet y volvé a intentar. Lo que estabas escribiendo no se perdió."

@@ -8,8 +8,9 @@ import { Toldo } from "./Toldo";
 type Props = {
   /** Ícono en círculo sol. Por defecto un escudo. */
   icono?: LucideIcon;
-  /** Título de la pantalla (`h1`). */
+  /** Título de la pantalla. Por defecto `h1`; dentro de otra página con su propio `h1`, usá 2. */
   titulo: string;
+  nivel?: 1 | 2;
   /** Texto corto explicando qué pasó y qué sigue. */
   texto?: string;
   /** Acción principal, normalmente un `<Boton>`. */
@@ -27,10 +28,12 @@ type Props = {
 export function AvisoPantalla({
   icono: Icono = ShieldCheck,
   titulo,
+  nivel = 1,
   texto,
   accion,
   className,
 }: Props) {
+  const Titulo = nivel === 1 ? "h1" : "h2";
   return (
     <section
       className={cn(
@@ -44,7 +47,7 @@ export function AvisoPantalla({
       >
         <Icono strokeWidth={2.5} className="size-12" />
       </span>
-      <h1 className="font-titulo text-[38px] leading-none text-texto">{titulo}</h1>
+      <Titulo className="font-titulo text-[38px] leading-none text-texto">{titulo}</Titulo>
       {texto ? <p className="max-w-sm text-lg text-texto">{texto}</p> : null}
       {accion ? <div className="w-full max-w-sm">{accion}</div> : null}
       <Toldo color="accion" alto={14} className="mt-auto" />

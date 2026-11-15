@@ -56,6 +56,11 @@ describe("AvisoPantalla", () => {
     expect(screen.getByRole("button", { name: "Reintentar" })).toBeInTheDocument();
   });
 
+  it("con nivel 2 el título es h2", () => {
+    render(<AvisoPantalla titulo="Enlace vencido" nivel={2} />);
+    expect(screen.getByRole("heading", { level: 2, name: "Enlace vencido" })).toBeInTheDocument();
+  });
+
   it("sin texto ni acción solo muestra el título", () => {
     render(<AvisoPantalla titulo="Enlace vencido" />);
     expect(screen.getByRole("heading", { name: "Enlace vencido" })).toBeInTheDocument();
