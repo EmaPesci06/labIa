@@ -8,7 +8,7 @@ import { Boton } from "@/components/ui/Boton";
  */
 export function BotonConfirmarBaja() {
   return (
-    <Boton type="submit" variante="cliente" tamano="grande" bloque>
+    <Boton type="submit" variante="principal" tamano="grande" bloque>
       Confirmar la baja
     </Boton>
   );

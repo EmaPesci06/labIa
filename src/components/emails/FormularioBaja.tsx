@@ -1,4 +1,5 @@
 import { BotonConfirmarBaja } from "@/components/emails/BotonConfirmarBaja";
+import { AvisoPantalla } from "@/components/ui/AvisoPantalla";
 import { confirmarBaja } from "@/lib/emails/acciones";
 import type { CategoriaBaja } from "@/lib/emails/token";
 
@@ -18,18 +19,22 @@ type Props = {
 /** Pide confirmar la baja (sin ingresar). Lo usan la ruta con `?t=` y la que lee el fragmento. */
 export function FormularioBaja({ token, categoria, conError }: Props) {
   return (
-    <form action={confirmarBaja} className="flex flex-col gap-4">
-      <input type="hidden" name="t" value={token} />
-      <p>
-        Vas a dejar de recibir {TEXTO_CATEGORIA[categoria]}. Los avisos de tu cuenta y de tus
-        trabajos en curso te siguen llegando.
-      </p>
-      {conError ? (
-        <p role="alert" className="text-sm font-semibold text-error">
-          No pudimos darte de baja. Probá de nuevo en unos minutos.
-        </p>
-      ) : null}
-      <BotonConfirmarBaja />
-    </form>
+    <AvisoPantalla
+      nivel={2}
+      titulo="Darte de baja de los emails"
+      texto={`Vas a dejar de recibir ${TEXTO_CATEGORIA[categoria]}. Los avisos de tu cuenta y de tus trabajos en curso te siguen llegando.`}
+      accion={
+        <form action={confirmarBaja} className="flex flex-col gap-3">
+          <input type="hidden" name="t" value={token} />
+          {conError ? (
+            <p role="alert" className="text-sm font-bold text-error">
+              No pudimos darte de baja. Probá de nuevo en unos minutos.
+            </p>
+          ) : null}
+          <BotonConfirmarBaja />
+        </form>
+      }
+      className="min-h-[60dvh] pt-4"
+    />
   );
 }

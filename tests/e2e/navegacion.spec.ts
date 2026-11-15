@@ -178,12 +178,14 @@ test.describe("PWA", () => {
 
     await context.setOffline(true);
     await page.goto("/mis-trabajos");
-    await expect(page.getByRole("heading", { name: "Sin conexión" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Te quedaste sin conexión" })).toBeVisible();
     await expect(
-      page.getByText("Sin conexión. Revisá tu internet y volvé a intentar."),
+      page.getByText(
+        "Revisá tu internet y volvé a intentar. Lo que estabas escribiendo no se perdió.",
+      ),
     ).toBeVisible();
     // La pantalla se ve completa (con estilos y logo), no solo el texto crudo.
-    await expect(page.getByRole("heading", { name: "Sin conexión" })).toHaveCSS(
+    await expect(page.getByRole("heading", { name: "Te quedaste sin conexión" })).toHaveCSS(
       "font-weight",
       "800",
     );
