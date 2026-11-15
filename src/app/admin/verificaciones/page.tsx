@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { Encabezado } from "@/components/ui/Encabezado";
 import { Vacio } from "@/components/ui/Vacio";
 import { cn } from "@/lib/cn";
 import { haceCuanto } from "@/lib/formato";
@@ -27,15 +28,15 @@ function Fila({ fila }: { fila: FilaProfesional }) {
     <li>
       <Link
         href={`/admin/verificaciones/${fila.usuarioId}`}
-        className="flex min-h-[44px] flex-col gap-2.5 rounded-[18px] bg-superficie p-4 text-texto hover:bg-superficie lg:flex-row lg:items-center lg:justify-between lg:gap-6"
+        className="flex min-h-11 flex-col gap-2.5 rounded-tarjeta bg-superficie p-4 text-texto lg:flex-row lg:items-center lg:justify-between lg:gap-6"
       >
         <div className="flex min-w-0 flex-col gap-1">
-          <p className="font-titulo text-lg font-extrabold">{nombre}</p>
-          <p className="text-sm text-texto">
+          <p className="font-titulo text-[22px] leading-tight">{nombre}</p>
+          <p className="text-[15px]">
             {fila.oficios.map(nombreOficio).join(" · ") || "Sin oficios cargados"}
             {fila.barrio ? ` · ${fila.barrio}` : ""}
           </p>
-          <p className="text-sm text-texto">
+          <p className="text-[15px]">
             {fila.documentos
               .filter((d, i, todos) => todos.findIndex((x) => x.tipo === d.tipo) === i)
               .map((d) => `${ETIQUETAS_DOCUMENTO[d.tipo]} (${ESTADO_TEXTO[d.estado]})`)
@@ -44,13 +45,19 @@ function Fila({ fila }: { fila: FilaProfesional }) {
         </div>
         <div className="flex shrink-0 flex-wrap items-center gap-2 text-sm lg:flex-col lg:items-end">
           {espera ? (
-            <span className={cn("font-semibold", enRojo ? "text-error" : "text-texto")}>
+            <span
+              className={cn(
+                "rounded-full px-3 py-1 text-sm font-bold",
+                // Más de 48 h: rojo de error con texto de superficie, como en el boceto.
+                enRojo ? "bg-error text-sobre-accion" : "bg-sol text-sobre-sol",
+              )}
+            >
               Envió {haceCuanto(espera)}
               {enRojo ? " · más de 48 h" : ""}
             </span>
           ) : null}
           {fila.pendientes > 0 ? (
-            <span className="rounded-full bg-sol px-2.5 py-1 text-xs font-bold text-sobre-sol">
+            <span className="rounded-full border-2 border-texto px-2.5 py-0.5 text-xs font-bold">
               {fila.pendientes === 1
                 ? "1 documento por revisar"
                 : `${fila.pendientes} documentos por revisar`}
@@ -71,60 +78,55 @@ export default async function Verificaciones({ searchParams }: Props) {
   const visibles = filas.filter((f) => f.pestana === pestana);
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex flex-col gap-1">
-        <h1 className="font-titulo text-[28px] font-extrabold lg:text-4xl">
-          Verificaciones
-          <span className="ml-3 text-lg font-semibold text-texto lg:text-xl">
-            {pendientes} {pendientes === 1 ? "pendiente" : "pendientes"}
-          </span>
-        </h1>
-        <p className="text-texto">
-          Revisá los documentos de cada profesional. Nadie aparece en las búsquedas hasta aprobar su
-          DNI y sus antecedentes.
-        </p>
+    <>
+      <Encabezado
+        variante="equipo"
+        titulo="Verificaciones"
+        descripcion={`${pendientes} ${pendientes === 1 ? "pendiente" : "pendientes"}. Revisá los documentos de cada profesional. Nadie aparece en las búsquedas hasta aprobar su DNI y sus antecedentes.`}
+      />
+
+      <div className="flex flex-col gap-5 pt-4">
+        <nav aria-label="Pestañas de verificación">
+          <ul className="flex flex-wrap gap-2">
+            {PESTANAS.map((p) => {
+              const activa = p.valor === pestana;
+              return (
+                <li key={p.valor}>
+                  <Link
+                    href={`/admin/verificaciones?pestana=${p.valor}`}
+                    aria-current={activa ? "page" : undefined}
+                    className={cn(
+                      "inline-flex min-h-11 items-center rounded-full px-4 text-[15px] font-bold",
+                      activa
+                        ? "bg-sol text-sobre-sol"
+                        : "border-2 border-texto bg-superficie text-texto",
+                    )}
+                  >
+                    {p.etiqueta}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        {visibles.length === 0 ? (
+          <Vacio
+            titulo={
+              pestana === "pendientes"
+                ? "No hay documentos para revisar"
+                : "No hay profesionales en esta lista"
+            }
+            descripcion="Cuando un profesional suba sus documentos, aparece acá."
+          />
+        ) : (
+          <ul className="flex flex-col gap-3">
+            {visibles.map((fila) => (
+              <Fila key={fila.usuarioId} fila={fila} />
+            ))}
+          </ul>
+        )}
       </div>
-
-      <nav aria-label="Pestañas de verificación">
-        <ul className="flex flex-wrap gap-2">
-          {PESTANAS.map((p) => {
-            const activa = p.valor === pestana;
-            return (
-              <li key={p.valor}>
-                <Link
-                  href={`/admin/verificaciones?pestana=${p.valor}`}
-                  aria-current={activa ? "page" : undefined}
-                  className={cn(
-                    "inline-flex min-h-11 items-center rounded-full px-4 text-sm font-bold",
-                    activa
-                      ? "bg-accion text-sobre-accion"
-                      : "border border-texto bg-superficie text-texto hover:bg-superficie",
-                  )}
-                >
-                  {p.etiqueta}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
-
-      {visibles.length === 0 ? (
-        <Vacio
-          titulo={
-            pestana === "pendientes"
-              ? "No hay documentos para revisar"
-              : "No hay profesionales en esta lista"
-          }
-          descripcion="Cuando un profesional suba sus documentos, aparece acá."
-        />
-      ) : (
-        <ul className="flex flex-col gap-3">
-          {visibles.map((fila) => (
-            <Fila key={fila.usuarioId} fila={fila} />
-          ))}
-        </ul>
-      )}
-    </div>
+    </>
   );
 }
