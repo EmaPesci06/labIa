@@ -25,9 +25,9 @@ const TEXTO_ESTADO = {
 export function DocumentoRevision({ documento }: { documento: DocumentoAdmin }) {
   const etiqueta = ETIQUETAS_DOCUMENTO[documento.tipo];
   return (
-    <Tarjeta borde className="flex flex-col gap-3.5">
+    <Tarjeta className="flex flex-col gap-3.5">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="font-titulo text-lg font-extrabold">{etiqueta}</h3>
+        <h3 className="font-titulo text-[22px] leading-tight">{etiqueta}</h3>
         <span
           className={`rounded-full px-2.5 py-1 text-xs font-bold ${ESTILO_ESTADO[documento.estado]}`}
         >
