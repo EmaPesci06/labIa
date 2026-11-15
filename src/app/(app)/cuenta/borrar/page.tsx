@@ -1,8 +1,9 @@
-import { ChevronLeft, TriangleAlert } from "lucide-react";
+import { ArrowLeft, TriangleAlert } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
 import { FormularioBorrar } from "@/components/cuenta/FormularioBorrar";
+import { Tarjeta } from "@/components/ui/Tarjeta";
 import { tieneContrasena } from "@/lib/cuenta/proveedor";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
@@ -35,10 +36,10 @@ const SE_BORRA_CLIENTE = [
   "Tus contactos con profesionales.",
 ];
 const SE_BORRA_PROFESIONAL = [
-  "Tu perfil profesional, tu foto y las fotos de tus trabajos.",
-  "Tus documentos de verificación (DNI, antecedentes y matrícula).",
-  "Tus postulaciones y tus contactos con clientes.",
-  "Las reseñas que recibiste.",
+  "Tu perfil, tus fotos y tus reseñas.",
+  "Tu DNI, tus antecedentes y tu matrícula.",
+  "Tus postulaciones y tus datos de contacto.",
+  "Los trabajos en curso con clientes se cancelan.",
 ];
 
 export default async function BorrarCuenta() {
@@ -55,20 +56,22 @@ export default async function BorrarCuenta() {
   const enCurso = await trabajosEnCurso(sesion.usuario.id, esProfesional);
 
   return (
-    <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
-      <div className="flex flex-col gap-1">
+    <div className="mx-auto flex w-full max-w-[560px] flex-col gap-3.5">
+      <header className="flex flex-col">
         <Link
           href="/cuenta"
-          className="inline-flex min-h-11 items-center gap-1 self-start rounded-campo pr-3 text-[15px] font-bold text-texto"
+          className="inline-flex min-h-11 items-center gap-1.5 self-start text-[15px] font-bold text-texto"
         >
-          <ChevronLeft aria-hidden strokeWidth={2} className="size-5" />
+          <ArrowLeft aria-hidden strokeWidth={3} className="size-5" />
           Mi cuenta
         </Link>
-        <h1 className="font-titulo text-[28px] lg:text-4xl">Borrar mi cuenta</h1>
-        <p className="text-texto">
+        <h1 className="mt-0.5 font-titulo text-[38px] leading-none lg:text-[48px]">
+          Borrar mi cuenta
+        </h1>
+        <p className="mt-2 text-[17px] leading-snug font-bold text-error">
           Esto no se puede deshacer. Borramos todo de verdad, incluidos tus archivos.
         </p>
-      </div>
+      </header>
 
       {enCurso.length > 0 ? (
         <div
@@ -76,7 +79,7 @@ export default async function BorrarCuenta() {
           className="flex items-start gap-2.5 rounded-[14px] bg-sol p-3.5 text-sm leading-snug text-sobre-sol"
         >
           <TriangleAlert aria-hidden strokeWidth={2} className="size-[22px] shrink-0" />
-          <ul className="flex flex-col gap-1 font-semibold">
+          <ul className="flex flex-col gap-1 font-bold">
             {enCurso.map((nombre, i) => (
               <li key={i}>
                 Tenés un trabajo en curso con {nombre}. Si borrás tu cuenta, se cancela.
@@ -86,23 +89,30 @@ export default async function BorrarCuenta() {
         </div>
       ) : null}
 
-      <section className="flex flex-col gap-2" aria-labelledby="que-se-borra">
-        <h2 id="que-se-borra" className="font-titulo text-xl">
+      <Tarjeta como="section" aria-labelledby="que-se-borra" className="flex flex-col gap-2">
+        <h2 id="que-se-borra" className="font-titulo text-[22px] leading-tight">
           Qué se borra
         </h2>
-        <ul className="list-disc space-y-1 pl-5 text-[15px] leading-snug">
+        <ul className="list-disc space-y-1.5 pl-5 text-base leading-snug">
           {(esProfesional ? SE_BORRA_PROFESIONAL : SE_BORRA_CLIENTE).map((linea) => (
             <li key={linea}>{linea}</li>
           ))}
         </ul>
-        {!esProfesional ? null : (
-          <p className="text-sm text-texto">Los trabajos en curso con clientes se cancelan.</p>
-        )}
-        <p className="text-[15px] leading-snug">
-          <strong>Las reseñas que escribiste</strong> quedan, pero anónimas (“Cliente de LabÍA”),
-          para no alterar el promedio de cada profesional.
-        </p>
-      </section>
+        {!esProfesional ? (
+          <p className="text-[15px] leading-snug">
+            <strong>Las reseñas que escribiste</strong> quedan, pero anónimas (“Cliente de LabÍA”),
+            para no alterar el promedio de cada profesional.
+          </p>
+        ) : null}
+      </Tarjeta>
+
+      <a
+        href="/api/cuenta/datos"
+        download
+        className="inline-flex min-h-12 items-center justify-center rounded-boton border-[3px] border-texto bg-transparent px-5 text-base font-bold text-texto hover:bg-superficie"
+      >
+        Antes, descargar mis datos
+      </a>
 
       <FormularioBorrar pedirContrasena={pedirContrasena} />
     </div>

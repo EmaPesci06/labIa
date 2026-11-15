@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { BloqueVerificacion } from "@/components/registro/BloqueVerificacion";
 import { Boton } from "@/components/ui/Boton";
+import { Tarjeta } from "@/components/ui/Tarjeta";
 import { registrarEvento } from "@/lib/metricas";
 import { subirDocumentos } from "@/lib/registro/subir-documentos";
 import type { ItemVerificacion } from "@/lib/registro/tipos";
@@ -61,7 +62,7 @@ export function DocumentosCuenta({ uid, tieneGas, verificaciones }: Props) {
   }
 
   return (
-    <div className="flex max-w-xl flex-col gap-4">
+    <div className="flex flex-col gap-3">
       <BloqueVerificacion
         tieneGas={tieneGas}
         verificaciones={verificaciones}
@@ -75,7 +76,6 @@ export function DocumentosCuenta({ uid, tieneGas, verificaciones }: Props) {
         consentimiento={{ tildado: consentido, onCambio: setConsentido }}
       />
       <Boton
-        variante="profesional"
         tamano="grande"
         bloque
         cargando={enviando}
@@ -84,6 +84,18 @@ export function DocumentosCuenta({ uid, tieneGas, verificaciones }: Props) {
       >
         Enviar documentos
       </Boton>
+      <Tarjeta como="section" aria-labelledby="mientras-tanto" className="mt-1 flex flex-col gap-1">
+        <h2 id="mientras-tanto" className="font-titulo text-xl leading-tight">
+          Mientras tanto
+        </h2>
+        <p className="text-[15px] leading-snug text-texto">
+          Tu perfil no aparece en las búsquedas y no podés postularte. Apenas aprobemos lo que
+          falta, se publica solo y te avisamos por email.
+        </p>
+      </Tarjeta>
+      <p className="text-sm leading-snug text-texto">
+        Los archivos ya subidos no se pueden volver a ver ni descargar, ni siquiera desde tu cuenta.
+      </p>
     </div>
   );
 }

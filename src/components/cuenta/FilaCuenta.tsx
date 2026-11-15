@@ -1,67 +1,45 @@
-import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { cn } from "@/lib/cn";
 
-const FILA =
-  "flex min-h-14 w-full items-center gap-3 px-4 text-left text-[15px] font-semibold text-texto hover:bg-superficie";
-
-/** Grupo de filas de ajustes: tarjeta con divisores y un título pequeño arriba. */
-export function GrupoCuenta({
-  titulo,
-  children,
-  peligro = false,
-}: {
-  titulo?: string;
-  children: ReactNode;
-  peligro?: boolean;
-}) {
+/** Grupo de filas de ajustes en una tarjeta blanca con divisores de color fondo. */
+export function GrupoCuenta({ etiqueta, children }: { etiqueta: string; children: ReactNode }) {
   return (
-    <section className="flex flex-col gap-2">
-      {titulo ? (
-        <h2 className="px-1 font-texto text-sm font-medium tracking-[0.4px] text-texto uppercase">
-          {titulo}
-        </h2>
-      ) : null}
-      <ul
-        className={cn(
-          "divide-divisor divide-y overflow-hidden rounded-[18px] border bg-superficie",
-          peligro ? "border-error/40" : "border-fondo",
-        )}
-      >
-        {children}
-      </ul>
-    </section>
+    <nav aria-label={etiqueta} className="rounded-[20px] bg-superficie px-4">
+      <ul className="divide-y-2 divide-fondo">{children}</ul>
+    </nav>
   );
 }
 
-/** Fila de 56 px con chevron que lleva a otra pantalla. */
+/** Fila que lleva a otra pantalla o descarga un archivo. */
 export function FilaEnlace({
   href,
-  icono,
   children,
-  detalle,
+  conFlecha = true,
+  compacta = false,
   peligro = false,
   descarga = false,
 }: {
   href: string;
-  icono?: ReactNode;
   children: ReactNode;
-  detalle?: string;
+  conFlecha?: boolean;
+  compacta?: boolean;
   peligro?: boolean;
   /** Descarga de archivo: un `<a>` común, no un `Link` de Next. */
   descarga?: boolean;
 }) {
   const contenido = (
     <>
-      {icono}
-      <span className="flex-1">{children}</span>
-      {detalle ? <span className="text-sm font-normal text-texto">{detalle}</span> : null}
-      <ChevronRight aria-hidden strokeWidth={2} className="size-5 shrink-0 text-texto" />
+      <span>{children}</span>
+      {conFlecha ? <span aria-hidden="true">›</span> : null}
     </>
   );
-  const clases = cn(FILA, peligro && "text-error");
+  const clases = cn(
+    "flex w-full items-center justify-between text-left text-texto",
+    compacta ? "min-h-12 text-base" : "min-h-[54px] text-[17px] font-bold",
+    peligro && "text-error",
+  );
   return (
     <li>
       {descarga ? (
@@ -77,7 +55,7 @@ export function FilaEnlace({
   );
 }
 
-/** Fila sin enlace (por ejemplo, el selector de tema o un texto de ayuda). */
+/** Fila sin enlace dentro de un grupo. */
 export function FilaLibre({ children, className }: { children: ReactNode; className?: string }) {
-  return <li className={cn("px-4 py-3.5", className)}>{children}</li>;
+  return <li className={cn("py-3.5", className)}>{children}</li>;
 }

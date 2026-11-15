@@ -3,9 +3,9 @@
 import { useActionState, useState, type FormEvent } from "react";
 
 import { CampoContrasena } from "@/components/auth/CampoContrasena";
-import { SelectorBarrio } from "@/components/auth/SelectorBarrio";
 import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
+import { Tarjeta } from "@/components/ui/Tarjeta";
 import { ESTADO_INICIAL, type EstadoFormulario } from "@/lib/auth/estado";
 import { cambiarContrasena, cambiarEmail, guardarDatos } from "@/lib/cuenta/acciones";
 import { erroresPorCampo, esquemaNuevaContrasena } from "@/lib/validaciones/auth";
@@ -14,19 +14,19 @@ import {
   esquemaContrasenaActual,
   esquemaDatosCuenta,
 } from "@/lib/validaciones/cuenta";
-import type { BarrioOpcion } from "@/lib/validaciones/registro-cliente";
+import { BARRIOS_FRECUENTES, type BarrioOpcion } from "@/lib/validaciones/registro-cliente";
 
 function Resultado({ estado }: { estado: EstadoFormulario }) {
   if (estado.mensaje) {
     return (
-      <p role="alert" className="text-sm font-semibold text-error">
+      <p role="alert" className="text-sm font-bold text-error">
         {estado.mensaje}
       </p>
     );
   }
   if (estado.exito) {
     return (
-      <p role="status" className="text-sm font-semibold text-texto">
+      <p role="status" className="text-sm font-bold text-texto">
         {estado.exito}
       </p>
     );
@@ -79,14 +79,18 @@ export function FormularioDatos({ barrios, inicial }: PropsDatos) {
   });
   const errores = { ...estado.errores, ...locales };
   const v = estado.valores ?? inicial;
+  const opcionesBarrios = barrios.length > 0 ? barrios : BARRIOS_FRECUENTES;
 
   return (
     <form
       action={accion}
       onSubmit={alEnviar}
-      onChange={(e) => e.target instanceof HTMLInputElement && limpiar(e.target.name)}
+      onChange={(e) =>
+        (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) &&
+        limpiar(e.target.name)
+      }
       noValidate
-      className="flex flex-col gap-3.5"
+      className="flex flex-col gap-3 rounded-tarjeta bg-superficie p-4 text-texto"
     >
       <Campo
         etiqueta="Nombre y apellido"
@@ -98,24 +102,96 @@ export function FormularioDatos({ barrios, inicial }: PropsDatos) {
       />
       <Campo
         variante="telefono"
-        etiqueta="Celular de WhatsApp"
+        etiqueta="WhatsApp"
         name="whatsapp"
-        placeholder="223 555-0000"
+        placeholder="223 555 0123"
         defaultValue={v.whatsapp}
         error={errores.whatsapp}
         required
       />
-      <SelectorBarrio
-        barrios={barrios}
-        valorInicial={v.barrio}
+      <Campo
+        variante="seleccion"
+        etiqueta="Barrio"
+        name="barrio"
+        defaultValue={v.barrio}
         error={errores.barrio}
-        alCambiar={() => limpiar("barrio")}
-      />
+      >
+        <option value="">Elegí tu barrio</option>
+        {opcionesBarrios.map((b) => (
+          <option key={b.id} value={String(b.id)}>
+            {b.nombre}
+          </option>
+        ))}
+      </Campo>
       <Resultado estado={estado} />
-      <Boton type="submit" variante="cliente" tamano="grande" bloque cargando={pendiente}>
-        Guardar cambios
+      <Boton type="submit" bloque cargando={pendiente}>
+        Guardar
       </Boton>
     </form>
+  );
+}
+
+/** Sección "Cómo ingresás" con resumen de email y contraseña y despliegue de los formularios. */
+export function SeccionComoIngresas({
+  emailActual,
+  conContrasena,
+}: {
+  emailActual: string;
+  conContrasena: boolean;
+}) {
+  const [abierto, setAbierto] = useState<"email" | "contrasena" | null>(null);
+
+  return (
+    <Tarjeta como="section" aria-labelledby="acceso" className="flex flex-col gap-2.5">
+      <h2 id="acceso" className="font-titulo text-[22px] leading-tight">
+        Cómo ingresás
+      </h2>
+      <div className="flex items-center gap-2.5">
+        <span className="flex min-w-0 flex-1 flex-col">
+          <span className="text-sm">Email</span>
+          <span className="truncate text-base font-bold">{emailActual || "—"}</span>
+        </span>
+        {conContrasena ? (
+          <button
+            type="button"
+            aria-expanded={abierto === "email"}
+            aria-label={abierto === "email" ? "Cerrar cambio de email" : "Cambiar email"}
+            onClick={() => setAbierto((a) => (a === "email" ? null : "email"))}
+            className="min-h-11 rounded-[14px] border-2 border-texto bg-transparent px-3.5 text-[15px] font-bold text-texto hover:bg-fondo"
+          >
+            {abierto === "email" ? "Cerrar" : "Cambiar"}
+          </button>
+        ) : null}
+      </div>
+      {abierto === "email" && conContrasena ? <FormularioEmail emailActual={emailActual} /> : null}
+
+      <div className="flex items-center gap-2.5">
+        <span className="flex flex-1 flex-col">
+          <span className="text-sm">Contraseña</span>
+          <span className="text-base font-bold">
+            {conContrasena ? "Configurada" : "Cuenta de Google"}
+          </span>
+        </span>
+        {conContrasena ? (
+          <button
+            type="button"
+            aria-expanded={abierto === "contrasena"}
+            aria-label={
+              abierto === "contrasena" ? "Cerrar cambio de contraseña" : "Cambiar contraseña"
+            }
+            onClick={() => setAbierto((a) => (a === "contrasena" ? null : "contrasena"))}
+            className="min-h-11 rounded-[14px] border-2 border-texto bg-transparent px-3.5 text-[15px] font-bold text-texto hover:bg-fondo"
+          >
+            {abierto === "contrasena" ? "Cerrar" : "Cambiar"}
+          </button>
+        ) : null}
+      </div>
+      {abierto === "contrasena" && conContrasena ? <FormularioContrasena /> : null}
+
+      <p className="text-sm leading-snug">
+        Si ingresás con Google, el email y la contraseña se manejan desde tu cuenta de Google.
+      </p>
+    </Tarjeta>
   );
 }
 
@@ -139,7 +215,7 @@ export function FormularioEmail({ emailActual }: { emailActual: string }) {
       onSubmit={alEnviar}
       onChange={(e) => e.target instanceof HTMLInputElement && limpiar(e.target.name)}
       noValidate
-      className="flex flex-col gap-3.5"
+      className="flex flex-col gap-3 border-t-2 border-fondo pt-3"
     >
       <Campo
         etiqueta="Email"
@@ -159,8 +235,8 @@ export function FormularioEmail({ emailActual }: { emailActual: string }) {
         required
       />
       <Resultado estado={estado} />
-      <Boton type="submit" variante="secundario" tamano="grande" bloque cargando={pendiente}>
-        Cambiar email
+      <Boton type="submit" variante="secundario" bloque cargando={pendiente}>
+        Guardar email
       </Boton>
     </form>
   );
@@ -192,7 +268,7 @@ export function FormularioContrasena() {
       onSubmit={alEnviar}
       onChange={(e) => e.target instanceof HTMLInputElement && limpiar(e.target.name)}
       noValidate
-      className="flex flex-col gap-3.5"
+      className="flex flex-col gap-3 border-t-2 border-fondo pt-3"
     >
       <CampoContrasena
         etiqueta="Tu contraseña actual"
@@ -217,8 +293,8 @@ export function FormularioContrasena() {
         required
       />
       <Resultado estado={estado} />
-      <Boton type="submit" variante="secundario" tamano="grande" bloque cargando={pendiente}>
-        Cambiar contraseña
+      <Boton type="submit" variante="secundario" bloque cargando={pendiente}>
+        Guardar contraseña
       </Boton>
     </form>
   );

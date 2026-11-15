@@ -289,7 +289,7 @@ test.describe("/cuenta/verificacion", () => {
     }) => {
       await page.emulateMedia({ colorScheme: esquema });
       await page.goto("/cuenta/verificacion");
-      await expect(page.getByRole("heading", { level: 1, name: "Verificación" })).toBeVisible();
+      await expect(page.getByRole("heading", { level: 1, name: "Mi verificación" })).toBeVisible();
       await expect(
         page.getByText("La verificación de documentos es para cuentas de profesional."),
       ).toBeVisible();

@@ -245,10 +245,10 @@ test.describe("perfil público: el dueño", () => {
     await capturar(page, "perfil-revision", "claro");
   });
 
-  test("edición: valida, guarda y enlaza a Ver mi perfil", async ({ page, context, baseURL }) => {
+  test("edición: valida, guarda y enlaza a Ver cómo se ve", async ({ page, context, baseURL }) => {
     await iniciarSesion(context, baseURL ?? "", "tok-dueno");
     await page.goto("/cuenta/perfil");
-    await expect(page.getByRole("heading", { level: 1, name: "Editar perfil" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Mi perfil público" })).toBeVisible();
     await expect(page.getByRole("checkbox", { name: "Gas" })).toBeChecked();
 
     // Sin oficios: error en castellano al lado del campo. El falso tiene gas y plomería: hay que
@@ -261,7 +261,7 @@ test.describe("perfil público: el dueño", () => {
     await page.getByRole("checkbox", { name: "Plomería" }).check();
     await page.getByRole("button", { name: "Guardar cambios" }).click();
     await expect(page.getByText("Guardamos los cambios de tu perfil.")).toBeVisible();
-    await expect(page.getByRole("link", { name: /Ver mi perfil/ })).toHaveAttribute(
+    await expect(page.getByRole("link", { name: /Ver cómo se ve/ }).first()).toHaveAttribute(
       "href",
       `/profesionales/${ID_PUBLICADO}`,
     );
@@ -310,7 +310,9 @@ for (const tema of ["light", "dark"] as const) {
       await sinViolacionesGraves(page);
 
       await page.goto("/cuenta/perfil");
-      await expect(page.getByRole("heading", { level: 1, name: "Editar perfil" })).toBeVisible();
+      await expect(
+        page.getByRole("heading", { level: 1, name: "Mi perfil público" }),
+      ).toBeVisible();
       await capturar(page, "editar-perfil", nombreTema);
       await sinViolacionesGraves(page);
     });
