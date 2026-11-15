@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 
+import { Boton } from "@/components/ui/Boton";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { haceCuanto } from "@/lib/formato";
 import type { FilaReporteAdmin } from "@/lib/admin/reportes-datos";
@@ -26,7 +27,7 @@ export function FilaReporte({ fila }: { fila: FilaReporteAdmin }) {
   const [modalSuspenderAbierto, setModalSuspenderAbierto] = useState(false);
 
   return (
-    <Tarjeta borde className="flex flex-col gap-4">
+    <Tarjeta className="flex flex-col gap-4">
       {/* Cabecera del reporte */}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap items-center gap-2">
@@ -103,13 +104,13 @@ export function FilaReporte({ fila }: { fila: FilaReporteAdmin }) {
                 variante="secundario"
               />
             ) : (
-              <button
+              <Boton
                 type="button"
+                variante="peligro"
                 onClick={() => setModalSuspenderAbierto(true)}
-                className="inline-flex min-h-11 items-center justify-center rounded-boton border border-error bg-superficie px-4 text-sm font-bold text-error hover:bg-fondo active:opacity-80"
               >
                 Suspender cuenta…
-              </button>
+              </Boton>
             )
           ) : null}
 
