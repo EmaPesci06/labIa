@@ -17,11 +17,7 @@ export async function ShellExplorar({ children }: { children: ReactNode }) {
   return (
     <>
       <BarraVisitante />
-      <main
-        id="contenido"
-        tabIndex={-1}
-        className="mx-auto w-full max-w-[1200px] flex-1 px-5 py-6 focus:outline-none lg:px-10 lg:py-8"
-      >
+      <main id="contenido" tabIndex={-1} className="marco flex-1 focus:outline-none">
         {children}
       </main>
     </>

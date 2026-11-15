@@ -6,18 +6,14 @@ import { Suspense } from "react";
 
 import { cn } from "@/lib/cn";
 import { esDestinoActivo, type Destino } from "@/lib/navegacion";
-import type { RolApp } from "@/lib/sesion";
-
-import { IconoDestino } from "./iconos";
 
 type Props = {
   destinos: readonly Destino[];
-  rol: RolApp;
 };
 
 type PropsLista = Props & { esActivo: (destino: Destino) => boolean };
 
-function Lista({ destinos, rol, esActivo }: PropsLista) {
+function Lista({ destinos, esActivo }: PropsLista) {
   return (
     <ul className="contents">
       {destinos.map((destino) => {
@@ -28,13 +24,11 @@ function Lista({ destinos, rol, esActivo }: PropsLista) {
               href={destino.href}
               aria-current={activo ? "page" : undefined}
               className={cn(
-                "flex min-h-12 w-full flex-col items-center justify-center gap-1 rounded-campo text-xs",
-                activo
-                  ? cn("font-bold", rol === "profesional" ? "text-texto" : "text-texto")
-                  : "font-semibold text-texto",
+                "flex min-h-12 w-full items-center justify-center rounded-campo text-[15px] text-texto",
+                // Sección actual: pastilla `fondo` de radio 16, en negrita (boceto App-Buscar).
+                activo ? "bg-fondo font-bold" : "font-normal",
               )}
             >
-              <IconoDestino icono={destino.icono} className="size-[22px]" />
               {destino.etiqueta}
             </Link>
           </li>
@@ -51,20 +45,20 @@ function ListaConRuta(props: Props) {
 }
 
 /**
- * Barra inferior de celular (< 1024 px): 3 ítems, 64 px de alto más el área segura de abajo.
- * El ítem activo va en azul (cliente) o naranja de acción (profesional) con `aria-current="page"`.
+ * Barra inferior de celular (< `lg`): 3 secciones de texto sobre fondo `superficie`, sin borde ni
+ * sombra. Alto 68 px más el área segura de abajo; el contenido ocupa los 68 px.
  * `data-barra-inferior` la usa globals.css para dejarle lugar al final de la página.
  */
-export function BarraInferior({ destinos, rol }: Props) {
+export function BarraInferior({ destinos }: Props) {
   return (
     <nav
       aria-label="Navegación"
       data-barra-inferior=""
-      className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-3 border-t border-fondo bg-superficie px-2 pt-2 pb-[calc(8px+env(safe-area-inset-bottom))] lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 grid h-[calc(68px+env(safe-area-inset-bottom))] grid-cols-3 items-center bg-superficie px-3 pb-[calc(6px+env(safe-area-inset-bottom))] lg:hidden"
     >
       {/* useSearchParams necesita Suspense; mientras tanto se dibuja sin ítem activo. */}
-      <Suspense fallback={<Lista destinos={destinos} rol={rol} esActivo={() => false} />}>
-        <ListaConRuta destinos={destinos} rol={rol} />
+      <Suspense fallback={<Lista destinos={destinos} esActivo={() => false} />}>
+        <ListaConRuta destinos={destinos} />
       </Suspense>
     </nav>
   );

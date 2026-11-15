@@ -133,12 +133,45 @@
 }
 
 /*
- * Celular: la barra inferior (64 px + área segura) es fija; el body le deja ese lugar para que no
+ * Marco de las pantallas con navegación (`<main class="marco">`): una columna centrada de hasta
+ * 1200 px con 20 px de margen (32 px desde `lg`). Los encabezados de color (`<Encabezado>` salvo la
+ * variante `plano`) ocupan todo el ancho y alinean su contenido con esa columna; si son lo primero
+ * de la pantalla, se pegan a la barra de arriba.
+ */
+.marco {
+  --marco-margen: 20px;
+  --marco-aire: 24px;
+  display: grid;
+  grid-template-columns:
+    minmax(var(--marco-margen), 1fr) minmax(0, 1200px)
+    minmax(var(--marco-margen), 1fr);
+  align-content: start;
+  padding-block: var(--marco-aire);
+}
+.marco > * {
+  grid-column: 2;
+}
+.marco > [data-encabezado]:not([data-encabezado="plano"]) {
+  grid-column: 1 / -1;
+  padding-inline: max(var(--marco-margen), calc((100% - 1200px) / 2));
+}
+.marco > [data-encabezado]:not([data-encabezado="plano"]):first-child {
+  margin-top: calc(var(--marco-aire) * -1);
+}
+@media (min-width: 1024px) {
+  .marco {
+    --marco-margen: 32px;
+    --marco-aire: 32px;
+  }
+}
+
+/*
+ * Celular: la barra inferior (68 px + área segura) es fija; el body le deja ese lugar para que no
  * tape el final de la página ni el pie. Solo hasta `lg` (1024 px), donde la barra no se muestra.
  */
 @media (max-width: 1023.98px) {
   body:has([data-barra-inferior]) {
-    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+    padding-bottom: calc(68px + env(safe-area-inset-bottom));
   }
 }
 

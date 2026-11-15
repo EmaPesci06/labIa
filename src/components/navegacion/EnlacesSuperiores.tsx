@@ -6,18 +6,18 @@ import { Suspense } from "react";
 
 import { cn } from "@/lib/cn";
 import { esDestinoActivo, type Destino } from "@/lib/navegacion";
-import type { RolApp } from "@/lib/sesion";
+
+import { SECCION_BARRA } from "./estilos";
 
 type Props = {
   destinos: readonly Destino[];
-  rol: RolApp;
 };
 
 type PropsLista = Props & { esActivo: (destino: Destino) => boolean };
 
-function Lista({ destinos, rol, esActivo }: PropsLista) {
+function Lista({ destinos, esActivo }: PropsLista) {
   return (
-    <ul className="flex items-center gap-7">
+    <ul className="flex items-center gap-1">
       {destinos.map((destino) => {
         const activo = esActivo(destino);
         return (
@@ -25,15 +25,8 @@ function Lista({ destinos, rol, esActivo }: PropsLista) {
             <Link
               href={destino.href}
               aria-current={activo ? "page" : undefined}
-              className={cn(
-                "inline-flex min-h-11 items-center text-[15px] font-semibold",
-                activo
-                  ? cn(
-                      "underline decoration-2 underline-offset-[6px]",
-                      rol === "profesional" ? "text-texto" : "text-texto",
-                    )
-                  : "text-texto hover:text-texto",
-              )}
+              // La sección actual lleva la pastilla `fondo` y va en negrita (boceto App-Escritorio).
+              className={cn(SECCION_BARRA, activo ? "bg-fondo font-bold" : "font-normal")}
             >
               {destino.etiqueta}
             </Link>
@@ -50,12 +43,12 @@ function ListaConRuta(props: Props) {
   return <Lista {...props} esActivo={(destino) => esDestinoActivo(destino, ruta, vista)} />;
 }
 
-/** Links del centro de la barra superior de escritorio. */
-export function EnlacesSuperiores({ destinos, rol }: Props) {
+/** Secciones del centro de la barra superior de escritorio. */
+export function EnlacesSuperiores({ destinos }: Props) {
   return (
     <nav aria-label="Principal">
-      <Suspense fallback={<Lista destinos={destinos} rol={rol} esActivo={() => false} />}>
-        <ListaConRuta destinos={destinos} rol={rol} />
+      <Suspense fallback={<Lista destinos={destinos} esActivo={() => false} />}>
+        <ListaConRuta destinos={destinos} />
       </Suspense>
     </nav>
   );

@@ -27,11 +27,12 @@ test.describe("navegación del cliente", () => {
       await expect(barraInferior(page)).toBeHidden();
       await expect(barraSuperior(page).getByRole("link")).toHaveText([
         "Buscar profesionales",
-        "Publicar un trabajo",
         "Mis trabajos",
       ]);
-      await expect(page.getByRole("link", { name: "Publicar trabajo" })).toBeVisible();
-      await expect(page.getByRole("banner").first()).toHaveCSS("height", "72px");
+      await expect(
+        page.getByRole("banner").getByRole("link", { name: "Publicar un trabajo" }),
+      ).toBeVisible();
+      await expect(page.getByRole("banner").first()).toHaveCSS("height", "64px");
     }
   });
 
@@ -197,8 +198,11 @@ test.describe("teclado", () => {
     // En escritorio /inicio redirige a /buscar (LAB-23): esperar a la pantalla final antes de tabular.
     if (!esCelular(page)) {
       await expect(page).toHaveURL(/\/buscar/);
-      await expect(page.locator("main")).toHaveCount(1);
     }
+    // El armazón (con sesión) llega en streaming: esperar a la pantalla final antes de tabular o el
+    // foco puede quedar en el esqueleto que se reemplaza.
+    await expect(page.locator("main#contenido")).toHaveCount(1);
+    await expect(esCelular(page) ? barraInferior(page) : barraSuperior(page)).toBeVisible();
     await page.keyboard.press("Tab");
     const salto = page.getByRole("link", { name: "Saltar al contenido" });
     await expect(salto).toBeFocused();

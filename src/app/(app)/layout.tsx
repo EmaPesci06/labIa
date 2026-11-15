@@ -16,12 +16,9 @@ export default function LayoutApp({ children }: { children: ReactNode }) {
         fallback={
           // Mismo alto que las barras reales, para que no salte el contenido al cargar.
           <>
-            <div className="hidden h-[72px] border-b border-fondo bg-superficie lg:block" />
-            <main
-              id="contenido"
-              tabIndex={-1}
-              className="mx-auto w-full max-w-[1200px] flex-1 px-5 py-6 focus:outline-none lg:px-10 lg:py-8"
-            >
+            <div className="hidden h-16 bg-superficie lg:block" />
+            {/* Sin id: el esqueleto sigue en el DOM mientras carga y #contenido debe ser único. */}
+            <main className="marco flex-1">
               <EsqueletoPagina />
             </main>
           </>
