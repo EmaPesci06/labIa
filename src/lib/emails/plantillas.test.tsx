@@ -28,21 +28,33 @@ const PLANTILLAS: Record<string, ConVistaPrevia> = {
   cuenta_suspendida: CuentaSuspendida as unknown as ConVistaPrevia,
 };
 
+/** Emails de novedades: llevan el enlace de baja del pie. */
+const CON_BAJA = ["eligieron_a_otro", "pedir_resena", "trabajos_cerca"];
+/** Emails que llevan el enlace "Elegir qué emails recibo" (incluye los de novedades). */
+const CON_PREFERENCIAS = [...CON_BAJA, "nueva_postulacion", "te_eligieron"];
+
+const URL_BAJA = "https://labia.example/baja#t=ejemplo";
+const URL_PREFERENCIAS = "https://labia.example/cuenta/emails";
+
 const vista = (c: ConVistaPrevia) =>
   createElement(c as unknown as ComponentType<object>, c.PreviewProps);
 
-describe.each(Object.entries(PLANTILLAS))("plantilla %s", (_nombre, Plantilla) => {
-  it("renderiza HTML con la marca, el pie y el link de baja", async () => {
+describe.each(Object.entries(PLANTILLAS))("plantilla %s", (nombre, Plantilla) => {
+  it("renderiza HTML con la marca y el pie de LabÍA", async () => {
     const html = await render(vista(Plantilla));
     expect(html).toContain("LabÍA");
-    expect(html).toContain("Recibís este email porque tenés cuenta en LabÍA");
-    expect(html).toContain("https://labia.example/baja#t=ejemplo");
-    expect(html).toContain("https://labia.example/cuenta/emails");
+    expect(html).toContain("LabÍA, Mar del Plata");
+  });
+
+  it("pone el enlace de baja y el de preferencias solo donde corresponde", async () => {
+    const html = await render(vista(Plantilla));
+    expect(html.includes(URL_BAJA)).toBe(CON_BAJA.includes(nombre));
+    expect(html.includes(URL_PREFERENCIAS)).toBe(CON_PREFERENCIAS.includes(nombre));
   });
 
   it("renderiza la versión de texto plano", async () => {
     const texto = await render(vista(Plantilla), { plainText: true });
-    expect(texto).toContain("Recibís este email porque tenés cuenta en LabÍA");
+    expect(texto).toContain("LabÍA, Mar del Plata");
     expect(texto).not.toContain("<");
   });
 
@@ -53,10 +65,17 @@ describe.each(Object.entries(PLANTILLAS))("plantilla %s", (_nombre, Plantilla) =
 });
 
 describe("botón de acción", () => {
-  it("es naranja #B84A25 con texto blanco", async () => {
+  it("es turquesa #0E7C86 con texto blanco", async () => {
     const html = await render(vista(BienvenidaCliente as unknown as ConVistaPrevia));
-    expect(html.toLowerCase()).toContain("background-color:#b84a25");
+    expect(html.toLowerCase()).toContain("background-color:#0e7c86");
     expect(html.toLowerCase()).toContain("color:#ffffff");
+  });
+});
+
+describe("cuenta suspendida", () => {
+  it("usa la cabecera azul noche #123B4A", async () => {
+    const html = await render(vista(CuentaSuspendida as unknown as ConVistaPrevia));
+    expect(html.toLowerCase()).toContain("background-color:#123b4a");
   });
 });
 
