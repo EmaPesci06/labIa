@@ -14,7 +14,7 @@ type Props = {
   className?: string;
 };
 
-/** "Continuar con Google" (como en el registro del prototipo). Es un formulario con Server Action. */
+/** "Seguir con Google" (bocetos `App-Ingresar` y `App-RegistroCliente`). Es un formulario con Server Action. */
 export function BotonGoogle({ rol, volver, className }: Props) {
   const [estado, accion, pendiente] = useActionState(continuarConGoogle, ESTADO_INICIAL);
   return (
@@ -24,25 +24,12 @@ export function BotonGoogle({ rol, volver, className }: Props) {
       <button
         type="submit"
         aria-busy={pendiente || undefined}
-        className="flex min-h-12 w-full items-center justify-center gap-2.5 rounded-campo border border-texto bg-superficie text-[15px] font-semibold text-texto hover:bg-superficie"
+        className="flex min-h-[52px] w-full items-center justify-center gap-2.5 rounded-boton border-2 border-texto bg-superficie px-5 text-[17px] font-bold text-texto hover:opacity-95"
       >
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          aria-hidden="true"
-        >
-          <circle cx="12" cy="12" r="9" />
-          <path d="M12 12h8" />
-        </svg>
-        Continuar con Google
+        Seguir con Google
       </button>
       {estado.mensaje ? (
-        <p role="alert" className="text-sm font-semibold text-error">
+        <p role="alert" className="text-[15px] font-bold text-error">
           {estado.mensaje}
         </p>
       ) : null}
@@ -50,13 +37,13 @@ export function BotonGoogle({ rol, volver, className }: Props) {
   );
 }
 
-/** Separador "o con tu email" entre Google y el formulario. */
+/** Separador "o con tu email" entre Google y el formulario (`App-Ingresar`). */
 export function SeparadorO({ texto = "o con tu email" }: { texto?: string }) {
   return (
-    <div className="flex items-center gap-2.5 text-[13px] text-texto">
-      <span aria-hidden className="h-px flex-1 bg-fondo" />
+    <div className="flex items-center gap-3 text-[15px] text-texto">
+      <span aria-hidden className="h-0.5 flex-1 bg-texto" />
       {texto}
-      <span aria-hidden className="h-px flex-1 bg-fondo" />
+      <span aria-hidden className="h-0.5 flex-1 bg-texto" />
     </div>
   );
 }

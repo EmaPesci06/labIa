@@ -36,7 +36,7 @@ async function Contenido({ searchParams }: PageProps<"/registro/cliente/completa
   return (
     <>
       {aviso ? (
-        <p role="alert" className="rounded-campo bg-sol p-3.5 text-sm font-semibold text-sobre-sol">
+        <p role="alert" className="rounded-campo bg-sol p-3.5 text-sm font-bold text-sobre-sol">
           Creamos tu cuenta pero no pudimos guardar tus datos. Completalos acá para seguir.
         </p>
       ) : null}
@@ -47,11 +47,12 @@ async function Contenido({ searchParams }: PageProps<"/registro/cliente/completa
 
 export default function CompletarRegistroCliente(props: PageProps<"/registro/cliente/completar">) {
   return (
-    <div className="flex flex-col gap-[18px]">
+    <div className="flex flex-col gap-4">
       <EncabezadoAuth
         titulo="Un último paso"
         bajada="Con tu WhatsApp y tu barrio, los profesionales pueden responderte."
-        contexto="Quiero contratar"
+        volverA="/"
+        volverTexto="Volver"
       />
       <Suspense fallback={null}>
         <Contenido {...props} />
