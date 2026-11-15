@@ -81,7 +81,7 @@ describe("PerfilProfesional", () => {
       <PerfilProfesional perfil={perfil} resenas={resenas} distanciaKm={null} puedeContactar />,
     );
     expect(
-      screen.getAllByRole("button", { name: /Contactar por WhatsApp/ }).length,
+      screen.getAllByRole("button", { name: /Escribirle por WhatsApp/ }).length,
     ).toBeGreaterThan(0);
     expect(container.innerHTML).not.toMatch(/\+549|wa\.me|@/);
   });
@@ -89,20 +89,20 @@ describe("PerfilProfesional", () => {
   it("con sesión de profesional (sin ser el dueño) no muestra el botón de contacto", () => {
     render(<PerfilProfesional perfil={perfil} resenas={resenas} distanciaKm={null} />);
     expect(
-      screen.queryByRole("button", { name: /Contactar por WhatsApp/ }),
+      screen.queryByRole("button", { name: /Escribirle por WhatsApp/ }),
     ).not.toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /Contactar por WhatsApp/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Escribirle por WhatsApp/ })).not.toBeInTheDocument();
   });
 
   it('el cliente abre la hoja "Antes de contactar" con los cuatro consejos', async () => {
     render(
       <PerfilProfesional perfil={perfil} resenas={resenas} distanciaKm={null} puedeContactar />,
     );
-    await userEvent.click(screen.getAllByRole("button", { name: /Contactar por WhatsApp/ })[0]!);
-    const hoja = screen.getByRole("dialog", { name: "Antes de contactar" });
+    await userEvent.click(screen.getAllByRole("button", { name: /Escribirle por WhatsApp/ })[0]!);
+    const hoja = screen.getByRole("dialog", { name: /Escribile a Martín por WhatsApp/ });
     expect(hoja.querySelectorAll("li")).toHaveLength(4);
     expect(screen.getByRole("button", { name: "Abrir WhatsApp" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Cancelar" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Ahora no" })).toBeInTheDocument();
   });
 
   it("al dueño le muestra el banner y Editar perfil, sin WhatsApp", () => {
@@ -143,7 +143,7 @@ describe("PerfilProfesional", () => {
         hrefIngreso="/ingresar?volver=%2Fprofesionales%2F1"
       />,
     );
-    const enlaces = screen.getAllByRole("link", { name: /Contactar por WhatsApp/ });
+    const enlaces = screen.getAllByRole("link", { name: /Escribirle por WhatsApp/ });
     expect(enlaces.length).toBeGreaterThan(0);
     for (const enlace of enlaces) {
       expect(enlace).toHaveAttribute("href", "/ingresar?volver=%2Fprofesionales%2F1");
