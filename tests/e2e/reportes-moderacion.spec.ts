@@ -127,7 +127,7 @@ test.describe("reportes del cliente y del profesional", () => {
     );
     await page.goto(`/profesionales/${ID_MODERADO}`);
 
-    await botonVisible(page, "Reportar perfil").click();
+    await botonVisible(page, "Reportar este perfil").click();
     const hoja = hojaDeReporte(page);
     await expect(hoja).toBeVisible();
     await expect(hoja.getByRole("button", { name: "Enviar reporte" })).toBeDisabled();
@@ -135,7 +135,7 @@ test.describe("reportes del cliente y del profesional", () => {
     await hoja.getByLabel(MOTIVO_ESTAFA).check();
     await expect(hoja.getByRole("button", { name: "Enviar reporte" })).toBeEnabled();
 
-    const detalle = hoja.getByLabel("Detalle opcional");
+    const detalle = hoja.getByLabel("Contanos qué pasó");
     await detalle.fill("x".repeat(600));
     await expect(detalle).toHaveValue("x".repeat(500));
     await expect(hoja.getByText("500 / 500")).toBeVisible();
@@ -150,7 +150,7 @@ test.describe("reportes del cliente y del profesional", () => {
 
     // Segundo reporte sobre el mismo perfil (tras recargar): el servidor lo rechaza junto al formulario.
     await page.reload();
-    await botonVisible(page, "Reportar perfil").click();
+    await botonVisible(page, "Reportar este perfil").click();
     await hoja.getByLabel(MOTIVO_CONTENIDO).check();
     await hoja.getByRole("button", { name: "Enviar reporte" }).click();
     await expect(hoja.getByRole("alert").filter({ hasText: YA_REPORTADO })).toBeVisible();
@@ -166,7 +166,7 @@ test.describe("reportes del cliente y del profesional", () => {
     );
     await page.goto(`/profesionales/${ID_MODERADO}`);
 
-    const boton = botonVisible(page, "Reportar perfil");
+    const boton = botonVisible(page, "Reportar este perfil");
     await boton.focus();
     await page.keyboard.press("Enter");
     const hoja = hojaDeReporte(page);
@@ -228,7 +228,7 @@ test.describe("reportes del cliente y del profesional", () => {
 
     for (const tema of ["claro", "oscuro"] as const) {
       await page.emulateMedia({ colorScheme: tema === "oscuro" ? "dark" : "light" });
-      await botonVisible(page, "Reportar perfil").click();
+      await botonVisible(page, "Reportar este perfil").click();
       const hoja = hojaDeReporte(page);
       await expect(hoja).toBeVisible();
       await hoja.getByLabel(MOTIVO_ESTAFA).check();

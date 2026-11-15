@@ -1,7 +1,6 @@
 "use client";
 
 import { MessageCircle, CheckCircle, ArrowLeftRight, XCircle, Star } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 
@@ -164,7 +163,7 @@ export function DetalleMiTrabajo({
       {/* Encabezado del trabajo */}
       <section
         aria-label="Detalles de mi trabajo"
-        className="flex flex-col gap-3.5 rounded-[18px] border border-fondo bg-superficie p-4 text-texto lg:p-6"
+        className="flex flex-col gap-3.5 rounded-[22px] bg-superficie p-5 text-texto lg:p-6"
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
           <EtiquetaMono partes={[ETIQUETA_OFICIO[trabajo.oficio], trabajo.barrioNombre]} />
@@ -187,7 +186,7 @@ export function DetalleMiTrabajo({
           </span>
         </div>
 
-        <h1 className="font-titulo text-xl font-extrabold tracking-tight text-texto lg:text-2xl">
+        <h1 className="font-titulo text-[30px] leading-[1.05] font-extrabold text-texto lg:text-[34px]">
           {trabajo.titulo}
         </h1>
 
@@ -249,7 +248,7 @@ export function DetalleMiTrabajo({
       {trabajo.estado === "asignado" ? (
         <section
           aria-label="Profesional contratado"
-          className="flex flex-col gap-4 rounded-[18px] border border-accion/30 bg-sol p-4 text-texto lg:p-5"
+          className="flex flex-col gap-4 rounded-[22px] bg-sol p-5 text-sobre-sol lg:p-6"
         >
           <div className="flex items-start gap-3">
             <CheckCircle aria-hidden className="size-6 shrink-0 text-texto" />
@@ -262,15 +261,14 @@ export function DetalleMiTrabajo({
           <div className="flex flex-wrap items-center gap-2.5">
             {trabajo.profesionalElegidoId ? (
               <>
-                <button
+                <Boton
                   ref={botonWhatsAppRef}
                   type="button"
                   onClick={() => setHojaContactoAbierta(true)}
-                  className="inline-flex min-h-[44px] cursor-pointer items-center justify-center gap-2 rounded-boton bg-accion px-5 text-sm font-bold text-sobre-accion transition-opacity hover:opacity-95 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco active:opacity-90"
                 >
-                  <MessageCircle aria-hidden className="size-4" />
+                  <MessageCircle aria-hidden className="size-5" />
                   Escribir por WhatsApp
-                </button>
+                </Boton>
                 <HojaContacto
                   abierta={hojaContactoAbierta}
                   onCambioAbierta={setHojaContactoAbierta}
@@ -282,16 +280,15 @@ export function DetalleMiTrabajo({
               </>
             ) : null}
 
-            <button
+            <Boton
               ref={botonTerminarRef}
               type="button"
               disabled={pendiente}
               onClick={() => setModalTerminarAbierto(true)}
-              className="inline-flex min-h-[44px] cursor-pointer items-center justify-center gap-1.5 rounded-boton bg-accion px-4 text-sm font-bold text-sobre-accion transition-colors hover:bg-accion focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
             >
-              <CheckCircle aria-hidden className="size-4" />
+              <CheckCircle aria-hidden className="size-5" />
               Marcar como terminado
-            </button>
+            </Boton>
             <ModalConfirmacion
               abierta={modalTerminarAbierto}
               onCambioAbierta={setModalTerminarAbierto}
@@ -304,16 +301,16 @@ export function DetalleMiTrabajo({
               devolverFocoA={botonTerminarRef}
             />
 
-            <button
+            <Boton
               ref={botonCambiarRef}
               type="button"
+              variante="secundario"
               disabled={pendiente}
               onClick={() => setModalCambiarAbierto(true)}
-              className="inline-flex min-h-[44px] cursor-pointer items-center justify-center gap-1.5 rounded-boton border border-texto bg-superficie px-3.5 text-sm font-semibold text-texto hover:border-accion focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
             >
-              <ArrowLeftRight aria-hidden className="size-4" />
+              <ArrowLeftRight aria-hidden className="size-5" />
               Cambiar de profesional
-            </button>
+            </Boton>
             <ModalConfirmacion
               abierta={modalCambiarAbierto}
               onCambioAbierta={setModalCambiarAbierto}
@@ -333,7 +330,7 @@ export function DetalleMiTrabajo({
       {trabajo.estado === "cerrado" ? (
         <section
           aria-label="Trabajo terminado"
-          className="flex flex-col gap-3 rounded-[18px] border border-fondo bg-superficie p-4 text-texto lg:p-5"
+          className="flex flex-col gap-3 rounded-[22px] bg-superficie p-5 text-texto lg:p-6"
         >
           <div className="flex items-center gap-2.5 text-texto">
             <CheckCircle aria-hidden className="size-5" />
@@ -341,17 +338,16 @@ export function DetalleMiTrabajo({
           </div>
           {trabajo.profesionalElegidoId ? (
             <div className="pt-1">
-              <Link
+              <Boton
                 href={`/profesionales/${trabajo.profesionalElegidoId}#resena`}
                 onClick={(e) => {
                   e.preventDefault();
                   setHojaResenaAbierta(true);
                 }}
-                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-boton bg-accion px-5 text-sm font-bold text-sobre-accion hover:opacity-95 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
               >
-                <Star aria-hidden className="size-4" />
+                <Star aria-hidden className="size-5" />
                 Dejar reseña al profesional
-              </Link>
+              </Boton>
             </div>
           ) : null}
         </section>
@@ -386,7 +382,7 @@ export function DetalleMiTrabajo({
         </div>
 
         {postulantesOrdenados.length === 0 ? (
-          <div className="flex min-h-[160px] flex-col items-center justify-center rounded-[18px] border border-dashed border-fondo bg-superficie p-6 text-center text-texto">
+          <div className="flex min-h-[160px] flex-col items-center justify-center rounded-[22px] bg-superficie p-6 text-center text-texto">
             <p className="text-[15px] font-medium">Todavía nadie se postuló.</p>
             <p className="text-sm">Te avisamos por email cuando pase.</p>
           </div>

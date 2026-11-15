@@ -5,13 +5,13 @@ import { useEffect, useState, useTransition } from "react";
 import { Aviso } from "@/components/ui/Aviso";
 import { Boton } from "@/components/ui/Boton";
 import { Chip } from "@/components/ui/Chip";
-import { Estrellas } from "@/components/ui/Estrellas";
 import { HojaInferior } from "@/components/ui/HojaInferior";
 import {
   consultarElegibilidadResena,
   guardarResena,
   type ResenaPropia,
 } from "@/lib/resenas/acciones";
+import { cn } from "@/lib/cn";
 import { CHIPS_RAPIDOS, ETIQUETAS_PUNTAJE } from "@/lib/validaciones/resenas";
 
 export type HojaResenaProps = {
@@ -28,6 +28,44 @@ export type HojaResenaProps = {
   alGuardar?: () => void;
   devolverFocoA?: { current: HTMLElement | null };
 };
+
+/**
+ * Cinco pastillas numeradas (boceto App-Resena). Son radios nativos: el teclado mueve y elige con
+ * las flechas, y el nombre accesible es la etiqueta del puntaje ("Excelente").
+ */
+function SelectorPuntaje({ valor, onChange }: { valor: number; onChange: (n: number) => void }) {
+  return (
+    <div
+      role="radiogroup"
+      aria-label="Calificación del profesional"
+      className="grid grid-cols-5 gap-2"
+    >
+      {[1, 2, 3, 4, 5].map((n) => {
+        const elegido = valor === n;
+        return (
+          <label
+            key={n}
+            className={cn(
+              "relative flex h-[60px] cursor-pointer items-center justify-center rounded-[18px] font-titulo text-2xl font-extrabold transition-colors has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-foco",
+              elegido ? "bg-sobre-sol text-sobre-encabezado" : "bg-sol text-sobre-sol",
+            )}
+          >
+            <input
+              type="radio"
+              name="puntaje"
+              value={n}
+              aria-label={ETIQUETAS_PUNTAJE[n]}
+              checked={elegido}
+              onChange={() => onChange(n)}
+              className="absolute inset-0 m-0 cursor-pointer opacity-0"
+            />
+            <span aria-hidden>{n}</span>
+          </label>
+        );
+      })}
+    </div>
+  );
+}
 
 /**
  * Hoja inferior "¿Cómo te fue con <nombre>?" (LAB-31).
@@ -164,19 +202,22 @@ function FormularioResena({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      {/* Calificación por estrellas */}
-      <div className="flex flex-col items-center gap-1.5 py-1 text-center">
-        <Estrellas
+      {/* Calificación: cinco pastillas numeradas. */}
+      <div className="flex flex-col gap-2">
+        <p className="text-base font-bold text-texto">Tu puntaje</p>
+        <SelectorPuntaje
           valor={puntaje}
           onChange={(nuevo) => {
             setPuntaje(nuevo);
             setError(null);
           }}
-          etiquetasPuntaje={ETIQUETAS_PUNTAJE}
-          etiqueta="Calificación del profesional"
         />
-        <p aria-live="polite" className="min-h-5 text-sm font-semibold text-texto">
-          {ETIQUETAS_PUNTAJE[puntaje] ?? "Tocá una estrella para calificar"}
+        <div aria-hidden className="flex justify-between text-sm text-texto">
+          <span>Mal</span>
+          <span>Excelente</span>
+        </div>
+        <p aria-live="polite" className="min-h-5 text-sm font-bold text-texto">
+          {ETIQUETAS_PUNTAJE[puntaje] ?? "Elegí un puntaje para calificar"}
         </p>
       </div>
 
@@ -197,8 +238,8 @@ function FormularioResena({
 
       {/* Campo comentario */}
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="comentario-resena" className="text-sm font-bold text-texto">
-          Comentario (opcional)
+        <label htmlFor="comentario-resena" className="text-base font-bold text-texto">
+          Contale a los vecinos
         </label>
         <textarea
           id="comentario-resena"
@@ -212,7 +253,7 @@ function FormularioResena({
           aria-invalid={errorTexto ? true : undefined}
           aria-describedby={errorTexto ? "error-comentario-resena" : undefined}
           placeholder="Contá cómo fue: puntualidad, prolijidad, si respetó el presupuesto."
-          className="w-full resize-none rounded-campo border border-texto bg-superficie p-3 text-[15px] leading-relaxed text-texto placeholder:text-texto focus:border-accion focus:ring-1 focus:ring-accion focus:outline-none"
+          className="w-full resize-none rounded-campo border-2 border-texto bg-campo p-3.5 text-[17px] leading-snug text-texto placeholder:text-texto placeholder:opacity-60"
         />
         {errorTexto ? (
           <p id="error-comentario-resena" role="alert" className="text-sm font-semibold text-error">

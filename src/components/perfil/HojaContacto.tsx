@@ -1,5 +1,6 @@
 "use client";
 
+import { Check } from "lucide-react";
 import { useActionState, useEffect, useRef } from "react";
 
 import { Boton } from "@/components/ui/Boton";
@@ -8,7 +9,7 @@ import { contactarProfesional } from "@/lib/contacto/acciones";
 import { ESTADO_CONTACTO_INICIAL, type EstadoContacto } from "@/lib/contacto/estado";
 import { registrarEvento } from "@/lib/metricas";
 
-/** Los cuatro consejos de seguridad, en el orden y con el texto del prototipo (LAB-25). */
+/** Los cuatro consejos de seguridad (LAB-25): no se recortan aunque el boceto muestre dos. */
 const CONSEJOS = [
   "Pedí el presupuesto por escrito.",
   "Pasá tu dirección exacta recién cuando haya acuerdo.",
@@ -39,11 +40,16 @@ type Props = {
   trabajoId?: string;
   /** Elemento al que vuelve el foco al cerrar. */
   devolverFocoA?: { current: HTMLElement | null };
+  /** Título de la hoja. Por defecto "Antes de contactar". */
+  titulo?: string;
+  /** Texto del botón que cierra sin contactar. Por defecto "Cancelar". */
+  textoCancelar?: string;
 };
 
 /**
- * Hoja "Antes de contactar" (prototipo "Perfil" y "Desk-Perfil"). Muestra los consejos y, al tocar
+ * Hoja de contacto por WhatsApp (prototipo "App-Contacto"). Muestra los consejos y, al tocar
  * "Abrir WhatsApp", la Server Action registra el contacto y devuelve el link de `wa.me`.
+ * El mensaje lo arma el servidor: el número nunca viaja en el HTML.
  */
 export function HojaContacto({
   abierta,
@@ -52,6 +58,8 @@ export function HojaContacto({
   origen = "perfil",
   trabajoId,
   devolverFocoA,
+  titulo = "Antes de contactar",
+  textoCancelar = "Cancelar",
 }: Props) {
   const [estado, accion, pendiente] = useActionState(contactarProfesional, ESTADO_CONTACTO_INICIAL);
   const pestanaRef = useRef<Window | null>(null);
@@ -78,13 +86,20 @@ export function HojaContacto({
     <HojaInferior
       abierta={abierta}
       onCambioAbierta={onCambioAbierta}
-      titulo="Antes de contactar"
+      titulo={titulo}
       devolverFocoA={devolverFocoA}
       ocultarCierreEnEscritorio
     >
-      <ul className="flex list-disc flex-col gap-2 pl-5 text-[15px] leading-snug">
+      <ul className="flex flex-col gap-2 rounded-[18px] bg-superficie p-3.5 text-[15px] leading-snug">
         {CONSEJOS.map((consejo) => (
-          <li key={consejo}>{consejo}</li>
+          <li key={consejo} className="flex gap-2.5">
+            <Check
+              aria-hidden
+              strokeWidth={3.5}
+              className="mt-0.5 size-[18px] shrink-0 text-accion"
+            />
+            <span>{consejo}</span>
+          </li>
         ))}
       </ul>
 
@@ -105,29 +120,25 @@ export function HojaContacto({
           </p>
         ) : null}
 
-        <div className="flex flex-col gap-3.5 lg:grid lg:grid-cols-2 lg:gap-2.5">
-          <Boton
-            type="submit"
-            variante="exito"
-            tamano="grande"
-            bloque
-            cargando={pendiente}
-            disabled={pendiente}
-            aria-describedby={estado.mensaje ? "error-contacto" : undefined}
-          >
-            Abrir WhatsApp
-          </Boton>
+        <Boton
+          type="submit"
+          tamano="grande"
+          bloque
+          cargando={pendiente}
+          disabled={pendiente}
+          aria-describedby={estado.mensaje ? "error-contacto" : undefined}
+        >
+          Abrir WhatsApp
+        </Boton>
 
-          <Boton
-            type="button"
-            variante="fantasma"
-            bloque
-            onClick={() => onCambioAbierta(false)}
-            className="lg:border-[1.5px] lg:border-texto lg:bg-superficie lg:text-texto lg:hover:bg-superficie"
-          >
-            Cancelar
-          </Boton>
-        </div>
+        <Boton
+          type="button"
+          variante="enlace"
+          className="self-center"
+          onClick={() => onCambioAbierta(false)}
+        >
+          {textoCancelar}
+        </Boton>
       </form>
     </HojaInferior>
   );
