@@ -4,11 +4,20 @@ import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
 /** Grupo de filas de ajustes en una tarjeta blanca con divisores de color fondo. */
-export function GrupoCuenta({ etiqueta, children }: { etiqueta: string; children: ReactNode }) {
+export function GrupoCuenta({
+  etiqueta,
+  children,
+  como = "nav",
+}: {
+  etiqueta: string;
+  children: ReactNode;
+  como?: "nav" | "section";
+}) {
+  const Contenedor = como;
   return (
-    <nav aria-label={etiqueta} className="rounded-[20px] bg-superficie px-4">
+    <Contenedor aria-label={etiqueta} className="rounded-[20px] bg-superficie px-4">
       <ul className="divide-y-2 divide-fondo">{children}</ul>
-    </nav>
+    </Contenedor>
   );
 }
 

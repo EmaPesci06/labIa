@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { BotonSalir } from "@/components/auth/BotonSalir";
-import { FilaEnlace, GrupoCuenta } from "@/components/cuenta/FilaCuenta";
+import { FilaEnlace, FilaLibre, GrupoCuenta } from "@/components/cuenta/FilaCuenta";
 import { FilasProfesional } from "@/components/cuenta/FilasProfesional";
 import { SelectorTema } from "@/components/SelectorTema";
 import { Avatar } from "@/components/ui/Avatar";
@@ -36,6 +36,7 @@ export default async function Cuenta() {
   if (!sesion) return null;
   const esProfesional = sesion.rol === "profesional";
   const { barrio, foto } = await datosDeEncabezado(sesion.usuario.id);
+  const soporte = process.env.EMAIL_SOPORTE || null;
   const resumen = esProfesional
     ? resumenBannerVerificacion(await obtenerMisVerificaciones())
     : null;
@@ -100,6 +101,29 @@ export default async function Cuenta() {
           <FilaEnlace href="/api/cuenta/datos" descarga compacta conFlecha={false}>
             Descargar mis datos
           </FilaEnlace>
+        </GrupoCuenta>
+
+        <GrupoCuenta etiqueta="Ayuda" como="section">
+          <FilaLibre className="text-[15px] leading-snug text-texto">
+            <p>
+              ¿Necesitás ayuda?{" "}
+              {soporte ? (
+                <>
+                  Escribinos a{" "}
+                  <a
+                    href={`mailto:${soporte}`}
+                    className="font-bold text-texto underline decoration-2 underline-offset-2"
+                  >
+                    {soporte}
+                  </a>
+                  .
+                </>
+              ) : (
+                "Escribinos por mail a soporte."
+              )}
+            </p>
+            <p className="mt-2 font-bold">Si estás en peligro, llamá al 911.</p>
+          </FilaLibre>
         </GrupoCuenta>
 
         {!esProfesional ? (

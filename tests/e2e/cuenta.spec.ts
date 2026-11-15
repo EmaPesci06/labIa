@@ -33,6 +33,8 @@ test.describe("mi cuenta (cliente)", () => {
       "href",
       "/terminos",
     );
+    await expect(page.getByText(/¿Necesitás ayuda\?/)).toBeVisible();
+    await expect(page.getByText("Si estás en peligro, llamá al 911.")).toBeVisible();
     await expect(page.getByText("¿Ofrecés un oficio?")).toBeVisible();
     await expect(page.getByRole("link", { name: "Descargar mis datos" })).toHaveAttribute(
       "href",

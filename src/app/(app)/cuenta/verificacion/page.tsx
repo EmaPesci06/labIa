@@ -1,6 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 
 import { DocumentosCuenta } from "@/components/cuenta/DocumentosCuenta";
 import { Boton } from "@/components/ui/Boton";
@@ -11,6 +12,7 @@ export const metadata: Metadata = { title: "Mi verificación · LabÍA" };
 
 /** Volver a subir documentos de verificación (LAB-19). Solo para profesionales. */
 export default async function Verificacion() {
+  await connection();
   const { sesion, rol, borrador, verificaciones } = await cargarDatosRegistro();
 
   return (
