@@ -122,6 +122,7 @@ export function MuestraComponentes() {
           onChange={setFiltros}
         />
         <Encabezado
+          nivel={2}
           variante="sol"
           titulo="Chips dentro de un encabezado sol"
           className="rounded-tarjeta"
@@ -138,6 +139,7 @@ export function MuestraComponentes() {
 
       <Seccion titulo="Encabezados">
         <Encabezado
+          nivel={2}
           titulo="Turquesa"
           descripcion="Por defecto, con volver."
           volver={{ href: "/dev/ui" }}
@@ -150,6 +152,7 @@ export function MuestraComponentes() {
         />
         <Encabezado nivel={2} variante="sol" titulo="Sol" descripcion="Texto azul noche." />
         <Encabezado
+          nivel={2}
           variante="plano"
           titulo="Plano"
           descripcion="Sin bloque de color, sobre arena."
