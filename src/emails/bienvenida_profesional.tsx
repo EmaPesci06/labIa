@@ -1,10 +1,10 @@
-import { Text } from "@react-email/components";
-
 import {
   BotonAccion,
-  estilosTexto,
   Layout,
+  Nota,
+  Parrafo,
   PIE_DE_PRUEBA,
+  Tarjeta,
   type DatosPie,
 } from "@/lib/emails/Layout";
 
@@ -16,16 +16,25 @@ export default function BienvenidaProfesional({
   pie,
 }: DatosBienvenidaProfesional & { pie: DatosPie }) {
   return (
-    <Layout previa="Recibimos tu perfil. Lo estamos revisando." pie={pie}>
-      <Text style={estilosTexto.titulo}>Recibimos tu perfil, {nombre}</Text>
-      <Text style={estilosTexto.parrafo}>
-        Estamos revisando tu documentación. Cuando todo esté aprobado, tu perfil aparece en las
-        búsquedas y te avisamos por acá.
-      </Text>
-      <Text style={estilosTexto.chico}>
-        Es un paso que cuida a los clientes y a vos: solo se muestran perfiles verificados.
-      </Text>
+    <Layout
+      previa="Estamos revisando tu documentación."
+      titulo={`Recibimos tu perfil, ${nombre}`}
+      subtitulo="Lo estamos revisando."
+      motivo="Te escribimos porque creaste una cuenta de profesional en LabÍA."
+      pie={pie}
+    >
+      <Tarjeta
+        etiqueta="Qué revisamos"
+        titulo="DNI y antecedentes"
+        detalle="Si sos gasista, también la matrícula."
+      />
+      <Parrafo>
+        Cuando todo esté aprobado, tu perfil aparece en las búsquedas y te avisamos por acá.
+      </Parrafo>
       <BotonAccion href={urlPerfil}>Ver mi perfil</BotonAccion>
+      <Nota>
+        Es un paso que cuida a los clientes y a vos: solo se muestran perfiles verificados.
+      </Nota>
     </Layout>
   );
 }

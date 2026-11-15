@@ -1,9 +1,8 @@
-import { Text } from "@react-email/components";
-
 import {
   BotonAccion,
-  estilosTexto,
+  EnlaceSecundario,
   Layout,
+  Parrafo,
   PIE_DE_PRUEBA,
   type DatosPie,
 } from "@/lib/emails/Layout";
@@ -17,14 +16,19 @@ export default function PerfilPublicado({
   pie,
 }: DatosPerfilPublicado & { pie: DatosPie }) {
   return (
-    <Layout previa="Tu perfil ya aparece en las búsquedas de LabÍA." pie={pie}>
-      <Text style={estilosTexto.titulo}>¡Tu perfil ya está publicado, {nombre}!</Text>
-      <Text style={estilosTexto.parrafo}>
-        Aprobamos tu verificación. Desde ahora los clientes te encuentran en las búsquedas y podés
-        postularte a los trabajos que publican.
-      </Text>
+    <Layout
+      previa="Tu perfil ya aparece en las búsquedas de LabÍA."
+      titulo={`${nombre}, tu perfil ya está publicado`}
+      subtitulo="Aprobamos tu verificación."
+      motivo="Te escribimos porque terminamos de revisar tu perfil."
+      pie={pie}
+    >
+      <Parrafo>
+        Desde ahora los clientes te encuentran en las búsquedas y podés postularte a los trabajos
+        que publican.
+      </Parrafo>
       <BotonAccion href={urlTrabajos}>Ver trabajos publicados</BotonAccion>
-      <Text style={estilosTexto.chico}>Así se ve tu perfil para los clientes: {urlPerfil}</Text>
+      <EnlaceSecundario href={urlPerfil}>Ver cómo se ve mi perfil</EnlaceSecundario>
     </Layout>
   );
 }
