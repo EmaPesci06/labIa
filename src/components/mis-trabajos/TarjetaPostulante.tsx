@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useRef, useState } from "react";
 
 import { Avatar } from "@/components/ui/Avatar";
+import { Boton } from "@/components/ui/Boton";
 import { Distancia } from "@/components/ui/Distancia";
 import { formatearPesos } from "@/lib/formato";
 import type { PostulanteParaCliente } from "@/lib/trabajos/consulta";
@@ -83,7 +83,7 @@ export function TarjetaPostulante({
   return (
     <article
       aria-label={`Postulación de ${nombreCompleto}`}
-      className="flex flex-col gap-3 rounded-[18px] border border-fondo bg-superficie p-4 text-texto lg:flex-row lg:items-center lg:gap-6 lg:p-5"
+      className="flex flex-col gap-3 rounded-[22px] bg-superficie p-4 text-texto lg:flex-row lg:items-center lg:gap-6 lg:p-5"
     >
       {/* En escritorio, datos del postulante a la izquierda y acciones a la derecha (prototipo Desk). */}
       <div className="flex min-w-0 flex-1 flex-col gap-3">
@@ -117,28 +117,29 @@ export function TarjetaPostulante({
       </div>
 
       <div className="mt-1 grid grid-cols-2 gap-2 pt-1 sm:flex sm:justify-end lg:mt-0 lg:shrink-0 lg:pt-0">
-        <Link
+        <Boton
           href={`/profesionales/${postulante.profesionalId}`}
-          className="inline-flex min-h-[44px] items-center justify-center rounded-boton border-[1.5px] border-accion px-4 text-center text-sm font-bold text-texto transition-colors hover:bg-superficie focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco sm:w-auto"
+          variante="secundario"
+          className="px-4 sm:w-auto"
         >
           Ver perfil
-        </Link>
+        </Boton>
 
         {esElegido ? (
-          <span className="inline-flex min-h-[44px] items-center justify-center rounded-boton bg-accion px-4 text-center text-sm font-bold text-sobre-accion sm:w-auto">
+          <span className="inline-flex min-h-[52px] items-center justify-center rounded-boton bg-sol px-4 text-center text-base font-bold text-sobre-sol sm:w-auto">
             Elegido
           </span>
         ) : trabajoEstado === "abierto" ? (
           <>
-            <button
+            <Boton
               ref={botonAbridorRef}
-              type="button"
+              variante="principal"
               disabled={pendiente}
               onClick={() => setModalAbierto(true)}
-              className="inline-flex min-h-[44px] cursor-pointer items-center justify-center rounded-boton bg-accion px-4 text-center text-sm font-bold text-sobre-accion transition-opacity hover:opacity-95 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco active:opacity-90 disabled:opacity-50 sm:w-auto"
+              className="px-4 sm:w-auto"
             >
               Elegir
-            </button>
+            </Boton>
             <ModalConfirmacion
               abierta={modalAbierto}
               onCambioAbierta={handleCambioModal}

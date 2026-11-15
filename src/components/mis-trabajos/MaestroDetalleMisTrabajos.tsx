@@ -71,14 +71,24 @@ export function MaestroDetalleMisTrabajos({
       ) : null}
       {/* Encabezado y Pestañas */}
       <div className="flex flex-col gap-3">
-        <h1 className="font-titulo text-2xl font-extrabold tracking-tight text-texto lg:text-[32px]">
-          Mis trabajos
-        </h1>
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="font-titulo text-[38px] leading-none font-extrabold text-texto lg:text-[44px]">
+            Mis trabajos
+          </h1>
+          <Boton
+            href="/trabajos/nuevo"
+            variante="principal"
+            tamano="normal"
+            className="min-h-11 px-4"
+          >
+            Publicar
+          </Boton>
+        </div>
         <PestanasMisTrabajos tabActiva={tabActiva} />
       </div>
 
       {trabajos.length === 0 ? (
-        <div className="flex min-h-[280px] flex-col items-center justify-center gap-4 rounded-[22px] border border-dashed border-texto bg-superficie p-8 text-center">
+        <div className="flex min-h-[280px] flex-col items-center justify-center gap-4 rounded-[22px] bg-superficie p-8 text-center">
           <p className="text-lg font-bold text-texto">{textoVacio.titulo}</p>
           <p className="max-w-md text-sm text-texto">{textoVacio.detalle}</p>
           {tabActiva === "abiertos" ? (
