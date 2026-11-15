@@ -41,19 +41,17 @@ async function Contenido({ searchParams }: { searchParams: Promise<Params> }) {
 
   if (listo && Object.hasOwn(TEXTO_CATEGORIA, listo)) {
     return (
-      <div role="status">
-        <AvisoPantalla
-          nivel={2}
-          titulo="Listo, no te mandamos más estos avisos."
-          texto={`Ya no vas a recibir ${TEXTO_CATEGORIA[listo as keyof typeof TEXTO_CATEGORIA]}. Podés volver a activarlos cuando quieras desde Mi cuenta, en Preferencias de email.`}
-          accion={
-            <Boton href="/ingresar" tamano="grande" bloque>
-              Ir a LabÍA
-            </Boton>
-          }
-          className="min-h-[60dvh] pt-4"
-        />
-      </div>
+      <AvisoPantalla
+        nivel={2}
+        titulo="Listo, no te mandamos más estos avisos."
+        texto={`Ya no vas a recibir ${TEXTO_CATEGORIA[listo as keyof typeof TEXTO_CATEGORIA]}. Podés volver a activarlos cuando quieras desde Mi cuenta, en Preferencias de email.`}
+        accion={
+          <Boton href="/ingresar" tamano="grande" bloque>
+            Ir a LabÍA
+          </Boton>
+        }
+        className="min-h-[60dvh] pt-4"
+      />
     );
   }
 

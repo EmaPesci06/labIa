@@ -12,7 +12,6 @@ export default function Normas() {
       <Encabezado
         titulo="Normas de seguridad"
         descripcion="A lo que se compromete cada profesional antes de aparecer en LabÍA."
-        className="rounded-[28px] lg:rounded-[40px]"
       />
       <ListaNormas />
       <QueHaceLabia />
