@@ -10,10 +10,11 @@ import {
   useState,
   useSyncExternalStore,
   type FormEvent,
-  type ReactNode,
 } from "react";
 
 import { BotonGoogle, SeparadorO } from "@/components/auth/BotonGoogle";
+import { SaltarAlContenido } from "@/components/navegacion/SaltarAlContenido";
+import { AvisoPantalla } from "@/components/ui/AvisoPantalla";
 import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
 import { GrupoChips } from "@/components/ui/Chip";
@@ -45,12 +46,13 @@ import {
   MAX_FOTOS_TRABAJOS,
   MAX_TEXTO_CORTO,
   OFICIOS,
+  separarNombre,
 } from "@/lib/validaciones/perfil-profesional";
 
-import { BloqueVerificacion } from "./BloqueVerificacion";
 import { CargaFotoPerfil, CargaFotosTrabajos, type FotoLocal } from "./CargaFotos";
+import { EncabezadoRegistro } from "./EncabezadoRegistro";
+import { PasoDocumentosProfesional } from "./PasoDocumentosProfesional";
 import { SelectorZonas, type ZonasElegidas } from "./SelectorZonas";
-import { VistaPreviaPerfil } from "./VistaPreviaPerfil";
 
 const ID_FORMULARIO = "perfil-profesional";
 const DESTINO_SIGUIENTE = "/registro/profesional/normas";
@@ -62,28 +64,21 @@ type Props = {
   /** URLs públicas de las fotos ya subidas, por ruta. */
   urls: Record<string, string>;
   verificaciones?: ItemVerificacion[];
+  pasoInicial?: 1 | 2;
 };
-
-function Seccion({ titulo, children }: { titulo: string; children: ReactNode }) {
-  const id = useId();
-  return (
-    <section aria-labelledby={id} className="flex flex-col gap-2.5">
-      <h2
-        id={id}
-        className="font-texto text-[13px] font-semibold tracking-[0.6px] text-texto uppercase lg:font-sans lg:text-lg lg:font-bold lg:tracking-normal lg:text-texto lg:normal-case"
-      >
-        {titulo}
-      </h2>
-      {children}
-    </section>
-  );
-}
 
 const nuevoId = () => crypto.randomUUID();
 
 function fotoDeRuta(ruta: string, urls: Record<string, string>): FotoLocal | null {
   const vista = urls[ruta];
   return vista ? { id: ruta, ruta, blob: null, vista } : null;
+}
+
+/** "Marta Rodríguez" → "Marta R." para mostrar el ejemplo vivo bajo el nombre. */
+function nombreVisibleCorto(completo: string): string {
+  const { nombre, apellido } = separarNombre(completo);
+  if (!nombre) return "Marta R.";
+  return apellido ? `${nombre} ${apellido[0]}.` : nombre;
 }
 
 /** Validación del navegador con los mismos esquemas que usa el servidor. */
@@ -106,8 +101,9 @@ function validarEnNavegador(datos: FormData, conCuenta: boolean): EstadoPerfil |
 const suscribirNada = () => () => undefined;
 
 /**
- * Paso 1 del registro de profesional: el perfil que van a ver los clientes. A la izquierda el
- * formulario; en escritorio, a la derecha, la vista previa en vivo, la verificación y el botón.
+ * Pasos 1 y 2 del registro de profesional (`App-ProPerfil` y `App-ProDocumentos`):
+ * el paso 1 arma el perfil y valida los datos; el paso 2 carga DNI, antecedentes y matrícula y
+ * guarda todo antes de pasar al paso 3 (normas).
  */
 export function FormularioPerfilProfesional({
   sesion,
@@ -115,15 +111,29 @@ export function FormularioPerfilProfesional({
   barrios,
   urls,
   verificaciones = [],
+  pasoInicial = 1,
 }: Props) {
   const router = useRouter();
   const formulario = useRef<HTMLFormElement>(null);
+  const idErrorOficios = useId();
+  const [paso, setPaso] = useState<1 | 2>(pasoInicial);
+
   const [nombre, setNombre] = useState(borrador.nombreCompleto);
+  const [whatsapp, setWhatsapp] = useState(borrador.whatsapp);
+  const [email, setEmail] = useState("");
+  const [contrasena, setContrasena] = useState("");
+  const [barrioId, setBarrioId] = useState(borrador.barrioId);
   const [oficios, setOficios] = useState<string[]>(borrador.oficios);
+  const [especialidades, setEspecialidades] = useState(borrador.especialidades);
   const [zonas, setZonas] = useState<ZonasElegidas>({
     todaLaCiudad: borrador.todaLaCiudad,
     zonas: borrador.zonas,
   });
+  const [aniosExperiencia, setAniosExperiencia] = useState(borrador.aniosExperiencia);
+  const [matricula, setMatricula] = useState(borrador.matricula);
+  const [disponibilidad, setDisponibilidad] = useState(borrador.disponibilidad);
+  const [descripcion, setDescripcion] = useState(borrador.descripcion);
+
   const [fotoPerfil, setFotoPerfil] = useState<FotoLocal | null>(() =>
     borrador.fotoPerfil ? fotoDeRuta(borrador.fotoPerfil, urls) : null,
   );
@@ -139,6 +149,9 @@ export function FormularioPerfilProfesional({
   const [progreso, setProgreso] = useState<{ hechos: number; total: number } | null>(null);
   const [procesando, setProcesando] = useState(false);
   const [errorFotos, setErrorFotos] = useState<{ perfil?: string; trabajos?: string }>({});
+  const [erroresPaso1, setErroresPaso1] = useState<Partial<Record<string, string>> | null>(null);
+  const [mensajePaso1, setMensajePaso1] = useState<string | null>(null);
+
   // Fotos ya subidas que la persona quitó: se borran del bucket al guardar.
   const quitadas = useRef<string[]>([]);
   const urlsLocales = useRef<string[]>([]);
@@ -260,16 +273,22 @@ export function FormularioPerfilProfesional({
 
   async function accion(anterior: EstadoPerfil, datos: FormData): Promise<EstadoPerfil> {
     const conErrores = validarEnNavegador(datos, conCuenta);
-    // Sin DNI y antecedentes (y matrícula si es gasista) no se pasa al paso 2. El servidor lo
-    // vuelve a exigir en el paso 2.
+    // Sin DNI y antecedentes (y matrícula si es gasista) no se pasa al paso 3. El servidor lo
+    // vuelve a exigir en el paso 3.
     const documentos = faltantes().length > 0 ? mensajeDocumentosFaltantes(tieneGas) : undefined;
-    if (conErrores) return { ...conErrores, documentos };
+    if (conErrores) {
+      setPaso(1);
+      return { ...conErrores, documentos };
+    }
     if (documentos) return { documentos };
     const hayArchivos = Object.values(documentosLocales).some(Boolean);
     if (hayArchivos && !consentido) return { documentos: MENSAJE_CONSENTIMIENTO };
 
     const resultado = await guardarPerfilProfesional(anterior, datos);
-    if (!resultado.guardado) return resultado;
+    if (!resultado.guardado) {
+      if (resultado.errores && Object.keys(resultado.errores).length > 0) setPaso(1);
+      return resultado;
+    }
 
     const errorSubida = await subirFotosPendientes(resultado.guardado.uid);
     if (errorSubida) return { mensaje: errorSubida };
@@ -282,18 +301,47 @@ export function FormularioPerfilProfesional({
   }
 
   const [estado, despachar, pendiente] = useActionState(accion, {});
-  const errores = estado.errores ?? {};
+  const errores = erroresPaso1 ?? estado.errores ?? {};
 
   useEffect(() => {
-    if (!estado.errores) return;
-    const primero = formulario.current?.querySelector<HTMLElement>(
-      '[aria-invalid="true"], [data-grupo-invalido]',
-    );
-    primero?.focus();
+    if (!estado.errores || Object.keys(estado.errores).length === 0) return;
+    requestAnimationFrame(() => {
+      const primero = formulario.current?.querySelector<HTMLElement>(
+        '[aria-invalid="true"], [data-grupo-invalido]',
+      );
+      primero?.focus();
+    });
   }, [estado]);
+
+  function enfocarPrimerError() {
+    requestAnimationFrame(() => {
+      const primero = formulario.current?.querySelector<HTMLElement>(
+        '[aria-invalid="true"], [data-grupo-invalido]',
+      );
+      primero?.focus();
+    });
+  }
+
+  function avanzarADocumentos() {
+    if (!formulario.current) return;
+    const datos = new FormData(formulario.current);
+    const conErrores = validarEnNavegador(datos, conCuenta);
+    if (conErrores) {
+      setErroresPaso1(conErrores.errores ?? {});
+      setMensajePaso1(conErrores.mensaje ?? null);
+      enfocarPrimerError();
+      return;
+    }
+    setErroresPaso1({});
+    setMensajePaso1(null);
+    setPaso(2);
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
 
   function enviar(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
+    setErroresPaso1(null);
+    setMensajePaso1(null);
     const datos = new FormData(evento.currentTarget);
     startTransition(() => despachar(datos));
   }
@@ -345,55 +393,47 @@ export function FormularioPerfilProfesional({
     setFotosTrabajos((previas) => previas.filter((f) => f.id !== id));
   }
 
-  const oficiosTexto = OFICIOS.filter((o) => oficios.includes(o.valor))
-    .map((o) => o.etiqueta)
-    .join(", ");
-  const zonasTexto = zonas.todaLaCiudad
-    ? "Toda la ciudad"
-    : zonas.zonas
-        .map((id) => barrios.find((b) => b.id === id)?.nombre ?? `Barrio ${id}`)
-        .join(", ");
-
-  const botonSiguiente = (clases: string) => (
-    <Boton
-      type="submit"
-      form={ID_FORMULARIO}
-      variante="profesional"
-      tamano="grande"
-      bloque
-      cargando={pendiente}
-      disabled={!hidratado}
-      className={clases}
-    >
-      Siguiente: normas de seguridad
-    </Boton>
-  );
-
   if (estado.exito) {
     return (
-      <p
-        role="status"
-        className="rounded-campo bg-sol p-4 text-[15px] font-semibold text-sobre-sol"
-      >
-        {estado.exito}
-      </p>
+      <div className="flex flex-1 flex-col">
+        <SaltarAlContenido />
+        <main id="contenido" tabIndex={-1} className="flex flex-1 flex-col focus:outline-none">
+          <AvisoPantalla
+            titulo="Revisá tu email"
+            texto={estado.exito}
+            accion={
+              <Boton href="/ingresar" tamano="grande" bloque>
+                Ir a ingresar
+              </Boton>
+            }
+          />
+        </main>
+      </div>
     );
   }
 
-  return (
-    <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start lg:gap-10">
-      <div className="flex min-w-0 flex-col gap-[22px] lg:gap-7">
-        <div className="flex flex-col gap-1.5 lg:gap-2">
-          <h1 className="font-titulo text-[30px] leading-tight lg:text-[40px]">
-            Contanos qué sabés hacer
-          </h1>
-          <p className="text-[15px] text-texto lg:text-[17px]">
-            Esto es lo que van a ver los clientes en tu perfil.
-          </p>
-        </div>
+  const tituloEncabezado = paso === 1 ? "Armá tu perfil" : "Mostranos quién sos";
+  const descripcionEncabezado =
+    paso === 1
+      ? "Es lo que ven los vecinos cuando te encuentran."
+      : "Los ve solo nuestro equipo. En tu perfil aparece la insignia, nunca el documento.";
 
-        {conCuenta ? (
-          <div className="flex flex-col gap-3.5">
+  return (
+    <div className="flex flex-1 flex-col">
+      <SaltarAlContenido />
+      <EncabezadoRegistro
+        paso={paso}
+        titulo={tituloEncabezado}
+        descripcion={descripcionEncabezado}
+      />
+
+      <main
+        id="contenido"
+        tabIndex={-1}
+        className="mx-auto flex w-full max-w-[560px] flex-1 flex-col gap-3.5 px-5 pt-3.5 pb-6 focus:outline-none lg:px-8 lg:py-8"
+      >
+        {paso === 1 && conCuenta ? (
+          <div className="flex flex-col gap-3">
             <BotonGoogle rol="profesional" />
             <SeparadorO />
           </div>
@@ -404,7 +444,7 @@ export function FormularioPerfilProfesional({
           ref={formulario}
           onSubmit={enviar}
           noValidate
-          className="flex flex-col gap-[22px] lg:gap-7"
+          className="flex flex-1 flex-col gap-3.5"
         >
           <input type="hidden" name="fotoPerfil" value={fotoPerfil?.ruta ?? ""} />
           {fotosTrabajos.map((foto) =>
@@ -416,60 +456,119 @@ export function FormularioPerfilProfesional({
             <input key={valor} type="hidden" name="oficios" value={valor} />
           ))}
 
-          <Seccion titulo="Tus datos">
-            <div className="grid grid-cols-2 gap-x-2.5 gap-y-3 lg:grid-cols-3 lg:gap-x-3.5">
+          {paso === 1 ? (
+            <>
+              <CargaFotoPerfil
+                foto={fotoPerfil}
+                ocupado={procesando}
+                error={errorFotos.perfil}
+                onElegir={elegirFotoPerfil}
+                onQuitar={() => {
+                  if (fotoPerfil?.ruta) quitadas.current.push(fotoPerfil.ruta);
+                  setFotoPerfil(null);
+                }}
+              />
+
               <Campo
                 etiqueta="Nombre y apellido"
                 name="nombreCompleto"
                 autoComplete="name"
-                placeholder="Martín Gómez"
+                placeholder="Marta Rodríguez"
                 value={nombre}
                 onChange={(evento) => setNombre(evento.target.value)}
+                ayuda={`En tu perfil se muestra como “${nombreVisibleCorto(nombre)}”`}
                 error={errores.nombreCompleto}
-                className="col-span-2 lg:col-span-1"
                 required
               />
+
               <Campo
                 variante="telefono"
                 etiqueta="WhatsApp"
                 name="whatsapp"
                 placeholder="223 555-0000"
-                defaultValue={borrador.whatsapp}
+                value={whatsapp}
+                onChange={(evento) => setWhatsapp(evento.target.value)}
                 error={errores.whatsapp}
                 required
               />
+
               {conCuenta ? (
-                <Campo
-                  etiqueta="Email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  inputMode="email"
-                  placeholder="martin@email.com"
-                  error={errores.email}
-                  required
-                />
+                <>
+                  <Campo
+                    etiqueta="Email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    inputMode="email"
+                    placeholder="marta@ejemplo.com"
+                    value={email}
+                    onChange={(evento) => setEmail(evento.target.value)}
+                    error={errores.email}
+                    required
+                  />
+                  <Campo
+                    etiqueta="Contraseña"
+                    name="contrasena"
+                    type="password"
+                    autoComplete="new-password"
+                    placeholder="Mínimo 8 caracteres"
+                    value={contrasena}
+                    onChange={(evento) => setContrasena(evento.target.value)}
+                    error={errores.contrasena}
+                    required
+                  />
+                </>
               ) : null}
-              {conCuenta ? (
-                <Campo
-                  etiqueta="Contraseña"
-                  name="contrasena"
-                  type="password"
-                  autoComplete="new-password"
-                  placeholder="Mínimo 8 caracteres"
-                  error={errores.contrasena}
-                  className="col-span-2 lg:col-span-1"
-                  required
-                />
-              ) : null}
+
+              <fieldset className="flex flex-col">
+                <legend className="mb-1.5 text-base font-bold text-texto">
+                  ¿Qué oficios hacés?
+                </legend>
+                <div
+                  data-grupo-invalido={errores.oficios ? "" : undefined}
+                  tabIndex={errores.oficios ? -1 : undefined}
+                  aria-describedby={errores.oficios ? idErrorOficios : undefined}
+                >
+                  <GrupoChips
+                    tipo="multiple"
+                    etiqueta="Oficios"
+                    opciones={OFICIOS.map((o) => ({ valor: o.valor, etiqueta: o.etiqueta }))}
+                    valor={oficios}
+                    onChange={setOficios}
+                  />
+                </div>
+                <p className="mt-1.5 text-sm text-texto">Para gas te vamos a pedir la matrícula.</p>
+                {errores.oficios ? (
+                  <p id={idErrorOficios} className="mt-1 text-[15px] font-bold text-error">
+                    {errores.oficios}
+                  </p>
+                ) : null}
+              </fieldset>
+
+              <Campo
+                etiqueta={tieneGas ? "Matrícula (obligatoria)" : "Matrícula"}
+                name="matricula"
+                placeholder={tieneGas ? "N° de matrícula" : "Si tenés"}
+                value={matricula}
+                onChange={(evento) => setMatricula(evento.target.value)}
+                maxLength={40}
+                ayuda={
+                  tieneGas && !errores.matricula
+                    ? "La matrícula es obligatoria para gasistas."
+                    : undefined
+                }
+                error={errores.matricula}
+                required={tieneGas}
+              />
+
               <Campo
                 variante="seleccion"
-                etiqueta="Tu barrio"
+                etiqueta="Barrio desde donde salís"
                 name="barrioId"
-                defaultValue={borrador.barrioId}
+                value={barrioId}
+                onChange={(evento) => setBarrioId(evento.target.value)}
                 ayuda="Se usa para calcular distancias. Nunca mostramos tu dirección."
                 error={errores.barrioId}
-                className="col-span-2 lg:col-span-1"
                 required
               >
                 <option value="">Elegí tu barrio</option>
@@ -479,164 +578,166 @@ export function FormularioPerfilProfesional({
                   </option>
                 ))}
               </Campo>
-            </div>
-          </Seccion>
 
-          <Seccion titulo="Tus oficios">
-            <p className="text-sm text-texto">Elegí uno o varios.</p>
-            <div
-              data-grupo-invalido={errores.oficios ? "" : undefined}
-              tabIndex={errores.oficios ? -1 : undefined}
-              aria-describedby={errores.oficios ? "error-oficios" : undefined}
-            >
-              <GrupoChips
-                tipo="multiple"
-                etiqueta="Oficios"
-                opciones={OFICIOS.map((o) => ({ valor: o.valor, etiqueta: o.etiqueta }))}
-                valor={oficios}
-                onChange={setOficios}
+              <fieldset className="flex flex-col gap-2">
+                <legend className="text-base font-bold text-texto">Dónde trabajás</legend>
+                <SelectorZonas
+                  valor={zonas}
+                  onChange={setZonas}
+                  barrios={barrios}
+                  error={errores.zonas}
+                />
+              </fieldset>
+
+              <Campo
+                variante="area"
+                etiqueta="Contá qué arreglás"
+                name="descripcion"
+                placeholder="Pérdidas, destapaciones, termotanques y cambio de cañerías."
+                value={descripcion}
+                onChange={(evento) => setDescripcion(evento.target.value)}
+                maxLength={MAX_DESCRIPCION}
+                error={errores.descripcion}
               />
-            </div>
-            {errores.oficios ? (
-              <p id="error-oficios" className="text-sm font-semibold text-error">
-                {errores.oficios}
-              </p>
-            ) : null}
-            <Campo
-              etiqueta="Especialidades (opcional)"
-              name="especialidades"
-              placeholder="Ej: calefactores, termotanques"
-              defaultValue={borrador.especialidades}
-              maxLength={MAX_TEXTO_CORTO}
-              error={errores.especialidades}
-            />
-          </Seccion>
 
-          <Seccion titulo="Dónde trabajás">
-            <SelectorZonas
-              valor={zonas}
-              onChange={setZonas}
-              barrios={barrios}
-              error={errores.zonas}
-            />
-          </Seccion>
+              <Campo
+                etiqueta="Especialidades (opcional)"
+                name="especialidades"
+                placeholder="Ej: calefactores, termotanques"
+                value={especialidades}
+                onChange={(evento) => setEspecialidades(evento.target.value)}
+                maxLength={MAX_TEXTO_CORTO}
+                error={errores.especialidades}
+              />
 
-          <div className="grid grid-cols-2 gap-x-2.5 gap-y-3 lg:grid-cols-3 lg:gap-x-3.5">
-            <Campo
-              etiqueta="Años de experiencia"
-              name="aniosExperiencia"
-              type="number"
-              inputMode="numeric"
-              min={0}
-              max={60}
-              placeholder="12"
-              defaultValue={borrador.aniosExperiencia}
-              error={errores.aniosExperiencia}
-            />
-            <Campo
-              etiqueta={tieneGas ? "Matrícula (obligatoria)" : "Matrícula"}
-              name="matricula"
-              placeholder={tieneGas ? "N° de matrícula" : "Si tenés"}
-              defaultValue={borrador.matricula}
-              maxLength={40}
-              ayuda={
-                tieneGas && !errores.matricula
-                  ? "La matrícula es obligatoria para gasistas."
-                  : undefined
-              }
-              error={errores.matricula}
-              required={tieneGas}
-            />
-            <Campo
-              etiqueta="Disponibilidad"
-              name="disponibilidad"
-              placeholder="Lun a sáb, 8 a 18 h"
-              defaultValue={borrador.disponibilidad}
-              maxLength={MAX_TEXTO_CORTO}
-              error={errores.disponibilidad}
-              className="col-span-2 lg:col-span-1"
-            />
-          </div>
+              <div className="grid grid-cols-2 gap-2.5">
+                <Campo
+                  etiqueta="Años de experiencia"
+                  name="aniosExperiencia"
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  max={60}
+                  placeholder="12"
+                  value={aniosExperiencia}
+                  onChange={(evento) => setAniosExperiencia(evento.target.value)}
+                  error={errores.aniosExperiencia}
+                />
+                <Campo
+                  etiqueta="Disponibilidad"
+                  name="disponibilidad"
+                  placeholder="Lun a sáb, 8 a 18 h"
+                  value={disponibilidad}
+                  onChange={(evento) => setDisponibilidad(evento.target.value)}
+                  maxLength={MAX_TEXTO_CORTO}
+                  error={errores.disponibilidad}
+                />
+              </div>
 
-          <Campo
-            variante="area"
-            etiqueta="Contá cómo trabajás"
-            name="descripcion"
-            placeholder="Gasista matriculado. Instalaciones, reparaciones y pruebas de hermeticidad. Paso presupuesto por escrito."
-            defaultValue={borrador.descripcion}
-            maxLength={MAX_DESCRIPCION}
-            error={errores.descripcion}
-          />
+              <CargaFotosTrabajos
+                fotos={fotosTrabajos}
+                ocupado={procesando}
+                error={errorFotos.trabajos ?? errores.fotosTrabajos}
+                onElegir={elegirFotosTrabajos}
+                onQuitar={quitarFotoTrabajo}
+              />
 
-          <div className="grid grid-cols-2 gap-x-2.5 gap-y-3 lg:gap-x-3.5">
-            <CargaFotoPerfil
-              foto={fotoPerfil}
-              ocupado={procesando}
-              error={errorFotos.perfil}
-              onElegir={elegirFotoPerfil}
-              onQuitar={() => {
-                if (fotoPerfil?.ruta) quitadas.current.push(fotoPerfil.ruta);
-                setFotoPerfil(null);
-              }}
-            />
-            <CargaFotosTrabajos
-              fotos={fotosTrabajos}
-              ocupado={procesando}
-              error={errorFotos.trabajos ?? errores.fotosTrabajos}
-              onElegir={elegirFotosTrabajos}
-              onQuitar={quitarFotoTrabajo}
-            />
-          </div>
+              {mensajePaso1 || estado.mensaje ? (
+                <p role="alert" className="text-[15px] font-bold text-error">
+                  {mensajePaso1 || estado.mensaje}
+                </p>
+              ) : null}
 
-          <BloqueVerificacion
-            className="lg:hidden"
-            tieneGas={tieneGas}
-            verificaciones={verificaciones}
-            documentosLocales={documentosLocales}
-            onElegirDocumento={elegirDocumento}
-            onQuitarDocumento={quitarDocumento}
-            subidosAhora={subidosAhora}
-            progreso={progreso}
-            error={estado.documentos}
-            ocupado={procesando || pendiente}
-            consentimiento={{ tildado: consentido, onCambio: setConsentido }}
-          />
+              <div
+                key="paso-1-acciones"
+                className="-mx-5 mt-auto -mb-6 rounded-t-hoja bg-superficie px-5 pt-3 pb-4 lg:mx-0 lg:mt-2 lg:mb-0 lg:rounded-tarjeta lg:p-5"
+              >
+                <Boton
+                  key="btn-avanzar"
+                  type="button"
+                  tamano="grande"
+                  bloque
+                  disabled={!hidratado}
+                  onClick={avanzarADocumentos}
+                >
+                  Seguir con los documentos
+                </Boton>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Campos del paso 1 en oculto para que el envío mande el perfil completo. */}
+              <input type="hidden" name="nombreCompleto" value={nombre} />
+              <input type="hidden" name="whatsapp" value={whatsapp} />
+              {conCuenta ? (
+                <>
+                  <input type="hidden" name="email" value={email} />
+                  <input type="hidden" name="contrasena" value={contrasena} />
+                </>
+              ) : null}
+              <input type="hidden" name="barrioId" value={barrioId} />
+              <input type="hidden" name="especialidades" value={especialidades} />
+              <input
+                type="hidden"
+                name="todaLaCiudad"
+                value={zonas.todaLaCiudad ? "true" : "false"}
+              />
+              {zonas.zonas.map((id) => (
+                <input key={id} type="hidden" name="zonas" value={id} />
+              ))}
+              <input type="hidden" name="aniosExperiencia" value={aniosExperiencia} />
+              <input type="hidden" name="matricula" value={matricula} />
+              <input type="hidden" name="disponibilidad" value={disponibilidad} />
+              <input type="hidden" name="descripcion" value={descripcion} />
 
-          {estado.mensaje ? (
-            <p role="alert" className="text-sm font-semibold text-error lg:hidden">
-              {estado.mensaje}
-            </p>
-          ) : null}
-          {botonSiguiente("lg:hidden")}
+              <PasoDocumentosProfesional
+                tieneGas={tieneGas}
+                verificaciones={verificaciones}
+                documentosLocales={documentosLocales}
+                onElegirDocumento={elegirDocumento}
+                onQuitarDocumento={quitarDocumento}
+                subidosAhora={subidosAhora}
+                progreso={progreso}
+                error={estado.documentos}
+                ocupado={procesando || pendiente}
+                consentimiento={{ tildado: consentido, onCambio: setConsentido }}
+              />
+
+              {estado.mensaje ? (
+                <p role="alert" className="text-[15px] font-bold text-error">
+                  {estado.mensaje}
+                </p>
+              ) : null}
+
+              <div
+                key="paso-2-acciones"
+                className="-mx-5 mt-auto -mb-6 flex flex-col rounded-t-hoja bg-superficie px-5 pt-3 pb-4 lg:mx-0 lg:mt-2 lg:mb-0 lg:rounded-tarjeta lg:p-5"
+              >
+                <Boton
+                  key="btn-enviar"
+                  type="submit"
+                  tamano="grande"
+                  bloque
+                  cargando={pendiente}
+                  disabled={!hidratado}
+                >
+                  Seguir con las normas
+                </Boton>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPaso(1);
+                    window.scrollTo({ top: 0, behavior: "instant" });
+                  }}
+                  className="inline-flex min-h-11 items-center justify-center self-center px-3 text-[15px] font-bold text-texto underline decoration-2 underline-offset-4"
+                >
+                  Volver al perfil
+                </button>
+              </div>
+            </>
+          )}
         </form>
-      </div>
-
-      <aside className="hidden min-w-0 flex-col gap-4 lg:sticky lg:top-6 lg:flex">
-        <VistaPreviaPerfil
-          nombre={nombre}
-          oficios={oficiosTexto}
-          zonas={zonasTexto}
-          foto={fotoPerfil?.vista ?? null}
-        />
-        <BloqueVerificacion
-          tieneGas={tieneGas}
-          verificaciones={verificaciones}
-          documentosLocales={documentosLocales}
-          onElegirDocumento={elegirDocumento}
-          onQuitarDocumento={quitarDocumento}
-          subidosAhora={subidosAhora}
-          progreso={progreso}
-          error={estado.documentos}
-          ocupado={procesando || pendiente}
-          consentimiento={{ tildado: consentido, onCambio: setConsentido }}
-        />
-        {estado.mensaje ? (
-          <p role="alert" className="text-sm font-semibold text-error">
-            {estado.mensaje}
-          </p>
-        ) : null}
-        {botonSiguiente("")}
-      </aside>
+      </main>
     </div>
   );
 }

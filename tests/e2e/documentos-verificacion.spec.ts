@@ -16,15 +16,15 @@ const PNG = Buffer.from(
 const imagen = (name: string) => ({ name, mimeType: "image/png", buffer: PNG });
 const TEXTO = { name: "nota.txt", mimeType: "text/plain", buffer: Buffer.from("hola") };
 
-const siguiente = (page: Page) =>
-  page.getByRole("button", { name: "Siguiente: normas de seguridad" }).locator("visible=true");
+const irADocumentosBtn = (page: Page) =>
+  page.getByRole("button", { name: "Seguir con los documentos" }).locator("visible=true");
 
-// Hay dos bloques en el DOM (celular y escritorio): se usa el que se ve.
+const seguirNormas = (page: Page) =>
+  page.getByRole("button", { name: "Seguir con las normas" }).locator("visible=true");
+
 const bloque = (page: Page) =>
-  page.getByRole("region", { name: "Verificación obligatoria" }).locator("visible=true");
+  page.getByRole("region", { name: "Documentos de verificación" }).locator("visible=true");
 
-// Los dos bloques repiten los mismos id (doc-antecedentes, doc-matricula): getByLabel apuntaría al
-// del bloque oculto en escritorio. Se toma el input que está dentro de la etiqueta del bloque visible.
 const entrada = (b: Locator, etiqueta: string) =>
   b.locator("label").filter({ hasText: etiqueta }).locator('input[type="file"]');
 
@@ -36,74 +36,78 @@ async function consentir(page: Page) {
   await casillaConsentimiento(bloque(page)).check();
 }
 
-async function abrir(page: Page) {
+async function irAPasoDocumentos(page: Page, opciones: { gas?: boolean } = {}) {
   await page.goto("/registro/profesional");
-  await expect(siguiente(page)).toBeEnabled();
-  await consentir(page);
+  await expect(irADocumentosBtn(page)).toBeEnabled();
+  await page.getByLabel("Nombre y apellido").fill("Martín Gómez");
+  await page.getByLabel("WhatsApp").fill("223 555-0000");
+  await page.getByLabel("Email").fill("martin@example.com");
+  await page.getByLabel("Contraseña").fill("clave-de-prueba-123");
+  await page.getByRole("button", { name: "Plomería" }).click();
+  if (opciones.gas) {
+    await page.getByRole("button", { name: "Gas" }).click();
+    await page.getByLabel(/Matrícula/).fill("MG-1234");
+  }
+  await page.getByLabel("Barrio desde donde salís").selectOption({ index: 1 });
+  await page.getByRole("button", { name: "Toda la ciudad" }).click();
+  await irADocumentosBtn(page).click();
+  await expect(bloque(page)).toBeVisible();
 }
 
-async function abrirDni(page: Page) {
-  await bloque(page)
-    .getByRole("button", { name: /DNI, frente y dorso/ })
-    .click();
+async function abrir(page: Page, opciones: { gas?: boolean } = {}) {
+  await irAPasoDocumentos(page, opciones);
+  await consentir(page);
 }
 
 test.describe("documentos de verificación", () => {
   test("sin consentimiento, las entradas de archivo están deshabilitadas", async ({ page }) => {
-    await page.goto("/registro/profesional");
-    await expect(siguiente(page)).toBeEnabled();
+    await irAPasoDocumentos(page);
     const b = bloque(page);
     await expect(casillaConsentimiento(b)).not.toBeChecked();
     await expect(entrada(b, "Certificado de antecedentes")).toBeDisabled();
-    await abrirDni(page);
-    await expect(entrada(b, "Frente del DNI")).toBeDisabled();
+    await expect(entrada(b, "DNI, frente")).toBeDisabled();
 
     await consentir(page);
     await expect(entrada(b, "Certificado de antecedentes")).toBeEnabled();
-    await expect(entrada(b, "Frente del DNI")).toBeEnabled();
+    await expect(entrada(b, "DNI, frente")).toBeEnabled();
   });
 
-  test("muestra el bloque con el texto y las filas obligatorias", async ({ page }) => {
+  test("muestra el paso 2 con los documentos obligatorios", async ({ page }) => {
     await abrir(page);
-    const b = bloque(page);
-    await expect(b.getByRole("heading", { name: "Verificación obligatoria" })).toBeVisible();
+    await expect(page.getByRole("group", { name: /Paso 2 de 3/ })).toBeVisible();
     await expect(
-      b.getByText("La revisamos a mano. No se muestra en tu perfil: solo aparecen las insignias."),
+      page.getByRole("heading", { level: 1, name: "Mostranos quién sos" }),
     ).toBeVisible();
-    await expect(b.getByRole("button", { name: /DNI, frente y dorso/ })).toBeVisible();
-    await expect(b.getByText("Certificado de antecedentes", { exact: true })).toBeVisible();
-    await expect(b.getByText("Constancia de matrícula")).toHaveCount(0);
+    const b = bloque(page);
+    await expect(b.getByText("DNI, frente", { exact: true }).first()).toBeVisible();
+    await expect(b.getByText("DNI, dorso", { exact: true }).first()).toBeVisible();
+    await expect(b.getByText("Certificado de antecedentes", { exact: true }).first()).toBeVisible();
+    await expect(b.getByText("Matrícula de gasista")).toHaveCount(0);
   });
 
-  test("DNI: se despliega, suma frente y dorso y llega a 2/2", async ({ page }) => {
+  test("DNI: permite subir frente y dorso y quitar el archivo", async ({ page }) => {
     await abrir(page);
     const b = bloque(page);
-    const boton = b.getByRole("button", { name: /DNI, frente y dorso/ });
-    await expect(boton).toHaveAttribute("aria-expanded", "false");
-    await abrirDni(page);
-    await expect(boton).toHaveAttribute("aria-expanded", "true");
 
-    await entrada(b, "Frente del DNI").setInputFiles(imagen("frente.png"));
-    await expect(b.getByText("frente.png")).toBeVisible();
-    await expect(b.getByText("1/2")).toBeVisible();
+    await entrada(b, "DNI, frente").setInputFiles(imagen("frente.png"));
+    await expect(b.getByText("Subido · frente.png")).toBeVisible();
 
-    await entrada(b, "Dorso del DNI").setInputFiles(imagen("dorso.png"));
-    await expect(b.getByText("2/2")).toBeVisible();
-    await expect(b.getByText("Listo")).toBeVisible();
+    await entrada(b, "DNI, dorso").setInputFiles(imagen("dorso.png"));
+    await expect(b.getByText("Subido · dorso.png")).toBeVisible();
 
-    await b.getByRole("button", { name: "Quitar archivo de Frente del DNI" }).click();
-    await expect(b.getByText("1/2")).toBeVisible();
-    await expect(b.getByText("frente.png")).toHaveCount(0);
+    await b.getByRole("button", { name: "Quitar archivo de DNI, frente" }).click();
+    await expect(b.getByText("Subido · frente.png")).toHaveCount(0);
+    await expect(b.getByText("Foto o PDF del frente")).toBeVisible();
   });
 
   test("antecedentes: acepta PDF y se puede quitar", async ({ page }) => {
     await abrir(page);
     const b = bloque(page);
     await entrada(b, "Certificado de antecedentes").setInputFiles(PDF);
-    await expect(b.getByText("antecedentes.pdf")).toBeVisible();
+    await expect(b.getByText("Subido · antecedentes.pdf")).toBeVisible();
     await b.getByRole("button", { name: "Quitar archivo de Certificado de antecedentes" }).click();
-    await expect(b.getByText("antecedentes.pdf")).toHaveCount(0);
-    await expect(b.getByText("Subir PDF")).toBeVisible();
+    await expect(b.getByText("Subido · antecedentes.pdf")).toHaveCount(0);
+    await expect(b.getByText("Emitido en los últimos 90 días")).toBeVisible();
   });
 
   test("error: un tipo de archivo no permitido avisa y no lo suma", async ({ page }) => {
@@ -141,26 +145,25 @@ test.describe("documentos de verificación", () => {
   test("gasista: aparece la matrícula con Gas, acepta archivo y se va al sacar Gas", async ({
     page,
   }) => {
-    await abrir(page);
+    await abrir(page, { gas: true });
     const b = bloque(page);
-    const gas = page.getByRole("button", { name: "Gas" });
-    await gas.click();
-    await expect(b.getByText("Constancia de matrícula")).toBeVisible();
-    await entrada(b, "Constancia de matrícula").setInputFiles(imagen("carnet.png"));
-    await expect(b.getByText("carnet.png")).toBeVisible();
-    await gas.click();
-    await expect(b.getByText("Constancia de matrícula")).toHaveCount(0);
+    await expect(b.getByText("Matrícula de gasista", { exact: true }).first()).toBeVisible();
+    await entrada(b, "Matrícula de gasista").setInputFiles(imagen("carnet.png"));
+    await expect(b.getByText("Subido · carnet.png")).toBeVisible();
+
+    await page.getByRole("button", { name: "Volver al perfil" }).click();
+    await page.getByRole("button", { name: "Gas" }).click();
+    await irADocumentosBtn(page).click();
+    await expect(bloque(page).getByText("Matrícula de gasista")).toHaveCount(0);
   });
 
-  test("con teclado: Enter y Espacio despliegan y pliegan el DNI", async ({ page }) => {
+  test("con teclado: se puede volver al perfil desde documentos", async ({ page }) => {
     await abrir(page);
-    const boton = bloque(page).getByRole("button", { name: /DNI, frente y dorso/ });
-    await boton.focus();
-    await expect(boton).toBeFocused();
+    const volver = page.getByRole("button", { name: "Volver al perfil" });
+    await volver.focus();
+    await expect(volver).toBeFocused();
     await page.keyboard.press("Enter");
-    await expect(boton).toHaveAttribute("aria-expanded", "true");
-    await page.keyboard.press("Space");
-    await expect(boton).toHaveAttribute("aria-expanded", "false");
+    await expect(page.getByRole("group", { name: /Paso 1 de 3/ })).toBeVisible();
   });
 
   // Convención de la app: táctiles de 44 px.
@@ -174,16 +177,10 @@ test.describe("documentos de verificación", () => {
     expect(caja?.height ?? 0).toBeGreaterThanOrEqual(44);
   });
 
-  // Criterio de aceptación de LAB-19 (lógica 5): sin los documentos obligatorios no se pasa al paso 2.
+  // Criterio de aceptación de LAB-19 (lógica 5): sin los documentos obligatorios no se pasa al paso 3.
   test("no se puede avanzar sin DNI y antecedentes", async ({ page }) => {
     await abrir(page);
-    await page.getByLabel("Nombre y apellido").fill("Martín Gómez");
-    await page.getByLabel("WhatsApp").fill("223 555-0000");
-    await page.getByLabel("Email").fill("martin@example.com");
-    await page.getByLabel("Contraseña").fill("clave-de-prueba-123");
-    await page.getByRole("button", { name: "Plomería" }).click();
-    await page.getByRole("button", { name: "Toda la ciudad" }).click();
-    await siguiente(page).click();
+    await seguirNormas(page).click();
     await expect(
       bloque(page).getByText(
         "Para publicar tu perfil necesitamos tu DNI y tu certificado de antecedentes.",
@@ -194,11 +191,9 @@ test.describe("documentos de verificación", () => {
   // Criterio: en celular se abre la cámara directamente.
   // El certificado de antecedentes es un PDF: sin `capture` el celular deja elegirlo.
   test("las entradas de fotos piden la cámara en celular", async ({ page }) => {
-    await abrir(page);
-    await page.getByRole("button", { name: "Gas" }).click();
+    await abrir(page, { gas: true });
     const b = bloque(page);
-    await abrirDni(page);
-    for (const etiqueta of ["Frente del DNI", "Dorso del DNI", "Constancia de matrícula"]) {
+    for (const etiqueta of ["DNI, frente", "DNI, dorso", "Matrícula de gasista"]) {
       await expect(entrada(b, etiqueta)).toHaveAttribute("capture", "environment");
     }
     await expect(entrada(b, "Certificado de antecedentes")).not.toHaveAttribute("capture");
@@ -217,23 +212,26 @@ test.describe("documentos de verificación", () => {
   test("muestra la ayuda con el link del Registro Nacional de Reincidencia", async ({ page }) => {
     await abrir(page);
     const b = bloque(page);
-    await expect(b.getByText(/Tiene que tener menos de 90 días/)).toBeVisible();
+    await expect(b.getByText("Emitido en los últimos 90 días")).toBeVisible();
     await expect(
       b.getByRole("link", { name: "Registro Nacional de Reincidencia" }),
     ).toHaveAttribute(
       "href",
       "https://www.argentina.gob.ar/justicia/reincidencia/antecedentespenales",
     );
-    await expect(b.getByText("Falta subir").first()).toBeVisible();
   });
 
-  // LAB-43: a 390 px el estado de la fila ("Falta subir" / "Subir PDF") no se parte en varias líneas.
+  // LAB-43: a 390 px los textos de estado de la fila de antecedentes no se parten en varias líneas.
   test("la fila de antecedentes se lee en una línea de estado", async ({ page }) => {
     await abrir(page);
     const b = bloque(page);
-    const falta = await b.getByText("Falta subir").first().boundingBox();
-    const subir = await b.getByText("Subir PDF").first().boundingBox();
-    expect(falta?.height ?? 99).toBeLessThan(26);
+    const subtitulo = await b.getByText("Emitido en los últimos 90 días").boundingBox();
+    const subir = await b
+      .locator("label > span")
+      .filter({ hasText: /^Subir$/ })
+      .first()
+      .boundingBox();
+    expect(subtitulo?.height ?? 99).toBeLessThan(26);
     expect(subir?.height ?? 99).toBeLessThan(26);
   });
 
@@ -259,16 +257,12 @@ test.describe("documentos de verificación", () => {
   });
 
   for (const esquema of ["light", "dark"] as const) {
-    test(`axe sin violaciones con DNI desplegado, archivos, gas y error (${esquema})`, async ({
-      page,
-    }) => {
+    test(`axe sin violaciones con archivos, gas y error (${esquema})`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: esquema });
-      await abrir(page);
-      await page.getByRole("button", { name: "Gas" }).click();
+      await abrir(page, { gas: true });
       const b = bloque(page);
-      await abrirDni(page);
-      await entrada(b, "Frente del DNI").setInputFiles(imagen("frente.png"));
-      await entrada(b, "Constancia de matrícula").setInputFiles(PDF);
+      await entrada(b, "DNI, frente").setInputFiles(imagen("frente.png"));
+      await entrada(b, "Matrícula de gasista").setInputFiles(PDF);
       await entrada(b, "Certificado de antecedentes").setInputFiles(TEXTO);
       await expect(b.getByRole("alert")).toBeVisible();
       const resultado = await new AxeBuilder({ page }).analyze();
@@ -312,19 +306,19 @@ test.describe("documentos con cuenta real", () => {
     await page.getByLabel("WhatsApp").fill("223 555-0000");
     await page.getByLabel("Email").fill(email);
     await page.getByLabel("Contraseña").fill("clave-de-prueba-123");
-    await page.getByLabel("Tu barrio").selectOption({ label: "La Perla" });
+    await page.getByLabel("Barrio desde donde salís").selectOption({ label: "La Perla" });
     await page.getByRole("button", { name: "Plomería" }).click();
     await page.getByRole("button", { name: "Toda la ciudad" }).click();
+    await irADocumentosBtn(page).click();
     const b = bloque(page);
     await consentir(page);
-    await abrirDni(page);
-    await entrada(b, "Frente del DNI").setInputFiles(imagen("frente.png"));
-    await entrada(b, "Dorso del DNI").setInputFiles(imagen("dorso.png"));
+    await entrada(b, "DNI, frente").setInputFiles(imagen("frente.png"));
+    await entrada(b, "DNI, dorso").setInputFiles(imagen("dorso.png"));
     await entrada(b, "Certificado de antecedentes").setInputFiles(PDF);
-    await siguiente(page).click();
+    await seguirNormas(page).click();
     await expect(page).toHaveURL(/\/registro\/profesional\/normas$/);
 
-    await page.goto("/registro/profesional");
-    await expect(bloque(page).getByText("En revisión").first()).toBeVisible();
+    await page.goto("/registro/profesional?paso=documentos");
+    await expect(bloque(page).getByText("Subido · en revisión").first()).toBeVisible();
   });
 });

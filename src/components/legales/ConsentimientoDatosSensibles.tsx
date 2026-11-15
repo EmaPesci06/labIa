@@ -23,7 +23,7 @@ export function ConsentimientoDatosSensibles({
   return (
     <div className="flex flex-col gap-1.5">
       <input type="hidden" name="version" value={VERSION_LEGALES} />
-      <label className="flex min-h-[52px] cursor-pointer items-start gap-3 rounded-[14px] border-[1.5px] border-texto bg-superficie px-3.5 py-3 text-[15px] leading-snug">
+      <label className="flex min-h-[52px] cursor-pointer items-start gap-3 rounded-[20px] bg-superficie px-3.5 py-3 text-[15px] leading-[1.35] text-texto">
         <input
           type="checkbox"
           name="consiento"
@@ -31,7 +31,7 @@ export function ConsentimientoDatosSensibles({
           onChange={(e) => onCambio(e.target.checked)}
           aria-describedby={error ? idError : undefined}
           aria-invalid={error ? true : undefined}
-          className="accent-azul mt-0.5 size-[22px] flex-none"
+          className="mt-0.5 size-6 flex-none accent-accion"
         />
         <span>
           Acepto que LabÍA trate mi DNI y mi certificado de antecedentes solo para verificar mi

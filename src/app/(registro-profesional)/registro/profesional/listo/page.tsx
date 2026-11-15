@@ -1,25 +1,81 @@
+import { Check } from "lucide-react";
 import type { Metadata } from "next";
-import { CheckCircle2 } from "lucide-react";
+import Link from "next/link";
+import { Suspense } from "react";
 
-import { EstructuraRegistro } from "@/components/registro/EstructuraRegistro";
-import { Boton } from "@/components/ui/Boton";
+import { SaltarAlContenido } from "@/components/navegacion/SaltarAlContenido";
+import { Toldo } from "@/components/ui/Toldo";
+import { obtenerSesion } from "@/lib/sesion";
 
 export const metadata: Metadata = { title: "Perfil enviado · LabÍA" };
 
-/** Confirmación al terminar el registro de profesional (LAB-20). */
+const PUNTOS = [
+  "La revisión la hace una persona y suele tardar uno o dos días hábiles.",
+  "Te avisamos por email cuando tu perfil se publique.",
+  "Hasta entonces no aparecés en las búsquedas ni podés postularte.",
+] as const;
+
+function ContenidoListo({ nombre }: { nombre: string | null }) {
+  return (
+    <div className="flex min-h-dvh flex-col bg-encabezado text-sobre-encabezado">
+      <SaltarAlContenido />
+      <Toldo color="sol" alto={26} />
+      <main
+        id="contenido"
+        tabIndex={-1}
+        className="mx-auto flex w-full max-w-[560px] flex-1 flex-col px-6 pt-8 pb-5 focus:outline-none"
+      >
+        <div className="my-auto py-4">
+          <span
+            aria-hidden
+            className="flex size-24 items-center justify-center rounded-full bg-sol text-sobre-sol"
+          >
+            <Check strokeWidth={3} className="size-[52px]" />
+          </span>
+          <h1 className="mt-[22px] font-titulo text-[48px] leading-[0.98] font-extrabold lg:text-[56px]">
+            {nombre ? `¡Listo, ${nombre}!` : "¡Listo!"}
+          </h1>
+          <p className="mt-3.5 text-[19px] leading-[1.4]">
+            Estamos revisando tus documentos. Mientras tanto ya podés ver trabajos.
+          </p>
+          <ul className="mt-6 flex flex-col gap-3 text-[17px] leading-[1.35]">
+            {PUNTOS.map((texto) => (
+              <li key={texto} className="flex gap-3">
+                <span aria-hidden className="mt-[7px] size-2.5 flex-none rounded-full bg-sol" />
+                <span>{texto}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="mt-auto flex flex-col pt-4">
+          <Link
+            href="/trabajos"
+            className="flex min-h-14 items-center justify-center rounded-boton bg-superficie px-6 text-lg font-bold text-texto no-underline transition-colors hover:bg-superficie/90 focus-visible:outline-sobre-encabezado"
+          >
+            Ver trabajos de mi zona
+          </Link>
+          <Link
+            href="/cuenta/perfil"
+            className="inline-flex min-h-12 items-center self-center text-base font-bold text-sobre-encabezado underline decoration-2 underline-offset-4 focus-visible:outline-sobre-encabezado"
+          >
+            Editar mi perfil
+          </Link>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+async function ListoConNombre() {
+  const sesion = await obtenerSesion();
+  return <ContenidoListo nombre={sesion?.perfil.nombre ?? null} />;
+}
+
+/** Confirmación al terminar el registro de profesional (LAB-20, LAB-77: `App-ProListo`). */
 export default function RegistroProfesionalListo() {
   return (
-    <EstructuraRegistro paso={2}>
-      <div className="mx-auto flex max-w-[480px] flex-col items-center gap-4 pt-8 text-center">
-        <CheckCircle2 aria-hidden strokeWidth={2} className="size-14 text-texto" />
-        <h1 className="font-titulo text-[30px] leading-tight">¡Listo!</h1>
-        <p className="text-[17px] leading-snug text-texto">
-          Estamos revisando tus documentos. Mientras tanto ya podés ver trabajos.
-        </p>
-        <Boton href="/trabajos" variante="profesional" tamano="grande" bloque>
-          Ver trabajos
-        </Boton>
-      </div>
-    </EstructuraRegistro>
+    <Suspense fallback={<ContenidoListo nombre={null} />}>
+      <ListoConNombre />
+    </Suspense>
   );
 }
