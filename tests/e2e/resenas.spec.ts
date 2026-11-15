@@ -142,10 +142,12 @@ test.describe("reseñas: cliente elegible", () => {
     await expect(publicar).toBeDisabled();
 
     await hoja(page).getByRole("radio", { name: "Excelente" }).click();
-    await expect(hoja(page).getByText("Excelente", { exact: true })).toBeVisible();
+    await expect(
+      hoja(page).locator('p[aria-live="polite"]').getByText("Excelente", { exact: true }),
+    ).toBeVisible();
     await hoja(page).getByRole("button", { name: "Puntual" }).click();
     await hoja(page)
-      .getByLabel("Comentario (opcional)")
+      .getByLabel("Contale a los vecinos")
       .fill("Llegó a horario y dejó todo prolijo.");
     await expect(publicar).toBeEnabled();
     await capturar(page, "resena-hoja", "claro");
@@ -180,11 +182,13 @@ test.describe("reseñas: cliente elegible", () => {
     const grupo = hoja(page).getByRole("radiogroup", { name: "Calificación del profesional" });
     await expect(grupo).toBeVisible();
     await grupo.getByRole("radio", { name: "Muy mal", exact: true }).focus();
-    await page.keyboard.press("ArrowRight");
-    await expect(hoja(page).getByRole("radio", { name: "Muy mal", exact: true })).toBeChecked();
+    // Radios nativos: la flecha pasa al siguiente puntaje y lo elige.
     await page.keyboard.press("ArrowRight");
     await expect(hoja(page).getByRole("radio", { name: "Mal", exact: true })).toBeChecked();
-    await page.keyboard.press("End");
+    await page.keyboard.press("ArrowRight");
+    await expect(hoja(page).getByRole("radio", { name: "Regular", exact: true })).toBeChecked();
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowRight");
     await expect(hoja(page).getByRole("radio", { name: "Excelente" })).toBeChecked();
   });
 
@@ -195,7 +199,7 @@ test.describe("reseñas: cliente elegible", () => {
     await botonDejarResena(page).click();
     await hoja(page).getByRole("radio", { name: "Bien" }).click();
     await hoja(page)
-      .getByLabel("Comentario (opcional)")
+      .getByLabel("Contale a los vecinos")
       .fill("Llamame al 2235551234 para coordinar.");
     await hoja(page).getByRole("button", { name: "Publicar reseña" }).click();
 
@@ -244,7 +248,7 @@ test.describe("reseñas: edición dentro de las 24 horas", () => {
     await botonEditarResena(page).click();
 
     await expect(hoja(page).getByRole("heading", { name: TITULO_HOJA_EDICION })).toBeVisible();
-    await expect(hoja(page).getByLabel("Comentario (opcional)")).toHaveValue(
+    await expect(hoja(page).getByLabel("Contale a los vecinos")).toHaveValue(
       "Llegó a horario, el resultado estuvo bien.",
     );
     await hoja(page).getByRole("radio", { name: "Excelente" }).click();

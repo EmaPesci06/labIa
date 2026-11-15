@@ -62,11 +62,11 @@ test.describe("capturas LAB-34", () => {
       const page = await contexto.newPage();
       await page.goto(`${URL_BASE}/profesionales/${ID_PUBLICADO}`);
       await page
-        .getByRole("button", { name: "Contactar por WhatsApp" })
+        .getByRole("button", { name: "Escribirle por WhatsApp" })
         .filter({ visible: true })
         .first()
         .click();
-      const hoja = page.getByRole("dialog", { name: "Antes de contactar" });
+      const hoja = page.getByRole("dialog", { name: /Escribile a .+ por WhatsApp/ });
       await hoja.getByRole("button", { name: "Abrir WhatsApp" }).click();
       await expect(hoja.getByRole("alert")).toHaveText(
         "Llegaste al máximo de contactos por hoy. Probá mañana.",

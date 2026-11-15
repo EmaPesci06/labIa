@@ -73,7 +73,13 @@ export function HojaReportar({
     <HojaInferior
       abierta={abierta}
       onCambioAbierta={handleCambioAbierta}
-      titulo={estado.exito ? "Reporte enviado" : "¿Qué pasó?"}
+      titulo={
+        estado.exito
+          ? "Reporte enviado"
+          : objetivoTipo === "perfil"
+            ? "¿Qué pasó con este perfil?"
+            : "¿Qué pasó?"
+      }
       devolverFocoA={devolverFocoA}
     >
       {!estaAutenticado ? (
@@ -117,7 +123,7 @@ export function HojaReportar({
           {motivoSeleccionado === "comportamiento" ? (
             <div
               role="alert"
-              className="border-naranja-suave flex items-center gap-2.5 rounded-[14px] border bg-sol/40 p-3.5 text-sm font-bold text-sobre-sol"
+              className="flex items-center gap-2.5 rounded-[14px] bg-sol p-3.5 text-sm font-bold text-sobre-sol"
             >
               <AlertTriangle aria-hidden className="size-5 shrink-0 text-error" />
               <span>Si estás en peligro, llamá al 911.</span>
@@ -125,9 +131,7 @@ export function HojaReportar({
           ) : null}
 
           <fieldset className="flex flex-col gap-2">
-            <legend className="mb-1 text-sm font-bold text-texto">
-              Seleccioná el motivo del reporte
-            </legend>
+            <legend className="mb-1 text-sm font-bold text-texto">Elegí el motivo</legend>
             {MOTIVOS_REPORTE.map((motivo) => {
               const inputId = `${idBase}-${motivo}`;
               const seleccionado = motivoSeleccionado === motivo;
@@ -136,10 +140,8 @@ export function HojaReportar({
                   key={motivo}
                   htmlFor={inputId}
                   className={cn(
-                    "flex min-h-[44px] cursor-pointer items-start gap-3 rounded-campo border p-3.5 transition-colors",
-                    seleccionado
-                      ? "border-borde-fuerte bg-superficie/30"
-                      : "border-texto hover:bg-superficie",
+                    "flex min-h-[50px] cursor-pointer items-center gap-3 rounded-campo px-4 py-3 text-[17px] transition-colors",
+                    seleccionado ? "bg-sol font-bold text-sobre-sol" : "bg-superficie text-texto",
                   )}
                 >
                   <input
@@ -149,7 +151,10 @@ export function HojaReportar({
                     value={motivo}
                     checked={seleccionado}
                     onChange={() => setMotivoSeleccionado(motivo)}
-                    className="mt-0.5 size-4 text-texto focus:ring-foco"
+                    className={cn(
+                      "m-0 size-[22px] shrink-0",
+                      seleccionado ? "accent-texto" : "accent-accion",
+                    )}
                   />
                   <span className="text-[15px] leading-snug font-medium text-texto">
                     {ETIQUETAS_MOTIVO[motivo]}
@@ -166,8 +171,8 @@ export function HojaReportar({
           ) : null}
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor={`${idBase}-detalle`} className="text-sm font-bold text-texto">
-              Detalle opcional
+            <label htmlFor={`${idBase}-detalle`} className="text-base font-bold text-texto">
+              Contanos qué pasó
             </label>
             <textarea
               id={`${idBase}-detalle`}
@@ -176,9 +181,13 @@ export function HojaReportar({
               maxLength={MAX_CARACTERES_DETALLE}
               value={detalle}
               onChange={(e) => setDetalle(e.target.value)}
+              aria-describedby={`${idBase}-ayuda`}
               placeholder="Contanos qué pasó con el mayor detalle posible..."
-              className="focus:border-borde-fuerte w-full rounded-campo border border-texto bg-superficie p-3 text-[15px] text-texto placeholder:text-texto focus:ring-2 focus:ring-foco focus:outline-none"
+              className="w-full resize-none rounded-campo border-2 border-texto bg-superficie p-3 text-[17px] leading-snug text-texto placeholder:text-texto/70"
             />
+            <p id={`${idBase}-ayuda`} className="text-sm text-texto">
+              Lo lee nuestro equipo. La otra persona no ve quién reportó.
+            </p>
             <div className="flex justify-end text-xs text-texto">
               <span>
                 {detalle.length} / {MAX_CARACTERES_DETALLE}
@@ -200,15 +209,24 @@ export function HojaReportar({
             </div>
           ) : null}
 
+          {/* Azul noche (texto), no turquesa: reportar no es una acción de contacto. */}
           <Boton
             type="submit"
-            variante="cliente"
             tamano="grande"
             cargando={pendiente}
             disabled={!motivoSeleccionado || pendiente}
             bloque
+            className="bg-texto text-sobre-accion hover:bg-texto/90"
           >
             Enviar reporte
+          </Boton>
+          <Boton
+            type="button"
+            variante="enlace"
+            className="self-center"
+            onClick={() => onCambioAbierta(false)}
+          >
+            Cancelar
           </Boton>
         </form>
       )}
