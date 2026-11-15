@@ -26,7 +26,7 @@ describe("HojaReportar", () => {
       />,
     );
 
-    expect(screen.getByRole("dialog", { name: "¿Qué pasó?" })).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "¿Qué pasó con este perfil?" })).toBeInTheDocument();
     expect(screen.getByText("Datos falsos o se hace pasar por otra persona")).toBeInTheDocument();
     expect(screen.getByText("Comportamiento inadecuado o inseguro")).toBeInTheDocument();
     expect(screen.getByText("Intento de estafa o pedido de pago por fuera")).toBeInTheDocument();
@@ -65,7 +65,7 @@ describe("HojaReportar", () => {
     );
 
     expect(screen.getByText(/0 \/ 500/)).toBeInTheDocument();
-    const textarea = screen.getByLabelText(/Detalle opcional/);
+    const textarea = screen.getByLabelText(/Contanos qué pasó/);
     await user.type(textarea, "Texto de prueba");
     expect(screen.getByText(/15 \/ 500/)).toBeInTheDocument();
   });

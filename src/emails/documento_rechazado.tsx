@@ -1,10 +1,10 @@
-import { Text } from "@react-email/components";
-
 import {
   BotonAccion,
-  estilosTexto,
   Layout,
+  Nota,
+  Parrafo,
   PIE_DE_PRUEBA,
+  Tarjeta,
   type DatosPie,
 } from "@/lib/emails/Layout";
 
@@ -24,18 +24,19 @@ export default function DocumentoRechazado({
   pie,
 }: DatosDocumentoRechazado & { pie: DatosPie }) {
   return (
-    <Layout previa={`No pudimos aprobar tu ${documento}. Subilo de nuevo.`} pie={pie}>
-      <Text style={estilosTexto.titulo}>Necesitamos que vuelvas a subir un documento</Text>
-      <Text style={estilosTexto.parrafo}>
-        Hola {nombre}, no pudimos aprobar tu documento: <strong>{documento}</strong>.
-      </Text>
-      <Text style={{ ...estilosTexto.tarjeta, ...estilosTexto.parrafo }}>
-        <strong>Motivo:</strong> {motivo}
-      </Text>
-      <Text style={estilosTexto.parrafo}>
+    <Layout
+      previa={`No pudimos aprobar tu ${documento}. Subilo de nuevo.`}
+      titulo="Hay que volver a subir un documento"
+      subtitulo={`${nombre}, no pudimos aprobar tu ${documento}.`}
+      motivo="Te escribimos porque revisamos tu documentación."
+      pie={pie}
+    >
+      <Tarjeta etiqueta="Motivo" titulo={motivo} />
+      <Parrafo>
         Subilo de nuevo con una foto bien iluminada y que se lea completa. Lo revisamos enseguida.
-      </Text>
+      </Parrafo>
       <BotonAccion href={urlSubir}>Subir el documento</BotonAccion>
+      <Nota>Tu perfil no se publica hasta que lo aprobemos.</Nota>
     </Layout>
   );
 }

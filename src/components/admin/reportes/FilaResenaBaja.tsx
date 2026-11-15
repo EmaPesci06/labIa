@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 
+import { Boton } from "@/components/ui/Boton";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { haceCuanto } from "@/lib/formato";
 import type { FilaResenaBajaAdmin } from "@/lib/admin/reportes-datos";
@@ -14,7 +15,7 @@ export function FilaResenaBaja({ fila }: { fila: FilaResenaBajaAdmin }) {
   const [modalSuspenderAbierto, setModalSuspenderAbierto] = useState(false);
 
   return (
-    <Tarjeta borde className="flex flex-col gap-3.5">
+    <Tarjeta className="flex flex-col gap-3.5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <span className="rounded-full border border-error bg-superficie px-2.5 py-1 text-xs font-bold text-error">
@@ -53,13 +54,9 @@ export function FilaResenaBaja({ fila }: { fila: FilaResenaBajaAdmin }) {
 
       <div className="flex flex-wrap items-center justify-end gap-2 border-t border-fondo pt-3">
         {fila.autorId ? (
-          <button
-            type="button"
-            onClick={() => setModalSuspenderAbierto(true)}
-            className="inline-flex min-h-11 items-center justify-center rounded-boton border border-error bg-superficie px-4 text-sm font-bold text-error hover:bg-fondo active:opacity-80"
-          >
+          <Boton type="button" variante="peligro" onClick={() => setModalSuspenderAbierto(true)}>
             Suspender cliente…
-          </button>
+          </Boton>
         ) : null}
 
         <BotonAccionModeracion

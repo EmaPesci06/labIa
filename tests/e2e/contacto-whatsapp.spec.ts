@@ -11,7 +11,7 @@ const DIR_CAPTURAS = process.env.LABIA_CAPTURAS_DIR;
 
 const ID_PUBLICADO = "11111111-1111-4111-8111-111111111111";
 const WHATSAPP_FALSO = "5492235550123";
-const NOMBRE_HOJA = "Antes de contactar";
+const NOMBRE_HOJA = /Escribile a .+ por WhatsApp/;
 
 test.skip(!ACTIVO, "Necesita el Supabase falso: LABIA_E2E_SUPABASE_FALSO=1");
 
@@ -48,9 +48,9 @@ async function capturar(page: Page, nombre: string, tema: "claro" | "oscuro") {
   });
 }
 
-/** El botón "Contactar por WhatsApp" visible del perfil (celular: uno solo; escritorio: puede haber dos). */
+/** El botón "Escribirle por WhatsApp" visible del perfil (celular: uno solo; escritorio: puede haber dos). */
 const botonContactar = (page: Page) =>
-  page.getByRole("button", { name: "Contactar por WhatsApp" }).filter({ visible: true }).first();
+  page.getByRole("button", { name: "Escribirle por WhatsApp" }).filter({ visible: true }).first();
 
 /** Foco dentro del diálogo abierto (la comprobación de foco no tiene rol accesible equivalente). */
 const focoDentroDeLaHoja = (page: Page) =>
@@ -139,7 +139,7 @@ test.describe("contacto: teclado y foco", () => {
     const hoja = page.getByRole("dialog", { name: NOMBRE_HOJA });
     await expect(hoja).toBeVisible();
 
-    await hoja.getByRole("button", { name: "Cancelar" }).click();
+    await hoja.getByRole("button", { name: "Ahora no" }).click();
     await expect(hoja).toBeHidden();
     await expect(boton).toBeFocused();
   });
