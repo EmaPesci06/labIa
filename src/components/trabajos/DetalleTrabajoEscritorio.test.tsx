@@ -41,12 +41,12 @@ describe("DetalleTrabajoEscritorio (LAB-45)", () => {
     const usuario = userEvent.setup();
     const { rerender } = render(<DetalleTrabajoEscritorio trabajo={base} />);
 
-    await usuario.type(screen.getByLabelText(/Mensaje para/), "Mensaje para el primero");
-    expect(screen.getByLabelText(/Mensaje para/)).toHaveValue("Mensaje para el primero");
+    await usuario.type(screen.getByLabelText(/Tu mensaje para/), "Mensaje para el primero");
+    expect(screen.getByLabelText(/Tu mensaje para/)).toHaveValue("Mensaje para el primero");
 
     rerender(<DetalleTrabajoEscritorio trabajo={otro} />);
 
-    expect(screen.getByLabelText(/Mensaje para/)).toHaveValue("");
+    expect(screen.getByLabelText(/Tu mensaje para/)).toHaveValue("");
   });
 
   it("muestra la postulación propia del trabajo elegido y el botón para retirarla", () => {
@@ -66,12 +66,12 @@ describe("DetalleTrabajoEscritorio (LAB-45)", () => {
 
     expect(screen.getByText("Postulación enviada")).toBeTruthy();
     expect(screen.getByText("Puedo ir hoy a las 17 h.")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Retirar postulación" })).toBeTruthy();
-    expect(screen.queryByLabelText(/Mensaje para/)).toBeNull();
+    expect(screen.getByRole("button", { name: "Retirar mi postulación" })).toBeTruthy();
+    expect(screen.queryByLabelText(/Tu mensaje para/)).toBeNull();
   });
 
   it("usa el texto de postulantes compartido", () => {
     render(<DetalleTrabajoEscritorio trabajo={base} />);
-    expect(screen.getByText("2 postulantes")).toBeTruthy();
+    expect(screen.getByText("2 postulaciones")).toBeTruthy();
   });
 });

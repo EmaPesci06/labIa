@@ -1,16 +1,16 @@
 import Link from "next/link";
 
-import { Distancia } from "@/components/ui/Distancia";
-import { EtiquetaMono } from "@/components/ui/EtiquetaMono";
-import { Insignia } from "@/components/ui/Insignia";
-import { Tarjeta } from "@/components/ui/Tarjeta";
-import { haceCuanto } from "@/lib/formato";
 import type { Oficio } from "@/lib/busqueda";
+import { cn } from "@/lib/cn";
+import { formatearDistancia, haceCuanto } from "@/lib/formato";
 import {
   ETIQUETA_OFICIO,
   ETIQUETA_URGENCIA,
   type UrgenciaTrabajo,
 } from "@/lib/validaciones/trabajo";
+
+import { Insignia } from "./ui/Insignia";
+import { Tarjeta } from "./ui/Tarjeta";
 
 export type TarjetaTrabajoProps = {
   oficio: Oficio;
@@ -30,15 +30,21 @@ export type TarjetaTrabajoProps = {
   className?: string;
 };
 
+export const ETIQUETA_URGENCIA_CORTA: Record<UrgenciaTrabajo, string> = {
+  lo_antes_posible: "Para hoy",
+  esta_semana: "Esta semana",
+  sin_apuro: "Sin apuro",
+};
+
 export function textoPostulantes(n: number): string {
-  if (n <= 0) return "Sin postulantes";
-  return n === 1 ? "1 postulante" : `${n} postulantes`;
+  if (n <= 0) return "Sin postulaciones todavía";
+  return n === 1 ? "1 postulación" : `${n} postulaciones`;
 }
 
 /**
- * Tarjeta de un trabajo publicado (lo ven los profesionales y el cliente en "Mis trabajos").
- * Etiqueta mono "GAS · LA PERLA", tiempo relativo, título, descripción a 2 líneas,
- * distancia, urgencia y cantidad de postulantes.
+ * Tarjeta de un trabajo publicado (bocetos App-Trabajos y Oscuro-Trabajos, LAB-78).
+ * Fila superior con oficio · barrio · tiempo relativo y pastilla de urgencia ("Para hoy" en sol,
+ * resto en fondo); título en Baloo 2 800; distancia y cantidad de postulaciones abajo.
  */
 export function TarjetaTrabajo({
   oficio,
@@ -53,46 +59,56 @@ export function TarjetaTrabajo({
   href,
   className,
 }: TarjetaTrabajoProps) {
+  void descripcion;
   const cuando = creadoEn ? haceCuanto(creadoEn) : "recién";
+  const distanciaTexto =
+    distanciaKm !== null && distanciaKm !== undefined
+      ? formatearDistancia(distanciaKm).replace(/^a /, "A ")
+      : null;
+
   const contenido = (
     <>
-      <div className="flex items-start justify-between gap-3">
-        <EtiquetaMono partes={[ETIQUETA_OFICIO[oficio], barrio]} />
-        <span className="shrink-0 text-sm text-texto">{cuando}</span>
-      </div>
-      <h3 className="mt-2 text-[17px] leading-snug font-bold break-words text-texto">
+      <span className="flex flex-wrap items-center justify-between gap-2 text-sm text-texto">
+        <span>
+          {ETIQUETA_OFICIO[oficio]} · {barrio} · {cuando}
+        </span>
+        <span className="flex flex-wrap items-center gap-1.5">
+          <span
+            aria-label={ETIQUETA_URGENCIA[urgencia]}
+            className={cn(
+              "rounded-[12px] px-2.5 py-1 font-bold",
+              urgencia === "lo_antes_posible" ? "bg-sol text-sobre-sol" : "bg-fondo text-texto",
+            )}
+          >
+            {ETIQUETA_URGENCIA_CORTA[urgencia]}
+          </span>
+          {yaMePostule ? <Insignia variante="verificada">Te postulaste</Insignia> : null}
+        </span>
+      </span>
+      <h3 className="font-titulo text-[22px] leading-[1.1] break-words text-texto">
         {titulo || "Tu título va acá"}
       </h3>
-      <p className="mt-1 line-clamp-2 text-[15px] leading-snug break-words text-texto">
-        {descripcion || "Acá se va a ver cómo contás lo que pasa."}
-      </p>
-      {distanciaKm !== null && distanciaKm !== undefined ? (
-        <Distancia km={distanciaKm} className="mt-3" />
-      ) : null}
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <Insignia variante={urgencia === "lo_antes_posible" ? "urgencia" : "verificada"}>
-            {ETIQUETA_URGENCIA[urgencia]}
-          </Insignia>
-          {yaMePostule ? <Insignia variante="verificada">Te postulaste</Insignia> : null}
-        </div>
-        <span className="text-sm font-semibold text-texto">{textoPostulantes(postulantes)}</span>
-      </div>
+      <span className="text-[15px] text-texto tabular-nums">
+        {distanciaTexto ? `${distanciaTexto} · ` : ""}
+        {textoPostulantes(postulantes)}
+      </span>
     </>
   );
 
   if (href) {
     return (
-      <Tarjeta borde className={className}>
-        <Link href={href} className="block rounded-[14px]">
-          {contenido}
-        </Link>
-      </Tarjeta>
+      <Link
+        href={href}
+        className={cn(
+          "flex flex-col gap-1 rounded-tarjeta bg-superficie px-4 py-3.5 text-texto no-underline transition-colors",
+          className,
+        )}
+      >
+        {contenido}
+      </Link>
     );
   }
   return (
-    <Tarjeta borde className={className}>
-      {contenido}
-    </Tarjeta>
+    <Tarjeta className={cn("flex flex-col gap-1 px-4 py-3.5", className)}>{contenido}</Tarjeta>
   );
 }

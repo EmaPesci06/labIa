@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import { Avatar } from "@/components/ui/Avatar";
-import { BannerVerificacion } from "@/components/verificacion/BannerVerificacion";
 import { FiltrosTrabajos } from "@/components/trabajos/FiltrosTrabajos";
 import type { MiPostulacionInfo } from "@/components/trabajos/FormularioPostulacion";
 import { ListaPostulaciones } from "@/components/trabajos/ListaPostulaciones";
 import { MaestroDetalleTrabajos } from "@/components/trabajos/MaestroDetalleTrabajos";
 import { Boton } from "@/components/ui/Boton";
+import { Encabezado } from "@/components/ui/Encabezado";
+import { BannerVerificacion } from "@/components/verificacion/BannerVerificacion";
 import type { Oficio } from "@/lib/busqueda";
 import { obtenerMisVerificaciones } from "@/lib/registro/documentos";
 import { obtenerSesion } from "@/lib/sesion";
@@ -53,26 +53,18 @@ export default async function Trabajos({ searchParams }: PaginaTrabajosProps) {
     const postulaciones = await obtenerMisPostulaciones();
 
     return (
-      <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-6">
-        <header className="flex flex-col gap-3">
+      <>
+        <Encabezado
+          variante="plano"
+          titulo="Mis postulaciones"
+          descripcion="Seguí el estado de los trabajos a los que te postulaste."
+          className="px-0 pt-0 pb-4 lg:px-0 lg:pt-0 lg:pb-6"
+        >
           <BannerVerificacion resumen={resumen} />
-          <div className="flex items-center justify-between">
-            <div className="flex flex-col gap-1">
-              <h1 className="font-titulo text-2xl font-extrabold tracking-tight text-texto lg:text-[34px]">
-                Mis postulaciones
-              </h1>
-              <p className="text-sm text-texto lg:text-[15px]">
-                Seguí el estado de los trabajos a los que te postulaste.
-              </p>
-            </div>
-            <div className="shrink-0 lg:hidden">
-              <Avatar nombre={sesion.perfil.nombreVisible} tamano={44} />
-            </div>
-          </div>
-        </header>
+        </Encabezado>
 
         <ListaPostulaciones postulaciones={postulaciones} />
-      </div>
+      </>
     );
   }
 
@@ -119,46 +111,36 @@ export default async function Trabajos({ searchParams }: PaginaTrabajosProps) {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-6">
-      <header className="flex flex-col gap-3">
+    <>
+      <Encabezado variante="sol" titulo="Trabajos para vos" descripcion={bajada}>
         <BannerVerificacion resumen={resumen} />
-        <div className="flex items-center justify-between">
-          <div className="flex flex-col gap-1">
-            <h1 className="font-titulo text-2xl font-extrabold tracking-tight text-texto lg:text-[34px]">
-              Trabajos para vos
-            </h1>
-            <p className="text-sm text-texto lg:text-[15px]">{bajada}</p>
-          </div>
-          <div className="shrink-0 lg:hidden">
-            <Avatar nombre={sesion.perfil.nombreVisible} tamano={44} />
-          </div>
-        </div>
-      </header>
+        {oficiosValidos.length > 0 ? (
+          <FiltrosTrabajos
+            oficios={oficiosValidos}
+            oficioSeleccionado={oficioFiltrado}
+            soloMisZonas={soloMisZonas}
+          />
+        ) : null}
+      </Encabezado>
 
-      {oficiosValidos.length > 0 ? (
-        <FiltrosTrabajos
-          oficios={oficiosValidos}
-          oficioSeleccionado={oficioFiltrado}
-          soloMisZonas={soloMisZonas}
+      <div className="mt-4 flex flex-col gap-3 lg:mt-6 lg:gap-4">
+        <MaestroDetalleTrabajos
+          trabajos={trabajos}
+          trabajoSeleccionadoId={params.trabajo}
+          miPostulacionSeleccionada={miPostulacionSeleccionada}
+          publicado={perfil?.publicado ?? false}
         />
-      ) : null}
 
-      <MaestroDetalleTrabajos
-        trabajos={trabajos}
-        trabajoSeleccionadoId={params.trabajo}
-        miPostulacionSeleccionada={miPostulacionSeleccionada}
-        publicado={perfil?.publicado ?? false}
-      />
-
-      {hayMasTrabajos(trabajos.length, total, pagina) ? (
-        <Boton href={urlTrabajosConPagina(urlFiltros, pagina + 1)} variante="secundario" bloque>
-          Ver más
-        </Boton>
-      ) : alcanzoElTopeDePaginas(trabajos.length, total, pagina) ? (
-        <p className="text-center text-[15px] text-texto">
-          Refiná los filtros para ver menos trabajos.
-        </p>
-      ) : null}
-    </div>
+        {hayMasTrabajos(trabajos.length, total, pagina) ? (
+          <Boton href={urlTrabajosConPagina(urlFiltros, pagina + 1)} variante="secundario" bloque>
+            Ver más
+          </Boton>
+        ) : alcanzoElTopeDePaginas(trabajos.length, total, pagina) ? (
+          <p className="text-center text-[15px] text-texto">
+            Refiná los filtros para ver menos trabajos.
+          </p>
+        ) : null}
+      </div>
+    </>
   );
 }
