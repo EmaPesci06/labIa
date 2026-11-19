@@ -1,4 +1,6 @@
+import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { FormularioPreferenciasEmail } from "@/components/cuenta/FormularioPreferenciasEmail";
 import { obtenerSesion } from "@/lib/sesion";
@@ -23,9 +25,24 @@ export default async function PreferenciasEmail() {
   }
 
   return (
-    <div className="flex max-w-xl flex-col gap-4">
-      <h1 className="font-titulo text-[28px] lg:text-4xl">Preferencias de email</h1>
-      <p className="text-texto">Elegí qué avisos querés recibir en tu correo.</p>
+    <div className="mx-auto flex w-full max-w-[560px] flex-col gap-4">
+      <header className="flex flex-col">
+        <Link
+          href="/cuenta"
+          className="inline-flex min-h-11 items-center gap-1.5 self-start text-[15px] font-bold text-texto"
+        >
+          <ArrowLeft aria-hidden strokeWidth={3} className="size-5" />
+          Mi cuenta
+        </Link>
+        <h1 className="mt-0.5 font-titulo text-[36px] leading-none lg:text-[48px]">
+          Qué emails te mandamos
+        </h1>
+        <p className="mt-2 text-base text-texto">
+          {sesion?.usuario.email
+            ? `Van a ${sesion.usuario.email}. Nunca mandamos publicidad.`
+            : "Elegí qué avisos querés recibir en tu correo. Nunca mandamos publicidad."}
+        </p>
+      </header>
       <FormularioPreferenciasEmail
         trabajosCerca={trabajosCerca}
         novedades={novedades}

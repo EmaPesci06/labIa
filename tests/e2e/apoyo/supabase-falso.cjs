@@ -1569,6 +1569,7 @@ const server = http.createServer((req, res) => {
         disponibilidad: "Lunes a viernes",
         toda_la_ciudad: false,
         zonas: [1, 2],
+        fotos_trabajos: [],
         publicado: yo?.id !== ID_EN_REVISION,
       };
       return responder(res, 200, unObjeto ? fila : [fila]);

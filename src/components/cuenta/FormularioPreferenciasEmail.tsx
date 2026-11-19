@@ -28,10 +28,10 @@ function Interruptor({
   return (
     <label
       htmlFor={id}
-      className="flex min-h-11 cursor-pointer items-start justify-between gap-4 rounded-boton border border-texto bg-superficie p-4"
+      className="flex min-h-11 cursor-pointer items-center justify-between gap-3.5 rounded-[20px] bg-superficie px-4 py-3.5 text-texto"
     >
-      <span className="flex flex-col gap-0.5">
-        <span className="text-base font-bold">{titulo}</span>
+      <span className="flex flex-1 flex-col gap-0.5">
+        <span className="text-[17px] font-bold">{titulo}</span>
         <span id={`${id}-d`} className="text-sm text-texto">
           {descripcion}
         </span>
@@ -43,7 +43,7 @@ function Interruptor({
         role="switch"
         defaultChecked={marcado}
         aria-describedby={`${id}-d`}
-        className="bg-borde relative mt-0.5 h-7 w-12 shrink-0 cursor-pointer appearance-none rounded-full transition-colors after:absolute after:top-0.5 after:left-0.5 after:size-6 after:rounded-full after:bg-superficie after:shadow-sm after:transition-transform checked:bg-accion checked:after:translate-x-5 motion-reduce:transition-none motion-reduce:after:transition-none"
+        className="size-7 shrink-0 cursor-pointer accent-accion"
       />
     </label>
   );
@@ -57,12 +57,12 @@ export function FormularioPreferenciasEmail({
   const [estado, accion, pendiente] = useActionState(guardarPreferenciasEmail, ESTADO_INICIAL);
 
   return (
-    <form action={accion} className="flex flex-col gap-3">
+    <form action={accion} className="flex flex-col gap-2.5">
       {mostrarTrabajosCerca ? (
         <Interruptor
           name="trabajos_cerca"
-          titulo="Trabajos nuevos cerca tuyo"
-          descripcion="Un resumen por día, a las 8, con los pedidos de tus oficios y zonas."
+          titulo="Trabajos nuevos en mi zona"
+          descripcion="Cuando publican algo de tus oficios cerca tuyo."
           marcado={trabajosCerca}
         />
       ) : null}
@@ -72,23 +72,28 @@ export function FormularioPreferenciasEmail({
         descripcion="Pedidos de reseña y avisos cuando eligen a otro profesional."
         marcado={novedades}
       />
-      <p className="text-sm text-texto">
-        Los avisos de tu cuenta y de tus trabajos en curso (perfil aprobado, postulaciones, te
-        eligieron) te llegan siempre.
-      </p>
+      <div className="flex flex-col gap-0.5 rounded-[20px] border-[3px] border-dashed border-texto px-4 py-3.5 text-texto">
+        <span className="text-[17px] font-bold">Avisos de tu cuenta</span>
+        <span className="text-sm leading-snug">
+          Verificación, seguridad, postulaciones y cambios en las normas. Estos llegan siempre: no
+          se pueden apagar.
+        </span>
+      </div>
       {estado.mensaje ? (
-        <p role="alert" className="text-sm font-semibold text-error">
+        <p role="alert" className="text-sm font-bold text-error">
           {estado.mensaje}
         </p>
       ) : null}
       {estado.exito ? (
-        <p role="status" className="text-sm font-semibold text-texto">
+        <p role="status" className="text-sm font-bold text-texto">
           {estado.exito}
         </p>
       ) : null}
-      <Boton type="submit" variante="cliente" tamano="grande" bloque cargando={pendiente}>
-        Guardar
-      </Boton>
+      <div className="rounded-t-[28px] bg-superficie px-5 pt-2.5 pb-4 lg:rounded-tarjeta lg:p-4">
+        <Boton type="submit" tamano="grande" bloque cargando={pendiente}>
+          Guardar preferencias
+        </Boton>
+      </div>
     </form>
   );
 }

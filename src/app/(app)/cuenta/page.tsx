@@ -1,20 +1,17 @@
-import { Download, FileText, Lock, Mail, ShieldCheck, Trash2, UserRound } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { BotonSalir } from "@/components/auth/BotonSalir";
 import { FilaEnlace, FilaLibre, GrupoCuenta } from "@/components/cuenta/FilaCuenta";
 import { FilasProfesional } from "@/components/cuenta/FilasProfesional";
 import { SelectorTema } from "@/components/SelectorTema";
 import { Avatar } from "@/components/ui/Avatar";
-import { BannerVerificacion } from "@/components/verificacion/BannerVerificacion";
 import { obtenerMisVerificaciones } from "@/lib/registro/documentos";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import { resumenBannerVerificacion } from "@/lib/verificacion/logica";
 
 export const metadata: Metadata = { title: "Mi cuenta · LabÍA" };
-
-const ICONO = "size-5 shrink-0 text-texto";
 
 async function datosDeEncabezado(uid: string) {
   if (!supabaseConfigurado()) return { barrio: null, foto: null };
@@ -45,92 +42,109 @@ export default async function Cuenta() {
     : null;
 
   return (
-    <div className="mx-auto flex w-full max-w-xl flex-col gap-6">
-      <h1 className="sr-only">Mi cuenta</h1>
-
-      <BannerVerificacion resumen={resumen} />
-
-      <header className="flex items-center gap-4">
-        <Avatar nombre={sesion.perfil.nombreVisible} src={foto} tamano={84} />
-        <div className="min-w-0">
-          <p className="truncate font-titulo text-2xl lg:text-[28px]">
+    <>
+      <header
+        data-encabezado="turquesa"
+        className="flex items-center gap-4 rounded-b-[28px] bg-encabezado py-5 text-sobre-encabezado lg:rounded-b-[40px] lg:py-8"
+      >
+        <Avatar
+          nombre={sesion.perfil.nombreVisible}
+          src={foto}
+          tamano={84}
+          className="size-[76px] border-[5px] bg-equipo text-[32px] text-sobre-encabezado"
+        />
+        <div className="flex min-w-0 flex-col">
+          <h1 className="truncate font-titulo text-[32px] leading-none lg:text-[44px]">
             {sesion.perfil.nombreVisible}
-          </p>
-          <p className="text-[15px] text-texto">
-            {esProfesional ? "Profesional" : "Cliente"}
-            {barrio ? ` · ${barrio}` : ""}
+          </h1>
+          <p className="mt-1 text-base">
+            <span>{esProfesional ? "Profesional" : "Cliente"}</span>
+            {barrio ? ` · ${barrio}` : null}
           </p>
         </div>
       </header>
 
-      <GrupoCuenta titulo="Tu cuenta">
-        <FilaEnlace href="/cuenta/datos" icono={<UserRound aria-hidden className={ICONO} />}>
-          Mis datos
-        </FilaEnlace>
-        {esProfesional ? <FilasProfesional /> : null}
-        <FilaEnlace href="/cuenta/emails" icono={<Mail aria-hidden className={ICONO} />}>
-          Emails
-        </FilaEnlace>
-        <FilaLibre>
-          <SelectorTema />
-        </FilaLibre>
-      </GrupoCuenta>
+      <div className="mx-auto flex w-full max-w-[560px] flex-col gap-3 pt-3.5 lg:gap-4 lg:pt-6">
+        {resumen ? (
+          <Link
+            href="/cuenta/verificacion"
+            className="flex flex-col gap-0.5 rounded-[20px] bg-sol px-4 py-3 text-sobre-sol"
+          >
+            <span className="text-[17px] font-bold">
+              {resumen.tipo === "rechazado"
+                ? "Hay un documento para volver a subir"
+                : "Estamos revisando tus documentos"}
+            </span>
+            <span className="text-[15px]">
+              {resumen.tipo === "rechazado"
+                ? `${resumen.documento}: ${resumen.motivo}. Tu perfil no se publica hasta que lo revisemos.`
+                : "Tu perfil no se publica hasta que lo revisemos."}
+            </span>
+          </Link>
+        ) : null}
 
-      <GrupoCuenta titulo="Información">
-        <FilaEnlace href="/normas" icono={<ShieldCheck aria-hidden className={ICONO} />}>
-          Normas de seguridad
-        </FilaEnlace>
-        <FilaEnlace href="/terminos" icono={<FileText aria-hidden className={ICONO} />}>
-          Términos
-        </FilaEnlace>
-        <FilaEnlace href="/privacidad" icono={<Lock aria-hidden className={ICONO} />}>
-          Privacidad
-        </FilaEnlace>
-      </GrupoCuenta>
+        <GrupoCuenta etiqueta="Mi cuenta">
+          <FilaEnlace href="/cuenta/datos">Mis datos</FilaEnlace>
+          {esProfesional ? <FilasProfesional /> : null}
+          <FilaEnlace href="/cuenta/emails">Preferencias de email</FilaEnlace>
+        </GrupoCuenta>
 
-      <GrupoCuenta titulo="Ayuda">
-        <FilaLibre className="text-[15px] leading-snug">
-          <p>
-            ¿Necesitás ayuda?{" "}
-            {soporte ? (
-              <>
-                Escribinos a{" "}
-                <a
-                  href={`mailto:${soporte}`}
-                  className="font-semibold text-texto underline underline-offset-2"
-                >
-                  {soporte}
-                </a>
-                .
-              </>
-            ) : (
-              "Escribinos por mail a soporte."
-            )}
-          </p>
-          <p className="mt-2 font-semibold">Si estás en peligro, llamá al 911.</p>
-        </FilaLibre>
-      </GrupoCuenta>
+        <SelectorTema etiqueta="Aspecto" className="rounded-[20px] bg-superficie px-4 py-3" />
 
-      <GrupoCuenta titulo="Tus datos">
-        <FilaEnlace
-          href="/api/cuenta/datos"
-          descarga
-          icono={<Download aria-hidden className={ICONO} />}
-        >
-          Descargar mis datos
-        </FilaEnlace>
-        <FilaEnlace
-          href="/cuenta/borrar"
-          peligro
-          icono={<Trash2 aria-hidden className="size-5 shrink-0" />}
-        >
-          Borrar mi cuenta
-        </FilaEnlace>
-      </GrupoCuenta>
+        <GrupoCuenta etiqueta="Legales">
+          <FilaEnlace href="/normas" compacta conFlecha={false}>
+            Normas de seguridad
+          </FilaEnlace>
+          <FilaEnlace href="/terminos" compacta conFlecha={false}>
+            Términos y privacidad
+          </FilaEnlace>
+          <FilaEnlace href="/api/cuenta/datos" descarga compacta conFlecha={false}>
+            Descargar mis datos
+          </FilaEnlace>
+        </GrupoCuenta>
 
-      <div className="rounded-[18px] border border-fondo bg-superficie p-1">
-        <BotonSalir />
+        <GrupoCuenta etiqueta="Ayuda" como="section">
+          <FilaLibre className="text-[15px] leading-snug text-texto">
+            <p>
+              ¿Necesitás ayuda?{" "}
+              {soporte ? (
+                <>
+                  Escribinos a{" "}
+                  <a
+                    href={`mailto:${soporte}`}
+                    className="font-bold text-texto underline decoration-2 underline-offset-2"
+                  >
+                    {soporte}
+                  </a>
+                  .
+                </>
+              ) : (
+                "Escribinos por mail a soporte."
+              )}
+            </p>
+            <p className="mt-2 font-bold">Si estás en peligro, llamá al 911.</p>
+          </FilaLibre>
+        </GrupoCuenta>
+
+        {!esProfesional ? (
+          <div className="flex flex-col gap-0.5 rounded-[20px] border-[3px] border-dashed border-texto px-4 py-3.5">
+            <span className="text-[17px] font-bold">¿Ofrecés un oficio?</span>
+            <span className="text-[15px]">
+              Para trabajar en LabÍA necesitás una cuenta de profesional.
+            </span>
+          </div>
+        ) : null}
+
+        <div className="flex items-center justify-between">
+          <BotonSalir className="min-w-11 px-1 text-base font-bold underline decoration-2 underline-offset-4 hover:bg-transparent [&_svg]:hidden" />
+          <Link
+            href="/cuenta/borrar"
+            className="inline-flex min-h-11 items-center text-base font-bold text-error underline decoration-2 underline-offset-4"
+          >
+            Borrar mi cuenta
+          </Link>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

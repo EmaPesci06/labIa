@@ -23,31 +23,82 @@ export type ValoresPerfil = {
 type Props = {
   valores: ValoresPerfil;
   barrios: readonly { id: number; nombre: string }[];
-  /** Perfil público propio, para el enlace "Ver mi perfil". */
+  /** Perfil público propio, para el enlace "Ver cómo se ve". */
   hrefPerfil: string;
 };
 
-const CASILLA = "size-5 shrink-0 accent-azul";
+const PASTILLA_CASILLA =
+  "flex min-h-[46px] cursor-pointer items-center gap-2 rounded-full bg-superficie px-3.5 text-base text-texto has-checked:bg-encabezado has-checked:font-bold has-checked:text-sobre-encabezado has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-foco";
+const CASILLA = "size-5 shrink-0 accent-accion";
 
-/** Edición del perfil profesional: oficios, descripción, años, disponibilidad y zonas. */
+/** Edición del perfil profesional: descripción, barrios, oficios y datos adicionales. */
 export function FormularioPerfil({ valores, barrios, hrefPerfil }: Props) {
   const [estado, accion, pendiente] = useActionState(actualizarPerfilProfesional, ESTADO_INICIAL);
   const [toda, setToda] = useState(valores.todaLaCiudad);
   const errores = estado.errores ?? {};
 
   return (
-    <form action={accion} noValidate className="flex max-w-xl flex-col gap-5">
+    <form action={accion} noValidate className="flex flex-col gap-3.5">
+      <Campo
+        variante="area"
+        etiqueta="Qué arreglás"
+        name="descripcion"
+        rows={3}
+        maxLength={500}
+        defaultValue={valores.descripcion}
+        ayuda="Sin teléfonos, emails ni direcciones: te escriben por WhatsApp desde el botón."
+        error={errores.descripcion}
+      />
+
       <fieldset
-        className="flex flex-col gap-2"
+        className="m-0 flex flex-col gap-1.5 border-0 p-0"
+        aria-describedby={errores.zonas ? "e-zonas" : undefined}
+      >
+        <legend className="mb-1.5 p-0 text-base font-bold text-texto">
+          Barrios donde trabajás
+        </legend>
+        <div className="flex flex-wrap gap-2">
+          <label className={PASTILLA_CASILLA}>
+            <input
+              type="checkbox"
+              name="todaLaCiudad"
+              checked={toda}
+              onChange={(e) => setToda(e.target.checked)}
+              className={CASILLA}
+            />
+            Toda la ciudad
+          </label>
+          {toda
+            ? null
+            : barrios.map((barrio) => (
+                <label key={barrio.id} className={PASTILLA_CASILLA}>
+                  <input
+                    type="checkbox"
+                    name="zonas"
+                    value={barrio.id}
+                    defaultChecked={valores.zonas.includes(barrio.id)}
+                    className={CASILLA}
+                  />
+                  {barrio.nombre}
+                </label>
+              ))}
+        </div>
+        <p className="text-sm text-texto">Hasta 10 barrios.</p>
+        {errores.zonas ? (
+          <p id="e-zonas" className="text-[15px] font-bold text-error">
+            {errores.zonas}
+          </p>
+        ) : null}
+      </fieldset>
+
+      <fieldset
+        className="m-0 flex flex-col gap-1.5 border-0 p-0"
         aria-describedby={errores.oficios ? "e-oficios" : undefined}
       >
-        <legend className="mb-1 text-sm font-semibold">Oficios</legend>
-        <div className="grid grid-cols-2 gap-2">
+        <legend className="mb-1.5 p-0 text-base font-bold text-texto">Oficios</legend>
+        <div className="flex flex-wrap gap-2">
           {OFICIOS.map((oficio) => (
-            <label
-              key={oficio}
-              className="flex min-h-11 items-center gap-2.5 rounded-campo border border-texto bg-superficie px-3 text-[15px]"
-            >
+            <label key={oficio} className={PASTILLA_CASILLA}>
               <input
                 type="checkbox"
                 name="oficios"
@@ -59,22 +110,16 @@ export function FormularioPerfil({ valores, barrios, hrefPerfil }: Props) {
             </label>
           ))}
         </div>
-        <p className="text-sm text-texto">Para ofrecer gas necesitás la matrícula verificada.</p>
+        <p className="text-sm leading-snug text-texto">
+          Si sumás uno, lo revisamos de nuevo. Para ofrecer gas necesitás la matrícula verificada.
+        </p>
         {errores.oficios ? (
-          <p id="e-oficios" className="text-sm font-semibold text-error">
+          <p id="e-oficios" className="text-[15px] font-bold text-error">
             {errores.oficios}
           </p>
         ) : null}
       </fieldset>
 
-      <Campo
-        variante="area"
-        etiqueta="Contá cómo trabajás"
-        name="descripcion"
-        maxLength={500}
-        defaultValue={valores.descripcion}
-        error={errores.descripcion}
-      />
       <Campo
         etiqueta="Especialidades"
         name="especialidades"
@@ -99,73 +144,23 @@ export function FormularioPerfil({ valores, barrios, hrefPerfil }: Props) {
         error={errores.disponibilidad}
       />
 
-      <fieldset
-        className="flex flex-col gap-2"
-        aria-describedby={errores.zonas ? "e-zonas" : undefined}
-      >
-        <legend className="mb-1 text-sm font-semibold">Zonas donde trabajás</legend>
-        <label className="flex min-h-11 items-center gap-2.5 text-[15px]">
-          <input
-            type="checkbox"
-            name="todaLaCiudad"
-            checked={toda}
-            onChange={(e) => setToda(e.target.checked)}
-            className={CASILLA}
-          />
-          Toda la ciudad
-        </label>
-        {toda ? null : (
-          <div
-            tabIndex={0}
-            role="group"
-            aria-label="Barrios"
-            className="grid max-h-64 grid-cols-1 gap-1 overflow-y-auto rounded-campo border border-texto bg-superficie p-2 sm:grid-cols-2"
-          >
-            {barrios.map((barrio) => (
-              <label
-                key={barrio.id}
-                className="flex min-h-11 items-center gap-2.5 px-1 text-[15px]"
-              >
-                <input
-                  type="checkbox"
-                  name="zonas"
-                  value={barrio.id}
-                  defaultChecked={valores.zonas.includes(barrio.id)}
-                  className={CASILLA}
-                />
-                {barrio.nombre}
-              </label>
-            ))}
-          </div>
-        )}
-        <p className="text-sm text-texto">Hasta 10 barrios.</p>
-        {errores.zonas ? (
-          <p id="e-zonas" className="text-sm font-semibold text-error">
-            {errores.zonas}
-          </p>
-        ) : null}
-      </fieldset>
-
       {estado.mensaje ? (
-        <p role="alert" className="text-sm font-semibold text-error">
+        <p role="alert" className="text-sm font-bold text-error">
           {estado.mensaje}
         </p>
       ) : null}
       {estado.exito ? (
-        <p role="status" className="text-sm font-semibold text-texto">
+        <p role="status" className="text-sm font-bold text-texto">
           {estado.exito}{" "}
           <Link href={hrefPerfil} className="underline">
-            Ver mi perfil
+            Ver cómo se ve
           </Link>
         </p>
       ) : null}
 
-      <div className="flex flex-col gap-2 sm:flex-row">
-        <Boton type="submit" variante="cliente" tamano="grande" cargando={pendiente}>
+      <div className="rounded-t-[28px] bg-superficie px-5 pt-2.5 pb-4 lg:rounded-tarjeta lg:p-4">
+        <Boton type="submit" tamano="grande" bloque cargando={pendiente}>
           Guardar cambios
-        </Boton>
-        <Boton href={hrefPerfil} variante="secundario" tamano="grande">
-          Cancelar
         </Boton>
       </div>
     </form>

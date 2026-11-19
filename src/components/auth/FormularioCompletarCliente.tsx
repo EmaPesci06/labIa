@@ -42,15 +42,19 @@ export function FormularioCompletarCliente({ barrios }: { barrios: BarrioOpcion[
     <form
       action={accion}
       onSubmit={validarAntes}
-      onChange={(e) => e.target instanceof HTMLInputElement && limpiarError(e.target.name)}
+      onChange={(e) =>
+        (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) &&
+        limpiarError(e.target.name)
+      }
       noValidate
       className="flex flex-col gap-3.5"
     >
       <Campo
         variante="telefono"
-        etiqueta="Celular de WhatsApp"
+        etiqueta="Tu WhatsApp"
         name="whatsapp"
-        placeholder="223 555-0000"
+        placeholder="223 555 0123"
+        ayuda="Lo ven solo los profesionales que elijas."
         defaultValue={estado.valores?.whatsapp}
         error={errores.whatsapp}
         required
@@ -62,11 +66,11 @@ export function FormularioCompletarCliente({ barrios }: { barrios: BarrioOpcion[
         alCambiar={() => limpiarError("barrio")}
       />
       {estado.mensaje ? (
-        <p role="alert" className="text-sm font-semibold text-error">
+        <p role="alert" className="text-[15px] font-bold text-error">
           {estado.mensaje}
         </p>
       ) : null}
-      <Boton type="submit" variante="cliente" tamano="grande" bloque cargando={pendiente}>
+      <Boton type="submit" tamano="grande" bloque cargando={pendiente}>
         Terminar
       </Boton>
     </form>

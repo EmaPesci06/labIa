@@ -1,6 +1,6 @@
 # Documento de traspaso y contexto general · LabÍA
 
-**Última revisión:** 2026-10-15
+**Última revisión:** 2026-11-19
 **Proyecto:** LabÍA MVP (Linear, equipo `LAB`, proyecto `LabÍA MVP`)
 **Repositorio:** `https://github.com/EmaPesci06/labIa`
 **Rama principal:** `main`
@@ -148,11 +148,11 @@ Los PRs que mergeó otro modelo sin revisión tuvieron 2 hallazgos ALTO de segur
   - `es_admin()` sin chequear que la cuenta esté activa.
   - Políticas de Storage que dejan leer al admin con su JWT. Solo se entregan URLs firmadas de 60 s desde el servidor.
 
-### 3.4 Interfaz
+### 3.4 Interfaz ("Verano en la costa")
 
-- La paleta y los tokens viven en `src/app/globals.css`. Nunca hex sueltos.
-- `--color-azul` es `#232f49` en claro y `#b7c5e8` en oscuro, así que `text-azul` es accesible en ambos modos.
-- `--color-azul-suave` es `#2a3550` en oscuro y es una superficie. **Nunca usar `dark:text-azul-suave` como color de texto:** no cumple WCAG AA.
+- El diseño vigente es **"Verano en la costa"** en `docs/prototipo-nuevo/` (`README.md` y `CONSTRUCCION.md`). `docs/prototipo/` es el diseño viejo y no se usa.
+- La paleta y los tokens viven en `src/app/globals.css` (claro y oscuro): `fondo` arena, `superficie` blanca, `texto` azul mar, `accion` turquesa (botón principal y enlaces), `sobre-accion`, `encabezado` turquesa con texto `sobre-encabezado` blanco, `sol` amarillo para lo elegido (texto `sobre-sol`), `coral` solo de adorno (nunca texto), `error`, `equipo`, `velo` (fondo de las hojas). Nunca hex sueltos fuera de `globals.css`, sin `style=` y sin `dark:` en páginas (los tokens cambian solos).
+- Tipografías con `next/font`: Baloo 2 (700 y 800) para títulos y la marca (`font-titulo`) y Nunito Sans (400 y 700) para el resto.
 - Accesibilidad que ya falló (no repetir):
   - Ids duplicados cuando un bloque se renderiza dos veces (celular y escritorio): usar `useId`.
   - `<dl>` con wrappers inválidos.

@@ -13,9 +13,9 @@ type FiltrosTrabajosProps = {
 };
 
 /**
- * Chips de filtro para la lista de trabajos del profesional (LAB-27):
- * - "Todos mis oficios" / cada oficio propio
- * - "Solo mis zonas" (activo por defecto)
+ * Chips de filtro para la lista de trabajos del profesional (LAB-27, LAB-78):
+ * - "Todos" / cada oficio propio (boceto App-Trabajos: role="group" aria-label="Filtrar por oficio")
+ * - "Solo mis zonas" (cuando está disponible el filtro por zona)
  */
 export function FiltrosTrabajos({
   oficios,
@@ -57,12 +57,12 @@ export function FiltrosTrabajos({
       aria-label="Filtros de trabajos"
       className="flex flex-wrap items-center gap-2"
     >
-      <div role="group" aria-label="Oficios" className="flex flex-wrap gap-2">
+      <div role="group" aria-label="Filtrar por oficio" className="flex flex-wrap gap-2">
         <Chip
           seleccionado={oficioSeleccionado === null}
           onClick={() => actualizarFiltros(null, soloMisZonas)}
         >
-          Todos mis oficios
+          Todos
         </Chip>
         {oficios.map((oficio) => (
           <Chip
@@ -74,8 +74,6 @@ export function FiltrosTrabajos({
           </Chip>
         ))}
       </div>
-
-      <div className="h-6 w-px bg-fondo" aria-hidden="true" />
 
       <Chip
         seleccionado={soloMisZonas}

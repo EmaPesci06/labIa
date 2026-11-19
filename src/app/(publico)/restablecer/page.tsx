@@ -21,15 +21,20 @@ async function Contenido() {
   const sesion = await obtenerSesion();
   return sesion ? (
     <>
-      <EncabezadoAuth titulo="Elegí tu contraseña nueva" volverA="/" />
+      <EncabezadoAuth
+        titulo="Cuando abrís el enlace"
+        volverA="/ingresar"
+        volverTexto="Volver a ingresar"
+      />
       <FormularioNuevaContrasena />
     </>
   ) : (
     <>
       <EncabezadoAuth
-        titulo="¿Olvidaste tu contraseña?"
-        bajada="Escribí tu email y te mandamos un enlace para elegir una nueva."
+        titulo="¿Te olvidaste la contraseña?"
+        bajada="Pasa seguido. Decinos tu email y te mandamos un enlace para elegir una nueva."
         volverA="/ingresar"
+        volverTexto="Volver a ingresar"
       />
       <FormularioPedirRestablecer />
     </>
@@ -38,7 +43,7 @@ async function Contenido() {
 
 export default function Restablecer() {
   return (
-    <div className="flex flex-col gap-[18px]">
+    <div className="flex flex-col gap-5">
       <Suspense fallback={null}>
         <Contenido />
       </Suspense>

@@ -52,12 +52,10 @@ test.describe("campos libres del perfil: sin datos de contacto (LAB-53)", () => 
     await iniciarSesionProfesional(context, baseURL ?? "");
   });
 
-  test("claro: un teléfono en «Contá cómo trabajás» muestra el error junto al campo", async ({
-    page,
-  }) => {
+  test("claro: un teléfono en «Qué arreglás» muestra el error junto al campo", async ({ page }) => {
     await page.goto("/cuenta/perfil");
     await page
-      .getByLabel("Contá cómo trabajás")
+      .getByLabel("Qué arreglás")
       .fill("Hago instalaciones de gas. Llamame al 223 555-1234 que te paso presupuesto.");
     await page.getByRole("button", { name: "Guardar cambios" }).click();
 
@@ -84,7 +82,7 @@ test.describe("modo oscuro del error (LAB-53)", () => {
   test("oscuro: el error se lee con el mismo contraste", async ({ page }) => {
     await page.goto("/cuenta/perfil");
     await page
-      .getByLabel("Contá cómo trabajás")
+      .getByLabel("Qué arreglás")
       .fill("Hago instalaciones de gas. Llamame al 223 555-1234 que te paso presupuesto.");
     await page.getByRole("button", { name: "Guardar cambios" }).click();
     await expect(page.getByText(MENSAJE_CONTENIDO)).toBeVisible();
