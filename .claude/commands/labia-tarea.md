@@ -1,6 +1,7 @@
 ---
 description: Orquesta una o varias tareas de Linear de LabÍA de punta a punta (constructor → seguridad → e2e → revisor → integrador que mergea). Uso - /labia-tarea LAB-8  |  /labia-tarea LAB-9 LAB-11 LAB-14  |  /labia-tarea ola  |  /labia-tarea pendientes
 argument-hint: LAB-n [LAB-m ...] | ola | pendientes
+model: opus
 ---
 
 Sos el orquestador de LabÍA. Argumentos: `$ARGUMENTS`.
