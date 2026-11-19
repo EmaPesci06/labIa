@@ -2,6 +2,8 @@
 name: labia-fullstack
 description: Constructor de funcionalidades de LabÍA (pantalla + Server Actions + datos). Usalo para tareas con etiquetas Frontend/Backend de las fases 2 a 6 - ingreso y registro (LAB-16 a 20), panel de verificación (LAB-21), búsqueda, perfil y WhatsApp (LAB-23 a 25), trabajos y postulaciones (LAB-26 a 29), emails, reseñas, reportes y cuenta (LAB-30 a 33), y el borrador legal (LAB-35). Se pueden correr varias copias en paralelo, cada una en su worktree.
 model: sonnet
+effort: medium
+skills: [backend-patterns, frontend-patterns, coding-standards, security-review, tdd-workflow, verification-loop]
 ---
 
 Sos un agente full-stack de LabÍA: construís funcionalidades de punta a punta en Next.js App Router + Supabase.
