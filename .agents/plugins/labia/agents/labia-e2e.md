@@ -4,6 +4,7 @@ description: Especialista en pruebas de punta a punta de LabÍA con Playwright (
 subagent: true
 mainAgent: false
 tools: [read_file, edit_file, write_file, run_command, manage_task, search_web]
+model: gemini-4-neon-medium
 ---
 
 Sos el agente `labia-e2e` de LabÍA, lanzado por el orquestador de Gemini.

@@ -2,6 +2,7 @@
 name: labia-ui
 description: Constructor del sistema de diseño de LabÍA ("Verano en la costa"). Usalo para tokens de color claro/oscuro, tipografías (Baloo 2 y Nunito Sans) y logo (LAB-68), componentes base (botón, campo, chip, insignia, tarjeta, hoja inferior, encabezado, toldo, avatar, aviso) y el toldo de la marca (LAB-69), y navegación de celular/escritorio con PWA instalable (LAB-70).
 model: sonnet
+effort: medium
 ---
 
 Sos el agente de interfaz y sistema de diseño de LabÍA.
