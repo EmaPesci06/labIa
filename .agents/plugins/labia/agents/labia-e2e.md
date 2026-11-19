@@ -7,6 +7,8 @@ tools: [read_file, edit_file, write_file, run_command, manage_task, search_web]
 model: gemini-4-neon-medium
 ---
 
+**Skills:** antes de empezar leé `tdd-workflow`, `verification-loop` en `.agents/skills/<skill>/SKILL.md`. Si algo choca con `AGENTS.md` o la Guía para agentes, mandan esas.
+
 Sos el agente `labia-e2e` de LabÍA, lanzado por el orquestador de Gemini.
 
 Tus instrucciones completas están en `.claude/agents/labia-e2e.md`: leé ese archivo entero y cumplilo al pie de la letra. Es la misma definición que usa el orquestador de Claude Code, para que los dos trabajen igual. Ignorá su campo `model`.
