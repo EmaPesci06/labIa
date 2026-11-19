@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
 
 import { BotonSalir } from "@/components/auth/BotonSalir";
+import { SaltarAlContenido } from "@/components/navegacion/SaltarAlContenido";
 import { Logo } from "@/components/ui/Logo";
-import { Tarjeta } from "@/components/ui/Tarjeta";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 
 export const metadata: Metadata = {
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 // El motivo es de cada usuario: el contenido se lee en cada pedido (dentro de Suspense, como en
-// (app)/layout), nunca en el build.
+// (app)/layout), nunca en el build (LAB-32, LAB-80: boceto `App-Suspendida`).
 async function Contenido() {
   await connection();
 
@@ -27,51 +28,69 @@ async function Contenido() {
   const emailContacto = process.env.EMAIL_SOPORTE || "soporte@labia.com.ar";
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center bg-fondo px-4 py-8 text-texto">
-      <main className="w-full max-w-[480px]">
-        <Tarjeta borde className="flex flex-col gap-6 p-6 sm:p-8">
-          <div className="flex flex-col items-center gap-3 text-center">
-            <Logo variante="icono" alt="" />
-            <h1 className="font-titulo text-2xl font-extrabold sm:text-3xl">
-              Tu cuenta fue suspendida
-            </h1>
-            <p className="text-sm text-texto">
-              Se detectó una infracción a las normas de la comunidad de LabÍA.
-            </p>
-          </div>
+    <div className="flex min-h-dvh flex-col bg-equipo text-sobre-encabezado">
+      <SaltarAlContenido />
+      <header className="mx-auto w-full max-w-[720px] px-6 pt-4 pb-0 lg:pt-6">
+        <Logo alt="LabÍA" sobre="encabezado" />
+      </header>
 
-          <div className="rounded-[14px] border border-error bg-superficie p-4">
-            <p className="text-xs font-bold tracking-wider text-error uppercase">
-              Motivo de la suspensión
-            </p>
-            <p className="mt-1 text-sm font-semibold text-texto">
-              {motivo || "Incumplimiento de las normas de convivencia o términos del servicio."}
-            </p>
-          </div>
+      <main
+        id="contenido"
+        tabIndex={-1}
+        className="mx-auto flex w-full max-w-[720px] flex-1 flex-col justify-center px-6 py-8 focus:outline-none"
+      >
+        <h1 className="font-titulo text-[44px] leading-[0.98] lg:text-[56px]">
+          Tu cuenta fue suspendida
+        </h1>
+        <p className="mt-3.5 text-lg leading-[1.4]">
+          Se detectó una infracción a las normas de la comunidad de LabÍA.
+        </p>
 
-          <div className="flex flex-col gap-3 text-sm text-texto">
-            <p>
-              Mientras tu cuenta esté suspendida, no podés publicar trabajos, postularte ni recibir
-              o enviar mensajes.
-            </p>
-            <p>
-              Si considerás que esto se trata de un error o querés solicitar una apelación,
-              escribinos a{" "}
-              <a
-                href={`mailto:${emailContacto}?subject=Apelaci%C3%B3n%20de%20cuenta%20suspendida`}
-                className="font-bold text-texto hover:underline"
-              >
-                {emailContacto}
-              </a>
-              .
-            </p>
-          </div>
+        <section
+          aria-labelledby="motivo-suspension"
+          className="mt-5 rounded-tarjeta bg-fondo px-[18px] py-4 text-texto"
+        >
+          <h2 id="motivo-suspension" className="mb-1 text-[15px] font-bold">
+            Motivo de la suspensión
+          </h2>
+          <p className="text-[17px] leading-[1.4]">
+            {motivo || "Incumplimiento de las normas de convivencia o términos del servicio."}
+          </p>
+        </section>
 
-          <div className="border-t border-fondo pt-4">
-            <BotonSalir className="justify-center border border-texto bg-superficie hover:bg-superficie" />
-          </div>
-        </Tarjeta>
+        <p className="mt-[18px] text-base leading-[1.45]">
+          Mientras tu cuenta esté suspendida, no podés publicar trabajos, postularte ni recibir
+          contactos.
+        </p>
+        <p className="mt-2.5 text-base leading-[1.45]">
+          Si considerás que se trata de un error o querés pedir una apelación, escribinos a{" "}
+          <a
+            href={`mailto:${emailContacto}?subject=Apelaci%C3%B3n%20de%20cuenta%20suspendida`}
+            className="font-bold text-sobre-encabezado underline underline-offset-2"
+          >
+            {emailContacto}
+          </a>
+          .
+        </p>
       </main>
+
+      <footer className="mx-auto flex w-full max-w-[720px] flex-col gap-2 px-6 pt-4 pb-5">
+        <a
+          href={`mailto:${emailContacto}?subject=Apelaci%C3%B3n%20de%20cuenta%20suspendida`}
+          className="flex min-h-14 items-center justify-center rounded-boton bg-sol px-6 text-lg font-bold text-sobre-sol no-underline transition-colors hover:bg-sol/90"
+        >
+          Pedir una apelación
+        </a>
+        <div className="flex items-center justify-between">
+          <Link
+            href="/normas"
+            className="flex min-h-12 items-center text-base font-bold text-sobre-encabezado underline underline-offset-4"
+          >
+            Leer las normas
+          </Link>
+          <BotonSalir className="min-h-12 w-auto px-2 text-base font-bold text-sobre-encabezado underline underline-offset-4 hover:bg-transparent" />
+        </div>
+      </footer>
     </div>
   );
 }
