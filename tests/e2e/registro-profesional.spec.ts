@@ -6,26 +6,19 @@ import { expect, test } from "@playwright/test";
 // cuenta real en el proyecto de desarrollo (E2E_AUTH=1, confirmación de email desactivada).
 
 const siguiente = (page: import("@playwright/test").Page) =>
-  page.getByRole("button", { name: "Siguiente: normas de seguridad" }).locator("visible=true");
+  page.getByRole("button", { name: "Seguir con los documentos" }).locator("visible=true");
 
 test.describe("registro de profesional · paso 1", () => {
   test("muestra los pasos, el título y las secciones", async ({ page }) => {
     await page.goto("/registro/profesional");
-    await expect(page.getByRole("group", { name: /Paso 1 de 2/ })).toBeVisible();
-    await expect(
-      page.getByRole("heading", { level: 1, name: "Contanos qué sabés hacer" }),
-    ).toBeVisible();
-    await expect(
-      page.getByText("Esto es lo que van a ver los clientes en tu perfil."),
-    ).toBeVisible();
-    await expect(page.getByRole("group", { name: "Oficios" })).toBeVisible();
+    await expect(page.getByRole("group", { name: /Paso 1 de 3/ })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Armá tu perfil" })).toBeVisible();
+    await expect(page.getByText("Es lo que ven los vecinos cuando te encuentran.")).toBeVisible();
+    await expect(page.getByRole("group", { name: "Oficios", exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: "Toda la ciudad" })).toBeVisible();
-    await expect(page.getByLabel("Contá cómo trabajás")).toBeVisible();
-    await expect(
-      page
-        .getByText("La revisamos a mano. No se muestra en tu perfil: solo aparecen las insignias.")
-        .locator("visible=true"),
-    ).toBeVisible();
+    await expect(page.getByLabel("Barrio desde donde salís")).toBeVisible();
+    await expect(page.getByLabel("Contá qué arreglás")).toBeVisible();
+    await expect(siguiente(page)).toBeVisible();
   });
 
   test("gasista sin matrícula no avanza y aparece la ayuda", async ({ page }) => {
@@ -74,29 +67,28 @@ test.describe("registro de profesional · paso 1", () => {
     await expect(toda).toHaveAttribute("aria-pressed", "false");
   });
 
-  test("contador de la descripción y vista previa en vivo (escritorio)", async ({ page }) => {
+  test("contador de la descripción y vista previa del nombre en el perfil", async ({ page }) => {
     await page.goto("/registro/profesional");
-    await page.getByLabel("Contá cómo trabajás").fill("Hola");
+    await page.getByLabel("Contá qué arreglás").fill("Hola");
     await expect(page.getByText("4/500")).toBeVisible();
 
-    const vista = page.getByRole("heading", { name: "Así te ven los clientes" });
-    if ((page.viewportSize()?.width ?? 0) >= 1024) {
-      await page.getByLabel("Nombre y apellido").fill("Martín Gómez");
-      await page.getByRole("button", { name: "Gas" }).click();
-      await page.getByRole("button", { name: "Toda la ciudad" }).click();
-      const tarjeta = page.getByRole("region", { name: "Así te ven los clientes" });
-      await expect(tarjeta.getByText("Martín Gómez")).toBeVisible();
-      await expect(tarjeta.getByText("Gas")).toBeVisible();
-      await expect(tarjeta.getByText("Zonas: Toda la ciudad")).toBeVisible();
-      await expect(tarjeta.getByText("Identidad verificada · pendiente")).toBeVisible();
-    } else {
-      await expect(vista).toBeHidden();
-    }
+    await page.getByLabel("Nombre y apellido").fill("Martín Gómez");
+    await expect(page.getByText("En tu perfil se muestra como “Martín G.”")).toBeVisible();
   });
 
-  test("el paso 2 existe y marca el paso 2 como actual", async ({ page }) => {
+  test("el paso 3 (normas) y la pantalla listo se muestran correctamente", async ({ page }) => {
     await page.goto("/registro/profesional/normas");
-    await expect(page.getByRole("group", { name: /Paso 2 de 2/ })).toBeVisible();
+    await expect(page.getByRole("group", { name: /Paso 3 de 3/ })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Te abren la puerta de su casa" }),
+    ).toBeVisible();
+    await expect(page.getByRole("button", { name: "Aceptar y terminar" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Volver a documentos" })).toBeVisible();
+
+    await page.goto("/registro/profesional/listo");
+    await expect(page.getByRole("heading", { level: 1, name: /¡Listo/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Ver trabajos de mi zona" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Editar mi perfil" })).toBeVisible();
   });
 });
 
@@ -115,7 +107,7 @@ const foto = (n: number) => ({ name: `trabajo-${n}.png`, mimeType: "image/png", 
 test.describe("registro de profesional · formulario completo", () => {
   test("el contador llega a 500 y no deja escribir más", async ({ page }) => {
     await hidratada(page);
-    const area = page.getByLabel("Contá cómo trabajás");
+    const area = page.getByLabel("Contá qué arreglás");
     await area.fill("a".repeat(600));
     await expect(area).toHaveValue("a".repeat(500));
     await expect(page.getByText("500/500")).toBeVisible();
@@ -152,7 +144,7 @@ test.describe("registro de profesional · formulario completo", () => {
 
   test("foto de perfil: cargar y quitar", async ({ page }) => {
     await hidratada(page);
-    await page.getByLabel("Foto de perfil").setInputFiles(foto(1));
+    await page.getByLabel(/Foto de perfil/).setInputFiles(foto(1));
     await expect(page.getByRole("img", { name: "Tu foto de perfil" })).toBeVisible();
     await page.getByRole("button", { name: "Quitar foto de perfil" }).click();
     await expect(page.getByRole("img", { name: "Tu foto de perfil" })).toHaveCount(0);
@@ -185,11 +177,30 @@ test.describe("registro de profesional · formulario completo", () => {
       await hidratada(page);
       await page.locator('input[type="file"][multiple]').setInputFiles([foto(1), foto(2)]);
       await expect(page.getByText("2 de 10 fotos")).toBeVisible();
-      await page.getByRole("button", { name: "Gas" }).click();
+      const gas = page.getByRole("button", { name: "Gas" });
+      await gas.click();
+      await expect(gas.locator("span")).toHaveCSS("background-color", "rgb(247, 201, 72)");
       await siguiente(page).click();
       await expect(page.getByText("Ingresá tu nombre y apellido.")).toBeVisible();
       const resultado = await new AxeBuilder({ page }).analyze();
       expect(resultado.violations).toEqual([]);
+    });
+
+    test(`axe sin violaciones en paso 3 (normas) y pantalla listo (${esquema})`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ colorScheme: esquema });
+      await page.goto("/registro/profesional/normas");
+      await expect(
+        page.getByRole("heading", { level: 1, name: "Te abren la puerta de su casa" }),
+      ).toBeVisible();
+      const resNormas = await new AxeBuilder({ page }).analyze();
+      expect(resNormas.violations).toEqual([]);
+
+      await page.goto("/registro/profesional/listo");
+      await expect(page.getByRole("heading", { level: 1, name: /¡Listo/ })).toBeVisible();
+      const resListo = await new AxeBuilder({ page }).analyze();
+      expect(resListo.violations).toEqual([]);
     });
   }
 });
@@ -206,7 +217,7 @@ test.describe("cuenta real", () => {
     await page.getByLabel("WhatsApp").fill("223 555-0000");
     await page.getByLabel("Email").fill(email);
     await page.getByLabel("Contraseña").fill("clave-de-prueba-123");
-    await page.getByLabel("Tu barrio").selectOption({ label: "La Perla" });
+    await page.getByLabel("Barrio desde donde salís").selectOption({ label: "La Perla" });
     await page.getByRole("button", { name: "Plomería" }).click();
     await page.getByRole("button", { name: "Gas" }).click();
     await page.getByLabel(/Matrícula/).fill("MG-1234");
@@ -214,21 +225,20 @@ test.describe("cuenta real", () => {
     await page.getByRole("button", { name: "Centro", exact: true }).click();
     await page.getByLabel("Años de experiencia").fill("12");
     await page.getByLabel("Disponibilidad").fill("Lun a sáb, 8 a 18 h");
-    await page.getByLabel("Contá cómo trabajás").fill("Instalaciones y reparaciones.");
+    await page.getByLabel("Contá qué arreglás").fill("Instalaciones y reparaciones.");
 
     await siguiente(page).click();
-    await expect(page).toHaveURL(/\/registro\/profesional\/normas$/);
-
-    await page.goto("/registro/profesional");
+    await expect(page.getByRole("group", { name: /Paso 2 de 3/ })).toBeVisible();
+    await page.getByRole("button", { name: "Volver al perfil" }).click();
     await expect(page.getByLabel("Nombre y apellido")).toHaveValue("Martín Gómez");
     await expect(page.getByLabel(/Matrícula/)).toHaveValue("MG-1234");
-    await expect(page.getByLabel("Tu barrio")).toHaveValue(/\d+/);
+    await expect(page.getByLabel("Barrio desde donde salís")).toHaveValue(/\d+/);
     await expect(page.getByRole("button", { name: "Gas" })).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByRole("button", { name: "Centro", exact: true })).toHaveAttribute(
       "aria-pressed",
       "true",
     );
-    await expect(page.getByLabel("Contá cómo trabajás")).toHaveValue(
+    await expect(page.getByLabel("Contá qué arreglás")).toHaveValue(
       "Instalaciones y reparaciones.",
     );
   });

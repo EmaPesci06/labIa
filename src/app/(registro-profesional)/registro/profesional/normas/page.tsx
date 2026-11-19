@@ -4,35 +4,34 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { FormularioNormas } from "@/components/normas/FormularioNormas";
-import { ListaNormas, QueHaceLabia } from "@/components/normas/ListaNormas";
+import { ListaNormasRegistro } from "@/components/normas/ListaNormasRegistro";
 import { EstructuraRegistro } from "@/components/registro/EstructuraRegistro";
-import { VistaPreviaPerfil } from "@/components/registro/VistaPreviaPerfil";
+import { AvisoPantalla } from "@/components/ui/AvisoPantalla";
 import { Boton } from "@/components/ui/Boton";
 import { inicioDelRol } from "@/lib/auth/rutas";
-import { faltantesRegistrados } from "@/lib/registro/documentos-estado";
 import { cargarDatosRegistro } from "@/lib/registro/borrador";
-import { OFICIOS } from "@/lib/validaciones/perfil-profesional";
+import { faltantesRegistrados } from "@/lib/registro/documentos-estado";
 
 export const metadata: Metadata = { title: "Normas de seguridad · LabÍA" };
 
 async function Contenido() {
-  const { sesion, rol, borrador, barrios, urls, verificaciones } = await cargarDatosRegistro();
+  const { sesion, rol, borrador, verificaciones } = await cargarDatosRegistro();
 
   if (sesion && rol && rol !== "profesional") {
     return (
-      <div className="mx-auto flex max-w-[480px] flex-col gap-4 pt-4">
-        <h1 className="font-titulo text-[30px] leading-tight">Tu cuenta no es de profesional</h1>
-        <p role="status" className="text-[15px] text-texto">
-          Las normas de seguridad son para quienes ofrecen sus servicios en LabÍA.
-        </p>
-        <Boton href={inicioDelRol(rol)} variante="cliente" tamano="grande" bloque>
-          Ir a mi inicio
-        </Boton>
-      </div>
+      <AvisoPantalla
+        titulo="Tu cuenta no es de profesional"
+        texto="Las normas de seguridad son para quienes ofrecen sus servicios en LabÍA."
+        accion={
+          <Boton href={inicioDelRol(rol)} tamano="grande" bloque>
+            Ir a mi inicio
+          </Boton>
+        }
+      />
     );
   }
 
-  // Sin DNI y antecedentes (y matrícula si es gasista) registrados no hay paso 2: se vuelve al 1.
+  // Sin DNI y antecedentes (y matrícula si es gasista) registrados no hay paso 3: se vuelve al 1.
   if (
     sesion &&
     rol === "profesional" &&
@@ -41,74 +40,32 @@ async function Contenido() {
     redirect("/registro/profesional");
   }
 
-  const oficios = OFICIOS.filter((o) => borrador.oficios.includes(o.valor))
-    .map((o) => o.etiqueta)
-    .join(", ");
-  const zonas = borrador.todaLaCiudad
-    ? "Toda la ciudad"
-    : barrios
-        .filter((b) => borrador.zonas.includes(b.id))
-        .map((b) => b.nombre)
-        .join(", ");
-  const foto = borrador.fotoPerfil ? (urls[borrador.fotoPerfil] ?? null) : null;
-
   return (
-    <div className="mx-auto flex w-full max-w-[480px] flex-col gap-5 lg:grid lg:max-w-[1040px] lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-x-10 lg:gap-y-7">
-      <div className="flex flex-col gap-5 lg:gap-7">
-        <div className="flex flex-col gap-1.5 lg:gap-2">
-          <h1 className="font-titulo text-[30px] leading-tight lg:text-[40px]">
-            Normas de seguridad
-          </h1>
-          <p className="text-[15px] leading-snug text-texto lg:text-[17px]">
-            Los clientes te abren la puerta de su casa. Para que confíen en vos, te comprometés a:
-          </p>
-        </div>
-        <ListaNormas dosColumnas />
-        <QueHaceLabia />
-        <FormularioNormas textoBoton="Enviar mi perfil a revisión" />
-        <p className="text-center text-[13px] leading-snug text-texto lg:text-left lg:text-sm">
-          Tu perfil se publica cuando revisemos tu DNI y tu certificado de antecedentes. Te avisamos
-          por email.
-        </p>
-        <p className="text-center text-[13px] leading-snug text-texto lg:text-left lg:text-sm">
-          Al continuar aceptás los{" "}
-          <Link
-            href="/terminos"
-            prefetch={false}
-            className="inline-block py-2 font-bold text-texto underline underline-offset-2"
-          >
-            Términos
-          </Link>{" "}
-          y la{" "}
-          <Link
-            href="/privacidad"
-            prefetch={false}
-            className="inline-block py-2 font-bold text-texto underline underline-offset-2"
-          >
-            Política de privacidad
-          </Link>
-          .
-        </p>
+    <div className="flex flex-1 flex-col gap-3.5">
+      <ListaNormasRegistro />
+      <div className="-mx-5 mt-auto -mb-6 flex flex-col gap-1 rounded-t-hoja bg-superficie px-5 pt-3 pb-4 lg:mx-0 lg:mt-4 lg:mb-0 lg:rounded-tarjeta lg:p-5">
+        <FormularioNormas textoBoton="Aceptar y terminar" />
+        <Link
+          href="/registro/profesional?paso=documentos"
+          className="inline-flex min-h-11 items-center justify-center self-center px-3 text-[15px] font-bold text-texto underline decoration-2 underline-offset-4"
+        >
+          Volver a documentos
+        </Link>
       </div>
-      <aside className="hidden flex-col gap-4 lg:sticky lg:top-6 lg:flex lg:self-start">
-        <VistaPreviaPerfil
-          nombre={borrador.nombreCompleto}
-          oficios={oficios}
-          zonas={zonas}
-          foto={foto}
-        />
-        <Boton href="/registro/profesional" variante="fantasma">
-          Editar mi perfil
-        </Boton>
-      </aside>
     </div>
   );
 }
 
-/** Registro de profesional, paso 2: normas de seguridad (LAB-20). */
+/** Registro de profesional, paso 3: normas de seguridad (LAB-20, LAB-77). */
 export default function RegistroProfesionalNormas() {
   return (
-    <EstructuraRegistro paso={2}>
+    <EstructuraRegistro
+      paso={3}
+      titulo="Te abren la puerta de su casa"
+      descripcion="Para que confíen en vos, te comprometés a:"
+      ancho="lectura"
+      tituloChico
+    >
       <Suspense fallback={<p className="text-texto">Cargando…</p>}>
         <Contenido />
       </Suspense>

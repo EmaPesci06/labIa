@@ -3,19 +3,23 @@
 import { useActionState, useState } from "react";
 
 import { Boton } from "@/components/ui/Boton";
+import { cn } from "@/lib/cn";
 import { VERSION_NORMAS } from "@/lib/normas";
 import { aceptarNormas } from "@/lib/registro/normas";
 import { MENSAJE_ACEPTAR_NORMAS } from "@/lib/validaciones/normas";
 
 /**
- * Casilla "Leí y acepto" + botón. Sin tildar el botón queda deshabilitado (aria-disabled, para que
- * siga recibiendo el toque) y al tocarlo muestra "Aceptá las normas para seguir".
+ * Casilla de aceptación + botón principal (`App-ProNormas`). Sin tildar el botón queda con
+ * `aria-disabled` (para que siga recibiendo el toque) y al tocarlo muestra
+ * "Aceptá las normas para seguir".
  */
 export function FormularioNormas({
   textoBoton,
+  etiquetaCasilla = "Leí las diez y me comprometo a cumplirlas",
   className,
 }: {
   textoBoton: string;
+  etiquetaCasilla?: string;
   className?: string;
 }) {
   const [estado, despachar, pendiente] = useActionState(aceptarNormas, {});
@@ -25,9 +29,9 @@ export function FormularioNormas({
   const mensaje = ayuda && !acepto ? MENSAJE_ACEPTAR_NORMAS : (estado.mensaje ?? null);
 
   return (
-    <form action={despachar} noValidate className={className ?? "flex flex-col gap-3"}>
+    <form action={despachar} noValidate className={cn("flex flex-col gap-2.5", className)}>
       <input type="hidden" name="version" value={VERSION_NORMAS} />
-      <label className="flex min-h-[52px] cursor-pointer items-center gap-3 rounded-[14px] border-[1.5px] border-texto bg-superficie px-3.5 py-2 text-[15px] font-semibold">
+      <label className="flex min-h-11 cursor-pointer items-center gap-3 text-base font-bold text-texto">
         <input
           type="checkbox"
           name="acepto"
@@ -37,19 +41,17 @@ export function FormularioNormas({
             if (e.target.checked) setAyuda(false);
           }}
           aria-describedby="ayuda-normas"
-          className="accent-azul size-[22px] flex-none"
+          className="size-6 flex-none accent-accion"
         />
-        Leí y acepto las normas de LabÍA
+        <span>{etiquetaCasilla}</span>
       </label>
 
       <Boton
         type="submit"
-        variante="profesional"
         tamano="grande"
         bloque
         cargando={pendiente}
         aria-disabled={!acepto}
-        className={acepto ? undefined : "bg-fondo text-texto hover:bg-fondo active:bg-fondo"}
         onClick={(e) => {
           if (!acepto) {
             e.preventDefault();
@@ -63,7 +65,7 @@ export function FormularioNormas({
       <p
         id="ayuda-normas"
         role="status"
-        className="text-center text-sm font-semibold text-error empty:hidden"
+        className="text-center text-[15px] font-bold text-error empty:hidden"
       >
         {mensaje}
       </p>

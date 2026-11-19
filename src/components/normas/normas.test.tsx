@@ -8,6 +8,7 @@ vi.mock("@/lib/registro/normas", () => ({
 
 import { FormularioNormas } from "./FormularioNormas";
 import { ListaNormas, QueHaceLabia } from "./ListaNormas";
+import { ListaNormasRegistro } from "./ListaNormasRegistro";
 
 describe("ListaNormas y QueHaceLabia", () => {
   it("muestra la lista de compromisos de seguridad", () => {
@@ -20,6 +21,12 @@ describe("ListaNormas y QueHaceLabia", () => {
     render(<QueHaceLabia />);
     expect(screen.getByRole("heading", { name: "Qué hace LabÍA" })).toBeInTheDocument();
   });
+
+  it("muestra la lista de normas para el registro profesional", () => {
+    render(<ListaNormasRegistro />);
+    expect(screen.getByRole("list", { name: "Compromisos de seguridad" })).toBeInTheDocument();
+    expect(screen.getAllByRole("listitem")).toHaveLength(10);
+  });
 });
 
 describe("FormularioNormas", () => {
@@ -31,7 +38,9 @@ describe("FormularioNormas", () => {
     await userEvent.click(boton);
     expect(screen.getByText("Aceptá las normas para seguir")).toBeInTheDocument();
 
-    const casilla = screen.getByRole("checkbox", { name: "Leí y acepto las normas de LabÍA" });
+    const casilla = screen.getByRole("checkbox", {
+      name: "Leí las diez y me comprometo a cumplirlas",
+    });
     await userEvent.click(casilla);
     expect(boton).not.toHaveAttribute("aria-disabled");
     expect(screen.queryByText("Aceptá las normas para seguir")).not.toBeInTheDocument();
