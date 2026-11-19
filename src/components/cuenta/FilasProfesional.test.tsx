@@ -11,11 +11,11 @@ describe("FilasProfesional", () => {
       </ul>,
     );
 
-    expect(screen.getByRole("link", { name: "Perfil profesional" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Mi perfil público" })).toHaveAttribute(
       "href",
       "/cuenta/perfil",
     );
-    expect(screen.getByRole("link", { name: "Verificación" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Mi verificación" })).toHaveAttribute(
       "href",
       "/cuenta/verificacion",
     );

@@ -94,9 +94,9 @@ test.describe("/cuenta/emails", () => {
   test("profesional ve los dos interruptores y guarda", async ({ page }) => {
     await page.goto(`${URL_PROFESIONAL}/cuenta/emails`);
     await expect(
-      page.getByRole("heading", { level: 1, name: "Preferencias de email" }),
+      page.getByRole("heading", { level: 1, name: "Qué emails te mandamos" }),
     ).toBeVisible();
-    const cerca = page.getByRole("switch", { name: /Trabajos nuevos cerca tuyo/ });
+    const cerca = page.getByRole("switch", { name: /Trabajos nuevos en mi zona/ });
     const novedades = page.getByRole("switch", { name: /Novedades y recordatorios/ });
     await expect(cerca).toBeChecked();
     await expect(novedades).toBeChecked();
@@ -105,7 +105,7 @@ test.describe("/cuenta/emails", () => {
     // Con o sin Supabase, la sesión falsa no guarda: tiene que avisar, no fallar en silencio.
     // Se reintenta el clic por si cae antes de que la página termine de hidratarse.
     await expect(async () => {
-      await page.getByRole("button", { name: "Guardar" }).click();
+      await page.getByRole("button", { name: "Guardar preferencias" }).click();
       await expect(
         page.getByText(
           /Ingresá de nuevo para cambiar tus preferencias|No pudimos guardar tus preferencias/,
@@ -117,7 +117,7 @@ test.describe("/cuenta/emails", () => {
   test("el cliente no ve el resumen de trabajos nuevos", async ({ page }) => {
     await page.goto(`${URL_CLIENTE}/cuenta/emails`);
     await expect(page.getByRole("switch", { name: /Novedades y recordatorios/ })).toBeVisible();
-    await expect(page.getByRole("switch", { name: /Trabajos nuevos cerca tuyo/ })).toHaveCount(0);
+    await expect(page.getByRole("switch", { name: /Trabajos nuevos en mi zona/ })).toHaveCount(0);
   });
 
   test("un visitante no puede ver las preferencias", async ({ page }) => {
@@ -127,7 +127,7 @@ test.describe("/cuenta/emails", () => {
 
   test("los interruptores se operan con teclado", async ({ page }) => {
     await page.goto(`${URL_PROFESIONAL}/cuenta/emails`);
-    const cerca = page.getByRole("switch", { name: /Trabajos nuevos cerca tuyo/ });
+    const cerca = page.getByRole("switch", { name: /Trabajos nuevos en mi zona/ });
     await cerca.focus();
     await page.keyboard.press("Space");
     await expect(cerca).not.toBeChecked();

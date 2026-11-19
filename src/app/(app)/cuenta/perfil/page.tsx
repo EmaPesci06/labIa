@@ -1,11 +1,15 @@
+import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { FotoDePerfil } from "@/components/cuenta/FotoDePerfil";
 import { FormularioPerfil } from "@/components/perfil/FormularioPerfil";
+import { Tarjeta } from "@/components/ui/Tarjeta";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 
-export const metadata: Metadata = { title: "Editar perfil · LabÍA" };
+export const metadata: Metadata = { title: "Mi perfil público · LabÍA" };
 
 /** Edición del perfil profesional. Solo para cuentas de profesional; el resto vuelve a su cuenta. */
 export default async function EditarPerfil() {
@@ -18,7 +22,7 @@ export default async function EditarPerfil() {
   }
 
   const supabase = await crearClienteServidor();
-  const [{ data: perfil }, { data: barrios }] = await Promise.all([
+  const [{ data: perfil }, { data: barrios }, { data: filaUsuario }] = await Promise.all([
     supabase
       .from("perfiles_profesionales")
       .select(
@@ -27,6 +31,7 @@ export default async function EditarPerfil() {
       .eq("usuario_id", sesion.usuario.id)
       .maybeSingle(),
     supabase.from("barrios").select("id, nombre").order("nombre"),
+    supabase.from("usuarios").select("foto_path").eq("id", sesion.usuario.id).maybeSingle(),
   ]);
 
   if (!perfil) {
@@ -35,11 +40,36 @@ export default async function EditarPerfil() {
     );
   }
 
+  const foto = filaUsuario?.foto_path
+    ? supabase.storage.from("fotos").getPublicUrl(filaUsuario.foto_path).data.publicUrl
+    : null;
+  const hrefPerfil = `/profesionales/${sesion.usuario.id}`;
+
   return (
-    <div className="flex flex-col gap-5">
-      <h1 className="font-titulo text-[28px] lg:text-4xl">Editar perfil</h1>
+    <div className="mx-auto flex w-full max-w-[560px] flex-col gap-3.5">
+      <header className="flex flex-col">
+        <Link
+          href="/cuenta"
+          className="inline-flex min-h-11 items-center gap-1.5 self-start text-[15px] font-bold text-texto"
+        >
+          <ArrowLeft aria-hidden strokeWidth={3} className="size-5" />
+          Mi cuenta
+        </Link>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h1 className="font-titulo text-[34px] leading-none lg:text-[48px]">Mi perfil público</h1>
+          <Link
+            href={hrefPerfil}
+            className="inline-flex min-h-11 items-center text-[15px] font-bold text-texto underline decoration-2 underline-offset-4"
+          >
+            Ver cómo se ve
+          </Link>
+        </div>
+      </header>
+
+      <FotoDePerfil uid={sesion.usuario.id} nombre={sesion.perfil.nombreVisible} fotoUrl={foto} />
+
       <FormularioPerfil
-        hrefPerfil={`/profesionales/${sesion.usuario.id}`}
+        hrefPerfil={hrefPerfil}
         barrios={barrios ?? []}
         valores={{
           oficios: perfil.oficios,
@@ -60,9 +90,22 @@ export default async function EditarPerfil() {
 
 function Aviso({ mensaje }: { mensaje: string }) {
   return (
-    <div className="flex flex-col gap-3">
-      <h1 className="font-titulo text-[28px] lg:text-4xl">Editar perfil</h1>
-      <p className="text-texto">{mensaje}</p>
+    <div className="mx-auto flex w-full max-w-[560px] flex-col gap-3">
+      <header className="flex flex-col">
+        <Link
+          href="/cuenta"
+          className="inline-flex min-h-11 items-center gap-1.5 self-start text-[15px] font-bold text-texto"
+        >
+          <ArrowLeft aria-hidden strokeWidth={3} className="size-5" />
+          Mi cuenta
+        </Link>
+        <h1 className="mt-0.5 font-titulo text-[34px] leading-none lg:text-[48px]">
+          Mi perfil público
+        </h1>
+      </header>
+      <Tarjeta>
+        <p className="text-texto">{mensaje}</p>
+      </Tarjeta>
     </div>
   );
 }

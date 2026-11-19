@@ -1,9 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useState, type FormEvent } from "react";
 
 import { CampoContrasena } from "@/components/auth/CampoContrasena";
-import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
 import { ESTADO_INICIAL } from "@/lib/auth/estado";
 import { borrarMiCuenta } from "@/lib/cuenta/acciones";
@@ -55,7 +55,7 @@ export function FormularioBorrar({ pedirContrasena }: { pedirContrasena: boolean
       />
       {pedirContrasena ? (
         <CampoContrasena
-          etiqueta="Tu contraseña"
+          etiqueta="Para confirmar, tu contraseña"
           name="contrasena"
           autoComplete="current-password"
           error={errores.contrasena}
@@ -68,20 +68,23 @@ export function FormularioBorrar({ pedirContrasena }: { pedirContrasena: boolean
         </p>
       )}
       {estado.mensaje ? (
-        <p role="alert" className="text-sm font-semibold text-error">
+        <p role="alert" className="text-sm font-bold text-error">
           {estado.mensaje}
         </p>
       ) : null}
       <button
         type="submit"
         aria-busy={pendiente || undefined}
-        className="inline-flex min-h-[52px] items-center justify-center rounded-boton bg-error px-5 text-base font-bold text-sobre-accion hover:opacity-90 active:opacity-80 disabled:opacity-50 aria-busy:pointer-events-none"
+        className="inline-flex min-h-14 items-center justify-center rounded-boton bg-error px-6 text-lg font-bold text-sobre-accion hover:opacity-90 active:opacity-80 disabled:opacity-50 aria-busy:pointer-events-none"
       >
         {pendiente ? "Borrando…" : "Borrar mi cuenta para siempre"}
       </button>
-      <Boton href="/cuenta" variante="secundario" tamano="grande" bloque>
-        Cancelar
-      </Boton>
+      <Link
+        href="/cuenta"
+        className="inline-flex min-h-12 items-center self-center px-2 text-[17px] font-bold text-texto underline decoration-2 underline-offset-4"
+      >
+        Mejor me quedo
+      </Link>
     </form>
   );
 }

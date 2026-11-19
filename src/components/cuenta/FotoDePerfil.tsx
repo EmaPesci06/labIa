@@ -48,11 +48,16 @@ export function FotoDePerfil({ uid, nombre, fotoUrl }: Props) {
   }
 
   return (
-    <div className="flex items-center gap-4">
-      <Avatar nombre={nombre} src={fotoUrl} tamano={84} />
+    <div className="flex items-center gap-3.5">
+      <Avatar
+        nombre={nombre}
+        src={fotoUrl}
+        tamano={84}
+        className="size-[72px] border-[5px] bg-equipo text-[30px] text-sobre-encabezado"
+      />
       <div className="flex flex-col items-start gap-1">
-        <label className="inline-flex min-h-11 cursor-pointer items-center rounded-campo border-[1.5px] border-texto bg-superficie px-4 text-[15px] font-bold text-texto hover:bg-superficie has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-foco">
-          {ocupado ? "Procesando…" : fotoUrl ? "Cambiar foto" : "Subir foto"}
+        <label className="inline-flex min-h-12 cursor-pointer items-center rounded-boton border-[3px] border-texto bg-transparent px-4.5 text-base font-bold text-texto hover:bg-superficie has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-foco">
+          {ocupado ? "Procesando…" : "Cambiar la foto"}
           <input
             ref={entrada}
             type="file"
@@ -78,7 +83,7 @@ export function FotoDePerfil({ uid, nombre, fotoUrl }: Props) {
           </button>
         ) : null}
         {error ? (
-          <p id={idError} role="alert" className="text-sm font-semibold text-error">
+          <p id={idError} role="alert" className="text-sm font-bold text-error">
             {error}
           </p>
         ) : null}

@@ -21,7 +21,7 @@ test.describe("mi cuenta (cliente)", () => {
       "href",
       "/cuenta/datos",
     );
-    await expect(page.getByRole("link", { name: "Emails" })).toHaveAttribute(
+    await expect(page.getByRole("link", { name: "Preferencias de email" })).toHaveAttribute(
       "href",
       "/cuenta/emails",
     );
@@ -29,11 +29,13 @@ test.describe("mi cuenta (cliente)", () => {
       "href",
       "/normas",
     );
-    await expect(page.getByRole("link", { name: "Términos" })).toHaveAttribute("href", "/terminos");
-    await expect(
-      page.locator("#contenido").getByRole("link", { name: "Privacidad" }),
-    ).toHaveAttribute("href", "/privacidad");
+    await expect(page.getByRole("link", { name: "Términos y privacidad" })).toHaveAttribute(
+      "href",
+      "/terminos",
+    );
+    await expect(page.getByText(/¿Necesitás ayuda\?/)).toBeVisible();
     await expect(page.getByText("Si estás en peligro, llamá al 911.")).toBeVisible();
+    await expect(page.getByText("¿Ofrecés un oficio?")).toBeVisible();
     await expect(page.getByRole("link", { name: "Descargar mis datos" })).toHaveAttribute(
       "href",
       "/api/cuenta/datos",
@@ -44,8 +46,8 @@ test.describe("mi cuenta (cliente)", () => {
     );
     await expect(page.getByRole("button", { name: "Salir" })).toBeVisible();
     // Un cliente no ve las filas de profesional.
-    await expect(page.getByRole("link", { name: "Mi perfil profesional" })).toHaveCount(0);
-    await expect(page.getByRole("link", { name: "Verificación" })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Mi perfil público" })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Mi verificación" })).toHaveCount(0);
   });
 
   test("borrar: pide escribir BORRAR y la contraseña antes de enviar", async ({ page }) => {
@@ -63,8 +65,8 @@ test.describe("mi cuenta (cliente)", () => {
   test("mis datos: valida teléfono y barrio como el registro", async ({ page }) => {
     await page.goto("/cuenta/datos");
     await expect(page.getByRole("heading", { level: 1, name: "Mis datos" })).toBeVisible();
-    await page.getByLabel("Celular de WhatsApp").fill("123");
-    await page.getByRole("button", { name: "Guardar cambios" }).click();
+    await page.getByLabel("WhatsApp").fill("123");
+    await page.getByRole("button", { name: "Guardar" }).click();
     await expect(page.getByText("Revisá el número. Ej.: 223 555 1234")).toBeVisible();
     await expect(page.getByText("Elegí tu barrio.")).toBeVisible();
   });
@@ -83,7 +85,7 @@ test.describe("mi cuenta (cliente)", () => {
     await page.goto("/cuenta");
     await page.getByRole("link", { name: "Mis datos", exact: true }).focus();
     await page.keyboard.press("Tab");
-    await expect(page.getByRole("link", { name: "Emails" })).toBeFocused();
+    await expect(page.getByRole("link", { name: "Preferencias de email" })).toBeFocused();
     await page.getByRole("button", { name: "Salir" }).focus();
     await expect(page.getByRole("button", { name: "Salir" })).toBeFocused();
   });
@@ -114,11 +116,11 @@ test.describe("mi cuenta (profesional)", () => {
   }) => {
     await page.goto("/cuenta");
     await expect(page.getByText("Profesional", { exact: true })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Perfil profesional" })).toHaveAttribute(
+    await expect(page.getByRole("link", { name: "Mi perfil público" })).toHaveAttribute(
       "href",
       "/cuenta/perfil",
     );
-    await expect(page.getByRole("link", { name: "Verificación" })).toHaveAttribute(
+    await expect(page.getByRole("link", { name: "Mi verificación" })).toHaveAttribute(
       "href",
       "/cuenta/verificacion",
     );
