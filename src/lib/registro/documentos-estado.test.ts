@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { faltantesRegistrados, tiposVigentes } from "./documentos-estado";
+import { faltaAprobarDocumentos, faltantesRegistrados, tiposVigentes } from "./documentos-estado";
 import type { ItemVerificacion } from "./tipos";
 
 const v = (
@@ -37,5 +37,42 @@ describe("documentos vigentes", () => {
     ];
     expect(faltantesRegistrados(completo, false)).toEqual([]);
     expect(faltantesRegistrados(completo, true)).toEqual(["matricula"]);
+  });
+});
+
+describe("faltaAprobarDocumentos", () => {
+  const aprobados = [
+    v("dni_frente", "aprobado"),
+    v("dni_dorso", "aprobado"),
+    v("antecedentes", "aprobado"),
+  ];
+
+  it("sin documentos todavía falta aprobar", () => {
+    expect(faltaAprobarDocumentos([], false)).toBe(true);
+  });
+
+  it("con todos los obligatorios aprobados no falta nada", () => {
+    expect(faltaAprobarDocumentos(aprobados, false)).toBe(false);
+  });
+
+  it("uno pendiente o rechazado sigue faltando", () => {
+    const base = aprobados.slice(0, 2);
+    expect(faltaAprobarDocumentos([...base, v("antecedentes", "pendiente")], false)).toBe(true);
+    expect(faltaAprobarDocumentos([...base, v("antecedentes", "rechazado")], false)).toBe(true);
+  });
+
+  it("para gasistas también hace falta la matrícula aprobada", () => {
+    expect(faltaAprobarDocumentos(aprobados, true)).toBe(true);
+    expect(faltaAprobarDocumentos([...aprobados, v("matricula", "aprobado")], true)).toBe(false);
+  });
+
+  it("manda el más nuevo de cada tipo", () => {
+    const lista = [
+      v("antecedentes", "rechazado", "2026-10-13T00:00:00Z"),
+      v("antecedentes", "aprobado", "2026-10-12T00:00:00Z"),
+      v("dni_frente", "aprobado"),
+      v("dni_dorso", "aprobado"),
+    ];
+    expect(faltaAprobarDocumentos(lista, false)).toBe(true);
   });
 });

@@ -250,7 +250,7 @@ test.describe("reportes del cliente y del profesional", () => {
     );
     await page.goto(`/trabajos/${escritorio ? TRABAJO_OLOR_GAS : TRABAJO_OTRO}`);
 
-    await botonVisible(page, "Reportar trabajo").click();
+    await botonVisible(page, "Reportar este trabajo").click();
     const hoja = hojaDeReporte(page);
     await hoja.getByLabel(MOTIVO_ESTAFA).check();
     await hoja.getByRole("button", { name: "Enviar reporte" }).click();
@@ -359,6 +359,15 @@ test.describe("moderación del admin", () => {
     await expect(moderado.page.getByText(MOTIVO_SUSPENSION)).toBeVisible();
     await capturar(moderado.page, "suspendida", "claro");
     expect(graves(await new AxeBuilder({ page: moderado.page }).analyze())).toEqual([]);
+
+    // LAB-81: sobre el fondo `equipo` el foco por teclado va en `sol` (en claro `foco` y `equipo` son
+    // el mismo azul y el anillo no se vería).
+    await moderado.page.keyboard.press("Tab");
+    const apelar = moderado.page.getByRole("link", { name: "Pedir una apelación" });
+    await apelar.focus();
+    await expect(apelar).toBeFocused();
+    await expect(apelar).toHaveCSS("outline-color", "rgb(247, 201, 72)");
+    await expect(apelar).toHaveCSS("outline-style", "solid");
     await moderado.contexto.close();
   });
 

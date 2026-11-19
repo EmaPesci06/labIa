@@ -111,7 +111,7 @@ export function FormularioPerfil({ valores, barrios, hrefPerfil }: Props) {
           ))}
         </div>
         <p className="text-sm leading-snug text-texto">
-          Si sumás uno, lo revisamos de nuevo. Para ofrecer gas necesitás la matrícula verificada.
+          Para ofrecer gas necesitás la matrícula verificada.
         </p>
         {errores.oficios ? (
           <p id="e-oficios" className="text-[15px] font-bold text-error">

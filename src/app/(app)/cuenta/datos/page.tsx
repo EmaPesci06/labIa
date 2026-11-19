@@ -2,6 +2,7 @@ import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { FotoDePerfil } from "@/components/cuenta/FotoDePerfil";
 import { FormularioDatos, SeccionComoIngresas } from "@/components/cuenta/FormulariosCuenta";
 import { listarBarrios } from "@/lib/barrios";
 import { tieneContrasena } from "@/lib/cuenta/proveedor";
@@ -16,20 +17,24 @@ export default async function MisDatos() {
 
   let whatsapp = "";
   let barrio = "";
-  let conContrasena = true;
+  let foto: string | null = null;
+  let conContrasena = false;
   if (supabaseConfigurado()) {
     const supabase = await crearClienteServidor();
     const [{ data: fila }, { data: auth }] = await Promise.all([
       supabase
         .from("usuarios")
-        .select("whatsapp, barrio_id")
+        .select("whatsapp, barrio_id, foto_path")
         .eq("id", sesion.usuario.id)
         .maybeSingle(),
       supabase.auth.getUser(),
     ]);
     whatsapp = fila?.whatsapp ?? "";
     barrio = fila?.barrio_id ? String(fila.barrio_id) : "";
-    conContrasena = auth.user ? tieneContrasena(auth.user) : true;
+    foto = fila?.foto_path
+      ? supabase.storage.from("fotos").getPublicUrl(fila.foto_path).data.publicUrl
+      : null;
+    conContrasena = auth.user ? tieneContrasena(auth.user) : false;
   }
   const barrios = await listarBarrios();
   const nombreCompleto = [sesion.perfil.nombre, sesion.perfil.apellido].filter(Boolean).join(" ");
@@ -46,6 +51,10 @@ export default async function MisDatos() {
         </Link>
         <h1 className="mt-0.5 font-titulo text-[38px] leading-none lg:text-[48px]">Mis datos</h1>
       </header>
+
+      {sesion.rol === "profesional" ? null : (
+        <FotoDePerfil uid={sesion.usuario.id} nombre={sesion.perfil.nombreVisible} fotoUrl={foto} />
+      )}
 
       <FormularioDatos barrios={barrios} inicial={{ nombreCompleto, whatsapp, barrio }} />
 

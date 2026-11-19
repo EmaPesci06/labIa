@@ -28,7 +28,7 @@ async function Contenido() {
   const emailContacto = process.env.EMAIL_SOPORTE || "soporte@labia.com.ar";
 
   return (
-    <div className="flex min-h-dvh flex-col bg-equipo text-sobre-encabezado">
+    <div className="flex min-h-dvh flex-col bg-equipo text-sobre-encabezado [&_:focus-visible]:outline-sol">
       <SaltarAlContenido />
       <header className="mx-auto w-full max-w-[720px] px-6 pt-4 pb-0 lg:pt-6">
         <Logo alt="LabÍA" sobre="encabezado" />

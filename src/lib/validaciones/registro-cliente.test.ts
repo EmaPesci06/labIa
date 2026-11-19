@@ -18,6 +18,7 @@ const valido = {
   email: "Laura@Correo.com ",
   contrasena: "unaclave123",
   barrio: "17",
+  mayorEdad: "on",
 };
 
 describe("separarNombre", () => {
@@ -41,6 +42,18 @@ describe("esquemaRegistroCliente", () => {
       email: "laura@correo.com",
       barrio: 17,
     });
+  });
+
+  it("exige tildar mayor de 18 y términos: sin la casilla no valida", () => {
+    for (const mayorEdad of ["", undefined]) {
+      const r = esquemaRegistroCliente.safeParse({ ...valido, mayorEdad });
+      expect(r.success).toBe(false);
+      if (!r.success) {
+        expect(erroresPorCampo(r.error).mayorEdad).toBe(
+          "Para crear la cuenta tenés que confirmar que sos mayor de 18 y aceptar los términos.",
+        );
+      }
+    }
   });
 
   it("cuatro formas de escribir el mismo celular dan el mismo E.164", () => {

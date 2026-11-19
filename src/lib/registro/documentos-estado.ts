@@ -24,3 +24,21 @@ export function faltantesRegistrados(
 ): TipoDocumento[] {
   return documentosFaltantes(tieneGas, tiposVigentes(verificaciones));
 }
+
+/**
+ * ¿Falta aprobar algún documento obligatorio? Cuenta el más nuevo de cada tipo: si está
+ * pendiente, rechazado o directamente no existe, todavía falta.
+ */
+export function faltaAprobarDocumentos(
+  verificaciones: ItemVerificacion[],
+  tieneGas: boolean,
+): boolean {
+  const vistos = new Set<TipoDocumento>();
+  const aprobados = new Set<TipoDocumento>();
+  for (const v of verificaciones) {
+    if (vistos.has(v.tipo)) continue;
+    vistos.add(v.tipo);
+    if (v.estado === "aprobado") aprobados.add(v.tipo);
+  }
+  return documentosFaltantes(tieneGas, aprobados).length > 0;
+}

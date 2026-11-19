@@ -71,6 +71,7 @@ export async function registrarCliente(
     email: texto(datos, "email"),
     contrasena: texto(datos, "contrasena"),
     barrio: texto(datos, "barrio"),
+    mayorEdad: texto(datos, "mayorEdad"),
   };
   // Nunca se devuelve la contraseña.
   const valores = {

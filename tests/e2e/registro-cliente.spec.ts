@@ -67,6 +67,25 @@ test.describe("registro de cliente", () => {
     await expect(page.getByLabel("Tu WhatsApp")).toHaveAttribute("aria-invalid", "true");
   });
 
+  test("la casilla de mayor de 18 y términos arranca sin tildar y es obligatoria", async ({
+    page,
+  }) => {
+    await page.goto("/registro/cliente");
+    const casilla = page.getByRole("checkbox", { name: /mayor de 18/ });
+    await expect(casilla).not.toBeChecked();
+    await page.getByLabel("Nombre").fill("Laura Fernández");
+    await page.getByLabel("Email").fill("laura@example.com");
+    await page.getByLabel("Contraseña", { exact: true }).fill("unaclave123");
+    await page.getByLabel("Tu WhatsApp").fill("223 555 1234");
+    await page.getByLabel("Tu barrio").selectOption({ label: "Centro" });
+    await page.getByRole("button", { name: "Crear cuenta" }).click();
+    await expect(
+      page.getByText("Para crear la cuenta tenés que confirmar que sos mayor de 18"),
+    ).toBeVisible();
+    await expect(casilla).toHaveAttribute("aria-invalid", "true");
+    await expect(casilla).toHaveAccessibleDescription(/mayor de 18/);
+  });
+
   test("un celular mal escrito muestra el ejemplo", async ({ page }) => {
     await page.goto("/registro/cliente");
     await page.getByLabel("Tu WhatsApp").fill("12345");
@@ -114,6 +133,7 @@ test.describe("registro de cliente con Supabase real", () => {
     await page.getByLabel("Email").fill(email);
     await page.getByLabel("Contraseña", { exact: true }).fill("clave-de-prueba-123");
     await page.getByLabel("Tu barrio").selectOption({ label: "Chauvín" });
+    await page.getByLabel(/mayor de 18/).check();
     await page.getByRole("button", { name: "Crear cuenta" }).click();
     await expect(page).toHaveURL(/\/inicio$/);
 
@@ -125,6 +145,7 @@ test.describe("registro de cliente con Supabase real", () => {
     await page.getByLabel("Email").fill(email);
     await page.getByLabel("Contraseña", { exact: true }).fill("clave-de-prueba-123");
     await page.getByLabel("Tu barrio").selectOption({ label: "Centro" });
+    await page.getByLabel(/mayor de 18/).check();
     await page.getByRole("button", { name: "Crear cuenta" }).click();
     await expect(page.getByText(`Te mandamos un mail a ${email}.`)).toBeVisible();
     await expect(page.getByText(/Ya hay una cuenta con ese email/)).toHaveCount(0);

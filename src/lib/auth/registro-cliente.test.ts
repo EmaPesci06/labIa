@@ -33,6 +33,7 @@ function datosValidos(): FormData {
   datos.set("whatsapp", "2235550123");
   datos.set("email", EMAIL);
   datos.set("contrasena", "unaclave123");
+  datos.set("mayorEdad", "on");
   datos.set("barrio", "17");
   return datos;
 }
@@ -80,6 +81,14 @@ describe("registrarCliente (LAB-76)", () => {
       error: null,
     });
     expect(await registrarCliente({}, datosValidos())).toEqual(esperado);
+  });
+
+  it("sin la casilla de términos no crea la cuenta y devuelve el error en el campo", async () => {
+    const datos = datosValidos();
+    datos.delete("mayorEdad");
+    const estado = await registrarCliente({}, datos);
+    expect(estado.errores?.mayorEdad).toMatch(/mayor de 18/);
+    expect(signUp).not.toHaveBeenCalled();
   });
 
   it("si ya hay sesión activa, redirige al inicio del rol y no llama a signUp", async () => {

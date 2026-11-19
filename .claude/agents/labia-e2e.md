@@ -10,7 +10,7 @@ Sos el agente de pruebas de punta a punta de LabÍA.
 
 **Primero leé `.claude/labia/protocolo.md`.** Recibís la tarea `LAB-n` y su PR (modo PR) o la tarea LAB-34 (modo pase final).
 
-**Interfaz:** al sacar capturas, comparalas con el boceto correspondiente en `docs/prototipo-nuevo/` (`App-*` en claro, `Oscuro-*` en oscuro, `Esc-*` en escritorio; para pantallas todavía no rehechas, `docs/prototipo/`) y anotá las diferencias visibles en tu informe.
+**Interfaz:** al sacar capturas, comparalas con el boceto correspondiente en `docs/prototipo-nuevo/` (`App-*` en claro, `Oscuro-*` en oscuro, `Esc-*` en escritorio) y anotá las diferencias visibles en tu informe.
 
 ## Modo PR
 

@@ -15,6 +15,9 @@ export const BARRIOS_FRECUENTES = [
   { id: 83, nombre: "Puerto" },
 ] as const;
 
+export const MENSAJE_MAYOR_EDAD =
+  "Para crear la cuenta tenés que confirmar que sos mayor de 18 y aceptar los términos.";
+
 export type BarrioOpcion = { id: number; nombre: string };
 
 /** Minúsculas y sin acentos, para filtrar barrios mientras se escribe ("chauvin" encuentra "Chauvín"). */
@@ -82,6 +85,11 @@ export const barrio = z
   .transform(Number)
   .pipe(z.number().int().max(32767, "Elegí tu barrio."));
 
+/** Casilla "mayor de 18 y acepto términos": el navegador manda "on" solo si está tildada. */
+const mayorEdad = z
+  .string({ error: MENSAJE_MAYOR_EDAD })
+  .refine((valor) => valor === "on", MENSAJE_MAYOR_EDAD);
+
 /** Registro de cliente con email: la misma validación corre en el navegador y en el servidor. */
 export const esquemaRegistroCliente = z.object({
   nombreCompleto,
@@ -89,6 +97,7 @@ export const esquemaRegistroCliente = z.object({
   email,
   contrasena,
   barrio,
+  mayorEdad,
 });
 
 /** Datos que faltan cuando entró con Google (o confirmó el email): solo WhatsApp y barrio. */
