@@ -140,7 +140,7 @@ export function HojaReportar({
                   key={motivo}
                   htmlFor={inputId}
                   className={cn(
-                    "flex min-h-[50px] cursor-pointer items-center gap-3 rounded-campo px-4 py-3 text-[17px] transition-colors",
+                    "flex min-h-[50px] cursor-pointer items-center gap-3 rounded-campo px-4 py-3 text-[17px]",
                     seleccionado ? "bg-sol font-bold text-sobre-sol" : "bg-superficie text-texto",
                   )}
                 >

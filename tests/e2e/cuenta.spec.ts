@@ -15,7 +15,7 @@ test.describe("mi cuenta (cliente)", () => {
 
   test("lista de ajustes con encabezado, secciones y zona de borrado", async ({ page }) => {
     await page.goto("/cuenta");
-    await expect(page.getByText("Laura Fernández")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Laura Fernández" })).toBeVisible();
     await expect(page.getByText("Cliente", { exact: true })).toBeVisible();
     await expect(page.getByRole("link", { name: "Mis datos", exact: true })).toHaveAttribute(
       "href",
