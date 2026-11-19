@@ -1,6 +1,6 @@
 ---
 name: labia-ui
-description: Constructor del sistema de diseño de LabÍA. Usalo para tokens de color claro/oscuro, tipografías y logo (LAB-9), componentes base y la cinta métrica (LAB-10), y navegación de celular/escritorio con PWA instalable (LAB-13).
+description: Constructor del sistema de diseño de LabÍA ("Verano en la costa"). Usalo para tokens de color claro/oscuro, tipografías (Baloo 2 y Nunito Sans) y logo (LAB-68), componentes base (botón, campo, chip, insignia, tarjeta, hoja inferior, encabezado, toldo, avatar, aviso) y el toldo de la marca (LAB-69), y navegación de celular/escritorio con PWA instalable (LAB-70).
 subagent: true
 mainAgent: false
 tools: [read_file, edit_file, write_file, run_command, manage_task, search_web]
