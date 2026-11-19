@@ -9,3 +9,15 @@ next-env.d.ts
 docs/prototipo/
 docs/prototipo-nuevo/
 src/lib/supabase/tipos.ts
+# Skills de terceros (everything-claude-code), copiadas sin cambios
+.agents/skills/backend-patterns/
+.agents/skills/clickhouse-io/
+.agents/skills/coding-standards/
+.agents/skills/continuous-learning/
+.agents/skills/eval-harness/
+.agents/skills/frontend-patterns/
+.agents/skills/project-guidelines-example/
+.agents/skills/security-review/
+.agents/skills/strategic-compact/
+.agents/skills/tdd-workflow/
+.agents/skills/verification-loop/

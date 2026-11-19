@@ -34,6 +34,14 @@ orquestador de Claude Code: no las construyas. Una tarea sin ninguna de las dos 
 | QA y pruebas E2E                            | `labia-e2e`                      |
 | Humano                                      | No se lanza: va a los pendientes |
 
+**Modelos de los agentes:** `labia-revisor` y `labia-seguridad` usan **Gemini 4 Neon (High)** (`gemini-4-neon-high`);
+`labia-infra`, `labia-db`, `labia-ui`, `labia-fullstack` y `labia-e2e` usan **Gemini 4 Neon (Medium)**
+(`gemini-4-neon-medium`); `labia-integrador` y `labia-pendientes-humanas` usan **Gemini 4 Hydrogen (Low)**
+(`gemini-4-hydrogen-low`). Como `invoke_subagent` solo permite heredar el modelo de la sesión, lanzalos con
+`swarm add` pasando el `model` del frontmatter de cada rol, con un
+brief que diga "sos `labia-<rol>`, leé `.agents/plugins/labia/agents/labia-<rol>.md`", la tarea, el worktree y que el
+resultado vuelve al coordinador.
+
 ## Recorrido por tarea
 
 1. **Constructor.** Un subagente por tarea, cada uno en su propio worktree. El encargo incluye el id de la tarea,

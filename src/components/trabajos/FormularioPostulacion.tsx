@@ -1,12 +1,12 @@
 "use client";
 
 import { Check } from "lucide-react";
-import Link from "next/link";
 import { useActionState, useId, type ReactNode } from "react";
 
 import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
-import { cn } from "@/lib/cn";
+import { Tarjeta } from "@/components/ui/Tarjeta";
+import { Toldo, type ColorToldo } from "@/components/ui/Toldo";
 import { formatearPesos } from "@/lib/formato";
 import { postularme } from "@/lib/trabajos/acciones";
 import type { EstadoPostulacion as TipoEstadoPostulacion } from "@/lib/trabajos/consulta";
@@ -30,48 +30,37 @@ type FormularioPostulacionProps = {
   miPostulacion?: MiPostulacionInfo | null;
 };
 
-type TonoEstado = "azul" | "exito" | "neutro";
-
 /** Título y detalle de cada estado de la postulación, desde el punto de vista del profesional. */
 const TEXTO_ESTADO: Record<
   TipoEstadoPostulacion,
-  { titulo: string; detalle: (cliente: string) => string; tono: TonoEstado; icono: boolean }
+  { titulo: string; detalle: (cliente: string) => string; toldo: ColorToldo; icono: boolean }
 > = {
   enviada: {
     titulo: "Postulación enviada",
     detalle: (cliente) => `${cliente} ve tu mensaje y, si te elige, te escribe por WhatsApp.`,
-    tono: "azul",
+    toldo: "sol",
     icono: true,
   },
   elegida: {
-    titulo: "¡Te eligieron!",
-    detalle: () => "El cliente te va a escribir por WhatsApp.",
-    tono: "exito",
+    titulo: "Te eligieron",
+    detalle: (cliente) => `${cliente} te va a escribir por WhatsApp.`,
+    toldo: "accion",
     icono: true,
   },
   descartada: {
-    titulo: "Eligieron a otro profesional",
+    titulo: "Eligieron a otra persona",
     detalle: () =>
       "Esta vez el cliente eligió a otra persona. Seguí postulándote a otros trabajos.",
-    tono: "neutro",
+    toldo: "texto",
     icono: false,
   },
   retirada: {
     titulo: "Retiraste tu postulación",
     detalle: () => "El cliente ya no la tiene en cuenta.",
-    tono: "neutro",
+    toldo: "texto",
     icono: false,
   },
 };
-
-const COLOR_TONO: Record<TonoEstado, string> = {
-  azul: "bg-superficie text-texto",
-  exito: "bg-sol text-sobre-sol",
-  neutro: "border border-fondo bg-superficie text-texto",
-};
-
-const CLASE_VER_MAS =
-  "mt-2 flex min-h-[48px] items-center justify-center rounded-xl bg-superficie text-[15px] font-bold text-texto transition-colors hover:bg-superficie focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco";
 
 /**
  * Formulario para que el profesional se postule a un trabajo, y el resumen de su postulación
@@ -79,7 +68,7 @@ const CLASE_VER_MAS =
  * - Trabajo cerrado: "Este trabajo ya no recibe postulaciones."
  * - Profesional en revisión: tarjeta deshabilitada con "Vas a poder postularte cuando aprobemos tus documentos."
  * - Ya postulado o recién enviado: resumen con el texto de su estado y, si está enviada, "Retirar".
- * - Formulario con validación de mensaje, precio estimado y seña propuesta.
+ * - Formulario con validación de mensaje, precio estimado y seña propuesta (bocetos App-TrabajoDetalle y Oscuro-TrabajoDetalle, LAB-78).
  */
 export function FormularioPostulacion({
   trabajoId,
@@ -94,26 +83,26 @@ export function FormularioPostulacion({
   // 1. Trabajo no abierto
   if (trabajoEstado !== "abierto") {
     return (
-      <div className="flex flex-col gap-4 rounded-[18px] border border-fondo bg-superficie p-5">
-        <p className="text-center text-sm font-semibold text-texto">
+      <Tarjeta className="flex flex-col gap-4 p-5">
+        <p className="text-center text-[15px] font-bold text-texto">
           Este trabajo ya no recibe postulaciones.
         </p>
         {postulacionInicial ? (
           <DatosPostulacion postulacion={postulacionInicial} titulo="Tu postulación previa" />
         ) : null}
-      </div>
+      </Tarjeta>
     );
   }
 
   // 2. Profesional en revisión (no publicado)
   if (!publicado) {
     return (
-      <div className="flex flex-col gap-3 rounded-[18px] border border-texto bg-superficie p-5">
-        <h2 className="font-titulo text-lg font-bold text-texto">Postularme</h2>
-        <p className="text-sm font-semibold text-texto">
+      <Tarjeta className="flex flex-col gap-2 p-5">
+        <h2 className="font-titulo text-[22px] leading-tight text-texto">Postularme</h2>
+        <p className="text-[15px] font-bold text-texto">
           Vas a poder postularte cuando aprobemos tus documentos.
         </p>
-      </div>
+      </Tarjeta>
     );
   }
 
@@ -127,9 +116,9 @@ export function FormularioPostulacion({
             <BotonRetirarPostulacion postulacionId={postulacionInicial.id} />
           </div>
         ) : null}
-        <Link href="/trabajos" className={CLASE_VER_MAS}>
+        <Boton href="/trabajos" variante="secundario" bloque className="mt-1">
           Ver más trabajos
-        </Link>
+        </Boton>
       </CajaEstado>
     );
   }
@@ -138,9 +127,9 @@ export function FormularioPostulacion({
   if (estado.ok) {
     return (
       <CajaEstado estado="enviada" clienteNombre={clienteNombre}>
-        <Link href="/trabajos" className={CLASE_VER_MAS}>
+        <Boton href="/trabajos" variante="secundario" bloque className="mt-1">
           Ver más trabajos
-        </Link>
+        </Boton>
       </CajaEstado>
     );
   }
@@ -151,15 +140,15 @@ export function FormularioPostulacion({
       action={accion}
       noValidate
       aria-describedby={estado.mensaje ? idError : undefined}
-      className="flex flex-col gap-4 rounded-[18px] border border-texto bg-superficie p-5"
+      className="flex flex-col gap-4"
     >
-      <h2 className="font-titulo text-lg font-bold text-texto">Postularme</h2>
+      <h2 className="font-titulo text-[22px] leading-tight text-texto">Postularme</h2>
 
       {estado.mensaje ? (
         <p
           id={idError}
           role="alert"
-          className="rounded-lg bg-sol p-3 text-sm font-semibold text-sobre-sol"
+          className="rounded-campo bg-sol p-3 text-sm font-bold text-sobre-sol"
         >
           {estado.mensaje}
         </p>
@@ -168,8 +157,9 @@ export function FormularioPostulacion({
       <Campo
         variante="area"
         name="mensaje"
-        etiqueta={`Mensaje para ${clienteNombre}`}
-        placeholder="Puedo ir hoy a las 17 h. Reviso la pérdida y te paso presupuesto."
+        etiqueta={`Tu mensaje para ${clienteNombre}`}
+        placeholder="Puedo pasar hoy a las 17. Por lo que contás es el cuerito o el vástago."
+        ayuda="No pongas teléfono ni precio final: eso se acuerda por WhatsApp, con presupuesto escrito."
         maxLength={500}
         defaultValue={estado.valores?.mensaje ?? ""}
         error={estado.errores?.mensaje}
@@ -195,19 +185,13 @@ export function FormularioPostulacion({
         />
       </div>
 
-      <p className="text-xs leading-relaxed text-texto">
+      <p className="text-sm leading-snug text-texto">
         La seña se acuerda con el cliente y queda escrita en el presupuesto. LabÍA no cobra ni
         retiene pagos.
       </p>
 
-      <Boton
-        type="submit"
-        variante="profesional"
-        tamano="grande"
-        cargando={isPending}
-        className="mt-1"
-      >
-        Enviar postulación
+      <Boton type="submit" variante="principal" tamano="grande" bloque cargando={isPending}>
+        Postularme
       </Boton>
     </form>
   );
@@ -225,14 +209,17 @@ function CajaEstado({
 }) {
   const texto = TEXTO_ESTADO[estado];
   return (
-    <div className={cn("flex flex-col gap-3 rounded-[18px] p-5", COLOR_TONO[texto.tono])}>
-      <div className="flex items-center gap-2 text-lg font-bold">
-        {texto.icono ? <Check aria-hidden strokeWidth={2.5} className="size-5 shrink-0" /> : null}
-        <span>{texto.titulo}</span>
+    <Tarjeta className="flex flex-col overflow-hidden p-0">
+      <Toldo color={texto.toldo} alto={14} />
+      <div className="flex flex-col gap-3 p-5">
+        <div className="flex items-center gap-2 font-titulo text-[22px] leading-tight text-texto">
+          {texto.icono ? <Check aria-hidden strokeWidth={3} className="size-5 shrink-0" /> : null}
+          <span>{texto.titulo}</span>
+        </div>
+        <p className="text-[15px] leading-relaxed text-texto">{texto.detalle(clienteNombre)}</p>
+        {children}
       </div>
-      <p className="text-[15px] leading-relaxed">{texto.detalle(clienteNombre)}</p>
-      {children}
-    </div>
+    </Tarjeta>
   );
 }
 
@@ -247,11 +234,11 @@ function DatosPostulacion({
   const tienePrecio = postulacion.precioEstimado !== null;
   const tieneSena = postulacion.senaPropuesta !== null;
   return (
-    <div className="rounded-xl border border-texto/50 bg-superficie p-4 text-texto">
-      <p className="text-xs font-semibold tracking-wider text-texto uppercase">{titulo}</p>
-      <p className="mt-1.5 text-sm whitespace-pre-line text-texto">{postulacion.mensaje}</p>
+    <div className="rounded-campo bg-fondo p-4 text-texto">
+      <p className="text-xs font-bold tracking-[0.4px] text-texto uppercase">{titulo}</p>
+      <p className="mt-1.5 text-[15px] whitespace-pre-line text-texto">{postulacion.mensaje}</p>
       {tienePrecio || tieneSena ? (
-        <div className="mt-3 flex flex-wrap gap-4 border-t border-fondo pt-2 text-xs">
+        <div className="mt-3 flex flex-wrap gap-4 border-t border-superficie pt-2 text-sm">
           {postulacion.precioEstimado !== null ? (
             <div>
               <span className="text-texto">Precio estimado: </span>

@@ -4,7 +4,10 @@ description: Constructor de base de datos de LabÍA. Usalo para tareas de Linear
 subagent: true
 mainAgent: false
 tools: [read_file, edit_file, write_file, run_command, manage_task, search_web]
+model: gemini-4-neon-medium
 ---
+
+**Skills:** antes de empezar leé `backend-patterns`, `coding-standards`, `security-review`, `tdd-workflow`, `verification-loop` en `.agents/skills/<skill>/SKILL.md`. Si algo choca con `AGENTS.md` o la Guía para agentes, mandan esas.
 
 Sos el agente `labia-db` de LabÍA, lanzado por el orquestador de Gemini.
 
