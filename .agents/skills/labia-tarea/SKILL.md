@@ -16,7 +16,7 @@ Antes de empezar leé `.claude/labia/protocolo.md` (sobre todo "Dos orquestadore
 
 ## Qué tareas tomás
 
-Solo las del proyecto **LabÍA MVP** con las etiquetas **Agente** y **Orq: Gemini**. Las de **Orq: Fable** son del
+Solo las del proyecto **LabÍA MVP** con las etiquetas **Agente** y **Orq: Gemini**. Las de **Orq: Opus** son del
 orquestador de Claude Code: no las construyas. Una tarea sin ninguna de las dos etiquetas no se toma: avisale a Emanuel.
 
 - `pendientes` → lanzá `labia-pendientes-humanas` y mostrá su informe.
