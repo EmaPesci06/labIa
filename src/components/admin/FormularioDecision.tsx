@@ -34,7 +34,7 @@ export function FormularioDecision({ verificacionId }: { verificacionId: string 
         </Boton>
         <Boton
           type="button"
-          variante="secundario"
+          variante="peligro"
           aria-expanded={rechazando}
           aria-controls="panel-rechazo"
           onClick={() => setRechazando((r) => !r)}
@@ -74,15 +74,16 @@ export function FormularioDecision({ verificacionId }: { verificacionId: string 
             maxLength={300}
             error={estado.errores?.detalle}
           />
-          <button
+          <Boton
             type="submit"
             name="accion"
             value="rechazar"
-            aria-busy={pendiente || undefined}
-            className="inline-flex min-h-[52px] items-center justify-center rounded-boton bg-error px-5 text-base font-bold text-sobre-accion hover:opacity-90 active:opacity-80 disabled:opacity-50 aria-busy:pointer-events-none"
+            variante="peligro"
+            cargando={pendiente}
+            bloque
           >
             {pendiente ? "Guardando…" : "Confirmar rechazo"}
-          </button>
+          </Boton>
         </div>
       ) : null}
 

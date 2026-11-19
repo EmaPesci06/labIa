@@ -27,8 +27,8 @@ describe("TarjetaProfesional", () => {
     render(<TarjetaProfesional profesional={base} />);
     expect(screen.getByRole("link")).toHaveAttribute("href", "/profesionales/abc");
     expect(screen.getByText("Martín G.")).toBeInTheDocument();
-    expect(screen.getByText("Gasista · 12 años · La Perla, Centro")).toBeInTheDocument();
-    expect(screen.getByText("4,9")).toBeInTheDocument();
+    expect(screen.getByText("Gasista · 12 años")).toBeInTheDocument();
+    expect(screen.getByText("4,9 en 10 reseñas")).toBeInTheDocument();
     expect(screen.getByText("a 1,2 km")).toBeInTheDocument();
     expect(screen.getByText("Identidad verificada")).toBeInTheDocument();
     expect(screen.getByText("Sin antecedentes")).toBeInTheDocument();
@@ -38,7 +38,7 @@ describe("TarjetaProfesional", () => {
   it("sin matrícula ni reseñas no muestra la insignia ni el puntaje", () => {
     render(<TarjetaProfesional profesional={{ ...base, matriculado: false, promedio: null }} />);
     expect(screen.queryByText("Matriculado")).not.toBeInTheDocument();
-    expect(screen.getByText("Nuevo")).toBeInTheDocument();
+    expect(screen.getByText("Sin reseñas todavía")).toBeInTheDocument();
   });
 
   it("la distancia se muestra con el formato de la app y cambia con el dato", () => {

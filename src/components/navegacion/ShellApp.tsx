@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
+import { elegirBarrio } from "@/lib/barrios-busqueda";
+import { barrioDeLaCuenta, obtenerBarrios } from "@/lib/busqueda-servidor";
 import { inicioDelRol } from "@/lib/auth/rutas";
 import { destinoParaAceptarNormas } from "@/lib/normas";
 import { navegacionPara } from "@/lib/navegacion";
@@ -25,9 +27,19 @@ export async function ShellApp({ children }: { children: ReactNode }) {
 
   const navegacion = navegacionPara(sesion.rol, sesion.usuario.id);
 
+  // LAB-71: el cliente ve su barrio en la barra superior ("Estás en …") y puede cambiarlo.
+  let barrio: { actual: string; barrios: Awaited<ReturnType<typeof obtenerBarrios>> } | undefined;
+  if (sesion.rol === "cliente") {
+    const barrios = await obtenerBarrios();
+    barrio = {
+      actual: elegirBarrio(barrios, undefined, await barrioDeLaCuenta(sesion)),
+      barrios,
+    };
+  }
+
   return (
     <>
-      <BarraSuperior navegacion={navegacion} nombre={sesion.perfil.nombreVisible} />
+      <BarraSuperior navegacion={navegacion} nombre={sesion.perfil.nombreVisible} barrio={barrio} />
       <main id="contenido" tabIndex={-1} className="marco flex-1 focus:outline-none">
         {children}
       </main>

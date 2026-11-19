@@ -1,9 +1,8 @@
-import { ChevronLeft } from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { FormularioTrabajo, type BarrioOpcion } from "@/components/trabajos/FormularioTrabajo";
+import { Encabezado } from "@/components/ui/Encabezado";
 import { OFICIOS, type Oficio } from "@/lib/busqueda";
 import { rolFalso } from "@/lib/auth/sesion-falsa";
 import { obtenerSesion } from "@/lib/sesion";
@@ -58,18 +57,12 @@ export default async function PublicarTrabajo({ searchParams }: Props) {
 
   return (
     <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-[18px]">
-      <div className="flex items-center gap-1.5">
-        <Link
-          href="/inicio"
-          aria-label="Volver"
-          className="flex size-11 items-center justify-center rounded-campo text-texto lg:hidden"
-        >
-          <ChevronLeft aria-hidden strokeWidth={2} className="size-[22px]" />
-        </Link>
-        <h1 className="font-titulo text-[26px] lg:text-4xl lg:tracking-[-1px]">
-          Publicar un trabajo
-        </h1>
-      </div>
+      <Encabezado
+        variante="plano"
+        titulo="Contanos qué pasó"
+        descripcion="Lo ven los profesionales verificados de tu zona y te escriben ellos."
+        volver={{ href: "/inicio" }}
+      />
       <FormularioTrabajo
         barrios={barrios.map(({ id, nombre }) => ({ id, nombre }))}
         frecuentes={frecuentes}

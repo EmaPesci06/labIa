@@ -1,21 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition, type ReactNode } from "react";
+import { useTransition, type ReactNode } from "react";
 
 import { Bloque } from "@/components/navegacion/Esqueleto";
-import { Boton } from "@/components/ui/Boton";
-import { Campo } from "@/components/ui/Campo";
 import { Chip } from "@/components/ui/Chip";
-import { EtiquetaMono } from "@/components/ui/EtiquetaMono";
+import { Encabezado } from "@/components/ui/Encabezado";
+import type { Barrio } from "@/lib/barrios-busqueda";
 import type { Oficio, OrdenBusqueda } from "@/lib/busqueda";
 import { urlBusqueda, type EstadoBusqueda } from "@/lib/busqueda-url";
-import type { Barrio } from "@/lib/barrios-busqueda";
-import { cn } from "@/lib/cn";
 import { esMatriculable, nombreOficio, OFICIOS_ORDENADOS } from "@/lib/oficios";
 
-/** Barrios que se ofrecen como atajo en la columna de filtros de escritorio, si existen. */
-const BARRIOS_FRECUENTES = ["centro", "la-perla", "chauvin", "los-troncos"] as const;
+import { SelectorPastilla, type OpcionPastilla } from "./SelectorPastilla";
 
 type Props = {
   oficio: Oficio | undefined;
@@ -24,33 +20,44 @@ type Props = {
   matriculados: boolean;
   orden: OrdenBusqueda;
   todaLaCiudad: boolean;
-  /** Título y contador (Server Component). */
-  encabezado: ReactNode;
-  /** Tarjetas de resultados (Server Component). */
+  /** Título de la pantalla ("Plomería cerca de La Perla"). */
+  titulo: string;
+  /** Línea de resultados ("8 verificados, del más cercano al más lejano"). */
+  descripcion?: string;
+  /** Columna lateral de escritorio (Server Component). */
+  aside: ReactNode;
+  /** Resultados, avisos y "Ver más" (Server Components). */
   children: ReactNode;
 };
 
 /** Esqueleto de la lista de resultados mientras se actualizan los filtros. */
 export function EsqueletoResultados() {
   return (
-    <div aria-hidden className="flex flex-col gap-3 lg:grid lg:grid-cols-2 lg:gap-4">
+    <div aria-hidden className="flex flex-col gap-2.5 lg:gap-3">
       {[0, 1, 2, 3].map((n) => (
-        <Bloque key={n} className="h-[148px] rounded-[18px] lg:h-[172px]" />
+        <Bloque key={n} className="h-24 rounded-[22px] lg:h-[120px]" />
       ))}
     </div>
   );
 }
 
-function TituloFiltro({ children }: { children: ReactNode }) {
-  return <EtiquetaMono className="text-texto">{children}</EtiquetaMono>;
-}
+const OPCIONES_OFICIO: OpcionPastilla[] = [
+  { valor: "", etiqueta: "Todos los oficios" },
+  ...OFICIOS_ORDENADOS.map((o) => ({ valor: o, etiqueta: nombreOficio(o) })),
+];
+
+const OPCIONES_DISTANCIA: OpcionPastilla[] = [
+  { valor: "cerca", etiqueta: "Cerca de tu barrio" },
+  { valor: "ciudad", etiqueta: "Toda la ciudad" },
+];
 
 /**
- * Filtros de la búsqueda y marco de la pantalla. La URL es el estado: cada filtro hace
- * `router.replace` dentro de una transición, así que el botón atrás funciona, la página no se
- * recarga entera y mientras llegan los resultados nuevos se muestran esqueletos.
+ * Encabezado de la búsqueda (turquesa, con volver al inicio), filtros y la lista. La URL es el estado:
+ * cada filtro hace `router.replace` dentro de una transición, así que el botón atrás funciona, la
+ * página no se recarga entera y mientras llegan los resultados nuevos se muestran esqueletos.
  *
- * Celular: fila de chips bajo el título. Escritorio (≥ 1024 px): columna de 280 px a la izquierda.
+ * Filtros: oficio, barrio y distancia (`Cerca de tu barrio` / `Toda la ciudad`) como pastillas; y
+ * los chips de matriculados (solo gas y electricidad) y mejor calificados.
  */
 export function PanelBusqueda({
   oficio,
@@ -59,12 +66,13 @@ export function PanelBusqueda({
   matriculados,
   orden,
   todaLaCiudad,
-  encabezado,
+  titulo,
+  descripcion,
+  aside,
   children,
 }: Props) {
   const router = useRouter();
   const [pendiente, empezar] = useTransition();
-  const [barrioElegido, setBarrioElegido] = useState(barrio);
 
   const estado: EstadoBusqueda = { oficio, barrio, matriculados, orden, todaLaCiudad };
 
@@ -74,127 +82,83 @@ export function PanelBusqueda({
     empezar(() => router.replace(destino, { scroll: false }));
   }
 
-  const frecuentes = BARRIOS_FRECUENTES.map((slug) => barrios.find((b) => b.slug === slug)).filter(
-    (b): b is Barrio => Boolean(b),
-  );
-
-  const chipMatriculados = (
-    <Chip seleccionado={matriculados} onClick={() => aplicar({ matriculados: !matriculados })}>
-      Solo matriculados
-    </Chip>
-  );
-  const chipCalificados = (
-    <Chip
-      seleccionado={orden === "calificacion"}
-      onClick={() => aplicar({ orden: orden === "calificacion" ? "cercania" : "calificacion" })}
-    >
-      Mejor calificados
-    </Chip>
-  );
-  const chipCiudad = (
-    <Chip seleccionado={todaLaCiudad} onClick={() => aplicar({ todaLaCiudad: !todaLaCiudad })}>
-      Toda la ciudad
-    </Chip>
-  );
+  const opcionesBarrio: OpcionPastilla[] =
+    barrios.length > 0
+      ? barrios.map((b) => ({ valor: b.slug, etiqueta: b.nombre }))
+      : [{ valor: barrio, etiqueta: barrio }];
 
   return (
-    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-8">
-      <aside
-        aria-label="Filtros"
-        className="hidden w-[280px] shrink-0 flex-col gap-[22px] rounded-[18px] bg-superficie p-[22px] lg:flex"
+    <>
+      <Encabezado
+        titulo={titulo}
+        volver={{ href: "/inicio", etiqueta: "Volver al inicio" }}
+        className="gap-4 lg:gap-5"
       >
-        <div className="flex flex-col gap-2">
-          <TituloFiltro>Barrio</TituloFiltro>
-          <form
-            key={barrio}
-            className="flex flex-col gap-3"
-            onSubmit={(evento) => {
-              evento.preventDefault();
-              aplicar({ barrio: barrioElegido });
+        <div className="flex flex-wrap gap-2.5">
+          <SelectorPastilla
+            etiqueta="Oficio"
+            valor={oficio ?? ""}
+            opciones={OPCIONES_OFICIO}
+            onCambio={(valor) => {
+              const elegido = OFICIOS_ORDENADOS.find((o) => o === valor);
+              aplicar({ oficio: elegido });
             }}
-          >
-            <Campo
-              variante="seleccion"
-              etiqueta="Barrio de referencia"
-              value={barrioElegido}
-              onChange={(evento) => setBarrioElegido(evento.target.value)}
-              disabled={barrios.length === 0}
+          />
+          <SelectorPastilla
+            etiqueta="Tu barrio"
+            valor={barrio}
+            opciones={opcionesBarrio}
+            disabled={barrios.length === 0}
+            onCambio={(slug) => aplicar({ barrio: slug })}
+          />
+          <SelectorPastilla
+            etiqueta="Distancia"
+            valor={todaLaCiudad ? "ciudad" : "cerca"}
+            opciones={OPCIONES_DISTANCIA}
+            onCambio={(valor) => aplicar({ todaLaCiudad: valor === "ciudad" })}
+          />
+        </div>
+        <div
+          role="group"
+          aria-label="Filtros de confianza y orden"
+          className="flex flex-wrap gap-x-2 gap-y-2"
+        >
+          {esMatriculable(oficio) || matriculados ? (
+            <Chip
+              seleccionado={matriculados}
+              onClick={() => aplicar({ matriculados: !matriculados })}
             >
-              {barrios.length === 0 ? <option value={barrio}>{barrio}</option> : null}
-              {barrios.map((b) => (
-                <option key={b.slug} value={b.slug}>
-                  {b.nombre}
-                </option>
-              ))}
-            </Campo>
-            <div className="flex flex-wrap gap-x-2">
-              {frecuentes.map((b) => (
-                <Chip
-                  key={b.slug}
-                  seleccionado={b.slug === barrio}
-                  onClick={() => {
-                    setBarrioElegido(b.slug);
-                    aplicar({ barrio: b.slug });
-                  }}
-                >
-                  {b.nombre}
-                </Chip>
-              ))}
-              {chipCiudad}
-            </div>
-            <Boton type="submit" variante="cliente" bloque>
-              Buscar
-            </Boton>
-          </form>
+              Solo matriculados
+            </Chip>
+          ) : null}
+          <Chip
+            seleccionado={orden === "calificacion"}
+            onClick={() =>
+              aplicar({ orden: orden === "calificacion" ? "cercania" : "calificacion" })
+            }
+          >
+            Mejor calificados
+          </Chip>
         </div>
+      </Encabezado>
 
-        <div className="flex flex-col gap-1">
-          <TituloFiltro>Oficio</TituloFiltro>
-          <ul className="flex flex-col">
-            {[undefined, ...OFICIOS_ORDENADOS].map((o) => (
-              <li key={o ?? "todos"}>
-                <button
-                  type="button"
-                  aria-pressed={oficio === o}
-                  onClick={() => aplicar({ oficio: o })}
-                  className={cn(
-                    "min-h-11 w-full rounded-[10px] px-3 text-left text-[15px] font-semibold",
-                    oficio === o ? "bg-accion text-sobre-accion" : "text-texto hover:bg-superficie",
-                  )}
-                >
-                  {o ? nombreOficio(o) : "Todos"}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <TituloFiltro>Confianza</TituloFiltro>
-          <div className="flex flex-wrap gap-x-2">
-            {chipMatriculados}
-            {chipCalificados}
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start lg:gap-8">
+        <div className="flex min-w-0 flex-col gap-3.5 lg:gap-4">
+          {descripcion ? (
+            <p role="status" className="text-[15px] lg:text-base">
+              {pendiente ? "Actualizando resultados…" : descripcion}
+            </p>
+          ) : (
+            <p role="status" className="sr-only">
+              {pendiente ? "Actualizando resultados…" : ""}
+            </p>
+          )}
+          <div aria-busy={pendiente} className="flex flex-col gap-3.5 lg:gap-4">
+            {pendiente ? <EsqueletoResultados /> : children}
           </div>
-          <p className="text-[13px] leading-snug text-texto">
-            Todos los perfiles tienen identidad y antecedentes verificados.
-          </p>
         </div>
-      </aside>
-
-      <div className="flex min-w-0 flex-1 flex-col gap-4 lg:gap-[18px]">
-        {encabezado}
-        <div role="group" aria-label="Filtros" className="flex flex-wrap gap-x-2 lg:hidden">
-          {esMatriculable(oficio) || matriculados ? chipMatriculados : null}
-          {chipCalificados}
-          {chipCiudad}
-        </div>
-        <p role="status" className="sr-only">
-          {pendiente ? "Actualizando resultados…" : ""}
-        </p>
-        <div aria-busy={pendiente} className="flex flex-col gap-4 lg:gap-[18px]">
-          {pendiente ? <EsqueletoResultados /> : children}
-        </div>
+        <div className="hidden flex-col gap-4 lg:sticky lg:top-6 lg:flex">{aside}</div>
       </div>
-    </div>
+    </>
   );
 }

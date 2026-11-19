@@ -26,7 +26,9 @@ async function MarcoAdmin({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col bg-fondo text-texto">
       <SaltarAlContenido />
-      <header className="rounded-b-[28px] bg-equipo text-sobre-encabezado lg:rounded-b-[40px]">
+      {/* Sin esquinas redondeadas: el <Encabezado variante="equipo"> de cada página va pegado debajo y
+          lleva las esquinas, así que se lee como un solo bloque (boceto App-AdminVerificaciones). */}
+      <header className="bg-equipo text-sobre-encabezado">
         <div className="mx-auto flex w-full max-w-[1264px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 py-3 lg:px-8">
           <div className="flex flex-wrap items-center gap-4 sm:gap-6">
             <p className="text-sm font-bold tracking-[0.08em] uppercase">

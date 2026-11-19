@@ -197,10 +197,8 @@ test.describe("PWA", () => {
 test.describe("teclado", () => {
   test('"Saltar al contenido" es el primer foco y lleva el foco a #contenido', async ({ page }) => {
     await page.goto("/inicio");
-    // En escritorio /inicio redirige a /buscar (LAB-23): esperar a la pantalla final antes de tabular.
-    if (!esCelular(page)) {
-      await expect(page).toHaveURL(/\/buscar/);
-    }
+    // Esperar a que el inicio esté dibujado antes de tabular (LAB-71: en escritorio ya no redirige).
+    await expect(page.getByRole("heading", { level: 1, name: "¿Qué se rompió?" })).toBeVisible();
     // El armazón (con sesión) llega en streaming: esperar a la pantalla final antes de tabular o el
     // foco puede quedar en el esqueleto que se reemplaza.
     await expect(page.locator("main#contenido")).toHaveCount(1);

@@ -101,7 +101,7 @@ describe("TarjetaMiTrabajo", () => {
       />,
     );
 
-    expect(screen.getByText("Gas · La Perla")).toBeInTheDocument();
+    expect(screen.getByText(/Gas · La Perla/)).toBeInTheDocument();
     expect(screen.getByText("Abierto")).toBeInTheDocument();
     expect(screen.getByText("Olor a gas en la cocina")).toBeInTheDocument();
     expect(screen.getByText(/3 postulantes/)).toBeInTheDocument();

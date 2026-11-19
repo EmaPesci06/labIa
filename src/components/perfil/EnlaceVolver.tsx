@@ -4,18 +4,29 @@ import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { cn } from "@/lib/cn";
+
 type Props = {
   /** A dónde ir si la persona llegó directo al perfil (sin pasar por la app). */
   href: string;
   /** Texto del enlace en escritorio, por ejemplo "Volver a gasistas". */
   etiquetaEscritorio: string;
+  /** Muestra el texto también en celular (en lugar de solo la flecha). */
+  mostrarEtiquetaMovil?: boolean;
+  /** Clases extra; el perfil lo usa para el color sobre el encabezado turquesa. */
+  className?: string;
 };
 
 /**
  * "Volver": en celular una flecha de 44 px, en escritorio "← Volver a gasistas". Si la persona
  * venía de otra pantalla de LabÍA vuelve ahí (conserva los filtros de la búsqueda); si no, va a `href`.
  */
-export function EnlaceVolver({ href, etiquetaEscritorio }: Props) {
+export function EnlaceVolver({
+  href,
+  etiquetaEscritorio,
+  mostrarEtiquetaMovil = false,
+  className,
+}: Props) {
   const router = useRouter();
 
   function volver(evento: React.MouseEvent<HTMLAnchorElement>) {
@@ -34,13 +45,20 @@ export function EnlaceVolver({ href, etiquetaEscritorio }: Props) {
     <Link
       href={href}
       onClick={volver}
-      aria-label="Volver"
-      className="-ml-2.5 flex min-h-11 w-fit items-center justify-center gap-1 rounded-campo px-2.5 text-texto lg:ml-0 lg:px-0 lg:text-sm lg:font-semibold lg:text-texto"
+      aria-label={mostrarEtiquetaMovil ? undefined : "Volver"}
+      className={cn(
+        "-ml-2.5 flex min-h-11 w-fit items-center justify-center gap-1 rounded-campo px-2.5 text-texto lg:ml-0 lg:px-0 lg:text-sm lg:font-semibold lg:text-texto",
+        className,
+      )}
     >
       <ChevronLeft aria-hidden strokeWidth={2} className="size-[22px] lg:hidden" />
-      <span aria-hidden className="hidden lg:inline">
-        ← {etiquetaEscritorio}
-      </span>
+      {mostrarEtiquetaMovil ? (
+        <span>{etiquetaEscritorio}</span>
+      ) : (
+        <span aria-hidden className="hidden lg:inline">
+          ← {etiquetaEscritorio}
+        </span>
+      )}
     </Link>
   );
 }

@@ -83,6 +83,12 @@ test.describe("Mis trabajos del cliente (LAB-29)", () => {
     await expect(page.getByText(/Presupuesto estimado\s\$\s40\.000/)).toBeVisible();
     await expect(page.getByText(/Seña\s\$\s10\.000/)).toBeVisible();
 
+    // Antes de elegir, ningún postulante muestra su WhatsApp: ni en el DOM ni en el payload de RSC.
+    // El número se libera recién cuando el cliente elige a alguien (LAB-29).
+    const htmlAntesDeElegir = await page.content();
+    expect(htmlAntesDeElegir).not.toMatch(/\+?549\d{8,}/);
+    expect(htmlAntesDeElegir).not.toContain("wa.me");
+
     // 1. Elegir a Martín (en "Más recientes" aparece primero Diego: el botón se busca por su tarjeta)
     const botonElegir = page
       .getByRole("article", { name: "Postulación de Martín G." })

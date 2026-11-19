@@ -3,7 +3,6 @@ import {
   Button,
   Container,
   Head,
-  Hr,
   Html,
   Link,
   Preview,
@@ -12,50 +11,168 @@ import {
 } from "@react-email/components";
 import type { CSSProperties, ReactNode } from "react";
 
-// Los emails no pueden usar los tokens CSS de la app: van estilos en línea con la marca.
-// Tipografía del sistema por compatibilidad con los clientes de correo.
-export const COLOR_AZUL = "#232F49";
-const AZUL = COLOR_AZUL;
-const NARANJA = "#B84A25";
-const TEXTO = "#1F2937";
-const GRIS = "#5B6472";
+// Los clientes de correo no leen variables CSS: los colores van fijos, tomados de los tokens de
+// "Verano en la costa" (src/app/globals.css). Baloo 2 y Nunito Sans llegan por Google Fonts y, si
+// no cargan, usan la tipografía de sistema de respaldo.
+export const TURQUESA = "#0E7C86";
+export const TEXTO = "#123B4A";
+export const ARENA = "#FFF3D6";
+const BLANCO = "#FFFFFF";
 
-const fuente =
-  "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+const titular = "'Baloo 2', 'Trebuchet MS', Arial, sans-serif";
+const cuerpo = "'Nunito Sans', Arial, Helvetica, sans-serif";
+
+const rayas = (color: string) =>
+  `repeating-linear-gradient(90deg, ${color} 0 18px, ${BLANCO} 18px 36px)`;
 
 const estilos = {
-  cuerpo: { backgroundColor: "#F4F5F7", margin: 0, padding: "24px 12px", fontFamily: fuente },
-  contenedor: {
-    maxWidth: 520,
-    margin: "0 auto",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 14,
+  cuerpo: {
+    backgroundColor: ARENA,
+    color: TEXTO,
+    margin: 0,
+    padding: "24px 12px",
+    fontFamily: cuerpo,
+  },
+  contenedor: { maxWidth: 600, margin: "0 auto" },
+  marca: {
+    margin: "0 0 16px",
+    textAlign: "center",
+    color: TURQUESA,
+    fontFamily: titular,
+    fontSize: 30,
+    lineHeight: "30px",
+    fontWeight: 800,
+  },
+  tarjeta: {
+    backgroundColor: BLANCO,
+    borderRadius: 28,
     overflow: "hidden",
   },
-  cabecera: { backgroundColor: AZUL, padding: "18px 24px" },
-  marca: { margin: 0, color: "#FFFFFF", fontSize: 22, fontWeight: 700, letterSpacing: 0.2 },
-  contenido: { padding: "24px 24px 8px" },
-  pie: { padding: "0 24px 24px" },
-  textoPie: { margin: "8px 0 0", color: GRIS, fontSize: 12, lineHeight: "18px" },
+  toldo: { height: 18, backgroundColor: TURQUESA, backgroundImage: rayas(TURQUESA) },
+  toldoSuspendida: { height: 18, backgroundColor: TEXTO, backgroundImage: rayas(TEXTO) },
+  toldoTexto: { margin: 0, fontSize: 1, lineHeight: "18px", color: BLANCO },
+  cabecera: { padding: "24px 32px 20px", backgroundColor: TURQUESA, color: BLANCO },
+  cabeceraSuspendida: { padding: "24px 32px 20px", backgroundColor: TEXTO, color: BLANCO },
+  titulo: {
+    margin: 0,
+    color: BLANCO,
+    fontFamily: titular,
+    fontSize: 40,
+    lineHeight: "39px",
+    fontWeight: 800,
+  },
+  subtitulo: { margin: "8px 0 0", color: BLANCO, fontSize: 18, lineHeight: "25px" },
+  contenido: { padding: "24px 32px" },
+  pie: { margin: "16px 0 0", textAlign: "center", fontSize: 14, lineHeight: "21px" },
 } satisfies Record<string, CSSProperties>;
 
-export const estilosTexto = {
-  titulo: {
-    margin: "0 0 12px",
-    color: AZUL,
-    fontSize: 22,
-    lineHeight: "28px",
-    fontWeight: 700,
-  },
-  parrafo: { margin: "0 0 14px", color: TEXTO, fontSize: 16, lineHeight: "24px" },
-  chico: { margin: "0 0 10px", color: GRIS, fontSize: 14, lineHeight: "20px" },
-  tarjeta: {
-    margin: "0 0 12px",
-    padding: "12px 14px",
-    border: "1px solid #E2E5EA",
-    borderRadius: 10,
-  },
-} satisfies Record<string, CSSProperties>;
+/** Párrafo del cuerpo: texto corrido de 17 px. */
+export function Parrafo({ children }: { children: ReactNode }) {
+  return (
+    <Text style={{ margin: "0 0 16px", fontSize: 17, lineHeight: "25px", color: TEXTO }}>
+      {children}
+    </Text>
+  );
+}
+
+/** Caja de color arena (radio 20) con una etiqueta chica, un dato grande y un detalle opcional. */
+export function Tarjeta({
+  etiqueta,
+  titulo,
+  detalle,
+}: {
+  etiqueta: string;
+  titulo: ReactNode;
+  detalle?: string;
+}) {
+  return (
+    <Section
+      style={{
+        backgroundColor: ARENA,
+        borderRadius: 20,
+        padding: "14px 20px",
+        margin: "0 0 16px",
+      }}
+    >
+      <Text style={{ margin: 0, fontSize: 15, lineHeight: "21px", color: TEXTO }}>{etiqueta}</Text>
+      <Text
+        style={{
+          margin: "2px 0 0",
+          fontFamily: titular,
+          fontSize: 24,
+          lineHeight: "28px",
+          fontWeight: 800,
+          color: TEXTO,
+        }}
+      >
+        {titulo}
+      </Text>
+      {detalle ? (
+        <Text style={{ margin: "4px 0 0", fontSize: 16, lineHeight: "22px", color: TEXTO }}>
+          {detalle}
+        </Text>
+      ) : null}
+    </Section>
+  );
+}
+
+/** Botón principal: turquesa, alto 60, radio 18, texto blanco. */
+export function BotonAccion({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <Section style={{ margin: "8px 0 16px" }}>
+      <Button
+        href={href}
+        style={{
+          display: "block",
+          backgroundColor: TURQUESA,
+          color: BLANCO,
+          borderRadius: 18,
+          padding: "19px 24px",
+          fontFamily: cuerpo,
+          fontSize: 19,
+          fontWeight: 700,
+          lineHeight: "22px",
+          textAlign: "center",
+          textDecoration: "none",
+        }}
+      >
+        {children}
+      </Button>
+    </Section>
+  );
+}
+
+/** Acción secundaria: enlace en negrita, centrado. */
+export function EnlaceSecundario({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <Text style={{ margin: "0 0 16px", textAlign: "center" }}>
+      <Link
+        href={href}
+        style={{ color: TEXTO, fontSize: 16, fontWeight: 700, textDecoration: "underline" }}
+      >
+        {children}
+      </Link>
+    </Text>
+  );
+}
+
+/** Nota al pie de la tarjeta, separada por una línea arena de 2 px. */
+export function Nota({ children }: { children: ReactNode }) {
+  return (
+    <Text
+      style={{
+        margin: "8px 0 0",
+        paddingTop: 14,
+        borderTop: `2px solid ${ARENA}`,
+        fontSize: 15,
+        lineHeight: "22px",
+        color: TEXTO,
+      }}
+    >
+      {children}
+    </Text>
+  );
+}
 
 /** Datos del pie que arma `enviarEmail`: las plantillas no los calculan. */
 export type DatosPie = {
@@ -70,61 +187,80 @@ export type DatosPie = {
 type Props = {
   /** Texto que se ve en la bandeja de entrada junto al asunto. */
   previa: string;
+  /** Título grande de la cabecera. */
+  titulo: string;
+  /** Línea debajo del título, dentro de la cabecera. */
+  subtitulo: string;
+  /** `suspendida` cambia la cabecera y el toldo a azul noche. */
+  variante?: "turquesa" | "suspendida";
+  /** Por qué le llega este email. Va en el pie. */
+  motivo: string;
   pie: DatosPie;
+  /** Muestra el enlace "Elegir qué emails recibo" (requiere ingresar). */
+  conPreferencias?: boolean;
+  /** Muestra el enlace de baja. Solo en los emails de novedades. */
+  conBaja?: boolean;
   children: ReactNode;
 };
 
-export function Layout({ previa, pie, children }: Props) {
+export function Layout({
+  previa,
+  titulo,
+  subtitulo,
+  variante = "turquesa",
+  motivo,
+  pie,
+  conPreferencias = false,
+  conBaja = false,
+  children,
+}: Props) {
+  const suspendida = variante === "suspendida";
   return (
     <Html lang="es-AR">
-      <Head />
+      <Head>
+        {/* eslint-disable-next-line @next/next/no-page-custom-font -- el email no pasa por _document */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito+Sans:wght@400;700&display=swap"
+        />
+      </Head>
       <Preview>{previa}</Preview>
       <Body style={estilos.cuerpo}>
         <Container style={estilos.contenedor}>
-          <Section style={estilos.cabecera}>
-            <Text style={estilos.marca}>LabÍA</Text>
+          <Text style={estilos.marca}>LabÍA</Text>
+          <Section style={estilos.tarjeta}>
+            <Section style={suspendida ? estilos.toldoSuspendida : estilos.toldo}>
+              <Text style={estilos.toldoTexto}>&nbsp;</Text>
+            </Section>
+            <Section style={suspendida ? estilos.cabeceraSuspendida : estilos.cabecera}>
+              {/* Un párrafo con rol de título: el texto plano no lo pasa a mayúsculas, como sí hace con h1. */}
+              <Text role="heading" aria-level={1} style={estilos.titulo}>
+                {titulo}
+              </Text>
+              <Text style={estilos.subtitulo}>{subtitulo}</Text>
+            </Section>
+            <Section style={estilos.contenido}>{children}</Section>
           </Section>
-          <Section style={estilos.contenido}>{children}</Section>
-          <Section style={estilos.pie}>
-            <Hr style={{ borderColor: "#E2E5EA", margin: "8px 0 12px" }} />
-            <Text style={estilos.textoPie}>
-              Recibís este email porque tenés cuenta en LabÍA.
-              <br />
-              <Link href={pie.urlPreferencias} style={{ color: GRIS }}>
-                Cambiar mis preferencias de email
+          <Text style={estilos.pie}>
+            {motivo}
+            <br />
+            LabÍA, Mar del Plata
+            {conPreferencias || conBaja ? <br /> : null}
+            {conPreferencias ? (
+              <Link href={pie.urlPreferencias} style={{ color: TEXTO, fontWeight: 700 }}>
+                Elegir qué emails recibo
               </Link>
-              {" · "}
-              <Link href={pie.urlBaja} style={{ color: GRIS }}>
+            ) : null}
+            {conPreferencias && conBaja ? " · " : null}
+            {conBaja ? (
+              <Link href={pie.urlBaja} style={{ color: TEXTO, fontWeight: 700 }}>
                 Darme de baja de estos avisos
               </Link>
-            </Text>
-          </Section>
+            ) : null}
+          </Text>
         </Container>
       </Body>
     </Html>
-  );
-}
-
-/** Botón de acción principal: naranja `#B84A25` con texto blanco. */
-export function BotonAccion({ href, children }: { href: string; children: ReactNode }) {
-  return (
-    <Section style={{ margin: "8px 0 18px" }}>
-      <Button
-        href={href}
-        style={{
-          backgroundColor: NARANJA,
-          color: "#FFFFFF",
-          fontSize: 16,
-          fontWeight: 700,
-          textDecoration: "none",
-          borderRadius: 10,
-          padding: "13px 22px",
-          display: "inline-block",
-        }}
-      >
-        {children}
-      </Button>
-    </Section>
   );
 }
 
