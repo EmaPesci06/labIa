@@ -127,14 +127,19 @@ export function FormularioTrabajo({
 
   const barrioElegido = barrios.find((b) => b.id === barrioId);
   const opcionesOficio = OFICIOS.map((o) => ({ valor: o, etiqueta: ETIQUETA_OFICIO[o] }));
-  const opcionesUrgencia = URGENCIAS.map((u) => ({ valor: u, etiqueta: ETIQUETA_URGENCIA[u] }));
+  // Textos del boceto "Publicar un trabajo": "Hoy" en vez de "Lo antes posible".
+  const etiquetasFormulario: Record<UrgenciaTrabajo, string> = {
+    ...ETIQUETA_URGENCIA,
+    lo_antes_posible: "Hoy",
+  };
+  const opcionesUrgencia = URGENCIAS.map((u) => ({ valor: u, etiqueta: etiquetasFormulario[u] }));
 
   return (
     <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-10">
       <form
         action={accion}
         noValidate
-        className="flex min-w-0 flex-1 flex-col gap-[18px] lg:rounded-[22px] lg:bg-superficie lg:p-8"
+        className="flex min-w-0 flex-1 flex-col gap-4 lg:max-w-[560px] lg:rounded-[22px] lg:bg-superficie lg:p-8"
       >
         <input type="hidden" name="oficio" value={oficio ?? ""} />
         <input type="hidden" name="barrioId" value={barrioId ?? ""} />
@@ -171,7 +176,8 @@ export function FormularioTrabajo({
 
         <Campo
           variante="area"
-          etiqueta="Contá qué pasa"
+          etiqueta="Contalo con tus palabras"
+          ayuda="No pongas tu teléfono ni tu dirección: no hace falta."
           name="descripcion"
           placeholder="Desde cuándo pasa, qué ya probaste, cualquier dato que ayude a presupuestar"
           rows={5}
@@ -183,7 +189,7 @@ export function FormularioTrabajo({
         />
 
         <fieldset className="flex flex-col gap-1.5">
-          <legend className="mb-1.5 text-sm font-semibold text-texto">Barrio</legend>
+          <legend className="mb-1.5 text-base font-bold text-texto">¿En qué barrio?</legend>
           <div role="radiogroup" aria-label="Barrio" className="flex flex-wrap gap-x-2">
             {chipsBarrio.map((b) => (
               <Chip
@@ -229,7 +235,7 @@ export function FormularioTrabajo({
         </fieldset>
 
         <fieldset className="flex flex-col gap-1.5">
-          <legend className="mb-1.5 text-sm font-semibold text-texto">¿Para cuándo?</legend>
+          <legend className="mb-1.5 text-base font-bold text-texto">¿Para cuándo?</legend>
           <GrupoChips
             tipo="unica"
             etiqueta="¿Para cuándo?"
@@ -255,10 +261,10 @@ export function FormularioTrabajo({
             <button
               type="button"
               onClick={() => entradaFotos.current?.click()}
-              className="flex min-h-[72px] items-center justify-center gap-2 rounded-boton border-[1.5px] border-dashed border-texto bg-superficie text-[15px] font-semibold text-texto hover:bg-superficie"
+              className="flex min-h-12 items-center justify-center gap-2 self-start rounded-boton border-[3px] border-dashed border-texto bg-transparent px-[18px] text-base font-bold text-texto hover:bg-superficie focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-texto"
             >
               <ImagePlus aria-hidden strokeWidth={2} className="size-[22px] text-texto" />
-              Agregar fotos (opcional)
+              Sumar una foto
             </button>
           ) : null}
           {fotos.length > 0 ? (
@@ -316,7 +322,7 @@ export function FormularioTrabajo({
           cargando={pendiente}
           className="w-full lg:w-auto lg:self-start lg:px-7"
         >
-          Publicar trabajo
+          Publicar el trabajo
         </Boton>
       </form>
 

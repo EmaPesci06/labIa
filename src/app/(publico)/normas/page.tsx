@@ -1,19 +1,18 @@
 import type { Metadata } from "next";
 
 import { ListaNormas, QueHaceLabia } from "@/components/normas/ListaNormas";
+import { Encabezado } from "@/components/ui/Encabezado";
 
 export const metadata: Metadata = { title: "Normas de seguridad · LabÍA" };
 
-/** Normas de seguridad, de solo lectura y sin sesión (LAB-20). */
+/** Normas de seguridad, de solo lectura y sin sesión (LAB-20, LAB-80: boceto `App-Normas`). */
 export default function Normas() {
   return (
-    <div className="flex flex-col gap-5 pt-2">
-      <div className="flex flex-col gap-1.5">
-        <h1 className="font-titulo text-[30px] leading-tight">Normas de seguridad</h1>
-        <p className="text-[15px] leading-snug text-texto">
-          Los clientes te abren la puerta de su casa. Para que confíen en vos, te comprometés a:
-        </p>
-      </div>
+    <div className="flex flex-col gap-3.5 pt-2 lg:relative lg:left-1/2 lg:w-[min(720px,calc(100vw-80px))] lg:-translate-x-1/2 lg:gap-5">
+      <Encabezado
+        titulo="Normas de seguridad"
+        descripcion="A lo que se compromete cada profesional antes de aparecer en LabÍA."
+      />
       <ListaNormas />
       <QueHaceLabia />
     </div>

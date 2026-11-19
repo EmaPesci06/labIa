@@ -83,7 +83,7 @@ test.describe("perfil público: visitante sin sesión", () => {
     expect(html).not.toMatch(/mailto:|[\w.]+@[\w-]+\.\w+/);
     expect(html).not.toMatch(/\bDNI\b/);
 
-    const contactar = page.getByRole("link", { name: "Contactar por WhatsApp" }).first();
+    const contactar = page.getByRole("link", { name: "Escribirle por WhatsApp" }).first();
     await expect(contactar).toHaveAttribute(
       "href",
       `/ingresar?volver=${encodeURIComponent(`/profesionales/${ID_PUBLICADO}`)}`,
@@ -135,9 +135,9 @@ test.describe("perfil público: cliente con sesión", () => {
     await page.goto(`/profesionales/${ID_PUBLICADO}`);
     await expect(page.getByRole("heading", { level: 1, name: "Martín Gómez" })).toBeVisible();
     await expect(page.getByText("a 1,2 km").filter({ visible: true }).first()).toBeVisible();
-    await expect(page.getByRole("link", { name: "Contactar por WhatsApp" })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Escribirle por WhatsApp" })).toHaveCount(0);
     await expect(
-      page.getByRole("button", { name: "Contactar por WhatsApp" }).first(),
+      page.getByRole("button", { name: "Escribirle por WhatsApp" }).first(),
     ).toBeVisible();
     const html = await page.content();
     expect(html).not.toMatch(/wa\.me|whatsapp\.com/i);
@@ -175,19 +175,19 @@ test.describe("contacto por WhatsApp: cliente con sesión", () => {
     expect(await page.content()).not.toContain(WHATSAPP_FALSO);
 
     const abrirHoja = page
-      .getByRole("button", { name: "Contactar por WhatsApp" })
+      .getByRole("button", { name: "Escribirle por WhatsApp" })
       .filter({ visible: true })
       .first();
     await abrirHoja.click();
 
-    const hoja = page.getByRole("dialog", { name: "Antes de contactar" });
+    const hoja = page.getByRole("dialog", { name: /Escribile a .+ por WhatsApp/ });
     await expect(hoja).toBeVisible();
     await expect(hoja.getByRole("listitem")).toHaveCount(4);
     await expect(hoja.getByText("Pedí el presupuesto por escrito.")).toBeVisible();
     await capturar(page, "contacto-hoja", "claro");
     await sinViolacionesGraves(page);
 
-    await hoja.getByRole("button", { name: "Cancelar" }).click();
+    await hoja.getByRole("button", { name: "Ahora no" }).click();
     await expect(hoja).toBeHidden();
 
     // Cancelar no abre nada. Interceptamos wa.me para no salir a internet al confirmar.
@@ -213,7 +213,7 @@ test.describe("contacto por WhatsApp: cliente con sesión", () => {
     await iniciarSesion(context, baseURL ?? "", "tok-dueno-revision");
     await page.goto(`/profesionales/${ID_PUBLICADO}`);
     await expect(page.getByRole("heading", { level: 1, name: "Martín Gómez" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Contactar por WhatsApp" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Escribirle por WhatsApp" })).toHaveCount(0);
     expect(await page.content()).not.toContain(WHATSAPP_FALSO);
   });
 });
@@ -230,7 +230,7 @@ test.describe("perfil público: el dueño", () => {
       page.getByRole("status").filter({ hasText: "Tu perfil está publicado." }),
     ).toBeVisible();
     await expect(page.getByRole("link", { name: "Editar perfil" }).first()).toBeVisible();
-    await expect(page.getByText("Contactar por WhatsApp")).toHaveCount(0);
+    await expect(page.getByText("Escribirle por WhatsApp")).toHaveCount(0);
     await capturar(page, "perfil-duenio", "claro");
   });
 
@@ -292,15 +292,15 @@ for (const tema of ["light", "dark"] as const) {
 
       // LAB-25: la hoja "Antes de contactar" abierta también tiene que pasar axe y verse en ambos temas.
       await page
-        .getByRole("button", { name: "Contactar por WhatsApp" })
+        .getByRole("button", { name: "Escribirle por WhatsApp" })
         .filter({ visible: true })
         .first()
         .click();
-      await expect(page.getByRole("dialog", { name: "Antes de contactar" })).toBeVisible();
+      await expect(page.getByRole("dialog", { name: /Escribile a .+ por WhatsApp/ })).toBeVisible();
       await capturar(page, "contacto-hoja", nombreTema);
       await sinViolacionesGraves(page);
       await page.keyboard.press("Escape");
-      await expect(page.getByRole("dialog", { name: "Antes de contactar" })).toBeHidden();
+      await expect(page.getByRole("dialog", { name: /Escribile a .+ por WhatsApp/ })).toBeHidden();
 
       await context.clearCookies();
       await iniciarSesion(context, baseURL ?? "", "tok-dueno");

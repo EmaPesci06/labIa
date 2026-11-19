@@ -20,8 +20,14 @@ describe("not-found", () => {
 describe("sin-conexion", () => {
   it("muestra el mensaje de la tarea", () => {
     render(<SinConexion />);
-    expect(screen.getByRole("heading", { level: 1, name: "Sin conexión" })).toBeInTheDocument();
-    expect(screen.getByText("Sin conexión. Revisá tu internet y volvé a intentar.")).toBeVisible();
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Te quedaste sin conexión" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Revisá tu internet y volvé a intentar. Lo que estabas escribiendo no se perdió.",
+      ),
+    ).toBeVisible();
   });
 });
 
