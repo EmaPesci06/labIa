@@ -28,30 +28,30 @@ async function Contenido({ searchParams }: PageProps<"/ingresar">) {
   return (
     <>
       {error ? (
-        <p role="alert" className="rounded-campo bg-sol p-3.5 text-sm font-semibold text-sobre-sol">
+        <p role="alert" className="rounded-campo bg-sol p-3.5 text-sm font-bold text-sobre-sol">
           {error}
         </p>
       ) : null}
       <BotonGoogle volver={volver} />
       <SeparadorO />
       <FormularioIngreso volver={volver} />
-      <p className="pt-2 text-center text-[15px] text-texto">
-        ¿Todavía no tenés cuenta?{" "}
+      <div className="-mx-5 mt-auto -mb-8 flex items-center justify-between rounded-t-hoja bg-superficie px-5 pt-4 pb-5 lg:mx-0 lg:mt-6 lg:mb-0 lg:rounded-tarjeta">
+        <span className="text-base text-texto">¿Primera vez?</span>
         <Link
           href="/"
-          className="inline-block py-3 font-bold text-texto underline underline-offset-2"
+          className="inline-flex min-h-12 items-center rounded-boton border-[3px] border-texto px-5 text-base font-bold text-texto hover:bg-fondo"
         >
           Crear cuenta
         </Link>
-      </p>
+      </div>
     </>
   );
 }
 
 export default function Ingresar(props: PageProps<"/ingresar">) {
   return (
-    <div className="flex flex-col gap-[18px]">
-      <EncabezadoAuth titulo="Ingresá a LabÍA" bajada="Con tu email o con tu cuenta de Google." />
+    <div className="flex flex-1 flex-col gap-4 pt-1">
+      <EncabezadoAuth titulo="¡Hola de nuevo!" volverA={null} />
       <Suspense fallback={null}>
         <Contenido {...props} />
       </Suspense>

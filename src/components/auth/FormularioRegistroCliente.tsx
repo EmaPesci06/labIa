@@ -17,8 +17,8 @@ import { SelectorBarrio } from "./SelectorBarrio";
 const CAMPOS = ["nombreCompleto", "whatsapp", "email", "contrasena", "barrio"] as const;
 
 /**
- * Registro de cliente con email (LAB-17). La validación corre dos veces: acá para errores
- * inmediatos y en la Server Action, que es la que vale.
+ * Registro de cliente con email (LAB-17, rehecho en LAB-76): boceto `App-RegistroCliente`.
+ * La validación corre dos veces: acá para errores inmediatos y en la Server Action, que es la que vale.
  */
 export function FormularioRegistroCliente({ barrios }: { barrios: BarrioOpcion[] }) {
   const [estado, accion, pendiente] = useActionState<EstadoRegistroCliente, FormData>(
@@ -50,26 +50,20 @@ export function FormularioRegistroCliente({ barrios }: { barrios: BarrioOpcion[]
     <form
       action={accion}
       onSubmit={validarAntes}
-      onChange={(e) => e.target instanceof HTMLInputElement && limpiarError(e.target.name)}
+      onChange={(e) =>
+        (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) &&
+        limpiarError(e.target.name)
+      }
       noValidate
-      className="flex flex-col gap-3.5"
+      className="flex flex-col gap-3"
     >
       <Campo
-        etiqueta="Nombre y apellido"
+        etiqueta="Nombre"
         name="nombreCompleto"
-        autoComplete="name"
-        placeholder="Laura Fernández"
+        autoComplete="given-name"
+        placeholder="Carla"
         defaultValue={estado.valores?.nombreCompleto}
         error={errores.nombreCompleto}
-        required
-      />
-      <Campo
-        variante="telefono"
-        etiqueta="Celular de WhatsApp"
-        name="whatsapp"
-        placeholder="223 555-0000"
-        defaultValue={estado.valores?.whatsapp}
-        error={errores.whatsapp}
         required
       />
       <Campo
@@ -78,7 +72,7 @@ export function FormularioRegistroCliente({ barrios }: { barrios: BarrioOpcion[]
         type="email"
         autoComplete="email"
         inputMode="email"
-        placeholder="laura@email.com"
+        placeholder="carla@ejemplo.com"
         defaultValue={estado.valores?.email}
         error={errores.email}
         required
@@ -87,8 +81,18 @@ export function FormularioRegistroCliente({ barrios }: { barrios: BarrioOpcion[]
         etiqueta="Contraseña"
         name="contrasena"
         autoComplete="new-password"
-        placeholder="Mínimo 8 caracteres"
+        ayuda="Al menos 8 caracteres."
         error={errores.contrasena}
+        required
+      />
+      <Campo
+        variante="telefono"
+        etiqueta="Tu WhatsApp"
+        name="whatsapp"
+        placeholder="223 555 0123"
+        ayuda="Lo ven solo los profesionales que elijas."
+        defaultValue={estado.valores?.whatsapp}
+        error={errores.whatsapp}
         required
       />
       <SelectorBarrio
@@ -98,42 +102,51 @@ export function FormularioRegistroCliente({ barrios }: { barrios: BarrioOpcion[]
         alCambiar={() => limpiarError("barrio")}
       />
 
-      {estado.emailExistente ? (
-        <p role="alert" className="text-sm font-semibold text-error">
-          Ya hay una cuenta con ese email. ¿Querés{" "}
-          <Link href="/ingresar" className="inline-block py-2 underline underline-offset-2">
-            ingresar
+      <label className="flex min-h-11 items-center gap-3 text-[15px] leading-[1.3] text-texto">
+        <input
+          type="checkbox"
+          name="mayorEdad"
+          defaultChecked
+          className="size-6 shrink-0 accent-accion"
+        />
+        <span>
+          Soy mayor de 18 y acepto los{" "}
+          <Link
+            href="/terminos"
+            prefetch={false}
+            className="font-bold text-texto underline decoration-2 underline-offset-4"
+          >
+            términos
+          </Link>{" "}
+          y la{" "}
+          <Link
+            href="/privacidad"
+            prefetch={false}
+            className="font-bold text-texto underline decoration-2 underline-offset-4"
+          >
+            privacidad
           </Link>
-          ?
-        </p>
-      ) : null}
+          .
+        </span>
+      </label>
+
       {estado.mensaje ? (
-        <p role="alert" className="text-sm font-semibold text-error">
+        <p role="alert" className="text-[15px] font-bold text-error">
           {estado.mensaje}
         </p>
       ) : null}
-      <Boton type="submit" variante="cliente" tamano="grande" bloque cargando={pendiente}>
-        Crear cuenta
-      </Boton>
-      <p className="text-center text-[13px] leading-snug text-texto">
-        Al crear tu cuenta aceptás los{" "}
+
+      <div className="flex flex-col pt-1">
+        <Boton type="submit" tamano="grande" bloque cargando={pendiente}>
+          Crear cuenta
+        </Boton>
         <Link
-          href="/terminos"
-          prefetch={false}
-          className="inline-block py-2 font-bold text-texto underline underline-offset-2"
+          href="/registro/profesional"
+          className="inline-flex min-h-11 items-center self-center text-[15px] font-bold text-texto underline decoration-2 underline-offset-4"
         >
-          Términos
-        </Link>{" "}
-        y la{" "}
-        <Link
-          href="/privacidad"
-          prefetch={false}
-          className="inline-block py-2 font-bold text-texto underline underline-offset-2"
-        >
-          Política de privacidad
+          ¿Ofrecés un oficio? Registrate como profesional
         </Link>
-        .
-      </p>
+      </div>
     </form>
   );
 }
