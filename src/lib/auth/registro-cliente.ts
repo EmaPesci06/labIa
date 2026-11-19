@@ -136,11 +136,16 @@ export async function completarRegistroCliente(
   _anterior: EstadoRegistroCliente,
   datos: FormData,
 ): Promise<EstadoRegistroCliente> {
-  const entrada = { whatsapp: texto(datos, "whatsapp"), barrio: texto(datos, "barrio") };
+  const entrada = {
+    whatsapp: texto(datos, "whatsapp"),
+    barrio: texto(datos, "barrio"),
+    mayorEdad: texto(datos, "mayorEdad"),
+  };
+  const valores = { whatsapp: entrada.whatsapp, barrio: entrada.barrio };
   const resultado = esquemaCompletarCliente.safeParse(entrada);
-  if (!resultado.success) return { errores: erroresPorCampo(resultado.error), valores: entrada };
+  if (!resultado.success) return { errores: erroresPorCampo(resultado.error), valores };
 
-  if (!supabaseConfigurado()) return { mensaje: MENSAJE_SIN_SUPABASE, valores: entrada };
+  if (!supabaseConfigurado()) return { mensaje: MENSAJE_SIN_SUPABASE, valores };
   const supabase = await crearClienteServidor();
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) redirect("/ingresar?volver=%2Fregistro%2Fcliente%2Fcompletar");
@@ -151,17 +156,17 @@ export async function completarRegistroCliente(
     .eq("id", auth.user.id)
     .maybeSingle();
   if (!fila || fila.estado !== "activa" || fila.rol !== "cliente") {
-    return { mensaje: "Esta pantalla es solo para cuentas de cliente.", valores: entrada };
+    return { mensaje: "Esta pantalla es solo para cuentas de cliente.", valores };
   }
 
   const limite = await mensajeSiSuperaElLimite("completar-registro");
-  if (limite) return { mensaje: limite, valores: entrada };
+  if (limite) return { mensaje: limite, valores };
 
   const guardado = await guardarDatosDeCliente(supabase, auth.user.id, {
     whatsapp: resultado.data.whatsapp,
     barrioId: resultado.data.barrio,
   });
-  if (!guardado) return { mensaje: MENSAJE_ERROR_GENERAL, valores: entrada };
+  if (!guardado) return { mensaje: MENSAJE_ERROR_GENERAL, valores };
 
   await registrarEventoServidor(auth.user.id, "registro_completado", { rol: "cliente" });
   redirect("/inicio");

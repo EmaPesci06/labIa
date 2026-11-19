@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { rolDeLaSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 
-import { registrarCliente } from "./registro-cliente";
+import { completarRegistroCliente, registrarCliente } from "./registro-cliente";
 
 const { redirigir } = vi.hoisted(() => ({
   redirigir: vi.fn((destino: string) => {
@@ -97,5 +97,33 @@ describe("registrarCliente (LAB-76)", () => {
 
     await expect(registrarCliente({}, datosValidos())).rejects.toThrow("NEXT_REDIRECT:/trabajos");
     expect(signUp).not.toHaveBeenCalled();
+  });
+});
+
+describe("completarRegistroCliente (alta con Google)", () => {
+  const datos = (conCasilla: boolean) => {
+    const d = new FormData();
+    d.set("whatsapp", "2235550123");
+    d.set("barrio", "17");
+    if (conCasilla) d.set("mayorEdad", "on");
+    return d;
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(supabaseConfigurado).mockReturnValue(true);
+  });
+
+  it("sin la casilla devuelve el error y no toca la base ni la sesión", async () => {
+    const estado = await completarRegistroCliente({}, datos(false));
+    expect(estado.errores?.mayorEdad).toMatch(/mayor de 18/);
+    expect(crearClienteServidor).not.toHaveBeenCalled();
+  });
+
+  it("con la casilla sigue adelante (llega a consultar la sesión)", async () => {
+    const getUser = vi.fn(async () => ({ data: { user: null } }));
+    vi.mocked(crearClienteServidor).mockResolvedValue({ auth: { getUser } } as never);
+    await expect(completarRegistroCliente({}, datos(true))).rejects.toThrow("NEXT_REDIRECT");
+    expect(getUser).toHaveBeenCalled();
   });
 });

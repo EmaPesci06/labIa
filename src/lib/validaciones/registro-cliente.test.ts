@@ -8,6 +8,7 @@ import {
   BARRIOS_FRECUENTES,
   esquemaCompletarCliente,
   esquemaRegistroCliente,
+  MENSAJE_MAYOR_EDAD,
   normalizarBusqueda,
   separarNombre,
 } from "./registro-cliente";
@@ -103,12 +104,29 @@ describe("esquemaRegistroCliente", () => {
 });
 
 describe("esquemaCompletarCliente", () => {
-  it("pide solo WhatsApp y barrio", () => {
-    expect(esquemaCompletarCliente.parse({ whatsapp: "2235551234", barrio: "51" })).toEqual({
+  it("pide WhatsApp, barrio y la casilla de mayor de 18 y términos", () => {
+    expect(
+      esquemaCompletarCliente.parse({ whatsapp: "2235551234", barrio: "51", mayorEdad: "on" }),
+    ).toEqual({
       whatsapp: "+5492235551234",
       barrio: 51,
+      mayorEdad: "on",
     });
-    expect(esquemaCompletarCliente.safeParse({ whatsapp: "", barrio: "" }).success).toBe(false);
+    expect(
+      esquemaCompletarCliente.safeParse({ whatsapp: "", barrio: "", mayorEdad: "on" }).success,
+    ).toBe(false);
+  });
+
+  it("sin la casilla no valida (el alta con Google no la saltea)", () => {
+    for (const mayorEdad of ["", undefined]) {
+      const r = esquemaCompletarCliente.safeParse({
+        whatsapp: "2235551234",
+        barrio: "51",
+        mayorEdad,
+      });
+      expect(r.success).toBe(false);
+      if (!r.success) expect(erroresPorCampo(r.error).mayorEdad).toBe(MENSAJE_MAYOR_EDAD);
+    }
   });
 });
 

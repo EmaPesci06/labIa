@@ -114,6 +114,44 @@ test.describe("registro de cliente", () => {
     await expect(page).toHaveURL(/\/ingresar\?volver=/);
   });
 
+  test("el alta con Google no saltea la casilla de mayor de 18 y términos", async ({
+    page,
+    context,
+    baseURL,
+  }) => {
+    test.skip(
+      process.env.LABIA_E2E_SUPABASE_FALSO !== "1",
+      "Necesita el Supabase falso (sesión de cliente sin WhatsApp ni barrio).",
+    );
+    const sesion = {
+      access_token: "tok-cliente",
+      refresh_token: "refresh-falso",
+      token_type: "bearer",
+      expires_in: 3600,
+      expires_at: Math.floor(Date.now() / 1000) + 3600,
+      user: { id: "x", aud: "authenticated", role: "authenticated" },
+    };
+    await context.addCookies([
+      {
+        name: "sb-localhost-auth-token",
+        value: `base64-${Buffer.from(JSON.stringify(sesion)).toString("base64url")}`,
+        url: baseURL as string,
+      },
+    ]);
+    await page.goto("/registro/cliente/completar");
+    const casilla = page.getByRole("checkbox", { name: /mayor de 18/ });
+    await expect(casilla).not.toBeChecked();
+    await page.getByLabel("Tu WhatsApp").fill("223 555 1234");
+    await page.getByLabel("Tu barrio").selectOption({ label: "Centro" });
+    await page.getByRole("button", { name: "Terminar" }).click();
+    await expect(
+      page.getByText("Para crear la cuenta tenés que confirmar que sos mayor de 18"),
+    ).toBeVisible();
+    await expect(casilla).toHaveAttribute("aria-invalid", "true");
+    await expect(casilla).toHaveAccessibleDescription(/mayor de 18/);
+    await expect(page).toHaveURL(/\/registro\/cliente\/completar/);
+  });
+
   test("sin violaciones de axe", async ({ page }) => {
     await page.goto("/registro/cliente");
     await page.waitForLoadState("networkidle");

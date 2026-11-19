@@ -100,7 +100,10 @@ export const esquemaRegistroCliente = z.object({
   mayorEdad,
 });
 
-/** Datos que faltan cuando entró con Google (o confirmó el email): solo WhatsApp y barrio. */
-export const esquemaCompletarCliente = z.object({ whatsapp, barrio });
+/**
+ * Datos que faltan cuando entró con Google (o confirmó el email): WhatsApp y barrio, más la casilla
+ * de mayor de 18 y términos: el alta con Google no pasa por el formulario de registro.
+ */
+export const esquemaCompletarCliente = z.object({ whatsapp, barrio, mayorEdad });
 
 export const esquemaReenviar = z.object({ email });
