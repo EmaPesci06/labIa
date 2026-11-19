@@ -37,8 +37,9 @@ test.describe("Trabajos para profesionales en escritorio (LAB-45)", () => {
   test("elegir un trabajo de la lista muestra su detalle y lo marca como seleccionado", async ({
     page,
     context,
+    baseURL,
   }) => {
-    await iniciarSesion(context, "http://localhost:3000", "tok-dueno");
+    await iniciarSesion(context, baseURL!, "tok-dueno");
     await page.goto("/trabajos");
 
     await expect(page.getByText("Elegí un trabajo para ver el detalle.")).toBeVisible();
@@ -63,10 +64,11 @@ test.describe("Trabajos para profesionales en escritorio (LAB-45)", () => {
   test("al cambiar de trabajo el detalle muestra la postulación de cada uno", async ({
     page,
     context,
+    baseURL,
   }) => {
     // El reinicio del formulario al cambiar de trabajo lo cubre el test unitario de
     // DetalleTrabajoEscritorio: el Supabase falso solo tiene trabajos ya postulados.
-    await iniciarSesion(context, "http://localhost:3000", "tok-dueno");
+    await iniciarSesion(context, baseURL!, "tok-dueno");
     await page.goto(`/trabajos?trabajo=${ID_GAS}`);
 
     const lista = page.getByRole("list", { name: "Lista de trabajos disponibles" });
@@ -87,8 +89,9 @@ test.describe("Trabajos para profesionales en escritorio (LAB-45)", () => {
   test("accesibilidad: el maestro-detalle no tiene violaciones serias ni críticas", async ({
     page,
     context,
+    baseURL,
   }) => {
-    await iniciarSesion(context, "http://localhost:3000", "tok-dueno");
+    await iniciarSesion(context, baseURL!, "tok-dueno");
     await page.goto(`/trabajos?trabajo=${ID_GAS}`);
     await expect(
       page.getByRole("region", { name: "Detalle: Olor a gas en la cocina" }),

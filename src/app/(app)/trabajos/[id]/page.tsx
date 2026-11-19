@@ -1,21 +1,27 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
 
-import { Avatar } from "@/components/ui/Avatar";
-import { EtiquetaMono } from "@/components/ui/EtiquetaMono";
-import { Insignia } from "@/components/ui/Insignia";
+import { BotonReportar } from "@/components/reportes/BotonReportar";
 import { FormularioPostulacion } from "@/components/trabajos/FormularioPostulacion";
 import { GaleriaFotosTrabajo } from "@/components/trabajos/GaleriaFotosTrabajo";
-import { BotonReportar } from "@/components/reportes/BotonReportar";
+import { Encabezado } from "@/components/ui/Encabezado";
 import { formatearDistancia, formatearPesos, haceCuanto } from "@/lib/formato";
 import { obtenerSesion } from "@/lib/sesion";
 import { obtenerTrabajoDetalle } from "@/lib/trabajos/consulta";
-import { ETIQUETA_OFICIO, ETIQUETA_URGENCIA } from "@/lib/validaciones/trabajo";
+import {
+  ETIQUETA_OFICIO,
+  ETIQUETA_URGENCIA,
+  type UrgenciaTrabajo,
+} from "@/lib/validaciones/trabajo";
 
 type PaginaDetalleTrabajoProps = {
   params: Promise<{ id: string }>;
+};
+
+const ETIQUETA_PARA: Record<UrgenciaTrabajo, string> = {
+  lo_antes_posible: "Hoy",
+  esta_semana: "Esta semana",
+  sin_apuro: "Sin apuro",
 };
 
 export async function generateMetadata({ params }: PaginaDetalleTrabajoProps): Promise<Metadata> {
@@ -47,84 +53,87 @@ export default async function PaginaDetalleTrabajo({ params }: PaginaDetalleTrab
     ? `${trabajo.cliente.nombre}${trabajo.cliente.apellidoInicial ? ` ${trabajo.cliente.apellidoInicial}.` : ""}`
     : "Cliente de LabÍA";
   const clienteNombreParaFormulario = trabajo.cliente.nombre ?? "el cliente";
-
-  const partesMono = [
-    ETIQUETA_OFICIO[trabajo.oficio],
-    trabajo.barrioNombre,
-    cuando,
-    trabajo.distanciaKm !== null ? formatearDistancia(trabajo.distanciaKm) : null,
-  ].filter((p): p is string => Boolean(p));
+  const distanciaNumero =
+    trabajo.distanciaKm !== null
+      ? formatearDistancia(trabajo.distanciaKm).replace(/^a /, "")
+      : null;
 
   return (
-    <div className="mx-auto flex w-full max-w-[560px] flex-col gap-5 pb-8">
-      {/* Botón volver a la lista */}
-      <Link
-        href="/trabajos"
-        aria-label="Volver"
-        className="flex size-11 items-center justify-center rounded-xl text-texto transition-colors hover:bg-superficie focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
-      >
-        <ChevronLeft aria-hidden strokeWidth={2.2} className="size-6" />
-      </Link>
-
-      {/* Encabezado del trabajo */}
-      <div className="flex flex-col gap-2">
-        <EtiquetaMono partes={partesMono} />
-        <h1 className="font-titulo text-[28px] leading-tight font-extrabold tracking-tight text-texto">
-          {trabajo.titulo}
-        </h1>
-        <div className="self-start pt-1">
-          <Insignia variante={trabajo.urgencia === "lo_antes_posible" ? "urgencia" : "verificada"}>
-            {ETIQUETA_URGENCIA[trabajo.urgencia]}
-          </Insignia>
-        </div>
-      </div>
-
-      {/* Descripción completa */}
-      <p className="text-base leading-relaxed whitespace-pre-line text-texto">
-        {trabajo.descripcion}
-      </p>
-
-      {/* Fotos del cliente en grilla de 2 (tocar = visor) */}
-      {trabajo.fotos.length > 0 ? (
-        <GaleriaFotosTrabajo fotos={trabajo.fotos} tituloTrabajo={trabajo.titulo} />
-      ) : null}
-
-      {/* Presupuesto estimado si lo puso */}
-      {trabajo.presupuestoEstimado !== null ? (
-        <div className="rounded-xl border border-fondo bg-superficie p-3.5 text-sm font-semibold text-texto">
-          El cliente estima {formatearPesos(trabajo.presupuestoEstimado)}
-        </div>
-      ) : null}
-
-      {/* Tarjeta del cliente */}
-      <div className="flex items-center gap-3 rounded-2xl border border-fondo bg-superficie p-3.5">
-        <Avatar nombre={clienteNombreVisible} tamano={44} />
-        <div className="flex min-w-0 flex-col gap-0.5">
-          <span className="truncate text-[15px] font-bold text-texto">{clienteNombreVisible}</span>
-          <span className="truncate text-[13px] text-texto">
-            Cliente · {trabajo.barrioNombre} · La dirección se comparte al acordar
-          </span>
-        </div>
-      </div>
-
-      {/* Formulario de postulación o estado actual */}
-      <FormularioPostulacion
-        trabajoId={trabajo.id}
-        clienteNombre={clienteNombreParaFormulario}
-        trabajoEstado={trabajo.estado}
-        publicado={perfil?.publicado ?? false}
-        miPostulacion={trabajo.miPostulacion}
+    <>
+      <Encabezado
+        variante="sol"
+        titulo={trabajo.titulo}
+        descripcion={`${ETIQUETA_OFICIO[trabajo.oficio]} · publicado ${cuando}`}
+        volver={{ href: "/trabajos", etiqueta: "Trabajos" }}
       />
 
-      {/* Reportar trabajo */}
-      <div className="flex justify-center pt-2">
-        <BotonReportar
-          objetivoTipo="trabajo"
-          objetivoId={trabajo.id}
-          tituloObjetivo={trabajo.titulo}
-          texto="Reportar trabajo"
-        />
+      <div className="mt-4 flex flex-col gap-6 pb-8 lg:mt-6 lg:flex-row lg:items-start lg:gap-8">
+        <div className="flex min-w-0 flex-1 flex-col gap-3.5">
+          {/* Descripción completa */}
+          <p className="text-[17px] leading-[1.45] whitespace-pre-line text-texto">
+            {trabajo.descripcion}
+          </p>
+
+          {/* Barrio, distancia y urgencia (boceto App-TrabajoDetalle) */}
+          <dl className="grid grid-cols-3 gap-2">
+            <div className="rounded-campo bg-superficie px-3 py-2.5">
+              <dt className="text-sm text-texto">Barrio</dt>
+              <dd className="font-bold text-texto">{trabajo.barrioNombre}</dd>
+            </div>
+            {distanciaNumero ? (
+              <div className="rounded-campo bg-superficie px-3 py-2.5">
+                <dt className="text-sm text-texto">Distancia</dt>
+                <dd className="font-bold text-texto tabular-nums">{distanciaNumero}</dd>
+              </div>
+            ) : null}
+            <div className="rounded-campo bg-superficie px-3 py-2.5">
+              <dt className="text-sm text-texto">Para</dt>
+              <dd aria-label={ETIQUETA_URGENCIA[trabajo.urgencia]} className="font-bold text-texto">
+                {ETIQUETA_PARA[trabajo.urgencia]}
+              </dd>
+            </div>
+          </dl>
+
+          {/* Fotos del cliente en grilla de 2 (tocar = visor) */}
+          {trabajo.fotos.length > 0 ? (
+            <GaleriaFotosTrabajo fotos={trabajo.fotos} tituloTrabajo={trabajo.titulo} />
+          ) : null}
+
+          {/* Presupuesto estimado si lo puso */}
+          {trabajo.presupuestoEstimado !== null ? (
+            <div className="rounded-campo bg-superficie p-3.5 text-sm font-bold text-texto">
+              El cliente estima {formatearPesos(trabajo.presupuestoEstimado)}
+            </div>
+          ) : null}
+
+          {/* Línea de quién publicó el trabajo */}
+          <p className="text-[15px] text-texto">
+            Lo publicó <strong>{clienteNombreVisible}</strong> · La dirección se comparte al
+            acordar.
+          </p>
+        </div>
+
+        <aside className="flex w-full flex-col gap-3 lg:sticky lg:top-6 lg:w-[380px] lg:shrink-0">
+          {/* Formulario de postulación o estado actual */}
+          <FormularioPostulacion
+            trabajoId={trabajo.id}
+            clienteNombre={clienteNombreParaFormulario}
+            trabajoEstado={trabajo.estado}
+            publicado={perfil?.publicado ?? false}
+            miPostulacion={trabajo.miPostulacion}
+          />
+
+          {/* Reportar trabajo */}
+          <div className="flex justify-center pt-1">
+            <BotonReportar
+              objetivoTipo="trabajo"
+              objetivoId={trabajo.id}
+              tituloObjetivo={trabajo.titulo}
+              texto="Reportar este trabajo"
+            />
+          </div>
+        </aside>
       </div>
-    </div>
+    </>
   );
 }
