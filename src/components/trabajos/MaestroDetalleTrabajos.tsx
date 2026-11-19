@@ -67,7 +67,7 @@ export function MaestroDetalleTrabajos({
     <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
       <ul
         aria-label="Lista de trabajos disponibles"
-        className="flex w-full flex-col gap-3 lg:w-[420px] lg:shrink-0"
+        className="flex w-full flex-col gap-2.5 lg:w-[420px] lg:shrink-0"
       >
         {trabajos.map((t) => {
           const seleccionado = t.id === trabajoActivo?.id;
@@ -89,7 +89,7 @@ export function MaestroDetalleTrabajos({
                 distanciaKm={t.distanciaKm}
                 yaMePostule={t.yaMePostule}
                 href={`/trabajos/${t.id}`}
-                className={seleccionado ? "shadow-sm ring-2 ring-accion transition-all" : undefined}
+                className={seleccionado ? "ring-3 ring-texto" : undefined}
               />
             </li>
           );

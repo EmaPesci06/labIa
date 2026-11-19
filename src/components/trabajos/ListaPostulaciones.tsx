@@ -1,13 +1,13 @@
-import Link from "next/link";
 import { Briefcase } from "lucide-react";
+import Link from "next/link";
 
-import { EtiquetaMono } from "@/components/ui/EtiquetaMono";
-import { Insignia } from "@/components/ui/Insignia";
 import { Tarjeta } from "@/components/ui/Tarjeta";
+import { Toldo, type ColorToldo } from "@/components/ui/Toldo";
 import { Vacio } from "@/components/ui/Vacio";
+import { cn } from "@/lib/cn";
 import { formatearPesos, haceCuanto } from "@/lib/formato";
-import type { PostulacionItem } from "@/lib/trabajos/consulta";
-import { ETIQUETA_OFICIO, ETIQUETA_URGENCIA } from "@/lib/validaciones/trabajo";
+import type { EstadoPostulacion, PostulacionItem } from "@/lib/trabajos/consulta";
+import { ETIQUETA_OFICIO } from "@/lib/validaciones/trabajo";
 
 import { BotonRetirarPostulacion } from "./BotonRetirarPostulacion";
 
@@ -15,8 +15,40 @@ type ListaPostulacionesProps = {
   postulaciones: PostulacionItem[];
 };
 
+const CONFIG_ESTADO: Record<
+  EstadoPostulacion,
+  {
+    toldo: ColorToldo;
+    etiqueta: string;
+    clasesPastilla: string;
+  }
+> = {
+  elegida: {
+    toldo: "accion",
+    etiqueta: "Te eligieron",
+    clasesPastilla: "bg-encabezado text-sobre-encabezado",
+  },
+  enviada: {
+    toldo: "sol",
+    etiqueta: "Esperando respuesta",
+    clasesPastilla: "bg-sol text-sobre-sol",
+  },
+  descartada: {
+    toldo: "texto",
+    etiqueta: "Eligieron a otra persona",
+    clasesPastilla: "bg-fondo text-texto",
+  },
+  retirada: {
+    toldo: "texto",
+    etiqueta: "Retiraste tu postulación",
+    clasesPastilla: "bg-fondo text-texto",
+  },
+};
+
 /**
- * Lista de postulaciones del profesional para /trabajos?vista=mias (LAB-27).
+ * Lista de postulaciones del profesional para /trabajos?vista=mias (LAB-27, LAB-78).
+ * Sigue los bocetos App-Postulaciones y Oscuro-Postulaciones: tarjeta con toldo superior
+ * según el estado, pastilla de estado, título en Baloo 2 800, resumen y acción.
  */
 export function ListaPostulaciones({ postulaciones }: ListaPostulacionesProps) {
   if (postulaciones.length === 0) {
@@ -30,7 +62,7 @@ export function ListaPostulaciones({ postulaciones }: ListaPostulacionesProps) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-3 lg:max-w-[720px]">
       {postulaciones.map((p) => {
         const cuando = haceCuanto(p.createdAt);
         const trabajo = p.trabajo;
@@ -39,74 +71,62 @@ export function ListaPostulaciones({ postulaciones }: ListaPostulacionesProps) {
         const oficioEtiqueta = trabajo
           ? (ETIQUETA_OFICIO[trabajo.oficio] ?? trabajo.oficio)
           : "Oficio";
+        const nombreCliente = p.cliente?.nombre ?? "El cliente";
+        const config = CONFIG_ESTADO[p.estado];
+
+        const resumenSecundario =
+          p.estado === "elegida"
+            ? `${nombreCliente}, de ${barrioTrabajo}, te va a escribir por WhatsApp.`
+            : p.estado === "enviada"
+              ? `${oficioEtiqueta} · ${barrioTrabajo} · te postulaste ${cuando}`
+              : `${oficioEtiqueta} · ${barrioTrabajo} · ${cuando}`;
 
         return (
-          <Tarjeta key={p.id} borde className="flex flex-col gap-3 p-5">
-            <div className="flex items-start justify-between gap-3">
-              <EtiquetaMono partes={[oficioEtiqueta, barrioTrabajo]} />
-              <span className="shrink-0 text-sm text-texto">{cuando}</span>
-            </div>
-
-            <div>
-              <Link
-                href={`/trabajos/${p.trabajoId}`}
-                className="rounded text-[17px] leading-snug font-bold text-texto hover:underline focus-visible:ring-2 focus-visible:ring-accion focus-visible:outline-none"
+          <Tarjeta key={p.id} como="article" className="flex flex-col overflow-hidden p-0">
+            <Toldo color={config.toldo} alto={14} />
+            <div className="flex flex-col gap-1.5 px-4 pt-3 pb-4">
+              <span
+                className={cn(
+                  "self-start rounded-[14px] px-3 py-[5px] text-[15px] font-bold",
+                  config.clasesPastilla,
+                )}
               >
-                {tituloTrabajo}
-              </Link>
-            </div>
+                {config.etiqueta}
+              </span>
 
-            {p.mensaje ? (
-              <p className="line-clamp-2 text-[15px] leading-snug text-texto">
-                &ldquo;{p.mensaje}&rdquo;
-              </p>
-            ) : null}
+              <h2 className="font-titulo text-[22px] leading-[1.1] text-texto">
+                <Link
+                  href={`/trabajos/${p.trabajoId}`}
+                  className="rounded no-underline hover:underline"
+                >
+                  {tituloTrabajo}
+                </Link>
+              </h2>
 
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-texto">
-              {p.precioEstimado ? (
-                <span>
-                  Presupuesto:{" "}
-                  <strong className="text-texto">{formatearPesos(p.precioEstimado)}</strong>
-                </span>
+              <span className="text-[15px] text-texto">{resumenSecundario}</span>
+
+              {p.mensaje ? (
+                <p className="line-clamp-2 text-[15px] leading-snug text-texto">
+                  &ldquo;{p.mensaje}&rdquo;
+                </p>
               ) : null}
-              {p.senaPropuesta ? (
-                <span>
-                  Seña propuesta:{" "}
-                  <strong className="text-texto">{formatearPesos(p.senaPropuesta)}</strong>
-                </span>
-              ) : null}
-            </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-fondo pt-2">
-              <div className="flex flex-wrap items-center gap-2">
-                {p.estado === "enviada" ? <Insignia variante="verificada">Enviada</Insignia> : null}
-                {p.estado === "elegida" ? (
-                  <div className="flex flex-col gap-0.5">
-                    <Insignia variante="exito">¡Te eligieron!</Insignia>
-                    <span className="text-xs font-semibold text-texto">
-                      El cliente te va a escribir por WhatsApp.
+              {p.precioEstimado !== null || p.senaPropuesta !== null ? (
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-texto">
+                  {p.precioEstimado !== null ? (
+                    <span>
+                      Presupuesto:{" "}
+                      <strong className="text-texto">{formatearPesos(p.precioEstimado)}</strong>
                     </span>
-                  </div>
-                ) : null}
-                {p.estado === "descartada" ? (
-                  <span className="inline-flex items-center rounded-full bg-superficie px-2.5 py-1 text-xs font-bold text-texto">
-                    Eligieron a otro profesional
-                  </span>
-                ) : null}
-                {p.estado === "retirada" ? (
-                  <span className="inline-flex items-center rounded-full bg-superficie px-2.5 py-1 text-xs font-bold text-texto">
-                    Retirada
-                  </span>
-                ) : null}
-
-                {trabajo?.urgencia ? (
-                  <Insignia
-                    variante={trabajo.urgencia === "lo_antes_posible" ? "urgencia" : "verificada"}
-                  >
-                    {ETIQUETA_URGENCIA[trabajo.urgencia]}
-                  </Insignia>
-                ) : null}
-              </div>
+                  ) : null}
+                  {p.senaPropuesta !== null ? (
+                    <span>
+                      Seña propuesta:{" "}
+                      <strong className="text-texto">{formatearPesos(p.senaPropuesta)}</strong>
+                    </span>
+                  ) : null}
+                </div>
+              ) : null}
 
               {p.estado === "enviada" ? <BotonRetirarPostulacion postulacionId={p.id} /> : null}
             </div>

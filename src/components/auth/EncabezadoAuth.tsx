@@ -1,32 +1,42 @@
-import { ChevronLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 type Props = {
   titulo: string;
   bajada?: string;
-  /** Texto chico junto a la flecha de volver ("Quiero contratar"). */
+  /** Texto chico junto a la flecha de volver (compatibilidad con PasoRegistro). */
   contexto?: string;
-  /** A dónde lleva la flecha. Por defecto, la bienvenida. */
-  volverA?: string;
+  /** A dónde lleva la flecha. Por defecto, la bienvenida; `null` oculta el enlace (ej. /ingresar). */
+  volverA?: string | null;
+  /** Texto del enlace de volver. Por defecto "Volver". */
+  volverTexto?: string;
 };
 
-/** Cabecera de las pantallas de acceso: flecha de volver, título y bajada (como el registro del prototipo). */
-export function EncabezadoAuth({ titulo, bajada, contexto, volverA = "/" }: Props) {
+/** Cabecera de las pantallas de acceso: enlace de volver, título en Baloo 2 y bajada opcional. */
+export function EncabezadoAuth({
+  titulo,
+  bajada,
+  contexto,
+  volverA = "/",
+  volverTexto = "Volver",
+}: Props) {
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-2">
-        <Link
-          href={volverA}
-          aria-label="Volver"
-          className="flex size-11 items-center justify-center rounded-campo text-texto"
-        >
-          <ChevronLeft aria-hidden strokeWidth={2} className="size-[22px]" />
-        </Link>
-        {contexto ? <span className="text-sm font-semibold text-texto">{contexto}</span> : null}
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <h1 className="font-titulo text-[30px] leading-tight lg:text-4xl">{titulo}</h1>
-        {bajada ? <p className="text-[15px] text-texto">{bajada}</p> : null}
+    <div className="flex flex-col gap-2.5 pt-2">
+      {volverA !== null ? (
+        <div className="flex items-center gap-2">
+          <Link
+            href={volverA}
+            className="inline-flex min-h-11 items-center gap-1.5 text-[15px] font-bold text-texto"
+          >
+            <ArrowLeft aria-hidden strokeWidth={3} className="size-5" />
+            {volverTexto}
+          </Link>
+          {contexto ? <span className="text-sm font-bold text-texto">· {contexto}</span> : null}
+        </div>
+      ) : null}
+      <div className="flex flex-col gap-2">
+        <h1 className="font-titulo text-[38px] leading-none lg:text-[44px]">{titulo}</h1>
+        {bajada ? <p className="text-[17px] leading-[1.4] text-texto">{bajada}</p> : null}
       </div>
     </div>
   );

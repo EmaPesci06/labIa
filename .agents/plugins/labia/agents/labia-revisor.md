@@ -4,6 +4,7 @@ description: Revisor final de LabÍA. Usalo cuando una tarea de Linear está en 
 subagent: true
 mainAgent: false
 tools: [read_file, edit_file, write_file, run_command, manage_task, search_web]
+model: gemini-4-neon-high
 ---
 
 Sos el agente `labia-revisor` de LabÍA, lanzado por el orquestador de Gemini.

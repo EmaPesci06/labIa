@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-// LAB-16: bienvenida, ingreso, protección de rutas y sesión.
+// LAB-16 / LAB-76: bienvenida, ingreso, protección de rutas y sesión.
 // El servidor base no tiene sesión falsa: prueba el comportamiento real de visitante.
 // Los servidores +100 y +200 simulan un profesional y un cliente (ver playwright.config.ts).
 const PUERTO = Number(process.env.PUERTO_E2E ?? 3000);
@@ -9,11 +9,11 @@ const URL_PROFESIONAL = `http://localhost:${PUERTO + 100}`;
 const URL_CLIENTE = `http://localhost:${PUERTO + 200}`;
 
 test.describe("bienvenida", () => {
-  test("muestra los dos caminos y el ingreso", async ({ page }) => {
+  test("muestra los dos caminos, explorar y el ingreso", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByText("Mar del Plata").locator("visible=true").first()).toBeVisible();
-    await expect(page.getByRole("heading", { name: "¿Qué querés hacer?" })).toBeVisible();
-    await expect(page.getByRole("link", { name: /Quiero contratar/ })).toHaveAttribute(
+    await expect(page.getByText("Todos con identidad y antecedentes verificados.")).toBeVisible();
+    await expect(page.getByRole("link", { name: /Necesito un profesional/ })).toHaveAttribute(
       "href",
       "/registro/cliente",
     );
@@ -21,17 +21,16 @@ test.describe("bienvenida", () => {
       "href",
       "/registro/profesional",
     );
-    await expect(
-      page.getByText(
-        "Carpintería · Plomería · Cerrajería · Gas · Pintura · Mecánica · Electricidad",
-      ),
-    ).toBeVisible();
+    await expect(page.getByRole("link", { name: "Primero quiero mirar" })).toHaveAttribute(
+      "href",
+      "/inicio",
+    );
   });
 
   test("escritorio en dos columnas, celular en una", async ({ page }) => {
     await page.goto("/");
     const titulo = await page.getByRole("heading", { level: 1 }).boundingBox();
-    const tarjeta = await page.getByRole("link", { name: /Quiero contratar/ }).boundingBox();
+    const tarjeta = await page.getByRole("link", { name: /Necesito un profesional/ }).boundingBox();
     const ancho = page.viewportSize()?.width ?? 0;
     if (ancho >= 1024) {
       expect(tarjeta!.x).toBeGreaterThan(titulo!.x + titulo!.width - 1);
@@ -41,12 +40,12 @@ test.describe("bienvenida", () => {
     }
   });
 
-  test("Quiero contratar lleva al registro de cliente", async ({ page }) => {
+  test("Necesito un profesional lleva al registro de cliente", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("link", { name: /Quiero contratar/ }).click();
+    await page.getByRole("link", { name: /Necesito un profesional/ }).click();
     await expect(page).toHaveURL(/\/registro\/cliente$/);
     await expect(page.getByRole("heading", { level: 1, name: "Creá tu cuenta" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Continuar con Google" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Seguir con Google" })).toBeVisible();
   });
 
   test("Ofrezco mis servicios lleva al registro de profesional", async ({ page }) => {
@@ -59,14 +58,14 @@ test.describe("bienvenida", () => {
 test.describe("ingreso", () => {
   test("muestra Google, email y contraseña, y el link para recuperar", async ({ page }) => {
     await page.goto("/ingresar");
-    await expect(page.getByRole("button", { name: "Continuar con Google" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Seguir con Google" })).toBeVisible();
     await expect(page.getByLabel("Email")).toBeVisible();
-    await expect(page.getByLabel("Contraseña")).toBeVisible();
-    await page.getByRole("link", { name: "¿Olvidaste tu contraseña?" }).click();
+    await expect(page.getByLabel("Contraseña", { exact: true })).toBeVisible();
+    await page.getByRole("link", { name: "Me olvidé la contraseña" }).click();
     await expect(page).toHaveURL(/\/restablecer$/);
     // Next conserva la pantalla anterior oculta un momento: solo cuenta el campo visible.
     await expect(page.locator('input[name="email"]:visible')).toHaveCount(1);
-    await expect(page.getByRole("button", { name: "Enviar enlace" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Mandarme el enlace" })).toBeVisible();
   });
 
   test("errores en castellano al lado del campo", async ({ page }) => {
@@ -79,7 +78,7 @@ test.describe("ingreso", () => {
 
   test("el registro valida la contraseña mínima", async ({ page }) => {
     await page.goto("/registro/cliente");
-    await page.getByLabel("Nombre y apellido").fill("Laura Fernández");
+    await page.getByLabel("Nombre").fill("Laura Fernández");
     await page.getByLabel("Email").fill("laura@example.com");
     await page.getByLabel("Contraseña", { exact: true }).fill("corta");
     await page.getByRole("button", { name: "Crear cuenta" }).click();
@@ -99,7 +98,7 @@ test.describe("rutas protegidas", () => {
     test(`${ruta} sin sesión redirige a /ingresar con volver`, async ({ page }) => {
       await page.goto(ruta);
       await expect(page).toHaveURL(new RegExp(`/ingresar\\?volver=${encodeURIComponent(ruta)}$`));
-      await expect(page.getByRole("heading", { level: 1, name: "Ingresá a LabÍA" })).toBeVisible();
+      await expect(page.getByRole("heading", { level: 1, name: "¡Hola de nuevo!" })).toBeVisible();
     });
   }
 
@@ -169,11 +168,11 @@ test.describe("cuenta real", () => {
     const contrasena = "clave-de-prueba-123";
 
     await page.goto("/registro/cliente");
-    await page.getByLabel("Nombre y apellido").fill("Prueba Uno");
-    await page.getByLabel("Celular de WhatsApp").fill("223 555 1234");
+    await page.getByLabel("Nombre").fill("Prueba Uno");
+    await page.getByLabel("Tu WhatsApp").fill("223 555 1234");
     await page.getByLabel("Email").fill(email);
     await page.getByLabel("Contraseña", { exact: true }).fill(contrasena);
-    await page.getByRole("radio", { name: "Centro" }).click();
+    await page.getByLabel("Tu barrio").selectOption({ label: "Centro" });
     await page.getByRole("button", { name: "Crear cuenta" }).click();
     await expect(page).toHaveURL(/\/(inicio|buscar\?barrio=[a-z0-9-]+)$/);
 
@@ -187,11 +186,11 @@ test.describe("cuenta real", () => {
     await expect(page).toHaveURL(/\/ingresar\?volver=%2Fmis-trabajos$/);
 
     await page.getByLabel("Email").fill(email);
-    await page.getByLabel("Contraseña").fill("otra-clave-equivocada");
+    await page.getByLabel("Contraseña", { exact: true }).fill("otra-clave-equivocada");
     await page.getByRole("button", { name: "Ingresar" }).click();
     await expect(page.getByText("El email o la contraseña no coinciden.")).toBeVisible();
 
-    await page.getByLabel("Contraseña").fill(contrasena);
+    await page.getByLabel("Contraseña", { exact: true }).fill(contrasena);
     await page.getByRole("button", { name: "Ingresar" }).click();
     await expect(page).toHaveURL(/\/mis-trabajos$/);
   });
@@ -239,9 +238,9 @@ test.describe("teclado", () => {
     await page.getByLabel("Email").focus();
     await page.keyboard.type("laura@example.com");
     await page.keyboard.press("Tab");
-    await expect(page.getByLabel("Contraseña")).toBeFocused();
+    await expect(page.getByLabel("Contraseña", { exact: true })).toBeFocused();
     await page.keyboard.press("Tab");
-    await expect(page.getByRole("link", { name: "¿Olvidaste tu contraseña?" })).toBeFocused();
+    await expect(page.getByRole("button", { name: "Ver contraseña" })).toBeFocused();
     await page.keyboard.press("Tab");
     await expect(page.getByRole("button", { name: "Ingresar" })).toBeFocused();
     await page.keyboard.press("Enter");
@@ -250,7 +249,7 @@ test.describe("teclado", () => {
 
   test("los links de la bienvenida tienen foco visible", async ({ page }) => {
     await page.goto("/");
-    const enlace = page.getByRole("link", { name: /Quiero contratar/ });
+    const enlace = page.getByRole("link", { name: /Necesito un profesional/ });
     await enlace.focus();
     await expect(enlace).toBeFocused();
     const contorno = await enlace.evaluate((el) => getComputedStyle(el).outlineStyle);
@@ -261,7 +260,7 @@ test.describe("teclado", () => {
 test.describe("restablecer", () => {
   test("pide el email y muestra el error en castellano", async ({ page }) => {
     await page.goto("/restablecer");
-    await page.getByRole("button", { name: "Enviar enlace" }).click();
+    await page.getByRole("button", { name: "Mandarme el enlace" }).click();
     await expect(page.getByText("Ingresá tu email.")).toBeVisible();
   });
 });

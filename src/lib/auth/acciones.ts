@@ -198,13 +198,11 @@ export async function pedirRestablecer(
 
   if (!supabaseConfigurado()) return { mensaje: MENSAJE_SIN_SUPABASE, valores: entrada };
   const supabase = await crearClienteServidor();
-  const { error } = await supabase.auth.resetPasswordForEmail(resultado.data.email, {
+  await supabase.auth.resetPasswordForEmail(resultado.data.email, {
     redirectTo: `${urlDelSitio()}/api/auth/callback?siguiente=${encodeURIComponent("/restablecer")}`,
   });
-  if (error && error.code === "over_email_send_rate_limit") {
-    return { mensaje: mensajeDeAuth(error.code, error.status), valores: entrada };
-  }
-  // Misma respuesta exista o no la cuenta: no se revela qué emails están registrados.
+  // Misma respuesta exista o no la cuenta (incluso con límite de envío por email): no se revela
+  // qué emails están registrados ni si tuvieron pedidos recientes.
   return {
     exito:
       "Si hay una cuenta con ese email, te enviamos un enlace para elegir una contraseña nueva.",

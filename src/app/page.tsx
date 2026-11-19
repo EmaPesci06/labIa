@@ -1,12 +1,9 @@
-import { ChevronRight, MapPin, Search, Wrench } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
 import { SaltarAlContenido } from "@/components/navegacion/SaltarAlContenido";
-import { Boton } from "@/components/ui/Boton";
-import { Toldo } from "@/components/ui/Toldo";
 import { Logo } from "@/components/ui/Logo";
-import { cn } from "@/lib/cn";
+import { Toldo } from "@/components/ui/Toldo";
 
 export const metadata: Metadata = {
   title: "LabÍA · Oficios de confianza en Mar del Plata",
@@ -14,204 +11,92 @@ export const metadata: Metadata = {
     "Encontrá gasistas, electricistas, cerrajeros y más en tu barrio. O conseguí trabajo con tu oficio.",
 };
 
-const OFICIOS = "Carpintería · Plomería · Cerrajería · Gas · Pintura · Mecánica · Electricidad";
-
-const PASOS = [
-  {
-    titulo: "Buscá por oficio y barrio",
-    texto: "O publicá lo que necesitás y los profesionales de tu zona se postulan.",
-  },
-  {
-    titulo: "Mirá perfiles verificados",
-    texto: "Fotos de trabajos, reseñas de vecinos, matrícula y antecedentes revisados.",
-  },
-  {
-    titulo: "Hablá por WhatsApp",
-    texto: "Acordás presupuesto, seña y horario directo con el profesional.",
-  },
-] as const;
-
-function EtiquetaCiudad({ className }: { className?: string }) {
-  return (
-    <p
-      className={cn(
-        "flex items-center gap-1.5 font-texto text-[13px] font-semibold tracking-[0.4px] text-texto uppercase",
-        className,
-      )}
-    >
-      <MapPin aria-hidden strokeWidth={2} className="size-4" />
-      Mar del Plata
-    </p>
-  );
-}
-
 /**
- * Bienvenida (LAB-16): "Main" (celular) y "Desk-Bienvenida" (escritorio) del prototipo.
+ * Bienvenida (LAB-16, rehecha en LAB-76): bocetos `App-Bienvenida` y `Oscuro-Bienvenida`.
  * Es estática: si ya hay sesión, `proxy.ts` redirige a cada rol a su inicio antes de llegar acá.
  */
 export default function Bienvenida() {
   return (
-    <>
+    <div className="flex flex-1 flex-col bg-encabezado text-sobre-encabezado">
       <SaltarAlContenido />
-      <header className="flex items-center justify-between gap-6 px-6 pt-7 lg:border-b lg:border-fondo lg:bg-superficie lg:px-10 lg:py-[18px]">
+      <Toldo color="sol" alto={26} />
+      <header className="mx-auto flex w-full max-w-[1200px] items-center justify-between px-5 pt-3 lg:px-8 lg:pt-6">
+        <Logo sobre="encabezado" className="text-[32px]" />
         <Link
-          href="/"
-          aria-label="LabÍA, inicio"
-          className="inline-flex min-h-11 items-center rounded-campo"
+          href="/ingresar"
+          className="inline-flex min-h-11 items-center rounded-full border-2 border-sobre-encabezado px-4 text-[15px] font-bold text-sobre-encabezado"
         >
-          <Logo alt="" />
+          Ingresar
         </Link>
-        <EtiquetaCiudad className="lg:hidden" />
-        <div className="hidden items-center gap-4 lg:flex">
-          <Link
-            href="/ingresar"
-            className="inline-flex min-h-11 items-center text-[15px] font-bold text-texto"
-          >
-            Ingresar
-          </Link>
-          <Boton href="/registro/cliente" variante="cliente">
-            Crear cuenta
-          </Boton>
-        </div>
       </header>
 
       <main
         id="contenido"
         tabIndex={-1}
-        className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col gap-7 px-6 pt-7 pb-8 focus:outline-none lg:gap-20 lg:px-10 lg:pt-[72px] lg:pb-14"
+        className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col focus:outline-none lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,440px)] lg:items-center lg:gap-14 lg:px-8 lg:py-12"
       >
-        <section className="flex flex-1 flex-col gap-7 lg:flex-none lg:flex-row lg:items-center lg:gap-14">
-          <div className="flex flex-col gap-7 lg:flex-[999_1_560px] lg:gap-[22px]">
-            <EtiquetaCiudad className="hidden lg:flex lg:text-[15px]" />
-            <div className="mt-2 flex flex-col gap-3.5 lg:mt-0 lg:gap-[22px]">
-              <h1 className="font-titulo text-[40px] leading-[1.05] lg:text-[64px] lg:leading-[1.02]">
-                Oficios de confianza, cerca tuyo.
-              </h1>
-              <p className="max-w-[560px] text-[17px] leading-[1.45] text-texto lg:text-xl lg:leading-normal">
-                Encontrá gasistas, electricistas, cerrajeros y más en tu barrio.{" "}
-                <span className="lg:hidden">O conseguí trabajo con tu oficio.</span>
-                <span className="hidden lg:inline">
-                  Todos con identidad y antecedentes verificados.
-                </span>
-              </p>
-            </div>
-            <div className="flex max-w-[640px] flex-col gap-2.5 lg:gap-3">
-              <Toldo color="sol" alto={26} />
-              <p className="font-texto text-xs leading-[1.7] font-semibold tracking-[0.6px] text-texto uppercase lg:text-[13px]">
-                {OFICIOS}
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-auto flex flex-col gap-3 lg:mt-0 lg:flex-[1_1_360px] lg:gap-3.5">
-            <h2 className="text-[15px] font-bold text-texto">¿Qué querés hacer?</h2>
-            <Link
-              href="/registro/cliente"
-              className="flex items-center gap-3.5 rounded-[18px] bg-accion p-[18px] text-sobre-accion lg:flex-col lg:items-stretch lg:gap-1.5 lg:rounded-[20px] lg:p-6"
-            >
-              <Search aria-hidden strokeWidth={2} className="size-7 shrink-0 lg:hidden" />
-              <span className="flex flex-1 flex-col gap-0.5 lg:flex-none lg:gap-1.5">
-                <span className="text-lg font-bold lg:text-[22px]">Quiero contratar</span>
-                <span className="text-sm lg:text-[15px] lg:leading-[1.4]">
-                  <span className="lg:hidden">Buscá profesionales o publicá un trabajo</span>
-                  <span className="hidden lg:inline">
-                    Buscá profesionales o publicá un trabajo y que ellos te escriban.
-                  </span>
-                </span>
-              </span>
-              <ChevronRight aria-hidden strokeWidth={2} className="size-5 shrink-0 lg:hidden" />
-            </Link>
-            <Link
-              href="/registro/profesional"
-              className="flex items-center gap-3.5 rounded-[18px] border-2 border-accion bg-superficie p-[18px] text-texto lg:flex-col lg:items-stretch lg:gap-1.5 lg:rounded-[20px] lg:p-6"
-            >
-              <Wrench
-                aria-hidden
-                strokeWidth={2}
-                className="size-7 shrink-0 text-texto lg:hidden"
-              />
-              <span className="flex flex-1 flex-col gap-0.5 lg:flex-none lg:gap-1.5">
-                <span className="text-lg font-bold lg:text-[22px]">Ofrezco mis servicios</span>
-                <span className="text-sm text-texto lg:text-[15px] lg:leading-[1.4]">
-                  <span className="lg:hidden">Mostrá tu oficio y encontrá trabajos</span>
-                  <span className="hidden lg:inline">
-                    Mostrá tu oficio, conseguí clientes y postulate a trabajos de tu zona.
-                  </span>
-                </span>
-              </span>
-              <ChevronRight
-                aria-hidden
-                strokeWidth={2}
-                className="size-5 shrink-0 text-texto lg:hidden"
-              />
-            </Link>
-            <p className="pt-1.5 text-center text-[15px] text-texto lg:hidden">
-              ¿Ya tenés cuenta?{" "}
-              <Link
-                href="/ingresar"
-                className="inline-block py-3 font-bold text-texto underline underline-offset-2"
-              >
-                Ingresar
-              </Link>
-            </p>
-          </div>
-        </section>
-
-        <section aria-labelledby="como-funciona" className="hidden flex-col gap-7 lg:flex">
-          <h2 id="como-funciona" className="font-titulo text-4xl">
-            Cómo funciona
-          </h2>
-          <ol className="grid grid-cols-3 gap-5">
-            {PASOS.map((paso, i) => (
-              <li
-                key={paso.titulo}
-                className="flex flex-col gap-2.5 rounded-[18px] bg-superficie p-6"
-              >
-                <span
-                  aria-hidden
-                  className="flex size-9 items-center justify-center rounded-full bg-superficie font-extrabold text-texto"
-                >
-                  {i + 1}
-                </span>
-                <span className="text-lg font-bold">{paso.titulo}</span>
-                <span className="text-[15px] leading-normal text-texto">{paso.texto}</span>
-              </li>
-            ))}
-          </ol>
-        </section>
+        <div className="flex flex-1 flex-col px-5 pt-[22px] pb-6 lg:p-0">
+          <span className="text-[15px] font-bold tracking-[0.08em] uppercase">Mar del Plata</span>
+          <h1 className="mt-1.5 font-titulo text-[50px] leading-[0.98] lg:text-[64px]">
+            Oficios de confianza, cerca tuyo.
+          </h1>
+          <p className="mt-3.5 text-lg leading-[1.4] lg:text-xl">
+            Todos con identidad y antecedentes verificados.
+          </p>
+        </div>
 
         <section
-          aria-labelledby="seguridad"
-          className="hidden items-center gap-8 rounded-3xl bg-accion p-10 text-sobre-accion lg:flex"
+          aria-label="Crear cuenta"
+          className="mt-auto flex flex-col gap-3 rounded-t-hoja bg-fondo px-5 pt-[22px] pb-4 text-texto lg:mt-0 lg:rounded-hoja lg:p-7"
         >
-          <div className="flex flex-1 flex-col gap-2.5">
-            <h2 id="seguridad" className="font-titulo text-[32px]">
-              Tu seguridad primero
-            </h2>
-            <p className="text-base leading-normal">
-              Cada profesional presenta DNI y certificado de antecedentes, y acepta nuestras normas
-              de seguridad antes de publicar su perfil.
-            </p>
-          </div>
-          <ul className="flex flex-1 flex-wrap gap-2.5">
-            {["Identidad verificada", "Sin antecedentes", "Matriculado", "Normas aceptadas"].map(
-              (insignia) => (
-                <li
-                  key={insignia}
-                  className={cn(
-                    "rounded-full px-4 py-2.5 text-[15px] font-bold",
-                    insignia === "Matriculado"
-                      ? "bg-sol text-sobre-sol"
-                      : "bg-superficie text-texto",
-                  )}
-                >
-                  {insignia}
-                </li>
-              ),
-            )}
-          </ul>
+          <Link
+            href="/registro/cliente"
+            className="flex flex-col gap-1 rounded-tarjeta bg-superficie px-[18px] py-4 text-texto"
+          >
+            <span className="font-titulo text-2xl leading-[1.1]">Necesito un profesional</span>
+            <span className="text-base leading-[1.35]">
+              Buscá profesionales o publicá un trabajo y que ellos te escriban.
+            </span>
+          </Link>
+          <Link
+            href="/registro/profesional"
+            className="flex flex-col gap-1 rounded-tarjeta bg-sol px-[18px] py-4 text-sobre-sol"
+          >
+            <span className="font-titulo text-2xl leading-[1.1]">Ofrezco mis servicios</span>
+            <span className="text-base leading-[1.35]">
+              Mostrá tu oficio, conseguí clientes y postulate a trabajos de tu zona.
+            </span>
+          </Link>
+          <Link
+            href="/inicio"
+            className="flex min-h-12 items-center justify-center text-base font-bold text-texto underline decoration-2 underline-offset-4"
+          >
+            Primero quiero mirar
+          </Link>
+          <nav aria-label="Legales" className="flex justify-center gap-5 text-sm text-texto">
+            <Link
+              href="/normas"
+              className="flex min-h-11 items-center underline underline-offset-2"
+            >
+              Normas
+            </Link>
+            <Link
+              href="/terminos"
+              prefetch={false}
+              className="flex min-h-11 items-center underline underline-offset-2"
+            >
+              Términos
+            </Link>
+            <Link
+              href="/privacidad"
+              prefetch={false}
+              className="flex min-h-11 items-center underline underline-offset-2"
+            >
+              Privacidad
+            </Link>
+          </nav>
         </section>
       </main>
-    </>
+    </div>
   );
 }

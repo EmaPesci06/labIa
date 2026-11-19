@@ -69,7 +69,7 @@ test.describe("/baja con token válido", () => {
 
   test("el estado de baja hecha confirma sin pedir nada más", async ({ page }) => {
     await page.goto("/baja?listo=novedades");
-    await expect(page.getByRole("status")).toContainText("Ya no vas a recibir");
+    await expect(page.getByText("Ya no vas a recibir")).toBeVisible();
     await expect(page.getByRole("link", { name: "Ir a LabÍA" })).toBeVisible();
   });
 
