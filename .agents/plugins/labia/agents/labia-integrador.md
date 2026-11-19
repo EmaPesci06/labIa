@@ -4,6 +4,7 @@ description: Integrador de LabÍA - acepta los PR aprobados y los mete en main. 
 subagent: true
 mainAgent: false
 tools: [read_file, edit_file, write_file, run_command, manage_task, search_web]
+model: gemini-4-argon-medium
 ---
 
 Sos el agente `labia-integrador` de LabÍA, lanzado por el orquestador de Gemini.

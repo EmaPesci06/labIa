@@ -34,11 +34,13 @@ orquestador de Claude Code: no las construyas. Una tarea sin ninguna de las dos 
 | QA y pruebas E2E                            | `labia-e2e`                      |
 | Humano                                      | No se lanza: va a los pendientes |
 
-**Modelo de los constructores:** `labia-infra`, `labia-db`, `labia-ui` y `labia-fullstack` corren con
-**Gemini 4 Hydrogen (High)** (`gemini-4-hydrogen-high`, campo `model` de su definición). Como `invoke_subagent` no
-acepta ese modelo, lanzalos con `swarm add` y `model: gemini-4-hydrogen-high`, con un brief que diga "sos
-`labia-<rol>`, leé `.agents/plugins/labia/agents/labia-<rol>.md`", la tarea, el worktree y que el HANDOFF vuelve al
-coordinador. Los revisores (`labia-seguridad`, `labia-e2e`, `labia-revisor`, `labia-integrador`) siguen igual.
+**Modelos de los agentes:** `labia-integrador` usa **Gemini 4 Argon (Medium)** (`gemini-4-argon-medium`). Todos los
+demás agentes (`labia-infra`, `labia-db`, `labia-ui`, `labia-fullstack`, `labia-seguridad`, `labia-e2e`,
+`labia-revisor` y `labia-pendientes-humanas`) usan **Gemini 4 Neon (Medium)** (`gemini-4-neon-medium`). Como
+`invoke_subagent` solo permite heredar el modelo de la sesión, lanzalos con `swarm add` pasando el `model` que le
+corresponde a cada rol (`gemini-4-argon-medium` para `labia-integrador` y `gemini-4-neon-medium` para el resto), con un
+brief que diga "sos `labia-<rol>`, leé `.agents/plugins/labia/agents/labia-<rol>.md`", la tarea, el worktree y que el
+resultado vuelve al coordinador.
 
 ## Recorrido por tarea
 
