@@ -48,6 +48,19 @@ describe("Combobox", () => {
     expect(new FormData(form!).get("barrio")).toBe("3");
   });
 
+  it("navega opciones con ArrowDown dentro de la lista abierta y confirma con Enter", async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(<Combobox etiqueta="Tu barrio" opciones={BARRIOS} onValueChange={onValueChange} />);
+    const trigger = screen.getByRole("combobox", { name: "Tu barrio" });
+    await user.click(trigger);
+
+    await user.keyboard("{ArrowDown}{Enter}");
+    expect(onValueChange).toHaveBeenCalledWith("2");
+    expect(trigger).toHaveTextContent("La Perla");
+    expect(screen.getByRole("status")).toHaveTextContent("Tu barrio: La Perla");
+  });
+
   it("cierra con Esc y devuelve el foco al botón", async () => {
     const user = userEvent.setup();
     render(<Combobox etiqueta="Tu barrio" opciones={BARRIOS} />);

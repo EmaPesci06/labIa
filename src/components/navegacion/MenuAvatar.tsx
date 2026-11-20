@@ -100,7 +100,7 @@ export function MenuAvatar({ nombre }: Props) {
                   key={opcion}
                   value={opcion}
                   closeOnClick={false}
-                  className="min-h-11 cursor-pointer rounded-campo px-3 pr-9 text-[15px] font-semibold text-texto focus:bg-sol focus:text-sobre-sol"
+                  className="min-h-11 cursor-pointer rounded-campo px-3 pr-9 text-[15px] font-normal text-texto focus:bg-sol focus:text-sobre-sol"
                 >
                   {ETIQUETAS_TEMA[opcion]}
                 </DropdownMenuRadioItem>
@@ -112,7 +112,7 @@ export function MenuAvatar({ nombre }: Props) {
 
           <DropdownMenuItem
             onClick={() => formSalir.current?.requestSubmit()}
-            className="min-h-11 cursor-pointer gap-3 rounded-campo px-3 text-[15px] font-semibold text-texto focus:bg-sol focus:text-sobre-sol"
+            className="min-h-11 cursor-pointer gap-3 rounded-campo px-3 text-[15px] font-bold text-texto focus:bg-sol focus:text-sobre-sol"
           >
             <LogOut aria-hidden strokeWidth={2} className="size-5" />
             Salir

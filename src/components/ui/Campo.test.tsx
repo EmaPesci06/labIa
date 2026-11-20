@@ -85,7 +85,7 @@ describe("Campo", () => {
     expect(combobox).toBeInTheDocument();
 
     await user.click(combobox);
-    expect(screen.getAllByRole("option")).toHaveLength(2);
+    expect(await screen.findAllByRole("option")).toHaveLength(2);
     await user.click(screen.getByRole("option", { name: "Gas" }));
 
     expect(combobox).toHaveTextContent("Gas");

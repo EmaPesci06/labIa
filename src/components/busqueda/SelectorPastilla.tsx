@@ -86,7 +86,7 @@ export function SelectorPastilla({
             <SelectItem
               key={opcion.valor || VALOR_VACIO}
               value={aInterno(opcion.valor)}
-              className="min-h-11 cursor-pointer rounded-md px-3 text-base font-medium text-texto focus:bg-sol focus:font-bold focus:text-sobre-sol"
+              className="min-h-11 cursor-pointer rounded-md px-3 text-base font-normal text-texto focus:bg-sol focus:font-bold focus:text-sobre-sol"
             >
               {opcion.etiqueta}
             </SelectItem>

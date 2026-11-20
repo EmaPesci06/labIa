@@ -158,14 +158,31 @@ test.describe("resultados", () => {
     await page.keyboard.press("ArrowDown");
     const buscador = page.getByPlaceholder("Buscá tu barrio…");
     await expect(buscador).toBeFocused();
-    await buscador.fill("perla");
-    await expect(page.getByRole("option", { name: "La Perla" })).toBeVisible();
+    // Navega con flechas dentro de la lista abierta antes de confirmar con Enter.
+    await expect(page.getByRole("option", { name: "Centro" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    await page.keyboard.press("ArrowDown");
+    await expect(page.getByRole("option", { name: "La Perla" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
     await page.keyboard.press("Enter");
     await expect(barrio).toHaveAttribute("aria-expanded", "false");
     await expect(page).toHaveURL(/barrio=la-perla/);
     await expect(
       page.getByRole("status").filter({ hasText: "Tu barrio: La Perla" }),
     ).toBeAttached();
+
+    // También filtra escribiendo en el buscador sin acentos.
+    await barrio.click();
+    await expect(buscador).toBeFocused();
+    await buscador.fill("guemes");
+    await expect(page.getByRole("option", { name: "Güemes" })).toBeVisible();
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/barrio=guemes/);
+    await expect(page.getByRole("status").filter({ hasText: "Tu barrio: Güemes" })).toBeAttached();
   });
 
   for (const esquema of ["light", "dark"] as const) {

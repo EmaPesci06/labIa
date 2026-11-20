@@ -121,7 +121,7 @@ export function Combobox(props: ComboboxProps) {
     >
       <Command
         filter={filtrarOpciones}
-        className="rounded-lg bg-popover text-popover-foreground [&_[data-slot=input-group]]:h-11! [&_[data-slot=input-group]]:border-borde/40 [&_[data-slot=input-group]]:bg-campo"
+        className="rounded-lg bg-popover text-popover-foreground [&_[data-slot=input-group]]:h-11! [&_[data-slot=input-group]]:border-borde [&_[data-slot=input-group]]:bg-campo"
       >
         <CommandInput
           value={busqueda}
@@ -144,7 +144,7 @@ export function Combobox(props: ComboboxProps) {
                   value={opcion.etiqueta}
                   data-checked={seleccionado ? "true" : undefined}
                   onSelect={() => elegir(opcion)}
-                  className="min-h-11 cursor-pointer rounded-md px-3 text-base font-medium text-texto data-selected:bg-sol data-selected:font-bold data-selected:text-sobre-sol"
+                  className="min-h-11 cursor-pointer rounded-md px-3 text-base font-normal text-texto data-selected:bg-sol data-selected:font-bold data-selected:text-sobre-sol data-selected:*:[svg]:text-sobre-sol"
                 >
                   <span className="truncate">{opcion.etiqueta}</span>
                 </CommandItem>
