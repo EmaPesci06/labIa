@@ -45,7 +45,7 @@ describe("Hoja", () => {
     await userEvent.tab();
     await userEvent.tab();
     await userEvent.tab();
-    expect(dialogo).toContainElement(document.activeElement as HTMLElement);
+    await waitFor(() => expect(dialogo).toContainElement(document.activeElement as HTMLElement));
   });
 
   it("se cierra con Esc y devuelve el foco al botón que la abrió", async () => {
