@@ -440,7 +440,7 @@ isOneToOne: false
           Views: {
             "matricula_propia": {
                   Row: {
-                    "matricula_numero": string | null,"usuario_id": string | null
+                    "matricula_numero": string | null,"usuario_id": string
                   }
                   ComputedFields: never
                   Insert: {
@@ -466,7 +466,7 @@ isOneToOne: true
                   ]
                 },"mis_verificaciones": {
                   Row: {
-                    "created_at": string | null,"estado": Database["public"]['Enums']["estado_verificacion"] | null,"id": string | null,"motivo_rechazo": string | null,"tipo": Database["public"]['Enums']["tipo_documento"] | null
+                    "created_at": string,"estado": Database["public"]['Enums']["estado_verificacion"],"id": string,"motivo_rechazo": string | null,"tipo": Database["public"]['Enums']["tipo_documento"]
                   }
                   ComputedFields: never
                   Insert: {
@@ -480,7 +480,7 @@ isOneToOne: true
                   ]
                 },"resenas_publicas": {
                   Row: {
-                    "autor_inicial": string | null,"autor_nombre": string | null,"created_at": string | null,"id": string | null,"profesional_id": string | null,"puntaje": number | null,"texto": string | null
+                    "autor_inicial": string | null,"autor_nombre": string | null,"created_at": string,"id": string,"profesional_id": string,"puntaje": number,"texto": string | null
                   }
                   ComputedFields: never
                   Relationships: [
@@ -500,7 +500,7 @@ isOneToOne: false
                   ]
                 },"usuarios_publicos": {
                   Row: {
-                    "apellido_inicial": string | null,"barrio_id": number | null,"foto_path": string | null,"id": string | null,"nombre": string | null
+                    "apellido_inicial": string | null,"barrio_id": number | null,"foto_path": string | null,"id": string,"nombre": string | null
                   }
                   ComputedFields: never
                   Relationships: [
