@@ -26,6 +26,8 @@ const eslintConfig = defineConfig([
     "test-results/**",
     "next-env.d.ts",
     "src/lib/supabase/tipos.ts",
+    // shadcn: archivos generados por el CLI, no se editan a mano (AGENTS.md).
+    "src/components/shadcn/**",
     // Servidor de apoyo para e2e sin Docker (CommonJS suelto, no es código de la app).
     "tests/e2e/apoyo/**",
   ]),

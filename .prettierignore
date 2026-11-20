@@ -21,3 +21,7 @@ src/lib/supabase/tipos.ts
 .agents/skills/strategic-compact/
 .agents/skills/tdd-workflow/
 .agents/skills/verification-loop/
+
+# shadcn: archivos generados por el CLI, no se editan a mano (AGENTS.md)
+src/components/shadcn/
+components.json
