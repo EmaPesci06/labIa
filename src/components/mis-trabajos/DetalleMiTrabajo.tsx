@@ -2,11 +2,12 @@
 
 import { MessageCircle, CheckCircle, ArrowLeftRight, XCircle, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 
 import { HojaContacto } from "@/components/perfil/HojaContacto";
 import { HojaResena } from "@/components/resenas/HojaResena";
 import { GaleriaFotosTrabajo } from "@/components/trabajos/GaleriaFotosTrabajo";
+import { avisarExito } from "@/components/ui/AvisosFlotantes";
 import { Boton } from "@/components/ui/Boton";
 import { Chip } from "@/components/ui/Chip";
 import { EtiquetaMono } from "@/components/ui/EtiquetaMono";
@@ -139,18 +140,16 @@ export function DetalleMiTrabajo({
     });
   }
 
+  // Confirmación pasajera al llegar desde /trabajos/nuevo (?publicado=1).
+  useEffect(() => {
+    if (!publicado) return;
+    avisarExito("¡Publicado! Te avisamos por email cuando alguien se postule.", {
+      id: "trabajo-publicado",
+    });
+  }, [publicado]);
+
   return (
     <div className="flex flex-col gap-5">
-      {publicado ? (
-        <div
-          role="status"
-          className="flex items-center gap-2.5 rounded-[14px] bg-sol p-4 text-[15px] font-semibold text-sobre-sol"
-        >
-          <CheckCircle aria-hidden className="size-5 shrink-0" />
-          <span>¡Publicado! Te avisamos por email cuando alguien se postule.</span>
-        </div>
-      ) : null}
-
       {mensajeError ? (
         <div
           role="alert"
