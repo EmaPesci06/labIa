@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Avatar as AvatarPrimitive } from "@base-ui/react/avatar"
-import { cn } from "@/lib/cn"
+import { cn } from "cn"
 
 function Avatar({
   className,

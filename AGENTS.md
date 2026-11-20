@@ -89,7 +89,7 @@ Rutas en español sin acentos: `/`, `/ingresar`, `/registro`, `/registro/cliente
   y **no se editan a mano**. La paleta se adapta solo desde `globals.css` (las variables `--primary`, `--border`, `--ring`…
   atadas a nuestros tokens) y la forma o los 44 px se resuelven en la capa fina de `src/components/ui/` con `className`
   y `cn()` (o con una regla por `data-slot` en `globals.css`). Las diferencias de forma con el boceto se aceptan. Radios
-  de shadcn (`--radius: 0.625rem`). El foco de 3 px de los componentes de shadcn sale de `[data-slot]:focus-visible`.
+  de shadcn (`--radius: 0.625rem`). Los componentes de shadcn importan `cn` del paquete npm `cn` (así los sirve el registro); nuestro código sigue usando `@/lib/cn`. El foco de 3 px de los componentes de shadcn sale de `[data-slot]:focus-visible`.
 - **Sin** `console.log`, **sin** `any`, **sin** secretos en el repo. `.env.example` lista todas las variables sin valores.
 
 ## Seguridad (no negociable)

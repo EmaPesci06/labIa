@@ -238,7 +238,7 @@
 /*
  * Componentes de shadcn (src/components/shadcn/, no se editan): usan `outline-none` y su propio
  * anillo, así que el foco de 3 px se impone desde acá. Va fuera de @layer para ganarle a las
- * utilidades. Los 44 px no son global: los pone cada capa fina con className o con una regla por
+ * utilidades; por eso las capas finas no pueden cambiar este outline con clases (focus-visible:outline-*). Los 44 px no son global: los pone cada capa fina con className o con una regla por
  * data-slot.
  */
 [data-slot]:focus-visible {
