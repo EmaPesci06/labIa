@@ -231,6 +231,7 @@ test.describe("reportes del cliente y del profesional", () => {
       await botonVisible(page, "Reportar este perfil").click();
       const hoja = hojaDeReporte(page);
       await expect(hoja).toBeVisible();
+      await expect(hoja).toHaveCSS("opacity", "1");
       await hoja.getByLabel(MOTIVO_ESTAFA).check();
       await capturar(page, "reporte-hoja", tema);
       // Solo la hoja: la página de fondo queda atenuada por el velo y axe mide ese color mezclado.

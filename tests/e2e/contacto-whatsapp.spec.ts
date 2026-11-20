@@ -124,7 +124,7 @@ test.describe("contacto: teclado y foco", () => {
     // Recorremos el diálogo dando varias vueltas de Tab: el foco no sale hacia la página de atrás.
     for (let i = 0; i < 12; i++) {
       await page.keyboard.press("Tab");
-      expect(await focoDentroDeLaHoja(page)).toBe(true);
+      await expect.poll(() => focoDentroDeLaHoja(page)).toBe(true);
     }
 
     await page.keyboard.press("Escape");
