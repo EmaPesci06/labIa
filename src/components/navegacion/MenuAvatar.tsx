@@ -1,89 +1,127 @@
 "use client";
 
-import { UserRound } from "lucide-react";
+import { LogOut, UserRound } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useId, useRef, useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 
-import { BotonSalir } from "@/components/auth/BotonSalir";
-import { SelectorTema } from "@/components/SelectorTema";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/shadcn/dropdown-menu";
 import { Avatar } from "@/components/ui/Avatar";
+import { SIN_ANILLO } from "@/components/ui/foco";
+import { salir } from "@/lib/auth/acciones";
+import { cn } from "@/lib/cn";
+import {
+  guardarPreferencia,
+  leerPreferencia,
+  PREFERENCIAS_TEMA,
+  suscribirseAlTema,
+  type PreferenciaTema,
+} from "@/lib/tema";
 
 type Props = {
   nombre: string;
 };
 
+const ETIQUETAS_TEMA: Record<PreferenciaTema, string> = {
+  claro: "Claro",
+  oscuro: "Oscuro",
+  sistema: "Sistema",
+};
+
+const leerDelNavegador = () => leerPreferencia(document.cookie);
+const leerEnServidor = () => null;
+
 const ITEM =
-  "flex min-h-11 w-full items-center gap-3 rounded-campo px-3 text-[15px] font-bold text-texto hover:bg-fondo";
+  "min-h-11 cursor-pointer gap-3 rounded-campo px-3 text-[15px] font-bold text-texto focus:bg-sol focus:text-sobre-sol";
 
 /**
- * Avatar de la barra superior con un panel desplegable: Mi cuenta, Tema y Salir.
- * Es un botón de despliegue (`aria-expanded`), no un `role="menu"`: adentro hay un grupo de
- * radios, así que se recorre con Tab. Escape o un clic afuera lo cierran.
+ * Avatar de la barra superior sobre `DropdownMenu` de shadcn: Mi cuenta, Tema y Salir.
+ * Se maneja con flechas, Enter y Esc; devuelve el foco al botón al cerrar.
  */
 export function MenuAvatar({ nombre }: Props) {
-  const [abierto, setAbierto] = useState(false);
-  const idPanel = useId();
-  const contenedor = useRef<HTMLDivElement>(null);
-  const boton = useRef<HTMLButtonElement>(null);
+  const formSalir = useRef<HTMLFormElement>(null);
+  const preferencia = useSyncExternalStore(suscribirseAlTema, leerDelNavegador, leerEnServidor);
+  const [anuncio, setAnuncio] = useState("");
 
-  useEffect(() => {
-    if (!abierto) return;
-    const alPresionar = (evento: PointerEvent) => {
-      if (!contenedor.current?.contains(evento.target as Node)) setAbierto(false);
-    };
-    const alTeclear = (evento: KeyboardEvent) => {
-      if (evento.key !== "Escape") return;
-      setAbierto(false);
-      boton.current?.focus();
-    };
-    const alSalirElFoco = (evento: FocusEvent) => {
-      const destino = evento.relatedTarget as Node | null;
-      if (destino && !contenedor.current?.contains(destino)) setAbierto(false);
-    };
-    const nodo = contenedor.current;
-    document.addEventListener("pointerdown", alPresionar);
-    document.addEventListener("keydown", alTeclear);
-    nodo?.addEventListener("focusout", alSalirElFoco);
-    return () => {
-      document.removeEventListener("pointerdown", alPresionar);
-      document.removeEventListener("keydown", alTeclear);
-      nodo?.removeEventListener("focusout", alSalirElFoco);
-    };
-  }, [abierto]);
+  function cambiarTema(valor: string) {
+    const tema = valor as PreferenciaTema;
+    guardarPreferencia(tema);
+    setAnuncio(`Tema: ${ETIQUETAS_TEMA[tema]}`);
+  }
 
   return (
-    <div ref={contenedor} className="relative">
-      <button
-        ref={boton}
-        type="button"
-        aria-expanded={abierto}
-        aria-controls={idPanel}
-        onClick={() => setAbierto((valor) => !valor)}
-        className="flex size-11 items-center justify-center rounded-full"
-      >
-        <span className="sr-only">Cuenta de {nombre}</span>
-        <span aria-hidden className="inline-flex">
-          <Avatar nombre={nombre} />
-        </span>
-      </button>
-      {abierto ? (
-        <div
-          id={idPanel}
-          className="absolute top-full right-0 z-50 mt-2 flex w-72 flex-col gap-3 rounded-tarjeta border-2 border-texto bg-superficie p-3"
+    <>
+      <form ref={formSalir} action={salir} className="hidden" />
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          className={cn(
+            "flex size-11 cursor-pointer items-center justify-center rounded-full",
+            SIN_ANILLO,
+          )}
         >
-          <p className="truncate px-3 pt-1 text-sm font-bold text-texto">{nombre}</p>
-          <Link href="/cuenta" className={ITEM} onClick={() => setAbierto(false)}>
-            <UserRound aria-hidden strokeWidth={2} className="size-5" />
-            Mi cuenta
-          </Link>
-          <div className="border-t border-fondo px-3 pt-3">
-            <SelectorTema />
-          </div>
-          <div className="border-t border-fondo pt-2">
-            <BotonSalir />
-          </div>
-        </div>
-      ) : null}
-    </div>
+          <span className="sr-only">Cuenta de {nombre}</span>
+          <span aria-hidden className="inline-flex">
+            <Avatar nombre={nombre} />
+          </span>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="end"
+          sideOffset={8}
+          className="w-72 rounded-tarjeta border-2 border-texto bg-superficie p-2 text-texto shadow-md data-open:zoom-in-100"
+        >
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="truncate px-3 py-1.5 text-sm font-bold text-texto">
+              {nombre}
+            </DropdownMenuLabel>
+            <DropdownMenuItem render={<Link href="/cuenta" />} className={ITEM}>
+              <UserRound aria-hidden strokeWidth={2} className="size-5" />
+              Mi cuenta
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+
+          <DropdownMenuSeparator className="my-1.5 bg-fondo" />
+
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="px-3 py-1 text-xs font-bold text-texto-suave">
+              Tema
+            </DropdownMenuLabel>
+            <DropdownMenuRadioGroup value={preferencia ?? undefined} onValueChange={cambiarTema}>
+              {PREFERENCIAS_TEMA.map((opcion) => (
+                <DropdownMenuRadioItem
+                  key={opcion}
+                  value={opcion}
+                  closeOnClick={false}
+                  className="min-h-11 cursor-pointer rounded-campo px-3 pr-9 text-[15px] font-semibold text-texto focus:bg-sol focus:text-sobre-sol"
+                >
+                  {ETIQUETAS_TEMA[opcion]}
+                </DropdownMenuRadioItem>
+              ))}
+            </DropdownMenuRadioGroup>
+          </DropdownMenuGroup>
+
+          <DropdownMenuSeparator className="my-1.5 bg-fondo" />
+
+          <DropdownMenuItem
+            onClick={() => formSalir.current?.requestSubmit()}
+            className="min-h-11 cursor-pointer gap-3 rounded-campo px-3 text-[15px] font-semibold text-texto focus:bg-sol focus:text-sobre-sol"
+          >
+            <LogOut aria-hidden strokeWidth={2} className="size-5" />
+            Salir
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <span role="status" aria-live="polite" className="sr-only">
+        {anuncio}
+      </span>
+    </>
   );
 }

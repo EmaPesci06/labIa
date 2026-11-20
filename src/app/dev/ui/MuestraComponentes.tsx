@@ -106,11 +106,16 @@ export function MuestraComponentes() {
             maxLength={500}
             placeholder="Se me rompió la llave de paso…"
           />
-          <Campo variante="seleccion" etiqueta="Tu barrio" defaultValue="La Perla">
-            <option>La Perla</option>
-            <option>Centro</option>
-            <option>Chauvín</option>
-          </Campo>
+          <Campo
+            variante="seleccion"
+            etiqueta="Oficio"
+            defaultValue="plomeria"
+            opciones={[
+              { valor: "plomeria", etiqueta: "Plomería" },
+              { valor: "gas", etiqueta: "Gas" },
+              { valor: "electricidad", etiqueta: "Electricidad" },
+            ]}
+          />
         </div>
       </Seccion>
 

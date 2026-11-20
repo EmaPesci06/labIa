@@ -65,12 +65,14 @@ test.describe("navegación del cliente", () => {
     test.skip(esCelular(page), "El avatar está en la barra superior de escritorio");
     await page.goto("/inicio");
     await page.getByRole("button", { name: /Cuenta de/ }).click();
-    await expect(page.getByRole("link", { name: "Mi cuenta" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Salir" })).toBeVisible();
-    await page.getByText("Oscuro", { exact: true }).click();
+    await expect(page.getByRole("menuitem", { name: "Mi cuenta" })).toBeVisible();
+    await expect(page.getByRole("menuitem", { name: "Salir" })).toBeVisible();
+    const oscuro = page.getByRole("menuitemradio", { name: "Oscuro" });
+    await oscuro.click();
+    await expect(oscuro).toHaveAttribute("aria-checked", "true");
     await expect(page.locator("html")).toHaveClass(/dark/);
     await page.keyboard.press("Escape");
-    await expect(page.getByRole("link", { name: "Mi cuenta" })).toBeHidden();
+    await expect(page.getByRole("menuitem", { name: "Mi cuenta" })).toBeHidden();
   });
 
   test("el selector de tema de /cuenta cambia a oscuro", async ({ page }) => {
@@ -224,7 +226,7 @@ test.describe("teclado", () => {
     await expect(page.locator("#contenido")).toBeFocused();
   });
 
-  test("el menú del avatar abre con Enter, cierra con Esc y devuelve el foco al botón", async ({
+  test("el menú del avatar se maneja con flechas, Enter y Esc y anuncia el tema elegido", async ({
     page,
   }) => {
     test.skip(esCelular(page), "El avatar está en la barra superior de escritorio");
@@ -234,7 +236,20 @@ test.describe("teclado", () => {
     await expect(boton).toHaveCSS("outline-width", "3px");
     await page.keyboard.press("Enter");
     await expect(boton).toHaveAttribute("aria-expanded", "true");
-    await expect(page.getByRole("link", { name: "Mi cuenta" })).toBeVisible();
+    await expect(page.getByRole("menuitem", { name: "Mi cuenta" })).toBeVisible();
+
+    // Bajamos con flechas hasta "Oscuro" y confirmamos con Enter.
+    const oscuro = page.getByRole("menuitemradio", { name: "Oscuro" });
+    for (let i = 0; i < 6; i++) {
+      if (await oscuro.evaluate((el) => el === document.activeElement)) break;
+      await page.keyboard.press("ArrowDown");
+    }
+    await expect(oscuro).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(oscuro).toHaveAttribute("aria-checked", "true");
+    await expect(page.locator("html")).toHaveClass(/dark/);
+    await expect(page.getByRole("status").filter({ hasText: "Tema: Oscuro" })).toBeAttached();
+
     await page.keyboard.press("Escape");
     await expect(boton).toHaveAttribute("aria-expanded", "false");
     await expect(boton).toBeFocused();
@@ -242,7 +257,7 @@ test.describe("teclado", () => {
 });
 
 const INTERACTIVOS =
-  'a[href], button, select, textarea, input:not([type="hidden"]):not([type="radio"]), label:has(input[type="radio"]), [role="button"], [tabindex]:not([tabindex="-1"])';
+  'a[href], button, select, textarea, input:not([type="hidden"]):not([type="radio"]), label:has(input[type="radio"]), [role="button"], [role="menuitem"], [role="menuitemradio"], [tabindex]:not([tabindex="-1"]):not([data-base-ui-focus-guard])';
 
 test.describe("objetivos táctiles de 44 px", () => {
   for (const ruta of ["/inicio", "/mis-trabajos", "/cuenta", "/esto-no-existe", "/sin-conexion"]) {
@@ -302,7 +317,7 @@ test.describe("axe en más pantallas", () => {
       await page.emulateMedia({ colorScheme: esquema });
       await page.goto("/inicio");
       await page.getByRole("button", { name: /Cuenta de/ }).click();
-      await expect(page.getByRole("link", { name: "Mi cuenta" })).toBeVisible();
+      await expect(page.getByRole("menuitem", { name: "Mi cuenta" })).toBeVisible();
       await sinViolaciones(page);
     });
   }

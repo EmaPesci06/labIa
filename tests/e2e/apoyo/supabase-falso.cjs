@@ -1587,9 +1587,9 @@ const server = http.createServer((req, res) => {
     }
     if (ruta === "/rest/v1/barrios") {
       const lista = [
-        { id: 1, nombre: "Centro" },
-        { id: 2, nombre: "La Perla" },
-        { id: 3, nombre: "Güemes" },
+        { id: 1, nombre: "Centro", slug: "centro" },
+        { id: 2, nombre: "La Perla", slug: "la-perla" },
+        { id: 3, nombre: "Güemes", slug: "guemes" },
       ];
       const en = url.searchParams.get("id");
       if (en && en.startsWith("in.")) {

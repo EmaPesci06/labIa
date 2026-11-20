@@ -17,6 +17,7 @@ import { SaltarAlContenido } from "@/components/navegacion/SaltarAlContenido";
 import { AvisoPantalla } from "@/components/ui/AvisoPantalla";
 import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
+import { Combobox } from "@/components/ui/Combobox";
 import { GrupoChips } from "@/components/ui/Chip";
 import { comprimirImagen } from "@/lib/imagen";
 import { registrarEvento } from "@/lib/metricas";
@@ -571,23 +572,22 @@ export function FormularioPerfilProfesional({
                 required={tieneGas}
               />
 
-              <Campo
-                variante="seleccion"
+              <Combobox
                 etiqueta="Barrio desde donde salís"
                 name="barrioId"
+                opciones={barrios.map((barrio) => ({
+                  valor: String(barrio.id),
+                  etiqueta: barrio.nombre,
+                }))}
                 value={barrioId}
-                onChange={(evento) => setBarrioId(evento.target.value)}
+                onValueChange={setBarrioId}
+                placeholder="Elegí tu barrio"
+                placeholderBusqueda="Buscá tu barrio…"
+                sinResultados="No encontramos ese barrio."
                 ayuda="Se usa para calcular distancias. Nunca mostramos tu dirección."
                 error={errores.barrioId}
                 required
-              >
-                <option value="">Elegí tu barrio</option>
-                {barrios.map((barrio) => (
-                  <option key={barrio.id} value={barrio.id}>
-                    {barrio.nombre}
-                  </option>
-                ))}
-              </Campo>
+              />
 
               <fieldset className="flex flex-col gap-2">
                 <legend className="text-base font-bold text-texto">Dónde trabajás</legend>

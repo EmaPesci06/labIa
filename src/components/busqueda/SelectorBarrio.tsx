@@ -2,9 +2,8 @@
 
 import { useRouter } from "next/navigation";
 
+import { Combobox } from "@/components/ui/Combobox";
 import type { Barrio } from "@/lib/barrios-busqueda";
-
-import { SelectorPastilla } from "./SelectorPastilla";
 
 type Props = {
   barrios: readonly Barrio[];
@@ -18,8 +17,9 @@ type Props = {
 };
 
 /**
- * Selector de barrio de referencia. Cambiarlo vale solo para la búsqueda que se está viendo: no
- * toca la cuenta (la URL es el estado). Sin barrios cargados muestra el Centro, deshabilitado.
+ * Selector de barrio de referencia (Combobox con búsqueda). Cambiarlo vale solo para la búsqueda
+ * que se está viendo: no toca la cuenta (la URL es el estado). Sin barrios cargados muestra el
+ * Centro, deshabilitado.
  */
 export function SelectorBarrio({ barrios, valor, ruta, prefijo, borde }: Props) {
   const router = useRouter();
@@ -29,14 +29,17 @@ export function SelectorBarrio({ barrios, valor, ruta, prefijo, borde }: Props) 
       : [{ valor, etiqueta: "Centro" }];
 
   return (
-    <SelectorPastilla
+    <Combobox
+      aspecto="pastilla"
       etiqueta="Tu barrio"
-      valor={valor}
+      value={valor}
       opciones={opciones}
       prefijo={prefijo}
       borde={borde}
       disabled={barrios.length === 0}
-      onCambio={(slug) => router.push(`${ruta}?barrio=${encodeURIComponent(slug)}`)}
+      placeholderBusqueda="Buscá tu barrio…"
+      sinResultados="No encontramos ese barrio."
+      onValueChange={(slug) => router.push(`${ruta}?barrio=${encodeURIComponent(slug)}`)}
     />
   );
 }

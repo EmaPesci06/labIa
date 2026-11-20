@@ -10,6 +10,7 @@ import { TarjetaTrabajo } from "@/components/TarjetaTrabajo";
 import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
 import { Chip, GrupoChips } from "@/components/ui/Chip";
+import { Combobox } from "@/components/ui/Combobox";
 import { OFICIOS, type Oficio } from "@/lib/busqueda";
 import { cn } from "@/lib/cn";
 import { comprimirImagen } from "@/lib/imagen";
@@ -211,19 +212,15 @@ export function FormularioTrabajo({
             </Chip>
           </div>
           {otroBarrio ? (
-            <Campo
-              variante="seleccion"
+            <Combobox
               etiqueta="Elegí el barrio"
-              value={barrioId ?? ""}
-              onChange={(e) => setBarrioId(e.target.value ? Number(e.target.value) : null)}
-            >
-              <option value="">Elegí un barrio</option>
-              {barrios.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.nombre}
-                </option>
-              ))}
-            </Campo>
+              opciones={barrios.map((b) => ({ valor: String(b.id), etiqueta: b.nombre }))}
+              value={barrioId ? String(barrioId) : ""}
+              onValueChange={(v) => setBarrioId(v ? Number(v) : null)}
+              placeholder="Elegí un barrio"
+              placeholderBusqueda="Buscá tu barrio…"
+              sinResultados="No encontramos ese barrio."
+            />
           ) : null}
           {errores.barrioId ? (
             <p role="alert" className="text-sm font-semibold text-error">
