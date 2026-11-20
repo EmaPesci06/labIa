@@ -5,7 +5,7 @@ import { useEffect, useState, useTransition } from "react";
 import { Aviso } from "@/components/ui/Aviso";
 import { Boton } from "@/components/ui/Boton";
 import { Chip } from "@/components/ui/Chip";
-import { HojaInferior } from "@/components/ui/HojaInferior";
+import { Hoja } from "@/components/ui/Hoja";
 import {
   consultarElegibilidadResena,
   guardarResena,
@@ -88,7 +88,7 @@ export function HojaResena({
     : `¿Cómo te fue con ${nombreProfesional}?`;
 
   return (
-    <HojaInferior
+    <Hoja
       abierta={abierta}
       onCambioAbierta={onCambioAbierta}
       titulo={titulo}
@@ -106,7 +106,7 @@ export function HojaResena({
           }}
         />
       ) : null}
-    </HojaInferior>
+    </Hoja>
   );
 }
 

@@ -247,6 +247,15 @@
 }
 
 /*
+ * Velo de las hojas y diálogos de shadcn (LAB-83): bg-black/10 no existe porque borramos la paleta
+ * por defecto; acá se ata al token velo al 60 %.
+ */
+[data-slot="sheet-overlay"],
+[data-slot="dialog-overlay"] {
+  background-color: color-mix(in srgb, var(--color-velo) 60%, transparent);
+}
+
+/*
  * Marco de las pantallas con navegación (`<main class="marco">`): una columna centrada de hasta
  * 1200 px con 20 px de margen (32 px desde `lg`). Los encabezados de color (`<Encabezado>` salvo la
  * variante `plano`) ocupan todo el ancho y alinean su contenido con esa columna; si son lo primero

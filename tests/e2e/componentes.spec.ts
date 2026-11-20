@@ -10,17 +10,71 @@ test.describe("/dev/ui", () => {
     expect(resultado.violations).toEqual([]);
   });
 
-  test("la hoja inferior no tiene errores de axe y se cierra con Esc", async ({ page }) => {
+  test("la hoja atrapa el foco, se cierra con Esc y devuelve el foco al botón que la abrió", async ({
+    page,
+  }) => {
     await page.goto("/dev/ui");
-    await page.getByRole("button", { name: "Contactar por WhatsApp" }).first().click();
+    const boton = page.getByRole("button", { name: "Contactar por WhatsApp" }).first();
+    await boton.focus();
+    await page.keyboard.press("Enter");
+
     const dialogo = page.getByRole("dialog", { name: "Antes de contactar" });
     await expect(dialogo).toBeVisible();
 
-    const resultado = await new AxeBuilder({ page }).include('[role="dialog"]').analyze();
-    expect(resultado.violations).toEqual([]);
+    const focoAdentro = () =>
+      page.evaluate(() => Boolean(document.activeElement?.closest('[role="dialog"]')));
+    await expect.poll(focoAdentro).toBe(true);
+
+    for (let i = 0; i < 8; i++) {
+      await page.keyboard.press("Tab");
+      await expect.poll(focoAdentro).toBe(true);
+    }
 
     await page.keyboard.press("Escape");
     await expect(dialogo).toBeHidden();
+    await expect(boton).toBeFocused();
+  });
+
+  for (const esquema of ["light", "dark"] as const) {
+    test(`la hoja abierta no tiene errores de axe en modo ${esquema === "light" ? "claro" : "oscuro"}`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ colorScheme: esquema });
+      await page.goto("/dev/ui");
+      await page.getByRole("button", { name: "Contactar por WhatsApp" }).first().click();
+
+      const dialogo = page.getByRole("dialog", { name: "Antes de contactar" });
+      await expect(dialogo).toBeVisible();
+      await expect(dialogo).toHaveCSS("opacity", "1");
+
+      const resultado = await new AxeBuilder({ page }).include('[role="dialog"]').analyze();
+      expect(resultado.violations).toEqual([]);
+    });
+  }
+
+  test("la hoja se apoya abajo en celular y se centra como diálogo en escritorio", async ({
+    page,
+  }) => {
+    await page.goto("/dev/ui");
+    await page.getByRole("button", { name: "Contactar por WhatsApp" }).first().click();
+
+    const dialogo = page.getByRole("dialog", { name: "Antes de contactar" });
+    await expect(dialogo).toBeVisible();
+
+    const caja = await dialogo.boundingBox();
+    const viewport = page.viewportSize();
+    expect(caja).not.toBeNull();
+    expect(viewport).not.toBeNull();
+    if (!caja || !viewport) return;
+
+    if (viewport.width < 1024) {
+      expect(caja.width).toBeGreaterThanOrEqual(viewport.width - 2);
+      expect(caja.y + caja.height).toBeGreaterThanOrEqual(viewport.height - 2);
+    } else {
+      expect(caja.width).toBeLessThanOrEqual(562);
+      expect(caja.x).toBeGreaterThan(200);
+      expect(caja.y).toBeGreaterThan(50);
+    }
   });
 
   test("ningún botón, enlace ni campo mide menos de 44 px de alto", async ({ page }) => {

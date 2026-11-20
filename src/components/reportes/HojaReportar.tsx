@@ -4,7 +4,7 @@ import { AlertTriangle, CheckCircle2 } from "lucide-react";
 import { useActionState, useEffect, useId, useState } from "react";
 
 import { Boton } from "@/components/ui/Boton";
-import { HojaInferior } from "@/components/ui/HojaInferior";
+import { Hoja } from "@/components/ui/Hoja";
 import { cn } from "@/lib/cn";
 import { registrarEvento } from "@/lib/metricas";
 import { enviarReporte } from "@/lib/reportes/acciones";
@@ -70,7 +70,7 @@ export function HojaReportar({
   }, [estado.exito, estado.motivoEnviado]);
 
   return (
-    <HojaInferior
+    <Hoja
       abierta={abierta}
       onCambioAbierta={handleCambioAbierta}
       titulo={
@@ -235,6 +235,6 @@ export function HojaReportar({
           </Boton>
         </form>
       )}
-    </HojaInferior>
+    </Hoja>
   );
 }

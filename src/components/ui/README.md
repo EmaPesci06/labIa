@@ -2,7 +2,7 @@
 
 Componentes base del sistema de diseño "Verano en la costa" (`docs/prototipo-nuevo/README.md`, sección "Piezas"):
 
-- Boton (principal, secundario, peligro, enlace), Campo (texto, área, selección), Chip (y GrupoChips), Insignia, Tarjeta, HojaInferior.
+- Boton (principal, secundario, peligro, enlace), Campo (texto, área, selección), Chip (y GrupoChips), Insignia, Tarjeta, Hoja (sobre `Sheet` de shadcn).
 - Encabezado (turquesa, equipo, sol, plano), Toldo, Avatar, Aviso (nota), AvisoPantalla (pantalla completa), Vacio.
 - Distancia (pastilla sol con la distancia), EtiquetaMono, Estrellas, Logo.
 
