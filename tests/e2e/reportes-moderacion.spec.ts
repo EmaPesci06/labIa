@@ -357,8 +357,18 @@ test.describe("moderación del admin", () => {
       moderado.page.getByRole("heading", { name: "Tu cuenta fue suspendida" }),
     ).toBeVisible();
     await expect(moderado.page.getByText(MOTIVO_SUSPENSION)).toBeVisible();
-    await capturar(moderado.page, "suspendida", "claro");
-    expect(graves(await new AxeBuilder({ page: moderado.page }).analyze())).toEqual([]);
+    // Axe sin filtrar por gravedad, en claro y oscuro, a 1440 y a 390 px.
+    for (const ancho of [1440, 390]) {
+      await moderado.page.setViewportSize({ width: ancho, height: ancho === 390 ? 844 : 900 });
+      for (const tema of ["claro", "oscuro"] as const) {
+        await moderado.page.emulateMedia({ colorScheme: tema === "oscuro" ? "dark" : "light" });
+        await capturar(moderado.page, "suspendida", tema);
+        const resultado = await new AxeBuilder({ page: moderado.page }).analyze();
+        expect(resultado.violations, `${ancho}px ${tema}`).toEqual([]);
+      }
+    }
+    await moderado.page.setViewportSize({ width: 1440, height: 900 });
+    await moderado.page.emulateMedia({ colorScheme: "light" });
 
     // LAB-81: sobre el fondo `equipo` el foco por teclado va en `sol` (en claro `foco` y `equipo` son
     // el mismo azul y el anillo no se vería).
