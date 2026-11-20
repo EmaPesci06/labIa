@@ -10,7 +10,12 @@ import {
   type TextareaHTMLAttributes,
 } from "react";
 
+import { Input } from "@/components/shadcn/input";
+import { Label } from "@/components/shadcn/label";
+import { Textarea } from "@/components/shadcn/textarea";
 import { cn } from "@/lib/cn";
+
+import { SIN_ANILLO } from "./foco";
 
 type PropsBase = {
   /** Texto de la etiqueta (siempre visible, arriba del campo). */
@@ -44,17 +49,26 @@ type PropsSeleccion = PropsBase & {
 
 export type CampoProps = PropsTexto | PropsArea | PropsSeleccion;
 
-// Borde de 2 px color texto (3 px con error, como en el prototipo), radio 16, fondo `campo`
-// (blanco en claro, fondo de página en oscuro). Texto 17 px: evita el zoom de iOS.
+// Texto e área: capa fina sobre `Input` y `Textarea` de shadcn. Radio de shadcn, borde de 2 px color
+// `borde` (3:1 sobre superficie y fondo, más visible que el `--input` de shadcn), 3 px con error.
+// Fondo `campo` en los dos temas (shadcn pinta `input/30` en oscuro). Texto de 17 px: evita el zoom
+// de iOS. Un solo foco: el outline de globals.css, sin el anillo de shadcn.
 const CONTROL =
+  "w-full border-2 border-borde bg-campo px-3.5 text-[17px] text-foreground md:text-[17px] dark:bg-campo " +
+  "focus-visible:border-borde aria-invalid:border-[3px] aria-invalid:border-error " +
+  "dark:aria-invalid:border-error " +
+  SIN_ANILLO;
+
+// Selección: sigue siendo el `<select>` nativo hasta LAB-84 (Select de shadcn), con su estilo propio.
+const CONTROL_SELECCION =
   "w-full rounded-campo border-2 border-texto bg-campo px-3.5 text-[17px] text-texto " +
   "placeholder:text-texto placeholder:opacity-60 " +
   "aria-invalid:border-3 aria-invalid:border-error " +
   "disabled:cursor-not-allowed disabled:opacity-60";
 
 /**
- * Campo de formulario con etiqueta, ayuda y error asociados. Alto 52 px, radio 16, borde de 2 px
- * color texto. Variantes: texto, teléfono, pesos (prefijo `$`), área (con contador) y selección.
+ * Campo de formulario con etiqueta, ayuda y error asociados: capa fina sobre `Input`, `Textarea` y
+ * `Label` de shadcn. Alto 52 px, borde de 2 px color `borde`. Variantes: texto, teléfono, pesos (prefijo `$`), área (con contador) y selección.
  *
  * @example
  * <Campo etiqueta="Nombre" name="nombre" error={errores.nombre} />
@@ -103,7 +117,7 @@ export function Campo(props: CampoProps) {
     } = props;
     void [_variante, _e, _a, _r, _c];
     control = (
-      <textarea
+      <Textarea
         {...area}
         {...comunes}
         rows={area.rows ?? 4}
@@ -130,7 +144,7 @@ export function Campo(props: CampoProps) {
         <select
           {...seleccion}
           {...comunes}
-          className={cn(CONTROL, "h-[52px] appearance-none pr-10")}
+          className={cn(CONTROL_SELECCION, "h-[52px] appearance-none pr-10")}
         >
           {children}
         </select>
@@ -167,7 +181,7 @@ export function Campo(props: CampoProps) {
             $
           </span>
         ) : null}
-        <input
+        <Input
           {...entrada}
           {...comunes}
           type={type ?? (esTelefono ? "tel" : "text")}
@@ -184,9 +198,9 @@ export function Campo(props: CampoProps) {
 
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
-      <label htmlFor={id} className="text-base font-bold text-texto">
+      <Label htmlFor={id} className="text-base leading-normal font-bold text-foreground">
         {etiqueta}
-      </label>
+      </Label>
       {control}
       {error ? (
         <p id={idError} className="text-[15px] font-bold text-error">

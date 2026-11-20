@@ -1,5 +1,6 @@
 import Image from "next/image";
 
+import { Avatar as AvatarShadcn } from "@/components/shadcn/avatar";
 import { cn } from "@/lib/cn";
 
 type Props = {
@@ -20,17 +21,21 @@ export function iniciales(nombre: string): string {
   return (primera + ultima).toUpperCase();
 }
 
-/** Avatar redondo con foto (`next/image`) o iniciales sobre turquesa, con borde sol. */
+/**
+ * Avatar redondo: capa fina sobre el `Avatar` de shadcn, con foto (`next/image`) o iniciales sobre
+ * turquesa, con borde sol. La foto no usa `AvatarImage` (que dibuja un `<img>` recién cuando carga):
+ * así sigue saliendo en el HTML del servidor y optimizada por `next/image`.
+ */
 export function Avatar({ nombre, src, tamano = 44, className }: Props) {
   const base = cn(
-    "relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full border-[3px] border-sol bg-accion text-sobre-accion",
+    "items-center justify-center overflow-hidden border-[3px] border-secondary bg-primary text-primary-foreground after:hidden",
     tamano === 84 ? "size-[84px] font-titulo text-[30px]" : "size-11 text-base font-bold",
     className,
   );
 
   if (src) {
     return (
-      <span className={base}>
+      <AvatarShadcn className={base}>
         <Image
           src={src}
           alt={nombre}
@@ -38,12 +43,12 @@ export function Avatar({ nombre, src, tamano = 44, className }: Props) {
           height={tamano}
           className="size-full object-cover"
         />
-      </span>
+      </AvatarShadcn>
     );
   }
   return (
-    <span role="img" aria-label={nombre} className={base}>
+    <AvatarShadcn role="img" aria-label={nombre} className={base}>
       <span aria-hidden>{iniciales(nombre)}</span>
-    </span>
+    </AvatarShadcn>
   );
 }
