@@ -3,6 +3,7 @@
 import { AlertTriangle, CheckCircle2 } from "lucide-react";
 import { useActionState, useEffect, useId, useState } from "react";
 
+import { RadioGroup, RadioGroupItem } from "@/components/shadcn/radio-group";
 import { Boton } from "@/components/ui/Boton";
 import { Hoja } from "@/components/ui/Hoja";
 import { cn } from "@/lib/cn";
@@ -132,45 +133,59 @@ export function HojaReportar({
 
           <fieldset className="flex flex-col gap-2">
             <legend className="mb-1 text-sm font-bold text-texto">Elegí el motivo</legend>
-            {MOTIVOS_REPORTE.map((motivo) => {
-              const inputId = `${idBase}-${motivo}`;
-              const seleccionado = motivoSeleccionado === motivo;
-              return (
-                <label
-                  key={motivo}
-                  htmlFor={inputId}
-                  className={cn(
-                    "flex min-h-[50px] cursor-pointer items-center gap-3 rounded-campo px-4 py-3 text-[17px]",
-                    seleccionado ? "bg-sol font-bold text-sobre-sol" : "bg-superficie text-texto",
-                  )}
-                >
-                  <input
-                    id={inputId}
-                    type="radio"
-                    name="motivo"
-                    value={motivo}
-                    checked={seleccionado}
-                    onChange={() => setMotivoSeleccionado(motivo)}
+            <RadioGroup
+              name="motivo"
+              value={motivoSeleccionado}
+              onValueChange={(valor) => setMotivoSeleccionado(valor as MotivoReporte)}
+              aria-describedby={estado.errores?.motivo ? `${idBase}-error-motivo` : undefined}
+              aria-invalid={estado.errores?.motivo ? true : undefined}
+              className="gap-2"
+            >
+              {MOTIVOS_REPORTE.map((motivo) => {
+                const inputId = `${idBase}-${motivo}`;
+                const textoId = `${inputId}-texto`;
+                const seleccionado = motivoSeleccionado === motivo;
+                return (
+                  <label
+                    key={motivo}
+                    htmlFor={inputId}
                     className={cn(
-                      "m-0 size-[22px] shrink-0",
-                      seleccionado ? "accent-texto" : "accent-accion",
-                    )}
-                  />
-                  <span
-                    className={cn(
-                      "text-[15px] leading-snug font-medium",
-                      seleccionado ? "text-sobre-sol" : "text-texto",
+                      "flex min-h-[50px] cursor-pointer items-center gap-3 rounded-campo px-4 py-3 text-[17px]",
+                      seleccionado ? "bg-sol font-bold text-sobre-sol" : "bg-superficie text-texto",
                     )}
                   >
-                    {ETIQUETAS_MOTIVO[motivo]}
-                  </span>
-                </label>
-              );
-            })}
+                    <RadioGroupItem
+                      id={inputId}
+                      value={motivo}
+                      aria-labelledby={textoId}
+                      className={cn(
+                        "size-[22px] shrink-0 border-2",
+                        seleccionado
+                          ? "border-sobre-sol bg-campo data-checked:border-sobre-sol! data-checked:bg-sobre-sol! [&_[data-slot=radio-group-indicator]>span]:bg-sol"
+                          : "border-texto bg-campo",
+                      )}
+                    />
+                    <span
+                      id={textoId}
+                      className={cn(
+                        "text-[15px] leading-snug font-medium",
+                        seleccionado ? "text-sobre-sol" : "text-texto",
+                      )}
+                    >
+                      {ETIQUETAS_MOTIVO[motivo]}
+                    </span>
+                  </label>
+                );
+              })}
+            </RadioGroup>
           </fieldset>
 
           {estado.errores?.motivo ? (
-            <p role="alert" className="text-sm font-semibold text-error">
+            <p
+              id={`${idBase}-error-motivo`}
+              role="alert"
+              className="text-sm font-semibold text-error"
+            >
               {estado.errores.motivo}
             </p>
           ) : null}

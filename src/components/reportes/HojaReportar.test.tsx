@@ -47,7 +47,9 @@ describe("HojaReportar", () => {
 
     expect(screen.queryByText(/Si estás en peligro, llamá al 911/)).not.toBeInTheDocument();
 
-    const radioComportamiento = screen.getByLabelText("Comportamiento inadecuado o inseguro");
+    const radioComportamiento = screen.getByRole("radio", {
+      name: "Comportamiento inadecuado o inseguro",
+    });
     await user.click(radioComportamiento);
 
     expect(screen.getByText(/Si estás en peligro, llamá al 911/)).toBeInTheDocument();

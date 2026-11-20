@@ -11,6 +11,7 @@ import "./globals.css";
 
 import { MetricasPostHog } from "@/components/MetricasPostHog";
 import { PieLegal } from "@/components/PieLegal";
+import { AvisosFlotantes } from "@/components/ui/AvisosFlotantes";
 
 // viewport-fit=cover deja que la página llegue al borde en celulares con notch; las barras usan
 // env(safe-area-inset-*). theme-color es el encabezado turquesa, que es igual en los dos temas.
@@ -55,6 +56,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <MetricasPostHog />
         </Suspense>
         <RegistrarServiceWorker />
+        <AvisosFlotantes />
       </body>
     </html>
   );
