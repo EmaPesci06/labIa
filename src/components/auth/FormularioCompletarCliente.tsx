@@ -12,7 +12,10 @@ import { esquemaCompletarCliente, type BarrioOpcion } from "@/lib/validaciones/r
 
 import { SelectorBarrio } from "./SelectorBarrio";
 
-/** Paso final para quien entró con Google: solo WhatsApp y barrio. */
+/**
+ * Paso final para quien entró con Google (o no completó el alta): WhatsApp, barrio y la casilla de
+ * mayor de 18 y términos. Sin esa casilla guardada en el servidor, la cuenta no usa la plataforma.
+ */
 export function FormularioCompletarCliente({ barrios }: { barrios: BarrioOpcion[] }) {
   const [estado, accion, pendiente] = useActionState<EstadoRegistroCliente, FormData>(
     completarRegistroCliente,

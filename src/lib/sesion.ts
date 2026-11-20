@@ -14,6 +14,11 @@ export type SesionActual = {
   rol: RolUsuario;
   /** Versión de las normas que aceptó (LAB-20), o `null` si todavía no aceptó. */
   normasVersion: string | null;
+  /**
+   * ¿Aceptó que es mayor de 18 y los términos? Lo guarda el servidor (`terminos_aceptados_at`).
+   * Solo se exige a los clientes: ver `altaIncompleta`.
+   */
+  terminosAceptados: boolean;
   perfil: {
     nombre: string | null;
     apellido: string | null;
@@ -69,6 +74,7 @@ export const obtenerSesion = cache(async (): Promise<SesionActual | null> => {
       },
       rol: falso,
       normasVersion: VERSION_NORMAS,
+      terminosAceptados: true,
       perfil: {
         nombre: falso === "profesional" ? "Martín" : "Laura",
         apellido: falso === "profesional" ? "Gómez" : "Fernández",
@@ -86,7 +92,7 @@ export const obtenerSesion = cache(async (): Promise<SesionActual | null> => {
 
   const { data: fila } = await supabase
     .from("usuarios")
-    .select("rol, estado, nombre, apellido, normas_version")
+    .select("rol, estado, nombre, apellido, normas_version, terminos_aceptados_at")
     .eq("id", data.user.id)
     .maybeSingle();
   // Sin fila o con la cuenta suspendida/baja: se trata como sin sesión.
@@ -97,6 +103,7 @@ export const obtenerSesion = cache(async (): Promise<SesionActual | null> => {
     usuario: { id: data.user.id, email },
     rol: fila.rol,
     normasVersion: fila.normas_version,
+    terminosAceptados: fila.terminos_aceptados_at !== null,
     perfil: {
       nombre: fila.nombre,
       apellido: fila.apellido,

@@ -43,6 +43,8 @@ vi.mock("@/lib/supabase/servidor", () => ({
   }),
 }));
 
+import { MENSAJE_ALTA_INCOMPLETA } from "@/lib/auth/alta";
+
 import { consultarElegibilidadResena, guardarResena } from "./acciones";
 
 const CLIENTE_ID = "11111111-1111-4111-8111-111111111111";
@@ -57,6 +59,7 @@ describe("guardarResena", () => {
     mockObtenerSesion.mockResolvedValue({
       usuario: { id: CLIENTE_ID },
       rol: "cliente",
+      terminosAceptados: true,
     });
   });
 
@@ -123,6 +126,19 @@ describe("guardarResena", () => {
     if (!res.ok) {
       expect(res.error).toMatch(/solo los clientes/i);
     }
+  });
+
+  it("falla si el cliente no aceptó mayor de 18 y términos (LAB-81)", async () => {
+    mockObtenerSesion.mockResolvedValue({
+      usuario: { id: CLIENTE_ID },
+      rol: "cliente",
+      terminosAceptados: false,
+    });
+
+    const res = await guardarResena({ profesionalId: PROFESIONAL_ID, puntaje: 5 });
+
+    expect(res).toEqual({ ok: false, error: MENSAJE_ALTA_INCOMPLETA });
+    expect(mockFrom).not.toHaveBeenCalled();
   });
 
   it("falla si el usuario intenta reseñarse a sí mismo", async () => {
@@ -467,6 +483,7 @@ describe("consultarElegibilidadResena", () => {
     mockObtenerSesion.mockResolvedValue({
       usuario: { id: CLIENTE_ID },
       rol: "cliente",
+      terminosAceptados: true,
     });
   });
 

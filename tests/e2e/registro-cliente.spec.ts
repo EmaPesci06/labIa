@@ -1,9 +1,30 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type BrowserContext } from "@playwright/test";
 
 // LAB-17 / LAB-76: registro de cliente. Estas pruebas no dependen de que el servidor tenga Supabase: solo
 // miran la pantalla y la validación; el registro completo corre con E2E_AUTH=1 (proyecto de desarrollo
 // con confirmación de email desactivada).
+
+const CON_FALSO = process.env.LABIA_E2E_SUPABASE_FALSO === "1";
+
+/** Cookie de sesión de un cliente que entró con Google y todavía no aceptó los términos. */
+async function entrarSinTerminos(context: BrowserContext, baseURL: string) {
+  const sesion = {
+    access_token: "tok-cliente-sin-terminos",
+    refresh_token: "refresh-falso",
+    token_type: "bearer",
+    expires_in: 3600,
+    expires_at: Math.floor(Date.now() / 1000) + 3600,
+    user: { id: "x", aud: "authenticated", role: "authenticated" },
+  };
+  await context.addCookies([
+    {
+      name: "sb-localhost-auth-token",
+      value: `base64-${Buffer.from(JSON.stringify(sesion)).toString("base64url")}`,
+      url: baseURL,
+    },
+  ]);
+}
 
 test.describe("registro de cliente", () => {
   test("muestra la pantalla del prototipo", async ({ page }) => {
@@ -119,25 +140,8 @@ test.describe("registro de cliente", () => {
     context,
     baseURL,
   }) => {
-    test.skip(
-      process.env.LABIA_E2E_SUPABASE_FALSO !== "1",
-      "Necesita el Supabase falso (sesión de cliente sin WhatsApp ni barrio).",
-    );
-    const sesion = {
-      access_token: "tok-cliente",
-      refresh_token: "refresh-falso",
-      token_type: "bearer",
-      expires_in: 3600,
-      expires_at: Math.floor(Date.now() / 1000) + 3600,
-      user: { id: "x", aud: "authenticated", role: "authenticated" },
-    };
-    await context.addCookies([
-      {
-        name: "sb-localhost-auth-token",
-        value: `base64-${Buffer.from(JSON.stringify(sesion)).toString("base64url")}`,
-        url: baseURL as string,
-      },
-    ]);
+    test.skip(!CON_FALSO, "Necesita el Supabase falso (sesión de cliente sin el alta completa).");
+    await entrarSinTerminos(context, baseURL as string);
     await page.goto("/registro/cliente/completar");
     const casilla = page.getByRole("checkbox", { name: /mayor de 18/ });
     await expect(casilla).not.toBeChecked();
@@ -150,6 +154,28 @@ test.describe("registro de cliente", () => {
     await expect(casilla).toHaveAttribute("aria-invalid", "true");
     await expect(casilla).toHaveAccessibleDescription(/mayor de 18/);
     await expect(page).toHaveURL(/\/registro\/cliente\/completar/);
+  });
+
+  // LAB-81: el consentimiento es un dato del servidor; "Un último paso" no se puede esquivar yendo
+  // directo a otra pantalla.
+  test("un cliente sin mayor de 18 y términos no pasa de 'Un último paso'", async ({
+    page,
+    context,
+    baseURL,
+  }) => {
+    test.skip(!CON_FALSO, "Necesita el Supabase falso (sesión de cliente sin el alta completa).");
+    await entrarSinTerminos(context, baseURL as string);
+    for (const ruta of [
+      "/inicio",
+      "/buscar",
+      "/trabajos/nuevo",
+      "/mis-trabajos",
+      "/cuenta/datos",
+    ]) {
+      await page.goto(ruta);
+      await expect(page, ruta).toHaveURL(/\/registro\/cliente\/completar/);
+    }
+    await expect(page.getByRole("heading", { level: 1, name: "Un último paso" })).toBeVisible();
   });
 
   test("sin violaciones de axe", async ({ page }) => {

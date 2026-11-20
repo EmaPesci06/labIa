@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { obtenerPerfil } from "@/lib/perfil/cargar";
 import { limitarPersistente, limitarPorIp } from "@/lib/rate-limit-persistente";
+import { MENSAJE_ALTA_INCOMPLETA } from "@/lib/auth/alta";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 
@@ -65,6 +66,7 @@ function preparar(opciones: { rpc?: Resultado; sinTrabajo?: boolean } = {}) {
   };
   vi.mocked(obtenerSesion).mockResolvedValue({
     rol: "cliente",
+    terminosAceptados: true,
     usuario: { id: CLIENTE },
   } as never);
   vi.mocked(supabaseConfigurado).mockReturnValue(true);
@@ -165,6 +167,26 @@ describe("contactarProfesional con origen postulacion (LAB-29)", () => {
     );
 
     expect(r.mensaje).toBe("Tu sesión venció. Ingresá de nuevo para contactar.");
+  });
+});
+
+describe("contactarProfesional: alta incompleta (LAB-81)", () => {
+  it("un cliente que no aceptó mayor de 18 y términos no contacta ni recibe el WhatsApp", async () => {
+    const { rpcLlamadas } = preparar();
+    vi.mocked(obtenerSesion).mockResolvedValue({
+      rol: "cliente",
+      terminosAceptados: false,
+      usuario: { id: CLIENTE },
+    } as never);
+
+    const r = await contactarProfesional(
+      estadoInicial,
+      formulario({ profesionalId: PROFESIONAL, origen: "perfil" }),
+    );
+
+    expect(r.mensaje).toBe(MENSAJE_ALTA_INCOMPLETA);
+    expect(r.url).toBeUndefined();
+    expect(rpcLlamadas).toHaveLength(0);
   });
 });
 

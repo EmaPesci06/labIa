@@ -1,5 +1,6 @@
 "use server";
 
+import { altaIncompleta, MENSAJE_ALTA_INCOMPLETA } from "@/lib/auth/alta";
 import { limiteReportePorIp } from "@/lib/limites";
 import { registrarEventoServidor } from "@/lib/metricas-servidor";
 import { limitarPersistente } from "@/lib/rate-limit-persistente";
@@ -41,6 +42,7 @@ export async function enviarReporte(
       mensaje: "Necesitás iniciar sesión para enviar un reporte.",
     };
   }
+  if (altaIncompleta(sesion)) return { mensaje: MENSAJE_ALTA_INCOMPLETA };
 
   // Rate limit persistente (LAB-47): cuenta en Postgres, compartido entre instancias.
   const limite = await limitarPersistente(`reporte:${sesion.usuario.id}`, REGLA_RATE_LIMIT);

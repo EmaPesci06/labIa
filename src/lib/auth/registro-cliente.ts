@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 
+import { VERSION_LEGALES } from "@/lib/legales";
 import { registrarEventoServidor } from "@/lib/metricas-servidor";
 import { limitarPersistente, limitarPorIp, mensajeDeLimite } from "@/lib/rate-limit-persistente";
 import { rolDeLaSesion } from "@/lib/sesion";
@@ -15,6 +16,7 @@ import {
   separarNombre,
 } from "@/lib/validaciones/registro-cliente";
 
+import { RUTA_COMPLETAR_ALTA } from "./alta";
 import { guardarDatosDeCliente } from "./datos-de-cliente";
 import type { EstadoFormulario } from "./estado";
 import { inicioDelRol } from "./rutas";
@@ -30,6 +32,12 @@ export type EstadoRegistroCliente = EstadoFormulario & {
 const REGLA_REGISTRO = { maximo: 5, ventanaMs: 60_000 } as const;
 const MENSAJE_SIN_SUPABASE = "El registro todavía no está disponible. Probá de nuevo más tarde.";
 const MENSAJE_ERROR_GENERAL = "No pudimos completar el registro. Probá de nuevo en unos minutos.";
+
+/** Graba en el servidor que la persona es mayor de 18 y aceptó los términos vigentes (LAB-81). */
+async function guardarTerminos(supabase: Awaited<ReturnType<typeof crearClienteServidor>>) {
+  const { error } = await supabase.rpc("aceptar_terminos", { p_version: VERSION_LEGALES });
+  return !error;
+}
 
 const texto = (datos: FormData, clave: string): string => {
   const valor = datos.get(clave);
@@ -57,9 +65,10 @@ function mensajeDeAuth(codigo: string | undefined, estado: number | undefined): 
 
 /**
  * Registro de cliente con email. `signUp` crea la cuenta con rol `cliente` (el trigger arma la
- * fila de `usuarios`). Si Supabase devuelve sesión, se guardan WhatsApp y barrio en el momento;
- * si pide confirmar el email, esos datos viajan en la metadata del usuario y el callback los
- * aplica cuando toca el enlace.
+ * fila de `usuarios`). Si Supabase devuelve sesión, se guardan WhatsApp, barrio y el consentimiento
+ * en el momento; si pide confirmar el email, WhatsApp y barrio viajan en la metadata del usuario
+ * (el callback los aplica cuando toca el enlace, ver LAB-17) y el consentimiento lo graba el
+ * trigger del alta (`terminos_version` de la metadata, solo con proveedor email).
  */
 export async function registrarCliente(
   _anterior: EstadoRegistroCliente,
@@ -101,7 +110,14 @@ export async function registrarCliente(
     options: {
       // El trigger `al_crear_usuario` toma rol, nombre y apellido; solo acepta cliente/profesional.
       // whatsapp y barrio_id esperan acá hasta que haya sesión (confirmación de email).
-      data: { rol: "cliente", nombre, apellido, whatsapp, barrio_id: barrio },
+      data: {
+        rol: "cliente",
+        nombre,
+        apellido,
+        whatsapp,
+        barrio_id: barrio,
+        terminos_version: VERSION_LEGALES,
+      },
       emailRedirectTo: `${urlDelSitio()}/api/auth/callback?rol=cliente`,
     },
   });
@@ -118,13 +134,12 @@ export async function registrarCliente(
   const usuario = data.user;
   if (!data.session || !usuario) return { confirmarEmail: email, valores: { email } };
 
-  const guardado = await guardarDatosDeCliente(supabase, usuario.id, {
-    whatsapp,
-    barrioId: barrio,
-  });
+  const guardado =
+    (await guardarDatosDeCliente(supabase, usuario.id, { whatsapp, barrioId: barrio })) &&
+    (await guardarTerminos(supabase));
   if (!guardado) {
     // La cuenta ya existe: se termina en el paso de completar datos.
-    redirect("/registro/cliente/completar?aviso=datos");
+    redirect(`${RUTA_COMPLETAR_ALTA}?aviso=datos`);
   }
 
   await registrarEventoServidor(usuario.id, "registro_completado", { rol: "cliente" });
@@ -162,10 +177,13 @@ export async function completarRegistroCliente(
   const limite = await mensajeSiSuperaElLimite("completar-registro");
   if (limite) return { mensaje: limite, valores };
 
-  const guardado = await guardarDatosDeCliente(supabase, auth.user.id, {
-    whatsapp: resultado.data.whatsapp,
-    barrioId: resultado.data.barrio,
-  });
+  // El consentimiento se graba primero: sin él la cuenta no usa la plataforma (LAB-81).
+  const guardado =
+    (await guardarTerminos(supabase)) &&
+    (await guardarDatosDeCliente(supabase, auth.user.id, {
+      whatsapp: resultado.data.whatsapp,
+      barrioId: resultado.data.barrio,
+    }));
   if (!guardado) return { mensaje: MENSAJE_ERROR_GENERAL, valores };
 
   await registrarEventoServidor(auth.user.id, "registro_completado", { rol: "cliente" });

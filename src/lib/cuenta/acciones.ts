@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { altaIncompleta, MENSAJE_ALTA_INCOMPLETA } from "@/lib/auth/alta";
 import type { EstadoFormulario } from "@/lib/auth/estado";
 import { guardarDatosDeCliente } from "@/lib/auth/datos-de-cliente";
 import { limitarPersistente, limitarPorIp } from "@/lib/rate-limit-persistente";
@@ -66,19 +67,28 @@ function mensajeDeAuth(codigo: string | undefined): string {
   }
 }
 
-/** Sesión con una cuenta activa de cliente o profesional, o el mensaje de por qué no. */
-async function sesionDeCuenta() {
+/**
+ * Sesión con una cuenta activa de cliente o profesional, o el mensaje de por qué no. Con
+ * `exigirAlta`, un cliente que todavía no aceptó "mayor de 18 y términos" tampoco pasa (LAB-81).
+ */
+async function sesionDeCuenta(exigirAlta = false) {
   if (!supabaseConfigurado()) return { error: SIN_SUPABASE } as const;
   const supabase = await crearClienteServidor();
   const { data } = await supabase.auth.getUser();
   if (!data.user) return { error: "Tu sesión venció. Ingresá de nuevo." } as const;
   const { data: fila } = await supabase
     .from("usuarios")
-    .select("rol, estado")
+    .select("rol, estado, terminos_aceptados_at")
     .eq("id", data.user.id)
     .maybeSingle();
   if (!fila || fila.estado !== "activa" || fila.rol === "admin") {
     return { error: "No podés hacer este cambio con esta cuenta." } as const;
+  }
+  if (
+    exigirAlta &&
+    altaIncompleta({ rol: fila.rol, terminosAceptados: !!fila.terminos_aceptados_at })
+  ) {
+    return { error: MENSAJE_ALTA_INCOMPLETA } as const;
   }
   return { supabase, usuario: data.user, rol: fila.rol } as const;
 }
@@ -96,7 +106,7 @@ export async function guardarDatos(
   const resultado = esquemaDatosCuenta.safeParse(entrada);
   if (!resultado.success) return { errores: erroresPorCampo(resultado.error), valores: entrada };
 
-  const sesion = await sesionDeCuenta();
+  const sesion = await sesionDeCuenta(true);
   if ("error" in sesion) return { mensaje: sesion.error, valores: entrada };
   const limite = await superaElLimite("datos", sesion.usuario.id);
   if (limite) return { mensaje: limite, valores: entrada };
@@ -196,7 +206,7 @@ export async function cambiarContrasena(
 export async function guardarFotoDePerfil(
   ruta: string | null,
 ): Promise<{ ok: boolean; mensaje?: string }> {
-  const sesion = await sesionDeCuenta();
+  const sesion = await sesionDeCuenta(true);
   if ("error" in sesion) return { ok: false, mensaje: sesion.error };
   const uid = sesion.usuario.id;
   if (ruta !== null && !(typeof ruta === "string" && esRutaFotoPerfil(ruta, uid))) {

@@ -106,4 +106,11 @@ export const esquemaRegistroCliente = z.object({
  */
 export const esquemaCompletarCliente = z.object({ whatsapp, barrio, mayorEdad });
 
+/**
+ * WhatsApp y barrio, sin la casilla: lo que se vuelve a validar cuando los datos vienen de la
+ * metadata del alta con email. La casilla nunca se toma de la metadata (la escribe el usuario):
+ * el consentimiento vive en el servidor (`usuarios.terminos_aceptados_at`).
+ */
+export const esquemaDatosDeContacto = esquemaCompletarCliente.omit({ mayorEdad: true });
+
 export const esquemaReenviar = z.object({ email });

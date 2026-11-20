@@ -7,6 +7,7 @@ import { erroresPorCampo } from "./auth";
 import {
   BARRIOS_FRECUENTES,
   esquemaCompletarCliente,
+  esquemaDatosDeContacto,
   esquemaRegistroCliente,
   MENSAJE_MAYOR_EDAD,
   normalizarBusqueda,
@@ -134,6 +135,24 @@ describe("normalizarBusqueda", () => {
   it("ignora acentos y mayúsculas", () => {
     expect(normalizarBusqueda("  Chauvín ")).toBe("chauvin");
     expect(normalizarBusqueda("CONSTITUCIÓN")).toBe("constitucion");
+  });
+});
+
+describe("esquemaDatosDeContacto", () => {
+  it("valida WhatsApp y barrio sin la casilla (los datos de la metadata del alta con email)", () => {
+    expect(esquemaDatosDeContacto.safeParse({ whatsapp: "2235551234", barrio: "51" }).success).toBe(
+      true,
+    );
+    expect(esquemaDatosDeContacto.safeParse({ whatsapp: "no", barrio: "51" }).success).toBe(false);
+  });
+
+  it("ignora una casilla que venga de afuera: nunca vale como consentimiento", () => {
+    const r = esquemaDatosDeContacto.parse({
+      whatsapp: "2235551234",
+      barrio: "51",
+      mayorEdad: "on",
+    });
+    expect(r).not.toHaveProperty("mayorEdad");
   });
 });
 

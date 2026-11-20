@@ -20,11 +20,11 @@ async function Contenido({ searchParams }: PageProps<"/registro/cliente/completa
     const supabase = await crearClienteServidor();
     const { data: fila } = await supabase
       .from("usuarios")
-      .select("whatsapp, barrio_id")
+      .select("whatsapp, barrio_id, terminos_aceptados_at")
       .eq("id", sesion.usuario.id)
       .maybeSingle();
-    // Ya tiene todo: no hay nada que completar.
-    if (fila?.whatsapp && fila.barrio_id) redirect("/inicio");
+    // Ya tiene todo, también el consentimiento (LAB-81): no hay nada que completar.
+    if (fila?.whatsapp && fila.barrio_id && fila.terminos_aceptados_at) redirect("/inicio");
   } else {
     redirect("/inicio");
   }
