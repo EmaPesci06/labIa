@@ -1590,6 +1590,7 @@ const server = http.createServer((req, res) => {
         { id: 1, nombre: "Centro", slug: "centro" },
         { id: 2, nombre: "La Perla", slug: "la-perla" },
         { id: 3, nombre: "Güemes", slug: "guemes" },
+        { id: 20, nombre: "Chauvín", slug: "chauvin" },
       ];
       const en = url.searchParams.get("id");
       if (en && en.startsWith("in.")) {

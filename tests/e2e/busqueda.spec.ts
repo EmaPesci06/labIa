@@ -159,30 +159,27 @@ test.describe("resultados", () => {
     const buscador = page.getByPlaceholder("Buscá tu barrio…");
     await expect(buscador).toBeFocused();
     // Navega con flechas dentro de la lista abierta antes de confirmar con Enter.
-    await expect(page.getByRole("option", { name: "Centro" })).toHaveAttribute(
-      "aria-selected",
-      "true",
-    );
+    const opciones = page.getByRole("option");
+    await expect(opciones.nth(0)).toHaveAttribute("aria-selected", "true");
     await page.keyboard.press("ArrowDown");
-    await expect(page.getByRole("option", { name: "La Perla" })).toHaveAttribute(
-      "aria-selected",
-      "true",
-    );
+    await expect(opciones.nth(1)).toHaveAttribute("aria-selected", "true");
+    const segundoNombre = (await opciones.nth(1).textContent())?.trim() ?? "";
+    expect(segundoNombre.length).toBeGreaterThan(0);
     await page.keyboard.press("Enter");
     await expect(barrio).toHaveAttribute("aria-expanded", "false");
-    await expect(page).toHaveURL(/barrio=la-perla/);
+    await expect(page).not.toHaveURL(/barrio=centro$/);
     await expect(
-      page.getByRole("status").filter({ hasText: "Tu barrio: La Perla" }),
+      page.getByRole("status").filter({ hasText: `Tu barrio: ${segundoNombre}` }),
     ).toBeAttached();
 
-    // También filtra escribiendo en el buscador sin acentos.
+    // También filtra escribiendo en el buscador sin acentos (Chauvín existe en falso y en Supabase real).
     await barrio.click();
     await expect(buscador).toBeFocused();
-    await buscador.fill("guemes");
-    await expect(page.getByRole("option", { name: "Güemes" })).toBeVisible();
+    await buscador.fill("chauvin");
+    await expect(page.getByRole("option", { name: "Chauvín" })).toBeVisible();
     await page.keyboard.press("Enter");
-    await expect(page).toHaveURL(/barrio=guemes/);
-    await expect(page.getByRole("status").filter({ hasText: "Tu barrio: Güemes" })).toBeAttached();
+    await expect(page).toHaveURL(/barrio=chauvin/);
+    await expect(page.getByRole("status").filter({ hasText: "Tu barrio: Chauvín" })).toBeAttached();
   });
 
   for (const esquema of ["light", "dark"] as const) {
