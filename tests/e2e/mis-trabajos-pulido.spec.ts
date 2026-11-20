@@ -2,6 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext, type Page, type TestInfo } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
+import { esperarHojaQuieta, focoDentroDelDialogo } from "./apoyo/hoja";
 
 // LAB-48: pulido de Mis trabajos del cliente. Grilla en escritorio, pestañas como links con
 // aria-current, hoja de elegir accesible (foco atrapado, Esc, foco que vuelve), error de elegir
@@ -154,12 +155,14 @@ for (const esquema of ["light", "dark"] as const) {
       await expect(page.getByText("¿Elegís a Martín?")).toBeVisible();
 
       // El foco entra a la hoja y no sale con Tab.
-      const dentroDelDialogo = () =>
-        page.evaluate(() => Boolean(document.activeElement?.closest('[role="dialog"]')));
-      expect(await dentroDelDialogo()).toBe(true);
+      // Base UI pasa el foco por una guarda y lo devuelve a la hoja en el cuadro siguiente: se espera a que
+      // se asiente (si de verdad se escapara, quedaría afuera y `poll` vencería).
+      await expect.poll(() => focoDentroDelDialogo(page)).toBe(true);
       for (let i = 0; i < 6; i++) {
         await page.keyboard.press("Tab");
-        expect(await dentroDelDialogo(), `Tab ${i + 1} salió de la hoja`).toBe(true);
+        await expect
+          .poll(() => focoDentroDelDialogo(page), { message: `Tab ${i + 1} salió de la hoja` })
+          .toBe(true);
       }
 
       // Esc cierra sin elegir y devuelve el foco al botón que la abrió.
@@ -249,7 +252,7 @@ for (const esquema of ["light", "dark"] as const) {
         visible: true,
       });
       await tarjeta.getByRole("button", { name: "Elegir" }).click();
-      await expect(page.getByRole("dialog")).toBeVisible();
+      await esperarHojaQuieta(page);
       await capturar(page, testInfo, `hoja-elegir-${esquema}`);
 
       const resultado = await new AxeBuilder({ page }).analyze();
@@ -285,9 +288,10 @@ test.describe("Elegir con error (LAB-48)", () => {
         visible: true,
       });
       await tarjeta.getByRole("button", { name: "Elegir" }).click();
+      const dialogo = page.getByRole("dialog");
+      await esperarHojaQuieta(page, dialogo);
       await page.getByRole("button", { name: "Elegir profesional" }).click();
 
-      const dialogo = page.getByRole("dialog");
       await expect(dialogo).toBeVisible();
       const error = dialogo.getByRole("alert");
       await expect(error).toContainText("No podés elegir a este postulante");

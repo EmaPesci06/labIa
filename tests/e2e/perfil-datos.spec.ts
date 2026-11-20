@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
+import { esperarHojaQuieta } from "./apoyo/hoja";
 
 // LAB-24: perfil público y edición, con un Supabase FALSO (tests/e2e/apoyo/supabase-falso.cjs).
 // Sirve en máquinas sin Docker. Para correr:
@@ -181,7 +182,7 @@ test.describe("contacto por WhatsApp: cliente con sesión", () => {
     await abrirHoja.click();
 
     const hoja = page.getByRole("dialog", { name: /Escribile a .+ por WhatsApp/ });
-    await expect(hoja).toBeVisible();
+    await esperarHojaQuieta(page, hoja);
     await expect(hoja.getByRole("listitem")).toHaveCount(4);
     await expect(hoja.getByText("Pedí el presupuesto por escrito.")).toBeVisible();
     await capturar(page, "contacto-hoja", "claro");
@@ -296,7 +297,10 @@ for (const tema of ["light", "dark"] as const) {
         .filter({ visible: true })
         .first()
         .click();
-      await expect(page.getByRole("dialog", { name: /Escribile a .+ por WhatsApp/ })).toBeVisible();
+      await esperarHojaQuieta(
+        page,
+        page.getByRole("dialog", { name: /Escribile a .+ por WhatsApp/ }),
+      );
       await capturar(page, "contacto-hoja", nombreTema);
       await sinViolacionesGraves(page);
       await page.keyboard.press("Escape");

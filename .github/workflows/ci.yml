@@ -184,6 +184,21 @@ jobs:
         env:
           NEXT_PUBLIC_SITE_URL: http://localhost:3000
 
+      # Las pruebas que se saltean sin el Supabase falso (hojas, reseñas, perfil, mis trabajos, reportes…) no
+      # corren contra la base real. Acá se las corre contra `tests/e2e/apoyo/supabase-falso.cjs`: no lleva
+      # secretos (las claves son de relleno y el falso decide quién mira por el token de la cookie). Se
+      # reconstruye la app apuntando al falso y van con un solo worker porque comparten su estado.
+      - name: Pruebas de punta a punta con el Supabase falso
+        run: |
+          node tests/e2e/apoyo/supabase-falso.cjs &
+          pnpm exec playwright test --workers=1             capturas-lab-78 contacto-whatsapp contenido-publico mis-trabajos-cliente mis-trabajos-pulido             panel-verificacion pase-final perfil-datos registro-cliente reportes-moderacion resenas             trabajos-escritorio trabajos-profesional
+        env:
+          NEXT_PUBLIC_SITE_URL: http://localhost:3000
+          NEXT_PUBLIC_SUPABASE_URL: http://localhost:54399
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: clave-anonima-falsa
+          SUPABASE_SERVICE_ROLE_KEY: clave-de-servicio-falsa
+          LABIA_E2E_SUPABASE_FALSO: "1"
+
       - name: Subir el reporte de Playwright
         if: failure()
         uses: actions/upload-artifact@v7
