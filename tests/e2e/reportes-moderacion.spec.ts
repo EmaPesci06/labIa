@@ -7,6 +7,7 @@ import {
   type Page,
   type TestInfo,
 } from "@playwright/test";
+import { esperarHojaQuieta } from "./apoyo/hoja";
 
 // LAB-32: reportes y moderación con el Supabase FALSO (tests/e2e/apoyo/supabase-falso.cjs).
 // Cubre: reportar perfil, trabajo y reseña (hoja, motivos, límite de detalle, errores junto al mensaje);
@@ -230,8 +231,7 @@ test.describe("reportes del cliente y del profesional", () => {
       await page.emulateMedia({ colorScheme: tema === "oscuro" ? "dark" : "light" });
       await botonVisible(page, "Reportar este perfil").click();
       const hoja = hojaDeReporte(page);
-      await expect(hoja).toBeVisible();
-      await expect(hoja).toHaveCSS("opacity", "1");
+      await esperarHojaQuieta(page, hoja);
       const radioEstafa = hoja.getByRole("radio", { name: MOTIVO_ESTAFA });
       await radioEstafa.check();
       await expect(radioEstafa).toHaveCSS("background-color", "rgb(18, 59, 74)");

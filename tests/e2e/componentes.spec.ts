@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { esperarHojaQuieta } from "./apoyo/hoja";
 
 test.describe("/dev/ui", () => {
   test("no tiene errores de axe (claro y oscuro a la vez)", async ({ page }) => {
@@ -44,8 +45,7 @@ test.describe("/dev/ui", () => {
       await page.getByRole("button", { name: "Contactar por WhatsApp" }).first().click();
 
       const dialogo = page.getByRole("dialog", { name: "Antes de contactar" });
-      await expect(dialogo).toBeVisible();
-      await expect(dialogo).toHaveCSS("opacity", "1");
+      await esperarHojaQuieta(page, dialogo);
 
       const resultado = await new AxeBuilder({ page }).include('[role="dialog"]').analyze();
       expect(resultado.violations).toEqual([]);

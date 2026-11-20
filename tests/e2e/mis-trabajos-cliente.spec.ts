@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext } from "@playwright/test";
 import { reiniciarFalso } from "./apoyo/reiniciar-falso";
+import { esperarHojaQuieta } from "./apoyo/hoja";
 
 // LAB-29: flujo completo de Mis Trabajos del cliente:
 // ver postulantes, comparar, elegir a uno atómicamente, flujo de WhatsApp con origen 'postulacion',
@@ -99,7 +100,7 @@ test.describe("Mis trabajos del cliente (LAB-29)", () => {
     await botonElegir.click();
 
     // Diálogo de confirmación accesible
-    await expect(page.getByRole("dialog")).toBeVisible();
+    await esperarHojaQuieta(page);
     await expect(page.getByText("¿Elegís a Martín?")).toBeVisible();
 
     // Confirmar elección

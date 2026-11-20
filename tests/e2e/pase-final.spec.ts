@@ -98,6 +98,10 @@ async function abrir(page: Page, ruta: string, esquema: Esquema) {
   expect(respuesta?.status(), `respuesta de ${ruta}`).toBeLessThan(400);
   // Esperá al h1 visible: el contenido con Suspense llega después de <main>, y axe pide un h1.
   await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
+  // Tras hidratar, algunas pantallas navegan solas (en escritorio /mis-trabajos agrega ?id= con
+  // router.replace) y durante esa navegación el <title> falta un instante: se espera a que se asiente.
+  await page.waitForLoadState("networkidle");
+  await expect(page).toHaveTitle(/.+/);
 }
 
 /** Axe con todas las infracciones (LAB-81: sin excepciones, también las menores). */
