@@ -161,7 +161,7 @@ export function HojaReportar({
                       className={cn(
                         "size-[22px] shrink-0 border-2",
                         seleccionado
-                          ? "border-sobre-sol bg-campo data-checked:border-sobre-sol data-checked:bg-sobre-sol [&_[data-slot=radio-group-indicator]>span]:bg-sol"
+                          ? "border-sobre-sol bg-campo data-checked:border-sobre-sol! data-checked:bg-sobre-sol! [&_[data-slot=radio-group-indicator]>span]:bg-sol"
                           : "border-texto bg-campo",
                       )}
                     />

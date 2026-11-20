@@ -232,7 +232,9 @@ test.describe("reportes del cliente y del profesional", () => {
       const hoja = hojaDeReporte(page);
       await expect(hoja).toBeVisible();
       await expect(hoja).toHaveCSS("opacity", "1");
-      await hoja.getByRole("radio", { name: MOTIVO_ESTAFA }).check();
+      const radioEstafa = hoja.getByRole("radio", { name: MOTIVO_ESTAFA });
+      await radioEstafa.check();
+      await expect(radioEstafa).toHaveCSS("background-color", "rgb(18, 59, 74)");
       await capturar(page, "reporte-hoja", tema);
       // Solo la hoja: la página de fondo queda atenuada por el velo y axe mide ese color mezclado.
       const resultado = await new AxeBuilder({ page }).include('[role="dialog"]').analyze();
