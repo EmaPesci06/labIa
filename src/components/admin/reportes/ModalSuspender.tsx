@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 
 import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
-import { HojaInferior } from "@/components/ui/HojaInferior";
+import { Hoja } from "@/components/ui/Hoja";
 import { suspenderCuentaAccion } from "@/lib/admin/reportes-acciones";
 
 type Props = {
@@ -38,7 +38,7 @@ export function ModalSuspender({ abierta, onCambioAbierta, usuarioId, nombreUsua
   };
 
   return (
-    <HojaInferior
+    <Hoja
       abierta={abierta}
       onCambioAbierta={(ab) => {
         if (!pendiente) {
@@ -89,6 +89,6 @@ export function ModalSuspender({ abierta, onCambioAbierta, usuarioId, nombreUsua
           </Boton>
         </div>
       </div>
-    </HojaInferior>
+    </Hoja>
   );
 }

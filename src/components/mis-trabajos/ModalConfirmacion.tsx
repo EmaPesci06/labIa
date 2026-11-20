@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 
 import { Boton, type VarianteBoton } from "@/components/ui/Boton";
-import { HojaInferior } from "@/components/ui/HojaInferior";
+import { Hoja } from "@/components/ui/Hoja";
 
 type Props = {
   abierta: boolean;
@@ -38,7 +38,7 @@ export function ModalConfirmacion({
   children,
 }: Props) {
   return (
-    <HojaInferior
+    <Hoja
       abierta={abierta}
       onCambioAbierta={onCambioAbierta}
       titulo={titulo}
@@ -74,6 +74,6 @@ export function ModalConfirmacion({
           Cancelar
         </Boton>
       </div>
-    </HojaInferior>
+    </Hoja>
   );
 }

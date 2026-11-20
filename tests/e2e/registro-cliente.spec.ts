@@ -197,7 +197,7 @@ test.describe("registro de cliente con Supabase real", () => {
     await page.getByLabel("Email").fill(email);
     await page.getByLabel("Contraseña", { exact: true }).fill("clave-de-prueba-123");
     await page.getByLabel("Tu barrio").selectOption({ label: "Chauvín" });
-    await page.getByLabel(/mayor de 18/).check();
+    await page.getByRole("checkbox", { name: /mayor de 18/ }).check();
     await page.getByRole("button", { name: "Crear cuenta" }).click();
     await expect(page).toHaveURL(/\/inicio$/);
 
@@ -209,7 +209,7 @@ test.describe("registro de cliente con Supabase real", () => {
     await page.getByLabel("Email").fill(email);
     await page.getByLabel("Contraseña", { exact: true }).fill("clave-de-prueba-123");
     await page.getByLabel("Tu barrio").selectOption({ label: "Centro" });
-    await page.getByLabel(/mayor de 18/).check();
+    await page.getByRole("checkbox", { name: /mayor de 18/ }).check();
     await page.getByRole("button", { name: "Crear cuenta" }).click();
     await expect(page.getByText(`Te mandamos un mail a ${email}.`)).toBeVisible();
     await expect(page.getByText(/Ya hay una cuenta con ese email/)).toHaveCount(0);

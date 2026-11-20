@@ -132,7 +132,7 @@ test.describe("reportes del cliente y del profesional", () => {
     await expect(hoja).toBeVisible();
     await expect(hoja.getByRole("button", { name: "Enviar reporte" })).toBeDisabled();
 
-    await hoja.getByLabel(MOTIVO_ESTAFA).check();
+    await hoja.getByRole("radio", { name: MOTIVO_ESTAFA }).check();
     await expect(hoja.getByRole("button", { name: "Enviar reporte" })).toBeEnabled();
 
     const detalle = hoja.getByLabel("Contanos qué pasó");
@@ -151,7 +151,7 @@ test.describe("reportes del cliente y del profesional", () => {
     // Segundo reporte sobre el mismo perfil (tras recargar): el servidor lo rechaza junto al formulario.
     await page.reload();
     await botonVisible(page, "Reportar este perfil").click();
-    await hoja.getByLabel(MOTIVO_CONTENIDO).check();
+    await hoja.getByRole("radio", { name: MOTIVO_CONTENIDO }).check();
     await hoja.getByRole("button", { name: "Enviar reporte" }).click();
     await expect(hoja.getByRole("alert").filter({ hasText: YA_REPORTADO })).toBeVisible();
   });
@@ -192,7 +192,7 @@ test.describe("reportes del cliente y del profesional", () => {
       .click();
     const hoja = hojaDeReporte(page);
     await expect(hoja).toBeVisible();
-    await hoja.getByLabel(MOTIVO_CONTENIDO).check();
+    await hoja.getByRole("radio", { name: MOTIVO_CONTENIDO }).check();
     await capturar(page, "reporte-resena", "claro");
     await hoja.getByRole("button", { name: "Enviar reporte" }).click();
     await expect(hoja.getByText("Gracias por avisarnos.")).toBeVisible();
@@ -211,7 +211,7 @@ test.describe("reportes del cliente y del profesional", () => {
       .getByRole("button", { name: "Reportar", exact: true })
       .click();
     const hoja = hojaDeReporte(page);
-    await hoja.getByLabel(MOTIVO_CONTENIDO).check();
+    await hoja.getByRole("radio", { name: MOTIVO_CONTENIDO }).check();
     await hoja.getByRole("button", { name: "Enviar reporte" }).click();
     await expect(
       hoja.getByRole("alert").filter({ hasText: "No podés reportar tu propia reseña." }),
@@ -231,7 +231,10 @@ test.describe("reportes del cliente y del profesional", () => {
       await botonVisible(page, "Reportar este perfil").click();
       const hoja = hojaDeReporte(page);
       await expect(hoja).toBeVisible();
-      await hoja.getByLabel(MOTIVO_ESTAFA).check();
+      await expect(hoja).toHaveCSS("opacity", "1");
+      const radioEstafa = hoja.getByRole("radio", { name: MOTIVO_ESTAFA });
+      await radioEstafa.check();
+      await expect(radioEstafa).toHaveCSS("background-color", "rgb(18, 59, 74)");
       await capturar(page, "reporte-hoja", tema);
       // Solo la hoja: la página de fondo queda atenuada por el velo y axe mide ese color mezclado.
       const resultado = await new AxeBuilder({ page }).include('[role="dialog"]').analyze();
@@ -252,7 +255,7 @@ test.describe("reportes del cliente y del profesional", () => {
 
     await botonVisible(page, "Reportar este trabajo").click();
     const hoja = hojaDeReporte(page);
-    await hoja.getByLabel(MOTIVO_ESTAFA).check();
+    await hoja.getByRole("radio", { name: MOTIVO_ESTAFA }).check();
     await hoja.getByRole("button", { name: "Enviar reporte" }).click();
     await expect(hoja.getByText("Gracias por avisarnos.")).toBeVisible();
   });
