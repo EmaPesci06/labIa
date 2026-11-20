@@ -68,7 +68,7 @@ describe("Tarjeta", () => {
     );
     const sola = screen.getByText("Sola");
     expect(sola).toHaveClass("rounded-xl", "p-4", "bg-card");
-    expect(sola).not.toHaveClass("border-2");
+    expect(sola).not.toHaveClass("border-2", "ring-1");
     const conBorde = screen.getByText("Con borde");
     expect(conBorde.closest("article")).not.toBeNull();
     expect(conBorde).toHaveClass("border-2", "border-foreground");

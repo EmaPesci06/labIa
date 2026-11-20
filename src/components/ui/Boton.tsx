@@ -10,8 +10,9 @@ import { SIN_ANILLO_BOTON } from "./foco";
 /**
  * Capa fina sobre el `Button` de shadcn (LAB-86). Variantes de LabÍA → variantes de shadcn:
  * - principal → default: turquesa con texto sobre-accion. Una por pantalla, abajo.
- * - secundario → secondary: sol con texto azul noche.
- * - peligro → destructive: error sobre un tinte suave (cancelar, borrar, suspender).
+ * - secundario → outline: borde de 3 px `texto` y fondo transparente, como el prototipo (el sol es el
+ *   color de lo elegido, no de un botón).
+ * - peligro → destructive: borde de 3 px `error` sobre superficie (cancelar, borrar, suspender).
  * - enlace → link: texto en negrita con subrayado. Nunca accion sobre arena (4,48:1).
  *
  * Los nombres viejos siguen funcionando para no romper las pantallas que todavía no se rehacen:
@@ -43,7 +44,7 @@ const VARIANTE_REAL: Record<VarianteBoton, VarianteReal> = {
 
 const VARIANTE_SHADCN = {
   principal: "default",
-  secundario: "secondary",
+  secundario: "outline",
   peligro: "destructive",
   enlace: "link",
 } as const;
@@ -51,10 +52,12 @@ const VARIANTE_SHADCN = {
 // El texto del enlace va en `foreground` (azul mar): `primary` sobre arena no llega a 4,5:1.
 const VARIANTES: Record<VarianteReal, string> = {
   principal: "active:opacity-90",
-  secundario: "",
+  // Se pisa lo de oscuro de `outline` (borde `input`, fondo `input/30`): el prototipo es igual en los dos temas.
+  secundario:
+    "border-[3px] border-foreground bg-transparent text-foreground hover:bg-card hover:text-foreground aria-expanded:bg-card dark:border-foreground dark:bg-transparent dark:hover:bg-card",
   // El tinte `destructive/20` de shadcn en oscuro deja el texto en 3,6:1: se usa superficie y borde.
   peligro:
-    "border-destructive bg-card hover:bg-destructive/10 dark:bg-card dark:hover:bg-destructive/10",
+    "border-[3px] border-destructive bg-card hover:bg-destructive/10 dark:border-destructive dark:bg-card dark:hover:bg-destructive/10",
   enlace: "h-auto min-h-11 px-1 font-bold text-foreground underline decoration-2 hover:underline",
 };
 

@@ -36,11 +36,16 @@ describe("Boton", () => {
     }
   });
 
-  it("secundario: variante secondary de shadcn (sol)", () => {
+  it("secundario: borde de 3 px color texto y fondo transparente, sin relleno sol", () => {
     render(<Boton variante="secundario">Cancelar</Boton>);
     const boton = screen.getByRole("button", { name: "Cancelar" });
-    expect(boton).toHaveClass("bg-secondary", "text-secondary-foreground");
-    expect(boton).not.toHaveClass("bg-primary");
+    expect(boton).toHaveClass(
+      "border-[3px]",
+      "border-foreground",
+      "bg-transparent",
+      "text-foreground",
+    );
+    expect(boton).not.toHaveClass("bg-secondary", "bg-primary");
   });
 
   it("enlace: texto en negrita con subrayado, sin tamaño de botón", () => {
@@ -98,7 +103,7 @@ describe("Boton", () => {
       </Boton>,
     );
     const boton = screen.getByRole("button", { name: "Cancelar trabajo" });
-    expect(boton).toHaveClass("text-destructive", "border-destructive", "bg-card");
+    expect(boton).toHaveClass("text-destructive", "border-[3px]", "border-destructive", "bg-card");
     expect(boton).not.toHaveClass("bg-destructive");
     expect(ref.current).toBe(boton);
   });
@@ -111,7 +116,7 @@ describe("Boton", () => {
     );
     const enlace = screen.getByRole("link", { name: "Crear cuenta" });
     expect(enlace).toHaveAttribute("href", "/registro");
-    expect(enlace).toHaveClass("bg-secondary");
+    expect(enlace).toHaveClass("border-foreground");
   });
 
   it("como enlace cargando no recibe clics ni foco", () => {
