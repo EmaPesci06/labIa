@@ -73,7 +73,7 @@ export function ListaResenas({ profesionalId, iniciales, total }: Props) {
                 objetivoId={resena.id}
                 tituloObjetivo={`Reseña de ${resena.autor}`}
                 texto="Reportar"
-                className="text-xs text-texto underline hover:text-texto"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center text-xs text-texto underline hover:text-texto"
               />
             </div>
             {resena.texto ? (

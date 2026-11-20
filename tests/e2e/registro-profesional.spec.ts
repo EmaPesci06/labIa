@@ -41,6 +41,22 @@ test.describe("registro de profesional · paso 1", () => {
     await expect(page.getByLabel(/Matrícula/)).toHaveAttribute("aria-invalid", "true");
   });
 
+  test("en el paso 2 la contraseña no queda en el DOM como input oculto", async ({ page }) => {
+    await page.goto("/registro/profesional");
+    await expect(siguiente(page)).toBeEnabled();
+    await page.getByRole("button", { name: "Plomería" }).click();
+    await page.getByLabel("Nombre y apellido").fill("Martín Gómez");
+    await page.getByLabel("WhatsApp").fill("223 555-0000");
+    await page.getByLabel("Email").fill("martin@example.com");
+    await page.getByLabel("Contraseña").fill("clave-de-prueba-123");
+    await page.getByLabel("Barrio desde donde salís").selectOption({ label: "La Perla" });
+    await page.getByRole("button", { name: "Toda la ciudad" }).click();
+    await siguiente(page).click();
+    await expect(page.getByRole("group", { name: /Paso 2 de 3/ })).toBeVisible();
+    await expect(page.locator('input[name="contrasena"]')).toHaveCount(0);
+    await expect(page.locator('input[type="hidden"][value="clave-de-prueba-123"]')).toHaveCount(0);
+  });
+
   test("sin datos muestra los errores en castellano junto a cada campo", async ({ page }) => {
     await page.goto("/registro/profesional");
     await siguiente(page).click();
@@ -84,6 +100,16 @@ test.describe("registro de profesional · paso 1", () => {
     ).toBeVisible();
     await expect(page.getByRole("button", { name: "Aceptar y terminar" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Volver a documentos" })).toBeVisible();
+    const aviso = page.getByText(/Al continuar aceptás los/);
+    await expect(aviso).toBeVisible();
+    await expect(aviso.getByRole("link", { name: "Términos" })).toHaveAttribute(
+      "href",
+      "/terminos",
+    );
+    await expect(aviso.getByRole("link", { name: "Política de privacidad" })).toHaveAttribute(
+      "href",
+      "/privacidad",
+    );
 
     await page.goto("/registro/profesional/listo");
     await expect(page.getByRole("heading", { level: 1, name: /¡Listo/ })).toBeVisible();

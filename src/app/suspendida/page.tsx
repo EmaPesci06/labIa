@@ -28,7 +28,7 @@ async function Contenido() {
   const emailContacto = process.env.EMAIL_SOPORTE || "soporte@labia.com.ar";
 
   return (
-    <div className="flex min-h-dvh flex-col bg-equipo text-sobre-encabezado">
+    <div className="flex min-h-dvh flex-col bg-equipo text-sobre-encabezado [&_:focus-visible]:outline-sol">
       <SaltarAlContenido />
       <header className="mx-auto w-full max-w-[720px] px-6 pt-4 pb-0 lg:pt-6">
         <Logo alt="LabÍA" sobre="encabezado" />
@@ -72,25 +72,26 @@ async function Contenido() {
           </a>
           .
         </p>
-      </main>
 
-      <footer className="mx-auto flex w-full max-w-[720px] flex-col gap-2 px-6 pt-4 pb-5">
-        <a
-          href={`mailto:${emailContacto}?subject=Apelaci%C3%B3n%20de%20cuenta%20suspendida`}
-          className="flex min-h-14 items-center justify-center rounded-boton bg-sol px-6 text-lg font-bold text-sobre-sol no-underline transition-colors hover:bg-sol/90"
-        >
-          Pedir una apelación
-        </a>
-        <div className="flex items-center justify-between">
-          <Link
-            href="/normas"
-            className="flex min-h-12 items-center text-base font-bold text-sobre-encabezado underline underline-offset-4"
+        {/* Dentro de <main>: así los accesos quedan en un landmark sin duplicar el contentinfo de PieLegal. */}
+        <div className="mt-6 flex flex-col gap-2">
+          <a
+            href={`mailto:${emailContacto}?subject=Apelaci%C3%B3n%20de%20cuenta%20suspendida`}
+            className="flex min-h-14 items-center justify-center rounded-boton bg-sol px-6 text-lg font-bold text-sobre-sol no-underline transition-colors hover:bg-sol/90"
           >
-            Leer las normas
-          </Link>
-          <BotonSalir className="min-h-12 w-auto px-2 text-base font-bold text-sobre-encabezado underline underline-offset-4 hover:bg-transparent" />
+            Pedir una apelación
+          </a>
+          <div className="flex items-center justify-between">
+            <Link
+              href="/normas"
+              className="flex min-h-12 items-center text-base font-bold text-sobre-encabezado underline underline-offset-4"
+            >
+              Leer las normas
+            </Link>
+            <BotonSalir className="min-h-12 w-auto px-2 text-base font-bold text-sobre-encabezado underline underline-offset-4 hover:bg-transparent" />
+          </div>
         </div>
-      </footer>
+      </main>
     </div>
   );
 }

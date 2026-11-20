@@ -55,7 +55,9 @@ test.describe("Mis trabajos del cliente (LAB-29)", () => {
 
     // Trabajo publicado en la lista
     // La lista está dos veces en el DOM (celular y escritorio): se mira solo la visible.
-    await expect(page.getByText("Olor a gas en la cocina").filter({ visible: true })).toBeVisible();
+    await expect(
+      page.getByText("Olor a gas en la cocina").filter({ visible: true }).first(),
+    ).toBeVisible();
     await expect(page.getByText("Gas · La Perla").filter({ visible: true }).first()).toBeVisible();
     await expect(page.getByText("Abierto").filter({ visible: true }).first()).toBeVisible();
   });

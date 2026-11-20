@@ -14,7 +14,14 @@ import { CampoContrasena } from "./CampoContrasena";
 import { ConfirmarEmail } from "./ConfirmarEmail";
 import { SelectorBarrio } from "./SelectorBarrio";
 
-const CAMPOS = ["nombreCompleto", "whatsapp", "email", "contrasena", "barrio"] as const;
+const CAMPOS = [
+  "nombreCompleto",
+  "whatsapp",
+  "email",
+  "contrasena",
+  "barrio",
+  "mayorEdad",
+] as const;
 
 /**
  * Registro de cliente con email (LAB-17, rehecho en LAB-76): boceto `App-RegistroCliente`.
@@ -106,7 +113,9 @@ export function FormularioRegistroCliente({ barrios }: { barrios: BarrioOpcion[]
         <input
           type="checkbox"
           name="mayorEdad"
-          defaultChecked
+          required
+          aria-invalid={errores.mayorEdad ? true : undefined}
+          aria-describedby={errores.mayorEdad ? "error-mayor-edad" : undefined}
           className="size-6 shrink-0 accent-accion"
         />
         <span>
@@ -129,6 +138,11 @@ export function FormularioRegistroCliente({ barrios }: { barrios: BarrioOpcion[]
           .
         </span>
       </label>
+      {errores.mayorEdad ? (
+        <p id="error-mayor-edad" className="-mt-1 text-[15px] font-bold text-error">
+          {errores.mayorEdad}
+        </p>
+      ) : null}
 
       {estado.mensaje ? (
         <p role="alert" className="text-[15px] font-bold text-error">

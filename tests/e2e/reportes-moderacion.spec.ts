@@ -250,7 +250,7 @@ test.describe("reportes del cliente y del profesional", () => {
     );
     await page.goto(`/trabajos/${escritorio ? TRABAJO_OLOR_GAS : TRABAJO_OTRO}`);
 
-    await botonVisible(page, "Reportar trabajo").click();
+    await botonVisible(page, "Reportar este trabajo").click();
     const hoja = hojaDeReporte(page);
     await hoja.getByLabel(MOTIVO_ESTAFA).check();
     await hoja.getByRole("button", { name: "Enviar reporte" }).click();
@@ -357,8 +357,27 @@ test.describe("moderación del admin", () => {
       moderado.page.getByRole("heading", { name: "Tu cuenta fue suspendida" }),
     ).toBeVisible();
     await expect(moderado.page.getByText(MOTIVO_SUSPENSION)).toBeVisible();
-    await capturar(moderado.page, "suspendida", "claro");
-    expect(graves(await new AxeBuilder({ page: moderado.page }).analyze())).toEqual([]);
+    // Axe sin filtrar por gravedad, en claro y oscuro, a 1440 y a 390 px.
+    for (const ancho of [1440, 390]) {
+      await moderado.page.setViewportSize({ width: ancho, height: ancho === 390 ? 844 : 900 });
+      for (const tema of ["claro", "oscuro"] as const) {
+        await moderado.page.emulateMedia({ colorScheme: tema === "oscuro" ? "dark" : "light" });
+        await capturar(moderado.page, "suspendida", tema);
+        const resultado = await new AxeBuilder({ page: moderado.page }).analyze();
+        expect(resultado.violations, `${ancho}px ${tema}`).toEqual([]);
+      }
+    }
+    await moderado.page.setViewportSize({ width: 1440, height: 900 });
+    await moderado.page.emulateMedia({ colorScheme: "light" });
+
+    // LAB-81: sobre el fondo `equipo` el foco por teclado va en `sol` (en claro `foco` y `equipo` son
+    // el mismo azul y el anillo no se vería).
+    await moderado.page.keyboard.press("Tab");
+    const apelar = moderado.page.getByRole("link", { name: "Pedir una apelación" });
+    await apelar.focus();
+    await expect(apelar).toBeFocused();
+    await expect(apelar).toHaveCSS("outline-color", "rgb(247, 201, 72)");
+    await expect(apelar).toHaveCSS("outline-style", "solid");
     await moderado.contexto.close();
   });
 

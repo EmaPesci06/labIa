@@ -5,6 +5,7 @@ import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { altaIncompleta, MENSAJE_ALTA_INCOMPLETA } from "@/lib/auth/alta";
 import { rolFalso } from "@/lib/auth/sesion-falsa";
 import type { EstadoFormulario } from "@/lib/auth/estado";
 import { registrarEventoServidor } from "@/lib/metricas-servidor";
@@ -62,6 +63,7 @@ export async function publicarTrabajo(
   if (sesion.rol !== "cliente") {
     return { mensaje: "Solo los clientes pueden publicar trabajos.", valores };
   }
+  if (altaIncompleta(sesion)) return { mensaje: MENSAJE_ALTA_INCOMPLETA, valores };
 
   const resultado = esquemaTrabajo.safeParse({
     ...valores,
@@ -136,7 +138,7 @@ export async function publicarTrabajo(
 /** Guarda en el trabajo las rutas de las fotos que el navegador ya subió. */
 export async function adjuntarFotos(trabajoId: string, rutas: string[]): Promise<{ ok: boolean }> {
   const sesion = await obtenerSesion();
-  if (!sesion || sesion.rol !== "cliente") return { ok: false };
+  if (!sesion || sesion.rol !== "cliente" || altaIncompleta(sesion)) return { ok: false };
   if (!esUuid(trabajoId)) return { ok: false };
   const validas = esquemaFotos(trabajoId, sesion.usuario.id).safeParse(rutas);
   if (!validas.success) return { ok: false };
@@ -371,6 +373,7 @@ export async function elegirPostulante(
   if (!sesion || sesion.rol !== "cliente") {
     return { ok: false, mensaje: "Solo el cliente dueño del trabajo puede elegir un postulante." };
   }
+  if (altaIncompleta(sesion)) return { ok: false, mensaje: MENSAJE_ALTA_INCOMPLETA };
 
   if (!esUuid(postulacionId) || !esUuid(trabajoId)) {
     return { ok: false, mensaje: "Identificador inválido." };
@@ -423,6 +426,7 @@ export async function cambiarProfesional(
   if (!sesion || sesion.rol !== "cliente") {
     return { ok: false, mensaje: "Solo el cliente dueño puede cambiar de profesional." };
   }
+  if (altaIncompleta(sesion)) return { ok: false, mensaje: MENSAJE_ALTA_INCOMPLETA };
 
   if (!esUuid(trabajoId)) {
     return { ok: false, mensaje: "Identificador inválido." };
@@ -465,6 +469,7 @@ export async function marcarTrabajoTerminado(
   if (!sesion || sesion.rol !== "cliente") {
     return { ok: false, mensaje: "Solo el cliente dueño puede marcar el trabajo como terminado." };
   }
+  if (altaIncompleta(sesion)) return { ok: false, mensaje: MENSAJE_ALTA_INCOMPLETA };
 
   if (!esUuid(trabajoId)) {
     return { ok: false, mensaje: "Identificador inválido." };
@@ -507,6 +512,7 @@ export async function cancelarTrabajo(
   if (!sesion || sesion.rol !== "cliente") {
     return { ok: false, mensaje: "Solo el cliente dueño puede cancelar el trabajo." };
   }
+  if (altaIncompleta(sesion)) return { ok: false, mensaje: MENSAJE_ALTA_INCOMPLETA };
 
   if (!esUuid(trabajoId)) {
     return { ok: false, mensaje: "Identificador inválido." };

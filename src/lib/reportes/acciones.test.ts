@@ -69,6 +69,7 @@ vi.mock("@/lib/supabase/servidor", () => ({
   }),
 }));
 
+import { MENSAJE_ALTA_INCOMPLETA } from "@/lib/auth/alta";
 import { obtenerSesion } from "@/lib/sesion";
 import { supabaseConfigurado } from "@/lib/supabase/servidor";
 import { enviarReporte } from "./acciones";
@@ -84,6 +85,25 @@ describe("enviarReporte", () => {
     mockLimitarPorIp.mockResolvedValue({ permitido: true, segundosParaReintentar: 0 });
     mockSelect.mockResolvedValue({ data: null });
     mockInsert.mockResolvedValue({ error: null });
+  });
+
+  it("rechaza al cliente que no aceptó mayor de 18 y términos (LAB-81)", async () => {
+    vi.mocked(obtenerSesion).mockResolvedValue({
+      usuario: { id: UUID_USUARIO, email: "test@example.com" },
+      rol: "cliente",
+      normasVersion: "1.0",
+      terminosAceptados: false,
+      perfil: { nombre: "Test", apellido: null, nombreVisible: "Test", completo: true },
+    });
+    const formData = new FormData();
+    formData.set("objetivoTipo", "perfil");
+    formData.set("objetivoId", UUID_OBJETIVO);
+    formData.set("motivo", "datos_falsos");
+
+    const res = await enviarReporte(ESTADO_REPORTE_INICIAL, formData);
+
+    expect(res.mensaje).toBe(MENSAJE_ALTA_INCOMPLETA);
+    expect(mockInsert).not.toHaveBeenCalled();
   });
 
   it("rechaza si faltan datos obligatorios o formato inválido", async () => {
@@ -110,6 +130,7 @@ describe("enviarReporte", () => {
       usuario: { id: UUID_USUARIO, email: "test@example.com" },
       rol: "cliente",
       normasVersion: "1.0",
+      terminosAceptados: true,
       perfil: { nombre: "Test", apellido: null, nombreVisible: "Test", completo: true },
     });
     mockLimitarPersistente.mockResolvedValue({ permitido: false, segundosParaReintentar: 3600 });
@@ -129,6 +150,7 @@ describe("enviarReporte", () => {
       usuario: { id: UUID_USUARIO, email: "test@example.com" },
       rol: "cliente",
       normasVersion: "1.0",
+      terminosAceptados: true,
       perfil: { nombre: "Test", apellido: null, nombreVisible: "Test", completo: true },
     });
     mockLimitarPorIp.mockResolvedValue({ permitido: false, segundosParaReintentar: 3600 });
@@ -150,6 +172,7 @@ describe("enviarReporte", () => {
       usuario: { id: UUID_USUARIO, email: "test@example.com" },
       rol: "cliente",
       normasVersion: "1.0",
+      terminosAceptados: true,
       perfil: { nombre: "Test", apellido: null, nombreVisible: "Test", completo: true },
     });
 
@@ -170,6 +193,7 @@ describe("enviarReporte", () => {
       usuario: { id: UUID_USUARIO, email: "test@example.com" },
       rol: "cliente",
       normasVersion: "1.0",
+      terminosAceptados: true,
       perfil: { nombre: "Test", apellido: null, nombreVisible: "Test", completo: true },
     });
 
@@ -190,6 +214,7 @@ describe("enviarReporte", () => {
       usuario: { id: UUID_USUARIO, email: "test@example.com" },
       rol: "cliente",
       normasVersion: "1.0",
+      terminosAceptados: true,
       perfil: { nombre: "Test", apellido: null, nombreVisible: "Test", completo: true },
     });
 
@@ -207,6 +232,7 @@ describe("enviarReporte", () => {
       usuario: { id: UUID_USUARIO, email: "test@example.com" },
       rol: "cliente",
       normasVersion: "1.0",
+      terminosAceptados: true,
       perfil: { nombre: "Test", apellido: null, nombreVisible: "Test", completo: true },
     });
     mockSelect.mockResolvedValue({ data: { id: "reporte-existente" } });
@@ -226,6 +252,7 @@ describe("enviarReporte", () => {
       usuario: { id: UUID_USUARIO, email: "test@example.com" },
       rol: "cliente",
       normasVersion: "1.0",
+      terminosAceptados: true,
       perfil: { nombre: "Test", apellido: null, nombreVisible: "Test", completo: true },
     });
 
@@ -255,6 +282,7 @@ describe("enviarReporte", () => {
       usuario: { id: UUID_USUARIO, email: "test@example.com" },
       rol: "cliente",
       normasVersion: "1.0",
+      terminosAceptados: true,
       perfil: { nombre: "Test", apellido: null, nombreVisible: "Test", completo: true },
     });
     vi.mocked(supabaseConfigurado).mockReturnValueOnce(false);

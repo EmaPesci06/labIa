@@ -173,6 +173,7 @@ test.describe("cuenta real", () => {
     await page.getByLabel("Email").fill(email);
     await page.getByLabel("Contraseña", { exact: true }).fill(contrasena);
     await page.getByLabel("Tu barrio").selectOption({ label: "Centro" });
+    await page.getByLabel(/mayor de 18/).check();
     await page.getByRole("button", { name: "Crear cuenta" }).click();
     await expect(page).toHaveURL(/\/(inicio|buscar\?barrio=[a-z0-9-]+)$/);
 

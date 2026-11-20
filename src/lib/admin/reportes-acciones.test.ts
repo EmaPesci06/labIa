@@ -103,6 +103,7 @@ describe("reportes-acciones (admin)", () => {
         usuario: { id: "admin-1", email: "admin@labia.ar" },
         rol: "admin",
         normasVersion: "1.0",
+        terminosAceptados: true,
         perfil: {
           nombre: "Admin",
           apellido: null,
@@ -149,6 +150,7 @@ describe("reportes-acciones (admin)", () => {
         usuario: { id: "admin-1", email: "admin@labia.ar" },
         rol: "admin",
         normasVersion: "1.0",
+        terminosAceptados: true,
         perfil: {
           nombre: "Admin",
           apellido: null,
@@ -189,6 +191,7 @@ describe("reportes-acciones (admin)", () => {
         usuario: { id: "admin-1", email: "admin@labia.ar" },
         rol: "admin",
         normasVersion: "1.0",
+        terminosAceptados: true,
         perfil: {
           nombre: "Admin",
           apellido: null,
@@ -212,6 +215,7 @@ describe("reportes-acciones (admin)", () => {
         usuario: { id: "admin-1", email: "admin@labia.ar" },
         rol: "admin",
         normasVersion: "1.0",
+        terminosAceptados: true,
         perfil: { nombre: "Admin", apellido: null, nombreVisible: "Admin", completo: true },
       } as Awaited<ReturnType<typeof sesionAdmin>>);
       mockRpc.mockResolvedValue({ error: null });

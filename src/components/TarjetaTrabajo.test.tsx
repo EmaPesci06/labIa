@@ -59,4 +59,35 @@ describe("TarjetaTrabajo", () => {
     );
     expect(screen.getByText("Te postulaste")).toBeInTheDocument();
   });
+
+  it("la pastilla 'Para hoy' va en azul noche con texto blanco, como el boceto", () => {
+    render(
+      <TarjetaTrabajo
+        oficio="gas"
+        barrio="Centro"
+        titulo="Olor a gas"
+        descripcion=""
+        urgencia="lo_antes_posible"
+        postulantes={0}
+      />,
+    );
+    const pastilla = screen.getByText("Para hoy");
+    expect(pastilla).toHaveClass("bg-sobre-sol", "text-sobre-encabezado");
+    expect(pastilla).not.toHaveClass("bg-sol");
+  });
+
+  it("el título es h3 por defecto y h2 si la lista cuelga del h1", () => {
+    const props = {
+      oficio: "gas",
+      barrio: "Centro",
+      titulo: "Olor a gas",
+      descripcion: "",
+      urgencia: "sin_apuro",
+      postulantes: 0,
+    } as const;
+    const { rerender } = render(<TarjetaTrabajo {...props} />);
+    expect(screen.getByRole("heading", { level: 3, name: "Olor a gas" })).toBeInTheDocument();
+    rerender(<TarjetaTrabajo {...props} nivelTitulo={2} />);
+    expect(screen.getByRole("heading", { level: 2, name: "Olor a gas" })).toBeInTheDocument();
+  });
 });

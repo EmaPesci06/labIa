@@ -24,6 +24,8 @@ const ID_RECHAZADO = "55555555-5555-4555-8555-555555555555";
 // Clientes para los errores de contacto (LAB-25). Cada token tiene su propio usuario: así las pruebas
 // no comparten estado (el límite diario se simula por token, no con un contador global).
 const ID_CLIENTE_LIMITE = "66666666-6666-4666-8666-666666666666";
+// LAB-81: cliente que entró con Google y todavía no aceptó "mayor de 18 y términos".
+const ID_CLIENTE_SIN_TERMINOS = "66666666-6666-4666-8666-666666666667";
 const ID_CLIENTE_DESPUBLICADO = "77777777-7777-4777-8777-777777777777";
 // LAB-32: profesional que se modera (suspensión, reseñas bajas). Sus datos son propios de la moderación.
 const ID_MODERADO = "99999999-9999-4999-8999-999999999999";
@@ -44,6 +46,14 @@ const USUARIOS = {
     nombre: "Laura",
     apellido: "Fernández",
     barrio_id: 1,
+  },
+  "tok-cliente-sin-terminos": {
+    id: ID_CLIENTE_SIN_TERMINOS,
+    rol: "cliente",
+    nombre: "Gabi",
+    apellido: "Soto",
+    barrio_id: null,
+    sinTerminos: true,
   },
   "tok-cliente-limite": {
     id: ID_CLIENTE_LIMITE,
@@ -1391,6 +1401,7 @@ const server = http.createServer((req, res) => {
         nombre: yo.nombre,
         apellido: yo.apellido,
         normas_version: "2026-10",
+        terminos_aceptados_at: yo.sinTerminos ? null : "2026-11-20T12:00:00Z",
         barrio_id: yo.barrio_id,
       };
       return responder(res, 200, unObjeto ? fila : [fila]);

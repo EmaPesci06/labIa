@@ -406,9 +406,8 @@ Next.js corta `pnpm build` con `SecurityFatalError` cuando la versión instalada
 
 **Paquetes frenados a propósito:**
 
-| Paquete                                         | Frenado en  | Por qué                                                                               | Tarea  |
-| ----------------------------------------------- | ----------- | ------------------------------------------------------------------------------------- | ------ |
-| `@axe-core/playwright`                          | 4.13.0      | La 4.14 exige arreglos de accesibilidad en la interfaz, que se rehace después del MVP | LAB-64 |
-| `eslint`, `typescript`, `jsdom`, `supabase` CLI | 9, 6, 30, 2 | Saltos de versión mayor, sin avisos de seguridad                                      | LAB-66 |
+| Paquete                                         | Frenado en  | Por qué                                          | Tarea  |
+| ----------------------------------------------- | ----------- | ------------------------------------------------ | ------ |
+| `eslint`, `typescript`, `jsdom`, `supabase` CLI | 9, 6, 30, 2 | Saltos de versión mayor, sin avisos de seguridad | LAB-66 |
 
 **Si producción corre una versión vulnerable y el arreglo tarda:** revertir no sirve (la versión anterior tiene la misma falla). Priorizar el PR de actualización por encima de todo lo demás.

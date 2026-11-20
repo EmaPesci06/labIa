@@ -10,7 +10,7 @@ Este archivo agrega **cómo trabajar** y **dónde quedó todo**.
    Si no tenés acceso a Linear, pedile a Emanuel el texto de la tarea.
 2. `.claude/labia/protocolo.md`: protocolo común (estados de Linear, ramas, PR, HANDOFF, trabajo en paralelo).
 3. `.claude/agents/labia-*.md`: instrucciones de cada rol. Usalas como checklist de cada fase (ver abajo).
-4. `docs/prototipo-nuevo/`: el diseño nuevo, "Verano en la costa". Empezá por `README.md` (tokens, qué boceto es cada pantalla y cuáles te tocan: milestone "Fase 7 · Interfaz nueva", tareas LAB-76 a LAB-80) y seguí con `CONSTRUCCION.md` (cómo se pasa un boceto a código). Toda pantalla se construye igual a su boceto, con tokens, nunca hex sueltos. `docs/prototipo/` es el diseño viejo: no lo uses.
+4. `docs/prototipo-nuevo/`: el diseño nuevo, "Verano en la costa". Empezá por `README.md` (tokens, qué boceto es cada pantalla y cuáles te tocan: milestone "Fase 7 · Interfaz nueva", tareas LAB-76 a LAB-80) y seguí con `CONSTRUCCION.md` (cómo se pasa un boceto a código). Toda pantalla se construye igual a su boceto, con tokens, nunca hex sueltos. El diseño viejo ya no está en el repo (se borró en LAB-81).
 5. Estado, contexto y decisiones del proyecto (documento único de traspaso): @docs/traspaso-agentes.md
 
 ## Flujo por tarea (orquestás subagentes)

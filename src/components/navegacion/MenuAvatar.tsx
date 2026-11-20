@@ -56,13 +56,15 @@ export function MenuAvatar({ nombre }: Props) {
       <button
         ref={boton}
         type="button"
-        aria-label={`Cuenta de ${nombre}`}
         aria-expanded={abierto}
         aria-controls={idPanel}
         onClick={() => setAbierto((valor) => !valor)}
         className="flex size-11 items-center justify-center rounded-full"
       >
-        <Avatar nombre={nombre} />
+        <span className="sr-only">Cuenta de {nombre}</span>
+        <span aria-hidden className="inline-flex">
+          <Avatar nombre={nombre} />
+        </span>
       </button>
       {abierto ? (
         <div

@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import { elegirBarrio } from "@/lib/barrios-busqueda";
 import { barrioDeLaCuenta, obtenerBarrios } from "@/lib/busqueda-servidor";
+import { altaIncompleta, RUTA_COMPLETAR_ALTA } from "@/lib/auth/alta";
 import { inicioDelRol } from "@/lib/auth/rutas";
 import { destinoParaAceptarNormas } from "@/lib/normas";
 import { navegacionPara } from "@/lib/navegacion";
@@ -20,6 +21,9 @@ export async function ShellApp({ children }: { children: ReactNode }) {
   const sesion = await obtenerSesion();
   if (!sesion) redirect("/ingresar");
   if (sesion.rol === "admin") redirect(inicioDelRol("admin"));
+
+  // LAB-81: un cliente que no aceptó "mayor de 18 y términos" termina el alta antes de seguir.
+  if (altaIncompleta(sesion)) redirect(RUTA_COMPLETAR_ALTA);
 
   // LAB-20: un profesional sin las normas vigentes las acepta antes de seguir.
   const aceptarNormas = destinoParaAceptarNormas(sesion.rol, sesion.normasVersion);

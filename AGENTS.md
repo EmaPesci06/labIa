@@ -49,7 +49,7 @@ src/app/(publico)/      bienvenida, ingresar, registro, normas, términos, priva
 src/app/(app)/          inicio, buscar, profesionales/[id], trabajos, mis-trabajos, cuenta
 src/app/admin/          verificaciones, reportes (solo rol admin)
 src/app/api/            route handlers puntuales (callbacks de auth, webhooks)
-src/components/ui/      componentes base (Boton, Campo, Chip, Insignia, Tarjeta, HojaInferior, CintaMetrica…)
+src/components/ui/      componentes base (Boton, Campo, Chip, Insignia, Tarjeta, HojaInferior, Encabezado, Toldo, Avatar…)
 src/components/         componentes de dominio (TarjetaProfesional, TarjetaTrabajo…)
 src/lib/supabase/       clientes server/browser/admin y tipos generados
 src/lib/validaciones/   esquemas Zod

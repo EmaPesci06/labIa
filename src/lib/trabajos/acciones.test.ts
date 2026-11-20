@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { MENSAJE_ALTA_INCOMPLETA } from "@/lib/auth/alta";
 import { MENSAJE_CONTACTO_POSTULACION, MENSAJE_SENA_MAYOR } from "@/lib/validaciones/postulacion";
 import { avisarEleccion, avisarNuevaPostulacion } from "@/lib/emails/avisos";
 import { registrarEventoServidor } from "@/lib/metricas-servidor";
@@ -8,6 +9,8 @@ import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 
 import {
+  adjuntarFotos,
+  cambiarProfesional,
   cancelarTrabajo,
   elegirPostulante,
   marcarTrabajoTerminado,
@@ -151,7 +154,7 @@ describe("postularme (LAB-28, bloqueante)", () => {
   it("un cliente no se puede postular", async () => {
     preparar(
       { perfil: perfilOk, trabajo: trabajoOk },
-      { rol: "cliente", usuario: { id: CLIENTE } },
+      { rol: "cliente", terminosAceptados: true, usuario: { id: CLIENTE } },
     );
     const r = await postularme(TRABAJO, {}, datosPostulacion());
     expect(r.mensaje).toBe("Solo las cuentas de profesional pueden postularse a trabajos.");
@@ -352,7 +355,7 @@ describe("elegirPostulante (LAB-29)", () => {
   });
 
   it("rechaza identificadores inválidos", async () => {
-    preparar({}, { rol: "cliente", usuario: { id: CLIENTE } });
+    preparar({}, { rol: "cliente", terminosAceptados: true, usuario: { id: CLIENTE } });
     const r = await elegirPostulante("x", TRABAJO);
     expect(r).toEqual({ ok: false, mensaje: "Identificador inválido." });
   });
@@ -360,7 +363,7 @@ describe("elegirPostulante (LAB-29)", () => {
   it("si el trabajo ya no está abierto o el profesional no está disponible, lo explica", async () => {
     preparar(
       { rpc: { elegir_postulante: { data: null, error: { code: "22023" } } } },
-      { rol: "cliente", usuario: { id: CLIENTE } },
+      { rol: "cliente", terminosAceptados: true, usuario: { id: CLIENTE } },
     );
     const r = await elegirPostulante(POSTULACION, TRABAJO);
     expect(r.ok).toBe(false);
@@ -372,7 +375,7 @@ describe("elegirPostulante (LAB-29)", () => {
   it("elige, registra la métrica y avisa por email", async () => {
     preparar(
       { rpc: { elegir_postulante: { data: PROFESIONAL, error: null } } },
-      { rol: "cliente", usuario: { id: CLIENTE } },
+      { rol: "cliente", terminosAceptados: true, usuario: { id: CLIENTE } },
     );
     const r = await elegirPostulante(POSTULACION, TRABAJO);
     expect(r).toEqual({ ok: true, profesionalId: PROFESIONAL });
@@ -394,7 +397,7 @@ describe("cancelarTrabajo y marcarTrabajoTerminado (LAB-29)", () => {
 
     preparar(
       { rpc: { cancelar_trabajo: { data: null, error: { code: "22023" } } } },
-      { rol: "cliente", usuario: { id: CLIENTE } },
+      { rol: "cliente", terminosAceptados: true, usuario: { id: CLIENTE } },
     );
     expect(await cancelarTrabajo(TRABAJO)).toEqual({
       ok: false,
@@ -405,7 +408,7 @@ describe("cancelarTrabajo y marcarTrabajoTerminado (LAB-29)", () => {
   it("cancelar: con éxito devuelve ok", async () => {
     preparar(
       { rpc: { cancelar_trabajo: { data: true, error: null } } },
-      { rol: "cliente", usuario: { id: CLIENTE } },
+      { rol: "cliente", terminosAceptados: true, usuario: { id: CLIENTE } },
     );
     expect(await cancelarTrabajo(TRABAJO)).toEqual({ ok: true });
   });
@@ -418,7 +421,7 @@ describe("cancelarTrabajo y marcarTrabajoTerminado (LAB-29)", () => {
         archivosDelTrabajo: ["0-1.jpg"],
         rpc: { cancelar_trabajo: { data: true, error: null } },
       },
-      { rol: "cliente", usuario: { id: CLIENTE } },
+      { rol: "cliente", terminosAceptados: true, usuario: { id: CLIENTE } },
     );
 
     expect(await cancelarTrabajo(TRABAJO)).toEqual({ ok: true });
@@ -436,7 +439,7 @@ describe("cancelarTrabajo y marcarTrabajoTerminado (LAB-29)", () => {
         archivosDelTrabajo: [],
         rpc: { cancelar_trabajo: { data: true, error: null } },
       },
-      { rol: "cliente", usuario: { id: CLIENTE } },
+      { rol: "cliente", terminosAceptados: true, usuario: { id: CLIENTE } },
     );
 
     expect(await cancelarTrabajo(TRABAJO)).toEqual({ ok: true });
@@ -451,7 +454,7 @@ describe("cancelarTrabajo y marcarTrabajoTerminado (LAB-29)", () => {
 
     preparar(
       { rpc: { marcar_trabajo_terminado: { data: null, error: { code: "22023" } } } },
-      { rol: "cliente", usuario: { id: CLIENTE } },
+      { rol: "cliente", terminosAceptados: true, usuario: { id: CLIENTE } },
     );
     expect(await marcarTrabajoTerminado(TRABAJO)).toEqual({
       ok: false,
@@ -462,7 +465,7 @@ describe("cancelarTrabajo y marcarTrabajoTerminado (LAB-29)", () => {
   it("terminar: con éxito devuelve ok", async () => {
     preparar(
       { rpc: { marcar_trabajo_terminado: { data: true, error: null } } },
-      { rol: "cliente", usuario: { id: CLIENTE } },
+      { rol: "cliente", terminosAceptados: true, usuario: { id: CLIENTE } },
     );
     expect(await marcarTrabajoTerminado(TRABAJO)).toEqual({ ok: true });
   });
@@ -497,7 +500,7 @@ describe("límites persistentes (LAB-47)", () => {
   });
 
   it("publicar: cuenta el intento por cliente, 5 cada 10 minutos, y si bloquea no escribe", async () => {
-    preparar({}, { rol: "cliente", usuario: { id: CLIENTE } });
+    preparar({}, { rol: "cliente", terminosAceptados: true, usuario: { id: CLIENTE } });
     vi.mocked(limitarPersistente).mockResolvedValueOnce({
       permitido: false,
       segundosParaReintentar: 9,
@@ -522,6 +525,55 @@ describe("límites persistentes (LAB-47)", () => {
       ventanaMs: 10 * 60_000,
     });
     expect(r.mensaje).toBe("Hiciste demasiados intentos. Esperá 9 segundos y probá de nuevo.");
+    expect(crearClienteServidor).not.toHaveBeenCalled();
+  });
+});
+
+describe("cliente sin mayor de 18 y términos (LAB-81)", () => {
+  const sinTerminos = { rol: "cliente", terminosAceptados: false, usuario: { id: CLIENTE } };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("no publica trabajos y no toca la base", async () => {
+    preparar({}, sinTerminos);
+    const datos = new FormData();
+    for (const [clave, valor] of Object.entries({
+      oficio: "gas",
+      titulo: "Olor a gas en la cocina",
+      descripcion: "Desde ayer hay olor a gas cerca del horno. Ya cerré la llave de paso.",
+      barrioId: "51",
+      urgencia: "lo_antes_posible",
+      presupuesto: "",
+      cantidadFotos: "0",
+    })) {
+      datos.set(clave, valor);
+    }
+
+    const r = await publicarTrabajo({}, datos);
+
+    expect(r.mensaje).toBe(MENSAJE_ALTA_INCOMPLETA);
+    expect(crearClienteServidor).not.toHaveBeenCalled();
+  });
+
+  it("no elige postulante, no cambia de profesional ni cierra o cancela trabajos", async () => {
+    preparar({}, sinTerminos);
+
+    expect(await elegirPostulante(POSTULACION, TRABAJO)).toEqual({
+      ok: false,
+      mensaje: MENSAJE_ALTA_INCOMPLETA,
+    });
+    expect(await cambiarProfesional(TRABAJO)).toEqual({
+      ok: false,
+      mensaje: MENSAJE_ALTA_INCOMPLETA,
+    });
+    expect(await marcarTrabajoTerminado(TRABAJO)).toEqual({
+      ok: false,
+      mensaje: MENSAJE_ALTA_INCOMPLETA,
+    });
+    expect(await cancelarTrabajo(TRABAJO)).toEqual({ ok: false, mensaje: MENSAJE_ALTA_INCOMPLETA });
+    expect(await adjuntarFotos(TRABAJO, [])).toEqual({ ok: false });
     expect(crearClienteServidor).not.toHaveBeenCalled();
   });
 });

@@ -340,9 +340,19 @@ export function FormularioPerfilProfesional({
 
   function enviar(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
+    if (paso === 1) {
+      avanzarADocumentos();
+      return;
+    }
     setErroresPaso1(null);
     setMensajePaso1(null);
     const datos = new FormData(evento.currentTarget);
+    // En el paso 2 los campos de cuenta ya no están montados: se suman en memoria, sin
+    // dejar la contraseña como atributo de un `<input type="hidden">` legible por extensiones.
+    if (conCuenta) {
+      datos.set("email", email);
+      datos.set("contrasena", contrasena);
+    }
     startTransition(() => despachar(datos));
   }
 
@@ -669,12 +679,7 @@ export function FormularioPerfilProfesional({
               {/* Campos del paso 1 en oculto para que el envío mande el perfil completo. */}
               <input type="hidden" name="nombreCompleto" value={nombre} />
               <input type="hidden" name="whatsapp" value={whatsapp} />
-              {conCuenta ? (
-                <>
-                  <input type="hidden" name="email" value={email} />
-                  <input type="hidden" name="contrasena" value={contrasena} />
-                </>
-              ) : null}
+              {/* El email y la contraseña no van en el DOM: se suman al FormData al enviar. */}
               <input type="hidden" name="barrioId" value={barrioId} />
               <input type="hidden" name="especialidades" value={especialidades} />
               <input

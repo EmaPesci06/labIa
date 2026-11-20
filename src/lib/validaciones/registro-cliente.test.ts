@@ -7,7 +7,9 @@ import { erroresPorCampo } from "./auth";
 import {
   BARRIOS_FRECUENTES,
   esquemaCompletarCliente,
+  esquemaDatosDeContacto,
   esquemaRegistroCliente,
+  MENSAJE_MAYOR_EDAD,
   normalizarBusqueda,
   separarNombre,
 } from "./registro-cliente";
@@ -18,6 +20,7 @@ const valido = {
   email: "Laura@Correo.com ",
   contrasena: "unaclave123",
   barrio: "17",
+  mayorEdad: "on",
 };
 
 describe("separarNombre", () => {
@@ -41,6 +44,18 @@ describe("esquemaRegistroCliente", () => {
       email: "laura@correo.com",
       barrio: 17,
     });
+  });
+
+  it("exige tildar mayor de 18 y términos: sin la casilla no valida", () => {
+    for (const mayorEdad of ["", undefined]) {
+      const r = esquemaRegistroCliente.safeParse({ ...valido, mayorEdad });
+      expect(r.success).toBe(false);
+      if (!r.success) {
+        expect(erroresPorCampo(r.error).mayorEdad).toBe(
+          "Para crear la cuenta tenés que confirmar que sos mayor de 18 y aceptar los términos.",
+        );
+      }
+    }
   });
 
   it("cuatro formas de escribir el mismo celular dan el mismo E.164", () => {
@@ -90,12 +105,29 @@ describe("esquemaRegistroCliente", () => {
 });
 
 describe("esquemaCompletarCliente", () => {
-  it("pide solo WhatsApp y barrio", () => {
-    expect(esquemaCompletarCliente.parse({ whatsapp: "2235551234", barrio: "51" })).toEqual({
+  it("pide WhatsApp, barrio y la casilla de mayor de 18 y términos", () => {
+    expect(
+      esquemaCompletarCliente.parse({ whatsapp: "2235551234", barrio: "51", mayorEdad: "on" }),
+    ).toEqual({
       whatsapp: "+5492235551234",
       barrio: 51,
+      mayorEdad: "on",
     });
-    expect(esquemaCompletarCliente.safeParse({ whatsapp: "", barrio: "" }).success).toBe(false);
+    expect(
+      esquemaCompletarCliente.safeParse({ whatsapp: "", barrio: "", mayorEdad: "on" }).success,
+    ).toBe(false);
+  });
+
+  it("sin la casilla no valida (el alta con Google no la saltea)", () => {
+    for (const mayorEdad of ["", undefined]) {
+      const r = esquemaCompletarCliente.safeParse({
+        whatsapp: "2235551234",
+        barrio: "51",
+        mayorEdad,
+      });
+      expect(r.success).toBe(false);
+      if (!r.success) expect(erroresPorCampo(r.error).mayorEdad).toBe(MENSAJE_MAYOR_EDAD);
+    }
   });
 });
 
@@ -103,6 +135,24 @@ describe("normalizarBusqueda", () => {
   it("ignora acentos y mayúsculas", () => {
     expect(normalizarBusqueda("  Chauvín ")).toBe("chauvin");
     expect(normalizarBusqueda("CONSTITUCIÓN")).toBe("constitucion");
+  });
+});
+
+describe("esquemaDatosDeContacto", () => {
+  it("valida WhatsApp y barrio sin la casilla (los datos de la metadata del alta con email)", () => {
+    expect(esquemaDatosDeContacto.safeParse({ whatsapp: "2235551234", barrio: "51" }).success).toBe(
+      true,
+    );
+    expect(esquemaDatosDeContacto.safeParse({ whatsapp: "no", barrio: "51" }).success).toBe(false);
+  });
+
+  it("ignora una casilla que venga de afuera: nunca vale como consentimiento", () => {
+    const r = esquemaDatosDeContacto.parse({
+      whatsapp: "2235551234",
+      barrio: "51",
+      mayorEdad: "on",
+    });
+    expect(r).not.toHaveProperty("mayorEdad");
   });
 });
 

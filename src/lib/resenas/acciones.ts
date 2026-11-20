@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 
 import { revalidatePath } from "next/cache";
 
+import { altaIncompleta, MENSAJE_ALTA_INCOMPLETA } from "@/lib/auth/alta";
 import { rolFalso } from "@/lib/auth/sesion-falsa";
 import { registrarEventoServidor } from "@/lib/metricas-servidor";
 import { limitarPersistente } from "@/lib/rate-limit-persistente";
@@ -130,6 +131,7 @@ export async function guardarResena(
   if (sesion.rol !== "cliente") {
     return { ok: false, error: "Solo los clientes pueden dejar reseñas." };
   }
+  if (altaIncompleta(sesion)) return { ok: false, error: MENSAJE_ALTA_INCOMPLETA };
 
   const parseo = esquemaGuardarResena.safeParse(entrada);
   if (!parseo.success) {
