@@ -82,8 +82,9 @@ test.describe("resultados", () => {
       "true",
     );
 
-    // La distancia es un selector: "Toda la ciudad" es el valor `ciudad`.
-    await page.getByLabel("Distancia").selectOption("ciudad");
+    // La distancia es un Select: "Toda la ciudad" cambia la URL a `toda_la_ciudad=1`.
+    await page.getByLabel("Distancia").click();
+    await page.getByRole("option", { name: "Toda la ciudad" }).click();
     await expect(page).toHaveURL(/toda_la_ciudad=1/);
     await page.goBack();
     await expect(page).not.toHaveURL(/toda_la_ciudad=1/);
@@ -108,12 +109,77 @@ test.describe("resultados", () => {
   }) => {
     test.skip(esCelular(page), "La columna lateral es de escritorio");
     await page.goto("/buscar?barrio=centro");
-    await page.getByLabel("Oficio").selectOption("plomeria");
+    await page.getByLabel("Oficio").click();
+    await page.getByRole("option", { name: "Plomería" }).click();
     await expect(page).toHaveURL(/oficio=plomeria/);
     await expect(page.getByRole("heading", { level: 1, name: /^Plomería cerca de/ })).toBeVisible();
     await expect(
       page.getByRole("heading", { level: 2, name: "Qué quiere decir “verificado”" }),
     ).toBeVisible();
+  });
+
+  test("selector de oficio (Select): flechas, Enter, Esc y anuncio al lector de pantalla", async ({
+    page,
+  }) => {
+    await page.goto("/buscar?barrio=centro");
+    await page.waitForLoadState("networkidle");
+    const oficio = page.getByLabel("Oficio");
+    await oficio.focus();
+    await page.keyboard.press("Enter");
+    await expect(oficio).toHaveAttribute("aria-expanded", "true");
+    await page.keyboard.press("Escape");
+    await expect(oficio).toHaveAttribute("aria-expanded", "false");
+    await expect(oficio).toBeFocused();
+
+    await page.keyboard.press("Enter");
+    await expect(oficio).toHaveAttribute("aria-expanded", "true");
+    await expect(page.getByRole("option", { name: "Todos los oficios" })).toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(page.getByRole("option", { name: "Gas" })).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(oficio).toHaveAttribute("aria-expanded", "false");
+    await expect(page).toHaveURL(/oficio=gas/);
+    await expect(page.getByRole("status").filter({ hasText: "Oficio: Gas" })).toBeAttached();
+  });
+
+  test("selector de barrio (Combobox): búsqueda, flechas, Enter, Esc y anuncio al lector de pantalla", async ({
+    page,
+  }) => {
+    await page.goto("/buscar?oficio=gas&barrio=centro");
+    await page.waitForLoadState("networkidle");
+    const barrio = page.getByRole("combobox", { name: "Tu barrio" });
+    await barrio.focus();
+    await page.keyboard.press("Enter");
+    await expect(barrio).toHaveAttribute("aria-expanded", "true");
+    await page.keyboard.press("Escape");
+    await expect(barrio).toHaveAttribute("aria-expanded", "false");
+    await expect(barrio).toBeFocused();
+
+    await page.keyboard.press("ArrowDown");
+    const buscador = page.getByPlaceholder("Buscá tu barrio…");
+    await expect(buscador).toBeFocused();
+    // Navega con flechas dentro de la lista abierta antes de confirmar con Enter.
+    const opciones = page.getByRole("option");
+    await expect(opciones.nth(0)).toHaveAttribute("aria-selected", "true");
+    await page.keyboard.press("ArrowDown");
+    await expect(opciones.nth(1)).toHaveAttribute("aria-selected", "true");
+    const segundoNombre = (await opciones.nth(1).textContent())?.trim() ?? "";
+    expect(segundoNombre.length).toBeGreaterThan(0);
+    await page.keyboard.press("Enter");
+    await expect(barrio).toHaveAttribute("aria-expanded", "false");
+    await expect(page).not.toHaveURL(/barrio=centro$/);
+    await expect(
+      page.getByRole("status").filter({ hasText: `Tu barrio: ${segundoNombre}` }),
+    ).toBeAttached();
+
+    // También filtra escribiendo en el buscador sin acentos (Chauvín existe en falso y en Supabase real).
+    await barrio.click();
+    await expect(buscador).toBeFocused();
+    await buscador.fill("chauvin");
+    await expect(page.getByRole("option", { name: "Chauvín" })).toBeVisible();
+    await page.keyboard.press("Enter");
+    await expect(page).toHaveURL(/barrio=chauvin/);
+    await expect(page.getByRole("status").filter({ hasText: "Tu barrio: Chauvín" })).toBeAttached();
   });
 
   for (const esquema of ["light", "dark"] as const) {

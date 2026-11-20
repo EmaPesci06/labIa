@@ -38,7 +38,8 @@ test.describe("registro de cliente", () => {
     await expect(page.getByLabel("Contraseña", { exact: true })).toBeVisible();
     const selectorBarrio = page.getByRole("combobox", { name: "Tu barrio" });
     await expect(selectorBarrio).toBeVisible();
-    // Los 7 barrios más comunes están siempre disponibles en el selector.
+    // Los 7 barrios más comunes están siempre disponibles al abrir el selector.
+    await selectorBarrio.click();
     for (const barrio of [
       "La Perla",
       "Centro",
@@ -48,8 +49,9 @@ test.describe("registro de cliente", () => {
       "Constitución",
       "Puerto",
     ]) {
-      await expect(selectorBarrio.getByRole("option", { name: barrio })).toBeAttached();
+      await expect(page.getByRole("option", { name: barrio })).toBeVisible();
     }
+    await page.keyboard.press("Escape");
     await expect(page.getByText("Nunca te pedimos la dirección.")).toBeVisible();
     await expect(page.getByText("Lo ven solo los profesionales que elijas.")).toBeVisible();
     await expect(
@@ -98,7 +100,8 @@ test.describe("registro de cliente", () => {
     await page.getByLabel("Email").fill("laura@example.com");
     await page.getByLabel("Contraseña", { exact: true }).fill("unaclave123");
     await page.getByLabel("Tu WhatsApp").fill("223 555 1234");
-    await page.getByLabel("Tu barrio").selectOption({ label: "Centro" });
+    await page.getByLabel("Tu barrio").click();
+    await page.getByRole("option", { name: "Centro" }).click();
     await page.getByRole("button", { name: "Crear cuenta" }).click();
     await expect(
       page.getByText("Para crear la cuenta tenés que confirmar que sos mayor de 18"),
@@ -126,8 +129,11 @@ test.describe("registro de cliente", () => {
   test("elegir un barrio actualiza el selector", async ({ page }) => {
     await page.goto("/registro/cliente");
     const selector = page.getByRole("combobox", { name: "Tu barrio" });
-    await selector.selectOption({ label: "La Perla" });
-    await expect(selector).toHaveValue("51");
+    await selector.click();
+    await page.getByPlaceholder("Buscá tu barrio…").fill("perla");
+    await page.getByRole("option", { name: "La Perla" }).click();
+    await expect(selector).toContainText("La Perla");
+    await expect(page.locator('input[name="barrio"]')).toHaveValue("51");
   });
 
   test("sin sesión, completar datos manda a ingresar", async ({ page }) => {
@@ -146,7 +152,8 @@ test.describe("registro de cliente", () => {
     const casilla = page.getByRole("checkbox", { name: /mayor de 18/ });
     await expect(casilla).not.toBeChecked();
     await page.getByLabel("Tu WhatsApp").fill("223 555 1234");
-    await page.getByLabel("Tu barrio").selectOption({ label: "Centro" });
+    await page.getByLabel("Tu barrio").click();
+    await page.getByRole("option", { name: "Centro" }).click();
     await page.getByRole("button", { name: "Terminar" }).click();
     await expect(
       page.getByText("Para crear la cuenta tenés que confirmar que sos mayor de 18"),
@@ -196,7 +203,8 @@ test.describe("registro de cliente con Supabase real", () => {
     await page.getByLabel("Tu WhatsApp").fill("(0223) 15 555-1234");
     await page.getByLabel("Email").fill(email);
     await page.getByLabel("Contraseña", { exact: true }).fill("clave-de-prueba-123");
-    await page.getByLabel("Tu barrio").selectOption({ label: "Chauvín" });
+    await page.getByLabel("Tu barrio").click();
+    await page.getByRole("option", { name: "Chauvín" }).click();
     await page.getByRole("checkbox", { name: /mayor de 18/ }).check();
     await page.getByRole("button", { name: "Crear cuenta" }).click();
     await expect(page).toHaveURL(/\/inicio$/);
@@ -208,7 +216,8 @@ test.describe("registro de cliente con Supabase real", () => {
     await page.getByLabel("Tu WhatsApp").fill("2235551234");
     await page.getByLabel("Email").fill(email);
     await page.getByLabel("Contraseña", { exact: true }).fill("clave-de-prueba-123");
-    await page.getByLabel("Tu barrio").selectOption({ label: "Centro" });
+    await page.getByLabel("Tu barrio").click();
+    await page.getByRole("option", { name: "Centro" }).click();
     await page.getByRole("checkbox", { name: /mayor de 18/ }).check();
     await page.getByRole("button", { name: "Crear cuenta" }).click();
     await expect(page.getByText(`Te mandamos un mail a ${email}.`)).toBeVisible();

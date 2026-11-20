@@ -48,7 +48,8 @@ async function irAPasoDocumentos(page: Page, opciones: { gas?: boolean } = {}) {
     await page.getByRole("button", { name: "Gas" }).click();
     await page.getByLabel(/Matrícula/).fill("MG-1234");
   }
-  await page.getByLabel("Barrio desde donde salís").selectOption({ index: 1 });
+  await page.getByLabel("Barrio desde donde salís").click();
+  await page.getByRole("option").first().click();
   await page.getByRole("button", { name: "Toda la ciudad" }).click();
   await irADocumentosBtn(page).click();
   await expect(bloque(page)).toBeVisible();
@@ -306,7 +307,8 @@ test.describe("documentos con cuenta real", () => {
     await page.getByLabel("WhatsApp").fill("223 555-0000");
     await page.getByLabel("Email").fill(email);
     await page.getByLabel("Contraseña").fill("clave-de-prueba-123");
-    await page.getByLabel("Barrio desde donde salís").selectOption({ label: "La Perla" });
+    await page.getByLabel("Barrio desde donde salís").click();
+    await page.getByRole("option", { name: "La Perla" }).click();
     await page.getByRole("button", { name: "Plomería" }).click();
     await page.getByRole("button", { name: "Toda la ciudad" }).click();
     await irADocumentosBtn(page).click();

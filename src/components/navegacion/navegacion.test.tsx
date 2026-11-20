@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -113,47 +113,71 @@ describe("BarraSuperior", () => {
 describe("MenuAvatar", () => {
   const NOMBRE = "Cuenta de Laura Fernández";
 
-  it("empieza cerrado y se abre con el botón", async () => {
+  it("empieza cerrado y se abre con el botón mostrando Mi cuenta, Tema y Salir", async () => {
+    const user = userEvent.setup();
     render(<MenuAvatar nombre="Laura Fernández" />);
     const boton = screen.getByRole("button", { name: NOMBRE });
     expect(boton).toHaveAttribute("aria-expanded", "false");
-    expect(screen.queryByRole("link", { name: "Mi cuenta" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("menuitem", { name: "Mi cuenta" })).not.toBeInTheDocument();
 
-    await userEvent.click(boton);
+    await user.click(boton);
+    expect(await screen.findByRole("menuitem", { name: "Mi cuenta" })).toHaveAttribute(
+      "href",
+      "/cuenta",
+    );
     expect(boton).toHaveAttribute("aria-expanded", "true");
-    expect(screen.getByRole("link", { name: "Mi cuenta" })).toHaveAttribute("href", "/cuenta");
-    expect(screen.getByRole("button", { name: "Salir" })).toBeInTheDocument();
-    expect(screen.getByRole("group", { name: "Tema" })).toBeInTheDocument();
-    const valores = screen.getAllByRole("radio").map((r) => r.getAttribute("value"));
-    expect(valores).toEqual(["claro", "oscuro", "sistema"]);
+    expect(screen.getByRole("menuitem", { name: "Salir" })).toBeInTheDocument();
+    const radios = screen.getAllByRole("menuitemradio").map((r) => r.textContent);
+    expect(radios).toEqual(["Claro", "Oscuro", "Sistema"]);
   });
 
   it("Escape lo cierra y devuelve el foco al botón", async () => {
+    const user = userEvent.setup();
     render(<MenuAvatar nombre="Laura Fernández" />);
     const boton = screen.getByRole("button", { name: NOMBRE });
-    await userEvent.click(boton);
-    await userEvent.keyboard("{Escape}");
-    expect(boton).toHaveAttribute("aria-expanded", "false");
+    await user.click(boton);
+    await screen.findByRole("menuitem", { name: "Mi cuenta" });
+
+    await user.keyboard("{Escape}");
+    await waitFor(() => expect(boton).toHaveAttribute("aria-expanded", "false"));
     expect(boton).toHaveFocus();
   });
 
   it("un clic afuera lo cierra", async () => {
+    const user = userEvent.setup();
     render(
       <div>
         <p>afuera</p>
         <MenuAvatar nombre="Laura Fernández" />
       </div>,
     );
-    await userEvent.click(screen.getByRole("button", { name: NOMBRE }));
-    await userEvent.click(screen.getByText("afuera"));
-    expect(screen.queryByRole("link", { name: "Mi cuenta" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: NOMBRE }));
+    await screen.findByRole("menuitem", { name: "Mi cuenta" });
+
+    await user.click(screen.getByText("afuera"));
+    await waitFor(() =>
+      expect(screen.queryByRole("menuitem", { name: "Mi cuenta" })).not.toBeInTheDocument(),
+    );
   });
 
   it("elegir Mi cuenta lo cierra", async () => {
+    const user = userEvent.setup();
     render(<MenuAvatar nombre="Laura Fernández" />);
-    await userEvent.click(screen.getByRole("button", { name: NOMBRE }));
-    await userEvent.click(screen.getByRole("link", { name: "Mi cuenta" }));
-    expect(screen.queryByRole("link", { name: "Mi cuenta" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: NOMBRE }));
+    await user.click(await screen.findByRole("menuitem", { name: "Mi cuenta" }));
+    await waitFor(() =>
+      expect(screen.queryByRole("menuitem", { name: "Mi cuenta" })).not.toBeInTheDocument(),
+    );
+  });
+
+  it("elegir un tema marca aria-checked y lo anuncia", async () => {
+    const user = userEvent.setup();
+    render(<MenuAvatar nombre="Laura Fernández" />);
+    await user.click(screen.getByRole("button", { name: NOMBRE }));
+    const oscuro = await screen.findByRole("menuitemradio", { name: "Oscuro" });
+    await user.click(oscuro);
+    expect(oscuro).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByRole("status")).toHaveTextContent("Tema: Oscuro");
   });
 });
 

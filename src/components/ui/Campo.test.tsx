@@ -65,14 +65,33 @@ describe("Campo", () => {
     expect(screen.getByText("4/500")).toBeInTheDocument();
   });
 
-  it("selección: dibuja las opciones", () => {
+  it("selección: abre opciones, elige una y envía su valor en el formulario", async () => {
+    const user = userEvent.setup();
     render(
-      <Campo variante="seleccion" etiqueta="Barrio">
-        <option>La Perla</option>
-        <option>Centro</option>
-      </Campo>,
+      <form>
+        <Campo
+          variante="seleccion"
+          etiqueta="Oficio"
+          name="oficio"
+          placeholder="Elegí un oficio"
+          opciones={[
+            { valor: "plomeria", etiqueta: "Plomería" },
+            { valor: "gas", etiqueta: "Gas" },
+          ]}
+        />
+      </form>,
     );
-    expect(screen.getByRole("combobox", { name: "Barrio" })).toBeInTheDocument();
-    expect(screen.getAllByRole("option")).toHaveLength(2);
+    const combobox = screen.getByRole("combobox", { name: "Oficio" });
+    expect(combobox).toBeInTheDocument();
+
+    await user.click(combobox);
+    expect(await screen.findAllByRole("option")).toHaveLength(2);
+    await user.click(screen.getByRole("option", { name: "Gas" }));
+
+    expect(combobox).toHaveTextContent("Gas");
+    expect(screen.getByRole("status")).toHaveTextContent("Oficio: Gas");
+    const form = combobox.closest("form");
+    expect(form).not.toBeNull();
+    expect(new FormData(form!).get("oficio")).toBe("gas");
   });
 });

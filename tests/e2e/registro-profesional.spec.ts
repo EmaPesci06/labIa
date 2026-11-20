@@ -49,7 +49,8 @@ test.describe("registro de profesional · paso 1", () => {
     await page.getByLabel("WhatsApp").fill("223 555-0000");
     await page.getByLabel("Email").fill("martin@example.com");
     await page.getByLabel("Contraseña").fill("clave-de-prueba-123");
-    await page.getByLabel("Barrio desde donde salís").selectOption({ label: "La Perla" });
+    await page.getByLabel("Barrio desde donde salís").click();
+    await page.getByRole("option", { name: "La Perla" }).click();
     await page.getByRole("button", { name: "Toda la ciudad" }).click();
     await siguiente(page).click();
     await expect(page.getByRole("group", { name: /Paso 2 de 3/ })).toBeVisible();
@@ -243,7 +244,8 @@ test.describe("cuenta real", () => {
     await page.getByLabel("WhatsApp").fill("223 555-0000");
     await page.getByLabel("Email").fill(email);
     await page.getByLabel("Contraseña").fill("clave-de-prueba-123");
-    await page.getByLabel("Barrio desde donde salís").selectOption({ label: "La Perla" });
+    await page.getByLabel("Barrio desde donde salís").click();
+    await page.getByRole("option", { name: "La Perla" }).click();
     await page.getByRole("button", { name: "Plomería" }).click();
     await page.getByRole("button", { name: "Gas" }).click();
     await page.getByLabel(/Matrícula/).fill("MG-1234");
@@ -258,7 +260,8 @@ test.describe("cuenta real", () => {
     await page.getByRole("button", { name: "Volver al perfil" }).click();
     await expect(page.getByLabel("Nombre y apellido")).toHaveValue("Martín Gómez");
     await expect(page.getByLabel(/Matrícula/)).toHaveValue("MG-1234");
-    await expect(page.getByLabel("Barrio desde donde salís")).toHaveValue(/\d+/);
+    await expect(page.getByLabel("Barrio desde donde salís")).toContainText("La Perla");
+    await expect(page.locator('input[name="barrioId"]')).toHaveValue(/\d+/);
     await expect(page.getByRole("button", { name: "Gas" })).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByRole("button", { name: "Centro", exact: true })).toHaveAttribute(
       "aria-pressed",

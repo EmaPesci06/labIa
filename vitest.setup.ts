@@ -19,6 +19,19 @@ if (typeof window !== "undefined" && !window.matchMedia) {
     }) satisfies MediaQueryList;
 }
 
+// jsdom no implementa ResizeObserver ni scrollIntoView (usados por cmdk y Base UI).
+if (typeof globalThis.ResizeObserver === "undefined") {
+  globalThis.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
+
+if (typeof HTMLElement !== "undefined" && !HTMLElement.prototype.scrollIntoView) {
+  HTMLElement.prototype.scrollIntoView = () => {};
+}
+
 afterEach(() => {
   cleanup();
 });

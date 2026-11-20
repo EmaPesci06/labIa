@@ -191,7 +191,8 @@ test.describe("panel de verificación: camino feliz del admin", () => {
     const antecedentes = tarjetaDe(page, "Certificado de antecedentes");
 
     await antecedentes.getByRole("button", { name: "Rechazar…" }).click();
-    await antecedentes.getByLabel("Motivo del rechazo").selectOption("Foto borrosa");
+    await antecedentes.getByLabel("Motivo del rechazo").click();
+    await page.getByRole("option", { name: "Foto borrosa" }).click();
     await antecedentes.getByRole("button", { name: "Confirmar rechazo" }).click();
 
     await expect(
@@ -216,7 +217,8 @@ test.describe("panel de verificación: camino feliz del admin", () => {
     const antecedentes = tarjetaDe(page, "Certificado de antecedentes");
 
     await antecedentes.getByRole("button", { name: "Rechazar…" }).click();
-    await antecedentes.getByLabel("Motivo del rechazo").selectOption("Otro");
+    await antecedentes.getByLabel("Motivo del rechazo").click();
+    await page.getByRole("option", { name: "Otro" }).click();
     await antecedentes.getByRole("button", { name: "Confirmar rechazo" }).click();
 
     const detalle = antecedentes.getByLabel("Detalle (opcional; obligatorio con Otro)");
@@ -233,7 +235,8 @@ test.describe("panel de verificación: camino feliz del admin", () => {
     const antecedentes = tarjetaDe(page, "Certificado de antecedentes");
 
     await antecedentes.getByRole("button", { name: "Rechazar…" }).click();
-    await antecedentes.getByLabel("Motivo del rechazo").selectOption("Otro");
+    await antecedentes.getByLabel("Motivo del rechazo").click();
+    await page.getByRole("option", { name: "Otro" }).click();
     await antecedentes
       .getByLabel("Detalle (opcional; obligatorio con Otro)")
       .fill("Falta la hoja 2 del certificado");
