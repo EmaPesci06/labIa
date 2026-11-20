@@ -205,7 +205,7 @@ test.describe("registro de profesional · formulario completo", () => {
       await expect(page.getByText("2 de 10 fotos")).toBeVisible();
       const gas = page.getByRole("button", { name: "Gas" });
       await gas.click();
-      await expect(gas.locator("span")).toHaveCSS("background-color", "rgb(247, 201, 72)");
+      await expect(gas).toHaveCSS("background-color", "rgb(247, 201, 72)");
       await siguiente(page).click();
       await expect(page.getByText("Ingresá tu nombre y apellido.")).toBeVisible();
       const resultado = await new AxeBuilder({ page }).analyze();

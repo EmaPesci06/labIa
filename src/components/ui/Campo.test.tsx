@@ -25,6 +25,21 @@ describe("Campo", () => {
     );
   });
 
+  it("el borde usa el token borde (visible) y el error lo pasa a error; sin anillo extra", () => {
+    render(
+      <>
+        <Campo etiqueta="Uno" />
+        <Campo etiqueta="Dos" error="Falta." />
+      </>,
+    );
+    expect(screen.getByLabelText("Uno")).toHaveClass(
+      "border-borde",
+      "bg-campo",
+      "focus-visible:ring-0",
+    );
+    expect(screen.getByLabelText("Dos")).toHaveClass("aria-invalid:border-error");
+  });
+
   it("sin error no marca el campo como inválido", () => {
     render(<Campo etiqueta="Email" />);
     expect(screen.getByLabelText("Email")).not.toHaveAttribute("aria-invalid");
