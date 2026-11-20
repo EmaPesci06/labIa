@@ -65,8 +65,17 @@ describe("tokens de la paleta nueva", () => {
     }
   });
 
-  it("los nombres de TOKENS_COLOR son los del README más campo", () => {
-    expect([...TOKENS_COLOR].sort()).toEqual(Object.keys(CLARO_README).sort());
+  it("los nombres de TOKENS_COLOR son los del README más campo, borde y texto-suave", () => {
+    expect([...TOKENS_COLOR].sort()).toEqual(
+      [...Object.keys(CLARO_README), "borde", "texto-suave"].sort(),
+    );
+  });
+
+  it("borde y texto-suave tienen el hex pensado en cada tema", () => {
+    expect(hexDe("claro", "texto-suave")).toBe("#48646F");
+    expect(hexDe("claro", "borde")).toBe("#6F8790");
+    expect(hexDe("oscuro", "texto-suave")).toBe("#C4D6D8");
+    expect(hexDe("oscuro", "borde")).toBe("#7AA3AE");
   });
 
   it("cada token de TOKENS_COLOR está mapeado en el @theme de Tailwind", () => {
@@ -84,7 +93,6 @@ describe("tokens de la paleta nueva", () => {
       "superficie-elevada",
       "texto-secundario",
       "texto-terciario",
-      "borde",
       "divisor",
       "cinta",
     ];
@@ -108,11 +116,21 @@ describe("contraste AA (≥ 4,5:1) de cada par texto/fondo, en claro y oscuro", 
     ["sobre-sol", "sol"],
     ["error", "fondo"],
     ["error", "superficie"],
+    ["texto-suave", "fondo"],
+    ["texto-suave", "superficie"],
+    ["texto-suave", "campo"],
   ];
 
   for (const tema of ["claro", "oscuro"] as const) {
     it.each(PARES)(`${tema}: %s sobre %s`, (texto, fondo) => {
       expect(contraste(hexDe(tema, texto), hexDe(tema, fondo))).toBeGreaterThanOrEqual(4.5);
+    });
+  }
+
+  // borde es un componente de interfaz (bordes de campos y tarjetas): WCAG 1.4.11 pide 3:1.
+  for (const tema of ["claro", "oscuro"] as const) {
+    it.each(["fondo", "superficie", "campo"])(`${tema}: borde sobre %s llega a 3:1`, (fondo) => {
+      expect(contraste(hexDe(tema, "borde"), hexDe(tema, fondo))).toBeGreaterThanOrEqual(3);
     });
   }
 

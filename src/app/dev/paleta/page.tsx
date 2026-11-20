@@ -18,6 +18,8 @@ const MUESTRA: Record<(typeof TOKENS_COLOR)[number], string> = {
   superficie: "bg-superficie",
   campo: "bg-campo",
   texto: "bg-texto",
+  "texto-suave": "bg-texto-suave",
+  borde: "bg-borde",
   accion: "bg-accion",
   "sobre-accion": "bg-sobre-accion",
   encabezado: "bg-encabezado",

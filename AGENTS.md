@@ -50,6 +50,7 @@ src/app/(app)/          inicio, buscar, profesionales/[id], trabajos, mis-trabaj
 src/app/admin/          verificaciones, reportes (solo rol admin)
 src/app/api/            route handlers puntuales (callbacks de auth, webhooks)
 src/components/ui/      componentes base (Boton, Campo, Chip, Insignia, Tarjeta, HojaInferior, Encabezado, Toldo, Avatar…)
+src/components/shadcn/  componentes de shadcn generados por el CLI (base-nova, Base UI); no se editan a mano
 src/components/         componentes de dominio (TarjetaProfesional, TarjetaTrabajo…)
 src/lib/supabase/       clientes server/browser/admin y tipos generados
 src/lib/validaciones/   esquemas Zod
@@ -84,6 +85,11 @@ Rutas en español sin acentos: `/`, `/ingresar`, `/registro`, `/registro/cliente
   (nunca texto), `error`, `equipo`, `velo` (fondo de las hojas). Tipografías con `next/font`: Baloo 2 (700 y 800) para
   títulos y la marca (`font-titulo`) y Nunito Sans (400 y 700) para el resto. Referencia de toda pantalla:
   `docs/prototipo-nuevo/` (`README.md` y `CONSTRUCCION.md`). No usar hex fuera de `globals.css`.
+- **shadcn (excepción a "igual al boceto"):** los archivos de `src/components/shadcn/` se generan con `pnpm dlx shadcn add`
+  y **no se editan a mano**. La paleta se adapta solo desde `globals.css` (las variables `--primary`, `--border`, `--ring`…
+  atadas a nuestros tokens) y la forma o los 44 px se resuelven en la capa fina de `src/components/ui/` con `className`
+  y `cn()` (o con una regla por `data-slot` en `globals.css`). Las diferencias de forma con el boceto se aceptan. Radios
+  de shadcn (`--radius: 0.625rem`). El foco de 3 px de los componentes de shadcn sale de `[data-slot]:focus-visible`.
 - **Sin** `console.log`, **sin** `any`, **sin** secretos en el repo. `.env.example` lista todas las variables sin valores.
 
 ## Seguridad (no negociable)

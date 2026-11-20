@@ -7,6 +7,8 @@ export const TOKENS_COLOR = [
   "superficie",
   "campo",
   "texto",
+  "texto-suave",
+  "borde",
   "accion",
   "sobre-accion",
   "encabezado",
