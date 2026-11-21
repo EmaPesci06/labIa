@@ -1,5 +1,6 @@
 import "server-only";
 
+import { sesionAdmin } from "@/lib/admin/sesion";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import type { Oficio } from "@/lib/oficios";
@@ -74,6 +75,8 @@ function aDocumento(fila: FilaVerificacion): DocumentoAdmin {
  * sesión del admin: la RLS (rol admin) es la que deja ver las filas.
  */
 export async function listarProfesionales(): Promise<FilaProfesional[]> {
+  // Defensa en profundidad (LAB-88): el layout de /admin no se vuelve a renderizar al navegar.
+  if (!(await sesionAdmin())) return [];
   if (!supabaseConfigurado()) return [];
   const cliente = await crearClienteServidor();
   const { data: verificaciones } = await cliente
@@ -154,6 +157,8 @@ async function emailDe(usuarioId: string): Promise<string | null> {
 export async function obtenerDetalleProfesional(
   usuarioId: string,
 ): Promise<DetalleProfesional | null> {
+  // Antes que nada: más abajo se lee el email con la service role (LAB-88).
+  if (!(await sesionAdmin())) return null;
   if (!supabaseConfigurado()) return null;
   const cliente = await crearClienteServidor();
   const { data: usuario } = await cliente

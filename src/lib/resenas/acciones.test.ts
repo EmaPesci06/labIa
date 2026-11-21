@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const {
   mockObtenerSesion,
+  mockObtenerSesionVerificada,
   mockRolFalso,
   mockRegistrarEvento,
   mockRevalidatePath,
@@ -9,6 +10,7 @@ const {
   mockLimitarPersistente,
 } = vi.hoisted(() => ({
   mockObtenerSesion: vi.fn(),
+  mockObtenerSesionVerificada: vi.fn(),
   mockRolFalso: vi.fn(() => null),
   mockRegistrarEvento: vi.fn(),
   mockRevalidatePath: vi.fn(),
@@ -34,6 +36,7 @@ vi.mock("@/lib/rate-limit-persistente", () => ({
 
 vi.mock("@/lib/sesion", () => ({
   obtenerSesion: mockObtenerSesion,
+  obtenerSesionVerificada: mockObtenerSesionVerificada,
 }));
 
 vi.mock("@/lib/supabase/servidor", () => ({
@@ -56,7 +59,7 @@ describe("guardarResena", () => {
     vi.clearAllMocks();
     mockRolFalso.mockReturnValue(null);
     mockLimitarPersistente.mockResolvedValue({ permitido: true, segundosParaReintentar: 0 });
-    mockObtenerSesion.mockResolvedValue({
+    mockObtenerSesionVerificada.mockResolvedValue({
       usuario: { id: CLIENTE_ID },
       rol: "cliente",
       terminosAceptados: true,
@@ -98,7 +101,7 @@ describe("guardarResena", () => {
   });
 
   it("falla si no hay sesión iniciada", async () => {
-    mockObtenerSesion.mockResolvedValue(null);
+    mockObtenerSesionVerificada.mockResolvedValue(null);
 
     const res = await guardarResena({
       profesionalId: PROFESIONAL_ID,
@@ -112,7 +115,7 @@ describe("guardarResena", () => {
   });
 
   it("falla si el rol no es cliente", async () => {
-    mockObtenerSesion.mockResolvedValue({
+    mockObtenerSesionVerificada.mockResolvedValue({
       usuario: { id: CLIENTE_ID },
       rol: "profesional",
     });
@@ -129,7 +132,7 @@ describe("guardarResena", () => {
   });
 
   it("falla si el cliente no aceptó mayor de 18 y términos (LAB-81)", async () => {
-    mockObtenerSesion.mockResolvedValue({
+    mockObtenerSesionVerificada.mockResolvedValue({
       usuario: { id: CLIENTE_ID },
       rol: "cliente",
       terminosAceptados: false,
@@ -490,6 +493,8 @@ describe("consultarElegibilidadResena", () => {
   it("devuelve puedeResenar: false si no hay sesión de cliente", async () => {
     mockObtenerSesion.mockResolvedValue(null);
     const res = await consultarElegibilidadResena(PROFESIONAL_ID);
+    // Es una lectura al pintar el perfil: no valida contra Auth (LAB-88).
+    expect(mockObtenerSesionVerificada).not.toHaveBeenCalled();
     expect(res.puedeResenar).toBe(false);
   });
 

@@ -6,7 +6,7 @@ import { crearClienteServidor } from "@/lib/supabase/servidor";
 import { cargarMasResenas } from "./acciones";
 
 vi.mock("server-only", () => ({}));
-vi.mock("@/lib/sesion", () => ({ obtenerSesion: vi.fn() }));
+vi.mock("@/lib/sesion", () => ({ obtenerSesionVerificada: vi.fn() }));
 vi.mock("@/lib/supabase/servidor", () => ({
   crearClienteServidor: vi.fn(async () => ({})),
   supabaseConfigurado: vi.fn(() => true),

@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-import type { EstadoUsuario, RolUsuario } from "@/lib/auth/rutas";
+import { esRutaAdmin, type EstadoUsuario, type RolUsuario } from "@/lib/auth/rutas";
 
 import { OPCIONES_COOKIES_SESION } from "./cookies";
 import type { Database } from "./tipos";
@@ -44,14 +44,21 @@ export async function refrescarSesion(request: NextRequest): Promise<SesionProxy
     },
   });
 
-  // getUser() valida el token con el servidor de Auth (no se confía en la cookie sola).
-  const { data } = await supabase.auth.getUser();
-  if (!data.user) return { respuesta, rol: null, estado: null };
+  // getClaims() verifica la firma del JWT con la clave pública del proyecto (JWKS en memoria): no
+  // se confía en la cookie sola y tampoco hay una ida y vuelta a Auth en cada pedido (LAB-88).
+  // Refresca el token si venció. Quien sí revisa a la cuenta es la lectura de `usuarios`: una
+  // cuenta suspendida o dada de baja no pasa aunque el token siga vigente.
+  // `/admin` es la excepción: ahí se valida el token contra Auth (`getUser`), así una sesión
+  // revocada no entra al panel (el layout no se vuelve a renderizar al navegar por RSC).
+  const idUsuario = esRutaAdmin(request.nextUrl.pathname)
+    ? (await supabase.auth.getUser()).data.user?.id
+    : (await supabase.auth.getClaims()).data?.claims.sub;
+  if (!idUsuario) return { respuesta, rol: null, estado: null };
 
   const { data: fila } = await supabase
     .from("usuarios")
     .select("rol, estado")
-    .eq("id", data.user.id)
+    .eq("id", idUsuario)
     .maybeSingle();
   const estado = fila ? (fila.estado as EstadoUsuario) : null;
   const rol = fila && fila.estado === "activa" ? fila.rol : null;

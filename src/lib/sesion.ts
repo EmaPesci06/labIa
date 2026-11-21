@@ -19,6 +19,8 @@ export type SesionActual = {
    * Solo se exige a los clientes: ver `altaIncompleta`.
    */
   terminosAceptados: boolean;
+  /** Barrio guardado en la cuenta (`usuarios.barrio_id`), o `null` si no eligió. */
+  barrioId?: number | null;
   perfil: {
     nombre: string | null;
     apellido: string | null;
@@ -57,11 +59,31 @@ export async function rolDeLaSesion(
 }
 
 /**
- * Sesión del pedido actual para Server Components: `{ usuario, rol, perfil }` o `null` si no hay
- * sesión. Se memoriza por pedido (`cache` de React): llamarla desde varios componentes cuesta una
- * sola consulta. Valida el token con Supabase Auth (`getUser`), no solo la cookie.
+ * Cómo se comprueba quién es el usuario (LAB-88):
+ * - `claims`: `getClaims()` verifica la firma del JWT en el servidor con la clave pública del
+ *   proyecto (JWKS, cacheada en memoria): no hace una ida y vuelta a Auth. Alcanza para pintar
+ *   pantallas. No ve una sesión revocada hasta que vence el token (1 h); la cuenta suspendida sí
+ *   se detecta, porque el estado se lee de `usuarios` en cada pedido.
+ * - `servidor`: `getUser()` valida el token contra Auth. Es para las Server Actions que mutan
+ *   datos y para el panel admin.
  */
-export const obtenerSesion = cache(async (): Promise<SesionActual | null> => {
+type Verificacion = "claims" | "servidor";
+
+async function identidad(
+  supabase: ClienteServidor,
+  verificacion: Verificacion,
+): Promise<{ id: string; email: string | null } | null> {
+  if (verificacion === "servidor") {
+    const { data } = await supabase.auth.getUser();
+    return data.user ? { id: data.user.id, email: data.user.email ?? null } : null;
+  }
+  const { data } = await supabase.auth.getClaims();
+  const claims = data?.claims;
+  if (!claims?.sub) return null;
+  return { id: claims.sub, email: typeof claims.email === "string" ? claims.email : null };
+}
+
+async function construirSesion(verificacion: Verificacion): Promise<SesionActual | null> {
   // Se lee en cada pedido (no al compilar).
   await connection();
 
@@ -75,6 +97,7 @@ export const obtenerSesion = cache(async (): Promise<SesionActual | null> => {
       rol: falso,
       normasVersion: VERSION_NORMAS,
       terminosAceptados: true,
+      barrioId: null,
       perfil: {
         nombre: falso === "profesional" ? "Martín" : "Laura",
         apellido: falso === "profesional" ? "Gómez" : "Fernández",
@@ -87,28 +110,43 @@ export const obtenerSesion = cache(async (): Promise<SesionActual | null> => {
   if (!supabaseConfigurado()) return null;
 
   const supabase = await crearClienteServidor();
-  const { data } = await supabase.auth.getUser();
-  if (!data.user) return null;
+  const quien = await identidad(supabase, verificacion);
+  if (!quien) return null;
 
   const { data: fila } = await supabase
     .from("usuarios")
-    .select("rol, estado, nombre, apellido, normas_version, terminos_aceptados_at")
-    .eq("id", data.user.id)
+    .select("rol, estado, nombre, apellido, normas_version, terminos_aceptados_at, barrio_id")
+    .eq("id", quien.id)
     .maybeSingle();
-  // Sin fila o con la cuenta suspendida/baja: se trata como sin sesión.
+  // Sin fila o con la cuenta suspendida/baja: se trata como sin sesión. Esta es la segunda
+  // barrera (la primera es `proxy.ts`): no depende de lo que diga el token.
   if (!fila || fila.estado !== "activa") return null;
 
-  const email = data.user.email ?? null;
   return {
-    usuario: { id: data.user.id, email },
+    usuario: { id: quien.id, email: quien.email },
     rol: fila.rol,
     normasVersion: fila.normas_version,
     terminosAceptados: fila.terminos_aceptados_at !== null,
+    barrioId: fila.barrio_id,
     perfil: {
       nombre: fila.nombre,
       apellido: fila.apellido,
-      nombreVisible: nombreVisible(fila.nombre, fila.apellido, email),
+      nombreVisible: nombreVisible(fila.nombre, fila.apellido, quien.email),
       completo: Boolean(fila.nombre),
     },
   };
-});
+}
+
+/**
+ * Sesión del pedido actual para Server Components: `{ usuario, rol, perfil }` o `null` si no hay
+ * sesión. Se memoriza por pedido (`cache` de React): llamarla desde varios componentes cuesta una
+ * sola consulta. Verifica el JWT con `getClaims` (sin ir a Auth) y lee `usuarios` una vez.
+ * Para Server Actions y el panel admin usar `obtenerSesionVerificada`.
+ */
+export const obtenerSesion = cache(() => construirSesion("claims"));
+
+/**
+ * Igual que `obtenerSesion`, pero valida el token contra Supabase Auth (`getUser`). Es la que usan
+ * las Server Actions que mutan datos y `/admin`: ahí se prefiere la comprobación más estricta.
+ */
+export const obtenerSesionVerificada = cache(() => construirSesion("servidor"));

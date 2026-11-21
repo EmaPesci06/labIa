@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import type { EstadoFormulario } from "@/lib/auth/estado";
 import { limitarPorIp } from "@/lib/rate-limit-persistente";
-import { obtenerSesion } from "@/lib/sesion";
+import { obtenerSesionVerificada } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import { datosDeFormularioPerfil, esquemaPerfilProfesional } from "@/lib/validaciones/perfil";
 
@@ -64,7 +64,7 @@ export async function actualizarPerfilProfesional(
   _anterior: EstadoFormulario,
   datos: FormData,
 ): Promise<EstadoFormulario> {
-  const sesion = await obtenerSesion();
+  const sesion = await obtenerSesionVerificada();
   if (!sesion) return { mensaje: "Tu sesión venció. Ingresá de nuevo para editar tu perfil." };
   if (sesion.rol !== "profesional") {
     return { mensaje: "Solo las cuentas de profesional tienen un perfil para editar." };

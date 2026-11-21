@@ -1,3 +1,4 @@
+import { tokenJwt } from "./apoyo/token";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 import { writeFileSync } from "node:fs";
@@ -75,7 +76,7 @@ const base64url = (texto: string) => Buffer.from(texto).toString("base64url");
 /** Cookie de sesión de @supabase/ssr contra el falso (mismo formato que reportes-moderacion). */
 async function sesionFalsa(contexto: BrowserContext, baseURL: string, token: string) {
   const sesion = {
-    access_token: token,
+    access_token: tokenJwt(token),
     refresh_token: "refresh-falso",
     token_type: "bearer",
     expires_in: 3600,

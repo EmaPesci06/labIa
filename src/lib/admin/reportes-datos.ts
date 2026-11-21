@@ -1,5 +1,6 @@
 import "server-only";
 
+import { sesionAdmin } from "@/lib/admin/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import {
   ETIQUETAS_MOTIVO,
@@ -42,6 +43,8 @@ export type FilaResenaBajaAdmin = {
 };
 
 export async function listarReportes(): Promise<FilaReporteAdmin[]> {
+  // Defensa en profundidad (LAB-88): el layout de /admin no se vuelve a renderizar al navegar.
+  if (!(await sesionAdmin())) return [];
   if (!supabaseConfigurado()) return [];
 
   const supabase = await crearClienteServidor();
@@ -217,6 +220,8 @@ export async function listarReportes(): Promise<FilaReporteAdmin[]> {
 }
 
 export async function listarResenasBajas(): Promise<FilaResenaBajaAdmin[]> {
+  // Defensa en profundidad (LAB-88): el layout de /admin no se vuelve a renderizar al navegar.
+  if (!(await sesionAdmin())) return [];
   if (!supabaseConfigurado()) return [];
 
   const supabase = await crearClienteServidor();

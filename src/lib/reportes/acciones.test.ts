@@ -15,7 +15,7 @@ const {
 }));
 
 vi.mock("@/lib/sesion", () => ({
-  obtenerSesion: vi.fn(),
+  obtenerSesionVerificada: vi.fn(),
 }));
 vi.mock("@/lib/rate-limit-consulta", () => ({
   cupoDisponible: vi.fn(async () => ({ permitido: true, segundosParaReintentar: 0 })),
@@ -70,7 +70,7 @@ vi.mock("@/lib/supabase/servidor", () => ({
 }));
 
 import { MENSAJE_ALTA_INCOMPLETA } from "@/lib/auth/alta";
-import { obtenerSesion } from "@/lib/sesion";
+import { obtenerSesionVerificada } from "@/lib/sesion";
 import { supabaseConfigurado } from "@/lib/supabase/servidor";
 import { enviarReporte } from "./acciones";
 import { ESTADO_REPORTE_INICIAL } from "./estado";
@@ -88,7 +88,7 @@ describe("enviarReporte", () => {
   });
 
   it("rechaza al cliente que no aceptó mayor de 18 y términos (LAB-81)", async () => {
-    vi.mocked(obtenerSesion).mockResolvedValue({
+    vi.mocked(obtenerSesionVerificada).mockResolvedValue({
       usuario: { id: UUID_USUARIO, email: "test@example.com" },
       rol: "cliente",
       normasVersion: "1.0",
@@ -114,7 +114,7 @@ describe("enviarReporte", () => {
   });
 
   it("rechaza si el usuario no tiene sesión iniciada", async () => {
-    vi.mocked(obtenerSesion).mockResolvedValue(null);
+    vi.mocked(obtenerSesionVerificada).mockResolvedValue(null);
 
     const formData = new FormData();
     formData.set("objetivoTipo", "perfil");
@@ -126,7 +126,7 @@ describe("enviarReporte", () => {
   });
 
   it("rechaza si se supera el rate limit de 10 reportes al día", async () => {
-    vi.mocked(obtenerSesion).mockResolvedValue({
+    vi.mocked(obtenerSesionVerificada).mockResolvedValue({
       usuario: { id: UUID_USUARIO, email: "test@example.com" },
       rol: "cliente",
       normasVersion: "1.0",
@@ -146,7 +146,7 @@ describe("enviarReporte", () => {
   });
 
   it("rechaza si la IP supera su tope diario aunque la cuenta tenga cupo (M-05)", async () => {
-    vi.mocked(obtenerSesion).mockResolvedValue({
+    vi.mocked(obtenerSesionVerificada).mockResolvedValue({
       usuario: { id: UUID_USUARIO, email: "test@example.com" },
       rol: "cliente",
       normasVersion: "1.0",
@@ -168,7 +168,7 @@ describe("enviarReporte", () => {
   });
 
   it("cuenta la IP con la clave 'reporte' y 30 reportes por día (M-05)", async () => {
-    vi.mocked(obtenerSesion).mockResolvedValue({
+    vi.mocked(obtenerSesionVerificada).mockResolvedValue({
       usuario: { id: UUID_USUARIO, email: "test@example.com" },
       rol: "cliente",
       normasVersion: "1.0",
@@ -189,7 +189,7 @@ describe("enviarReporte", () => {
   });
 
   it("cuenta el intento con la clave y la regla persistentes de reportes", async () => {
-    vi.mocked(obtenerSesion).mockResolvedValue({
+    vi.mocked(obtenerSesionVerificada).mockResolvedValue({
       usuario: { id: UUID_USUARIO, email: "test@example.com" },
       rol: "cliente",
       normasVersion: "1.0",
@@ -210,7 +210,7 @@ describe("enviarReporte", () => {
   });
 
   it("rechaza el autorreporte de un perfil propio", async () => {
-    vi.mocked(obtenerSesion).mockResolvedValue({
+    vi.mocked(obtenerSesionVerificada).mockResolvedValue({
       usuario: { id: UUID_USUARIO, email: "test@example.com" },
       rol: "cliente",
       normasVersion: "1.0",
@@ -228,7 +228,7 @@ describe("enviarReporte", () => {
   });
 
   it("rechaza si ya envió un reporte sobre ese objetivo", async () => {
-    vi.mocked(obtenerSesion).mockResolvedValue({
+    vi.mocked(obtenerSesionVerificada).mockResolvedValue({
       usuario: { id: UUID_USUARIO, email: "test@example.com" },
       rol: "cliente",
       normasVersion: "1.0",
@@ -248,7 +248,7 @@ describe("enviarReporte", () => {
   });
 
   it("inserta el reporte y envía la métrica en éxito", async () => {
-    vi.mocked(obtenerSesion).mockResolvedValue({
+    vi.mocked(obtenerSesionVerificada).mockResolvedValue({
       usuario: { id: UUID_USUARIO, email: "test@example.com" },
       rol: "cliente",
       normasVersion: "1.0",
@@ -278,7 +278,7 @@ describe("enviarReporte", () => {
   });
 
   it("sin Supabase configurado, fuera de desarrollo no informa un envío exitoso", async () => {
-    vi.mocked(obtenerSesion).mockResolvedValue({
+    vi.mocked(obtenerSesionVerificada).mockResolvedValue({
       usuario: { id: UUID_USUARIO, email: "test@example.com" },
       rol: "cliente",
       normasVersion: "1.0",
