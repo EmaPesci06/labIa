@@ -42,23 +42,7 @@ pnpm format         # Prettier con prettier-plugin-tailwindcss
 
 La primera vez: `pnpm exec playwright install chromium`. Variables: copiá `.env.example` a `.env.local`.
 
-## Estructura
-
-```
-src/app/(publico)/      bienvenida, ingresar, registro, normas, términos, privacidad
-src/app/(app)/          inicio, buscar, profesionales/[id], trabajos, mis-trabajos, cuenta
-src/app/admin/          verificaciones, reportes (solo rol admin)
-src/app/api/            route handlers puntuales (callbacks de auth, webhooks)
-src/components/ui/      componentes base (Boton, Campo, Chip, Insignia, Tarjeta, HojaInferior, CintaMetrica…)
-src/components/         componentes de dominio (TarjetaProfesional, TarjetaTrabajo…)
-src/lib/supabase/       clientes server/browser/admin y tipos generados
-src/lib/validaciones/   esquemas Zod
-src/lib/                utilidades: formato.ts, whatsapp.ts, distancia.ts
-src/emails/             plantillas React Email
-supabase/               migrations/ y seed.sql
-tests/e2e/              Playwright
-.github/workflows/      CI
-```
+## Rutas
 
 Rutas en español sin acentos: `/`, `/ingresar`, `/registro`, `/registro/cliente`, `/registro/profesional`, `/normas`,
 `/inicio`, `/buscar`, `/profesionales/[id]`, `/trabajos`, `/trabajos/nuevo`, `/trabajos/[id]`, `/mis-trabajos`, `/cuenta`,
