@@ -96,6 +96,12 @@ describe("HojaResena", () => {
     const radio3 = screen.getByRole("radio", { name: "Regular" });
     await userEvent.click(radio3);
     expect(radio3).toBeChecked();
+    // Elegido: mismos tokens que Chip (secondary); sin elegir: superficie (card).
+    expect(radio3.closest("label")).toHaveClass("bg-secondary", "text-secondary-foreground");
+    expect(screen.getByRole("radio", { name: "Bien" }).closest("label")).toHaveClass(
+      "bg-card",
+      "text-card-foreground",
+    );
 
     await userEvent.keyboard("{ArrowRight}");
     expect(screen.getByRole("radio", { name: "Bien" })).toBeChecked();
