@@ -1,6 +1,8 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
+import { hexDe, rgbComas } from "../../src/lib/tokens-css";
+
 // LAB-18: registro de profesional, paso 1 (el perfil).
 // Las pruebas de validación y de interfaz no necesitan Supabase; la de punta a punta crea una
 // cuenta real en el proyecto de desarrollo (E2E_AUTH=1, confirmación de email desactivada).
@@ -206,7 +208,10 @@ test.describe("registro de profesional · formulario completo", () => {
       await expect(page.getByText("2 de 10 fotos")).toBeVisible();
       const gas = page.getByRole("button", { name: "Gas" });
       await gas.click();
-      await expect(gas).toHaveCSS("background-color", "rgb(247, 201, 72)");
+      await expect(gas).toHaveCSS(
+        "background-color",
+        rgbComas(hexDe(esquema === "dark" ? "oscuro" : "claro", "destacado")),
+      );
       await siguiente(page).click();
       await expect(page.getByText("Ingresá tu nombre y apellido.")).toBeVisible();
       const resultado = await new AxeBuilder({ page }).analyze();

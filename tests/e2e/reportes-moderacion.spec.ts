@@ -1,3 +1,4 @@
+import { hexDe, rgbComas } from "../../src/lib/tokens-css";
 import { tokenJwt } from "./apoyo/token";
 import AxeBuilder from "@axe-core/playwright";
 import {
@@ -235,7 +236,10 @@ test.describe("reportes del cliente y del profesional", () => {
       await esperarHojaQuieta(page, hoja);
       const radioEstafa = hoja.getByRole("radio", { name: MOTIVO_ESTAFA });
       await radioEstafa.check();
-      await expect(radioEstafa).toHaveCSS("background-color", "rgb(18, 59, 74)");
+      await expect(radioEstafa).toHaveCSS(
+        "background-color",
+        rgbComas(hexDe(tema, "sobre-destacado")),
+      );
       await capturar(page, "reporte-hoja", tema);
       // Solo la hoja: la página de fondo queda atenuada por el velo y axe mide ese color mezclado.
       const resultado = await new AxeBuilder({ page }).include('[role="dialog"]').analyze();
@@ -380,7 +384,7 @@ test.describe("moderación del admin", () => {
     const apelar = moderado.page.getByRole("link", { name: "Pedir una apelación" });
     await apelar.focus();
     await expect(apelar).toBeFocused();
-    await expect(apelar).toHaveCSS("outline-color", "rgb(247, 201, 72)");
+    await expect(apelar).toHaveCSS("outline-color", rgbComas(hexDe("claro", "destacado")));
     await expect(apelar).toHaveCSS("outline-style", "solid");
     await moderado.contexto.close();
   });

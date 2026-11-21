@@ -1,6 +1,8 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
+import { hexDe, rgbComas } from "../../src/lib/tokens-css";
+
 const PUERTO = Number(process.env.PUERTO_E2E ?? 3000);
 // Sesión falsa de cliente (sin base de datos: la publicación se simula) y de profesional.
 const URL_CLIENTE = `http://localhost:${PUERTO + 200}`;
@@ -93,10 +95,10 @@ test.describe("publicar un trabajo (cliente)", () => {
     await page.emulateMedia({ colorScheme: "dark" });
     await page.goto("/trabajos/nuevo");
     await expect(page.getByRole("heading", { level: 1, name: "Contanos qué pasó" })).toBeVisible();
-    // El radio elegido sobre fondo destacado mantiene fondo sobre-destacado (#123b4a) en oscuro (contraste AA).
+    // El radio elegido sobre fondo destacado mantiene fondo sobre-destacado en oscuro (contraste AA).
     await expect(page.getByRole("radio", { name: "Hoy" })).toHaveCSS(
       "background-color",
-      "rgb(18, 59, 74)",
+      rgbComas(hexDe("oscuro", "sobre-destacado")),
     );
     const resultado = await new AxeBuilder({ page }).analyze();
     expect(
