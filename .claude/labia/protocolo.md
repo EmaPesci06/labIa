@@ -39,7 +39,7 @@ Solo `labia-integrador` mergea a `main`, y solo con autorización de Emanuel. Lo
 
 Hay dos orquestadores trabajando a la par: Claude Code (`/labia-tarea`) y Gemini (skill `labia-tarea` de `.agents/`). Los dos usan los mismos roles y este mismo protocolo.
 
-- **Reparto por etiqueta de Linear.** Claude toma solo las tareas con `Orq: Fable`; Gemini, solo las de `Orq: Gemini`. Una tarea sin ninguna de las dos no se toma: se le avisa a Emanuel.
+- **Reparto por etiqueta de Linear.** Claude toma solo las tareas con `Orq: Opus`; Gemini, solo las de `Orq: Gemini`. Una tarea sin ninguna de las dos no se toma: se le avisa a Emanuel.
 - **Una tarea, un worktree, una rama** `lab-<n>-<slug>`. Nadie trabaja en el checkout principal mientras el otro orquestador esté activo.
 - **Se mergea de a un PR por vez.** Antes de mergear, `gh pr list --state open` y actualizar la rama con `main`. Si el otro orquestador está mergeando, se espera.
 - **Dependencias:** solo una tarea abierta a la vez puede tocar `package.json` y `pnpm-lock.yaml`. Si hay otro PR abierto que los toca, esperá a que se mergee.

@@ -11,7 +11,7 @@ Leé `.claude/labia/protocolo.md`. Cargá las herramientas de Linear con ToolSea
 ## Qué hacer según el argumento
 
 - `pendientes` → lanzá `labia-pendientes-humanas` y mostrá su informe.
-- `ola` → listá las tareas del proyecto LabÍA MVP con etiquetas **Agente** y **Orq: Fable** en Todo cuyos `blockedBy` estén todos en Done. Esa es la próxima ola. Mostrala y procesala.
+- `ola` → listá las tareas del proyecto LabÍA MVP con etiquetas **Agente** y **Orq: Opus** en Todo cuyos `blockedBy` estén todos en Done. Esa es la próxima ola. Mostrala y procesala.
 - `LAB-n …` → procesá esas tareas. Verificá antes que no tengan bloqueos abiertos; las bloqueadas no se lanzan y se informan.
 
 Las tareas con etiqueta **Orq: Gemini** son del otro orquestador: no las construyas (ver "Dos orquestadores" en el protocolo). Sí podés revisar sus PR con `labia-seguridad` y `labia-revisor` si Emanuel lo pide.

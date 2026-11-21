@@ -42,24 +42,9 @@ pnpm format         # Prettier con prettier-plugin-tailwindcss
 
 La primera vez: `pnpm exec playwright install chromium`. Variables: copiá `.env.example` a `.env.local`.
 
-## Estructura
+## Rutas
 
-```
-src/app/(publico)/      bienvenida, ingresar, registro, normas, términos, privacidad
-src/app/(app)/          inicio, buscar, profesionales/[id], trabajos, mis-trabajos, cuenta
-src/app/admin/          verificaciones, reportes (solo rol admin)
-src/app/api/            route handlers puntuales (callbacks de auth, webhooks)
-src/components/ui/      capa fina sobre shadcn (Boton, Campo, Chip, Insignia, Tarjeta, Hoja, Avatar…) y piezas propias (Encabezado, Toldo, Logo, Distancia, EtiquetaMono, Estrellas, VisorFotos)
-src/components/shadcn/  componentes de shadcn generados por el CLI (base-nova, Base UI); no se editan a mano
-src/components/         componentes de dominio (TarjetaProfesional, TarjetaTrabajo…)
-src/lib/supabase/       clientes server/browser/admin y tipos generados
-src/lib/validaciones/   esquemas Zod
-src/lib/                utilidades: formato.ts, whatsapp.ts, distancia.ts
-src/emails/             plantillas React Email
-supabase/               migrations/ y seed.sql
-tests/e2e/              Playwright
-.github/workflows/      CI
-```
+`src/components/shadcn/` lo genera el CLI de shadcn (base-nova, Base UI): no se edita a mano; `src/components/ui/` es la capa fina encima.
 
 Rutas en español sin acentos: `/`, `/ingresar`, `/registro`, `/registro/cliente`, `/registro/profesional`, `/normas`,
 `/inicio`, `/buscar`, `/profesionales/[id]`, `/trabajos`, `/trabajos/nuevo`, `/trabajos/[id]`, `/mis-trabajos`, `/cuenta`,

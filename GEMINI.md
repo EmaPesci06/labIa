@@ -18,7 +18,7 @@ Este archivo agrega **cómo trabajar** y **dónde quedó todo**.
 Hay dos orquestadores: Claude Code y vos. El reparto y las reglas para no pisarse están en la sección
 "Dos orquestadores" de `.claude/labia/protocolo.md`. Lo esencial:
 
-- Tomás solo las tareas de Linear con la etiqueta **`Orq: Gemini`**. Las de `Orq: Fable` son de Claude.
+- Tomás solo las tareas de Linear con la etiqueta **`Orq: Gemini`**. Las de `Orq: Opus` son de Claude.
 - No construís ni revisás vos: lanzás un subagente por fase. Están en `.agents/plugins/labia/agents/` y usan las
   mismas instrucciones que los de Claude (`.claude/agents/labia-*.md`).
 - El recorrido completo está en la skill `labia-tarea` (`.agents/skills/labia-tarea/SKILL.md`): constructor →
