@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import { esperarHojaQuieta } from "./apoyo/hoja";
+import { esperarHojaQuieta, esperarColoresEstables } from "./apoyo/hoja";
 
 // Segundo servidor (mismo build) con LABIA_ROL_DEV=profesional; ver playwright.config.ts.
 const URL_PROFESIONAL = `http://localhost:${Number(process.env.PUERTO_E2E ?? 3000) + 100}`;
@@ -85,6 +85,7 @@ test.describe("navegación del cliente", () => {
   for (const esquema of ["light", "dark"] as const) {
     test(`/inicio no tiene problemas de accesibilidad (${esquema})`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: esquema });
+      await esperarColoresEstables(page);
       await page.goto("/inicio");
       await expect(page.locator("html")).toHaveClass(
         esquema === "dark" ? /dark/ : /^((?!dark).)*$/,
@@ -309,6 +310,7 @@ test.describe("axe en más pantallas", () => {
     for (const ruta of ["/mis-trabajos", "/cuenta", "/esto-no-existe", "/sin-conexion"]) {
       test(`${ruta} (${esquema})`, async ({ page }) => {
         await page.emulateMedia({ colorScheme: esquema });
+        await esperarColoresEstables(page);
         await page.goto(ruta);
         await sinViolaciones(page);
       });
@@ -317,6 +319,7 @@ test.describe("axe en más pantallas", () => {
     test(`menú del avatar abierto (${esquema})`, async ({ page }) => {
       test.skip(esCelular(page), "El avatar está en la barra superior de escritorio");
       await page.emulateMedia({ colorScheme: esquema });
+      await esperarColoresEstables(page);
       await page.goto("/inicio");
       await page.getByRole("button", { name: /Cuenta de/ }).click();
       await expect(page.getByRole("menuitem", { name: "Mi cuenta" })).toBeVisible();
@@ -331,12 +334,14 @@ test.describe("axe en más pantallas", () => {
     for (const esquema of ["light", "dark"] as const) {
       test(`/trabajos (${esquema})`, async ({ page }) => {
         await page.emulateMedia({ colorScheme: esquema });
+        await esperarColoresEstables(page);
         await page.goto("/trabajos");
         await sinViolaciones(page);
       });
 
       test(`/trabajos?vista=mias (${esquema})`, async ({ page }) => {
         await page.emulateMedia({ colorScheme: esquema });
+        await esperarColoresEstables(page);
         await page.goto("/trabajos?vista=mias");
         await sinViolaciones(page);
       });

@@ -219,6 +219,7 @@ test.describe("reseñas: cliente elegible", () => {
       page,
     }) => {
       await page.emulateMedia({ colorScheme: esquema });
+      await esperarColoresEstables(page);
       await page.goto(RUTA_PERFIL);
       await botonDejarResena(page).click();
       await esperarHojaQuieta(page, hoja(page));
@@ -276,6 +277,7 @@ test.describe("reseñas: capturas", () => {
   for (const esquema of ["claro", "oscuro"] as const) {
     test(`perfil y hojas de reseña (${esquema})`, async ({ context, baseURL, page }) => {
       await page.emulateMedia({ colorScheme: esquema === "claro" ? "light" : "dark" });
+      await esperarColoresEstables(page);
 
       await iniciarSesion(context, baseURL ?? "", "tok-resena-editable");
       await page.goto(RUTA_PERFIL);

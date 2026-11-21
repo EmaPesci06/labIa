@@ -31,7 +31,7 @@ const primero = (valor: string | string[] | undefined) => (Array.isArray(valor) 
 
 /**
  * Búsqueda de cada oficio cerca del barrio, con la misma consulta de `/buscar` (LAB-22). De ahí salen
- * los números de las carpas y los profesionales del problema elegido. `null` si no hay base de datos.
+ * los números de las tarjetas de oficio y los profesionales del problema elegido. `null` si no hay base de datos.
  */
 async function cargarOficios(
   barrio: string,
@@ -45,7 +45,7 @@ async function cargarOficios(
       try {
         return [oficio, await buscarProfesionales(supabase, { oficio, barrio }, barrioId)];
       } catch (error) {
-        // Un oficio que falla no tira toda la pantalla: esa carpa sale sin número.
+        // Un oficio que falla no tira toda la pantalla: esa tarjeta sale sin número.
         if (error instanceof ErrorBusqueda) return [oficio, null];
         throw error;
       }

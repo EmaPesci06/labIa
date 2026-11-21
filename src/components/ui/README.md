@@ -1,9 +1,9 @@
 # components/ui
 
-Componentes base del sistema de diseño "Verano en la costa" (`docs/prototipo-nuevo/README.md`, sección "Piezas"):
+Componentes base del sistema de diseño "Papelería sellada" de Oficio Seguro (paleta LAB-93, tipografías LAB-94, motivos LAB-95). La fuente de verdad es el código: `src/app/globals.css` (tokens: `accion` terracota, `encabezado` tinta, `destacado`, `adorno`) y `src/app/fuentes.ts` (Archivo y Archivo Narrow). `docs/prototipo-nuevo/` queda solo como referencia de la estructura de las pantallas:
 
 - Boton (principal, secundario, peligro, enlace), Campo (texto, área, selección), Chip (y GrupoChips), Insignia, Tarjeta, Hoja (sobre `Sheet` de shadcn).
-- Encabezado (turquesa, equipo, destacado, plano), Sello, FranjaRubro, Avatar, Aviso (nota), AvisoPantalla (pantalla completa), Vacio.
+- Encabezado (variantes `turquesa` —nombre heredado, hoy tinta y es la de por defecto—, `equipo`, `destacado` y `plano`), Sello, FranjaRubro, Avatar, Aviso (nota), AvisoPantalla (pantalla completa), Vacio.
 - Distancia (pastilla destacado con la distancia), EtiquetaMono, Estrellas, Logo.
 
 Los que no tienen equivalente en shadcn (Encabezado, Sello, FranjaRubro, Logo, Distancia, EtiquetaMono, Estrellas) son propios: `cn()`, tokens y `Badge` donde sirve (Distancia). VisorFotos usa `Dialog` y `Carousel` de shadcn. Radios: `rounded-xl` (campo), `rounded-2xl` (botón) y `rounded-3xl` (tarjeta); no hay tokens propios de radio salvo `rounded-hoja`.

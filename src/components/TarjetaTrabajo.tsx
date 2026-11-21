@@ -82,7 +82,7 @@ export function TarjetaTrabajo({
             className={cn(
               "rounded-[12px] px-2.5 py-1 font-bold",
               urgencia === "lo_antes_posible"
-                ? "bg-sobre-destacado text-sobre-encabezado"
+                ? "bg-destacado text-sobre-destacado"
                 : "bg-fondo text-texto",
             )}
           >

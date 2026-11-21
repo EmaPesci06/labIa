@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
+import { esperarColoresEstables } from "./apoyo/hoja";
 
 // LAB-19: carga de documentos (DNI, antecedentes, matrícula) en el registro de profesional.
 // La interfaz se prueba sin Supabase; la subida real al bucket privado necesita E2E_AUTH=1.
@@ -260,6 +261,7 @@ test.describe("documentos de verificación", () => {
   for (const esquema of ["light", "dark"] as const) {
     test(`axe sin violaciones con archivos, gas y error (${esquema})`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: esquema });
+      await esperarColoresEstables(page);
       await abrir(page, { gas: true });
       const b = bloque(page);
       await entrada(b, "DNI, frente").setInputFiles(imagen("frente.png"));
@@ -283,6 +285,7 @@ test.describe("/cuenta/verificacion", () => {
       page,
     }) => {
       await page.emulateMedia({ colorScheme: esquema });
+      await esperarColoresEstables(page);
       await page.goto("/cuenta/verificacion");
       await expect(page.getByRole("heading", { level: 1, name: "Mi verificación" })).toBeVisible();
       await expect(

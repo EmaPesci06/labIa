@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { esperarColoresEstables } from "./apoyo/hoja";
 
 // LAB-23 y LAB-71: inicio del cliente y resultados de búsqueda. Se ven sin cuenta, así que corre
 // contra el servidor base (sin sesión falsa). Las pruebas de datos necesitan un Supabase con
@@ -21,7 +22,7 @@ test.describe("inicio", () => {
       return;
     }
     await expect(page.getByRole("link", { name: "Crear cuenta" })).toBeVisible();
-    // El nombre de cada carpa incluye su número de verificados: se busca por el comienzo.
+    // El nombre de cada tarjeta de oficio incluye su número de verificados: se busca por el comienzo.
     await expect(page.getByRole("link", { name: /^Gas/ })).toHaveAttribute(
       "href",
       /^\/buscar\?oficio=gas&barrio=[a-z0-9-]+$/,
@@ -185,6 +186,7 @@ test.describe("resultados", () => {
   for (const esquema of ["light", "dark"] as const) {
     test(`no tiene problemas de accesibilidad (${esquema})`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: esquema });
+      await esperarColoresEstables(page);
       await page.goto("/buscar?oficio=gas&barrio=centro");
       await expect(page.getByRole("heading", { level: 1, name: /^Gas cerca de/ })).toBeVisible();
       const resultado = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
@@ -267,6 +269,7 @@ test.describe("con profesionales publicados", () => {
       page,
     }) => {
       await page.emulateMedia({ colorScheme: esquema });
+      await esperarColoresEstables(page);
       for (const url of [
         "/buscar?barrio=centro",
         "/buscar?oficio=carpinteria&barrio=centro&matriculados=1",
