@@ -47,16 +47,20 @@ test("los términos incluyen las diez normas", async ({ page }) => {
   ).toHaveCount(10);
 });
 
-test("/normas muestra el encabezado, los diez compromisos y qué hace LabÍA", async ({ page }) => {
+test("/normas muestra el encabezado, los diez compromisos y qué hace Oficio Seguro", async ({
+  page,
+}) => {
   await page.goto("/normas");
   await expect(page.getByRole("heading", { level: 1, name: "Normas de seguridad" })).toBeVisible();
   await expect(
-    page.getByText("A lo que se compromete cada profesional antes de aparecer en LabÍA."),
+    page.getByText("A lo que se compromete cada profesional antes de aparecer en Oficio Seguro."),
   ).toBeVisible();
   await expect(
     page.getByRole("list", { name: "Compromisos de seguridad" }).getByRole("listitem"),
   ).toHaveCount(10);
-  await expect(page.getByRole("heading", { level: 2, name: "Qué hace LabÍA" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Qué hace Oficio Seguro" }),
+  ).toBeVisible();
 });
 
 for (const esquema of ["light", "dark"] as const) {

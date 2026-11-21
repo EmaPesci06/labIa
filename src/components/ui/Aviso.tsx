@@ -6,7 +6,7 @@ import { cn } from "@/lib/cn";
 
 /**
  * Nota dentro de una pantalla: capa fina sobre el `Alert` de shadcn, con borde turquesa y escudo,
- * como "Se comprometió con las normas de seguridad de LabÍA." en el perfil del prototipo. Es una
+ * como "Se comprometió con las normas de seguridad de Oficio Seguro." en el perfil del prototipo. Es una
  * nota (`role="note"`), no una alerta: no interrumpe al lector de pantalla. Para una pantalla
  * completa (ícono, título, texto y botón) está `AvisoPantalla`.
  */

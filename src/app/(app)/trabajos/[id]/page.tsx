@@ -27,13 +27,13 @@ const ETIQUETA_PARA: Record<UrgenciaTrabajo, string> = {
 export async function generateMetadata({ params }: PaginaDetalleTrabajoProps): Promise<Metadata> {
   const { id } = await params;
   const sesion = await obtenerSesion();
-  if (!sesion) return { title: "Detalle del trabajo · LabÍA" };
+  if (!sesion) return { title: "Detalle del trabajo · Oficio Seguro" };
 
   const { trabajo } = await obtenerTrabajoDetalle(id, sesion.usuario.id);
-  if (!trabajo) return { title: "Trabajo no encontrado · LabÍA" };
+  if (!trabajo) return { title: "Trabajo no encontrado · Oficio Seguro" };
 
   return {
-    title: `${trabajo.titulo} · LabÍA`,
+    title: `${trabajo.titulo} · Oficio Seguro`,
     description: trabajo.descripcion.slice(0, 160),
   };
 }
@@ -51,7 +51,7 @@ export default async function PaginaDetalleTrabajo({ params }: PaginaDetalleTrab
   const cuando = haceCuanto(trabajo.createdAt);
   const clienteNombreVisible = trabajo.cliente.nombre
     ? `${trabajo.cliente.nombre}${trabajo.cliente.apellidoInicial ? ` ${trabajo.cliente.apellidoInicial}.` : ""}`
-    : "Cliente de LabÍA";
+    : "Cliente de Oficio Seguro";
   const clienteNombreParaFormulario = trabajo.cliente.nombre ?? "el cliente";
   const distanciaNumero =
     trabajo.distanciaKm !== null

@@ -18,7 +18,7 @@ export default function LayoutPublico({ children }: { children: ReactNode }) {
       <header className="px-5 pt-3 pb-0 lg:px-10 lg:pt-4">
         <Link
           href="/"
-          aria-label="LabÍA, inicio"
+          aria-label="Oficio Seguro, inicio"
           className="inline-flex min-h-11 items-center rounded-xl"
         >
           <Logo alt="" />

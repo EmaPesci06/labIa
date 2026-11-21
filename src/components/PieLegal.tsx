@@ -5,7 +5,7 @@ export function PieLegal() {
   return (
     <footer className="px-4 py-3 text-center text-sm text-texto">
       <p>
-        Usamos métricas anónimas para mejorar LabÍA.{" "}
+        Usamos métricas anónimas para mejorar Oficio Seguro.{" "}
         {/* Sin prefetch: es un link poco usado y /privacidad recién existe con LAB-35. */}
         <Link
           href="/privacidad"

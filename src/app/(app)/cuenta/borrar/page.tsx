@@ -8,7 +8,7 @@ import { tieneContrasena } from "@/lib/cuenta/proveedor";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 
-export const metadata: Metadata = { title: "Borrar mi cuenta · LabÍA" };
+export const metadata: Metadata = { title: "Borrar mi cuenta · Oficio Seguro" };
 
 /** Nombres de las personas con las que tiene un trabajo en curso (estado `asignado`). */
 async function trabajosEnCurso(uid: string, esProfesional: boolean): Promise<string[]> {
@@ -100,8 +100,8 @@ export default async function BorrarCuenta() {
         </ul>
         {!esProfesional ? (
           <p className="text-[15px] leading-snug">
-            <strong>Las reseñas que escribiste</strong> quedan, pero anónimas (“Cliente de LabÍA”),
-            para no alterar el promedio de cada profesional.
+            <strong>Las reseñas que escribiste</strong> quedan, pero anónimas (“Cliente de Oficio
+            Seguro”), para no alterar el promedio de cada profesional.
           </p>
         ) : null}
       </Tarjeta>

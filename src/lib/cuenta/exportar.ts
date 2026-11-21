@@ -5,13 +5,13 @@
 
 const ZONA = "America/Argentina/Buenos_Aires";
 
-/** "Laura" + "Fernández" → "Laura F.". Sin nombre: "Persona de LabÍA". */
+/** "Laura" + "Fernández" → "Laura F.". Sin nombre: "Persona de Oficio Seguro". */
 export function nombreConInicial(
   nombre: string | null | undefined,
   apellidoOInicial: string | null | undefined,
 ): string {
   const n = nombre?.trim();
-  if (!n) return "Persona de LabÍA";
+  if (!n) return "Persona de Oficio Seguro";
   const inicial = apellidoOInicial?.trim().charAt(0).toUpperCase();
   return inicial ? `${n} ${inicial}.` : n;
 }

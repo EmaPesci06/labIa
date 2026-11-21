@@ -6,7 +6,7 @@ import { Logo } from "@/components/ui/Logo";
 import { Toldo } from "@/components/ui/Toldo";
 
 export const metadata: Metadata = {
-  title: "LabÍA · Oficios de confianza en Mar del Plata",
+  title: "Oficio Seguro · Oficios de confianza en Mar del Plata",
   description:
     "Encontrá gasistas, electricistas, cerrajeros y más en tu barrio. O conseguí trabajo con tu oficio.",
 };

@@ -9,7 +9,7 @@ import { Tarjeta } from "@/components/ui/Tarjeta";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 
-export const metadata: Metadata = { title: "Mi perfil público · LabÍA" };
+export const metadata: Metadata = { title: "Mi perfil público · Oficio Seguro" };
 
 /** Edición del perfil profesional. Solo para cuentas de profesional; el resto vuelve a su cuenta. */
 export default async function EditarPerfil() {

@@ -226,7 +226,7 @@ export function MuestraComponentes() {
       </Seccion>
 
       <Seccion titulo="Avisos y estado vacío">
-        <Aviso>Se comprometió con las normas de seguridad de LabÍA.</Aviso>
+        <Aviso>Se comprometió con las normas de seguridad de Oficio Seguro.</Aviso>
         <Tarjeta>
           <Vacio
             icono={Hammer}

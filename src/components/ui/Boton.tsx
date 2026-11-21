@@ -8,7 +8,7 @@ import { cn } from "@/lib/cn";
 import { SIN_ANILLO_BOTON } from "./foco";
 
 /**
- * Capa fina sobre el `Button` de shadcn (LAB-86). Variantes de LabÍA → variantes de shadcn:
+ * Capa fina sobre el `Button` de shadcn (LAB-86). Variantes de Oficio Seguro → variantes de shadcn:
  * - principal → default: turquesa con texto sobre-accion. Una por pantalla, abajo.
  * - secundario → outline: borde de 3 px `texto` y fondo transparente, como el prototipo (el sol es el
  *   color de lo elegido, no de un botón).
@@ -92,7 +92,7 @@ export type BotonProps = PropsComunes &
   );
 
 /**
- * Botón de LabÍA. Con `href` se dibuja como enlace (`next/link`) con las clases de `Button`; sin
+ * Botón de Oficio Seguro. Con `href` se dibuja como enlace (`next/link`) con las clases de `Button`; sin
  * `href`, como `Button` de shadcn. Estados: hover, presionado, deshabilitado (`disabled`) y cargando
  * (spinner + `aria-busy`).
  *

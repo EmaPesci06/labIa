@@ -94,7 +94,10 @@ describe("BarraSuperior", () => {
       "href",
       "/trabajos/nuevo",
     );
-    expect(screen.getByRole("link", { name: "LabÍA, inicio" })).toHaveAttribute("href", "/inicio");
+    expect(screen.getByRole("link", { name: "Oficio Seguro, inicio" })).toHaveAttribute(
+      "href",
+      "/inicio",
+    );
     expect(screen.getByRole("button", { name: "Cuenta de Laura Fernández" })).toBeInTheDocument();
   });
 

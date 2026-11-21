@@ -132,8 +132,8 @@ describe("Vacio", () => {
 
 describe("Aviso (nota)", () => {
   it("es una nota con el mensaje, con borde turquesa", () => {
-    render(<Aviso>Se comprometió con las normas de seguridad de LabÍA.</Aviso>);
-    expect(screen.getByRole("note")).toHaveTextContent("normas de seguridad de LabÍA");
+    render(<Aviso>Se comprometió con las normas de seguridad de Oficio Seguro.</Aviso>);
+    expect(screen.getByRole("note")).toHaveTextContent("normas de seguridad de Oficio Seguro");
     expect(screen.getByRole("note")).toHaveClass("bg-card", "border-primary");
   });
 });

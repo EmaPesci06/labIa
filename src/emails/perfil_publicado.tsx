@@ -17,7 +17,7 @@ export default function PerfilPublicado({
 }: DatosPerfilPublicado & { pie: DatosPie }) {
   return (
     <Layout
-      previa="Tu perfil ya aparece en las búsquedas de LabÍA."
+      previa="Tu perfil ya aparece en las búsquedas de Oficio Seguro."
       titulo={`${nombre}, tu perfil ya está publicado`}
       subtitulo="Aprobamos tu verificación."
       motivo="Te escribimos porque terminamos de revisar tu perfil."

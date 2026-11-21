@@ -6,7 +6,7 @@ import { FormularioPreferenciasEmail } from "@/components/cuenta/FormularioPrefe
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 
-export const metadata: Metadata = { title: "Preferencias de email · LabÍA" };
+export const metadata: Metadata = { title: "Preferencias de email · Oficio Seguro" };
 
 export default async function PreferenciasEmail() {
   const sesion = await obtenerSesion();

@@ -55,11 +55,11 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     bloqueoLecturaPublica("busqueda"),
     resolverBarrio(crudo),
   ]);
-  if (bloqueo) return { title: "Buscar · LabÍA", robots: { index: false } };
+  if (bloqueo) return { title: "Buscar · Oficio Seguro", robots: { index: false } };
   const params = leer(crudo, slug);
   const oficio = params instanceof ErrorBusqueda ? undefined : params.oficio;
   return {
-    title: `${pluralOficio(oficio)} en ${nombreDeBarrio(barrios, slug)}, Mar del Plata · LabÍA`,
+    title: `${pluralOficio(oficio)} en ${nombreDeBarrio(barrios, slug)}, Mar del Plata · Oficio Seguro`,
   };
 }
 

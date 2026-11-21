@@ -17,9 +17,9 @@ describe("ListaNormas y QueHaceLabia", () => {
     expect(screen.getAllByRole("listitem")).toHaveLength(10);
   });
 
-  it("muestra qué hace LabÍA", () => {
+  it("muestra qué hace Oficio Seguro", () => {
     render(<QueHaceLabia />);
-    expect(screen.getByRole("heading", { name: "Qué hace LabÍA" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Qué hace Oficio Seguro" })).toBeInTheDocument();
   });
 
   it("muestra la lista de normas para el registro profesional", () => {

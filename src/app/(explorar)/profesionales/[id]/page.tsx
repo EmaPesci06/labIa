@@ -31,9 +31,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   // Con el tope por IP cumplido no se lee el perfil (M-03): mismo chequeo que la página, cacheado.
   if (await bloqueoLecturaPublica("perfil"))
-    return { title: "Perfil · LabÍA", robots: { index: false } };
+    return { title: "Perfil · Oficio Seguro", robots: { index: false } };
   const perfil = await perfilDelPedido(id).catch(() => null);
-  if (!perfil) return { title: "Perfil no encontrado · LabÍA" };
+  if (!perfil) return { title: "Perfil no encontrado · Oficio Seguro" };
 
   const titulo = tituloPerfil(perfil.nombre, perfil.oficios);
   const descripcion = descripcionCorta(perfil.nombre, perfil.oficios, perfil.descripcion);

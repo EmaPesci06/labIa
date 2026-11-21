@@ -19,7 +19,7 @@ type Props = {
 
 /**
  * "Volver": en celular una flecha de 44 px, en escritorio "← Volver a gasistas". Si la persona
- * venía de otra pantalla de LabÍA vuelve ahí (conserva los filtros de la búsqueda); si no, va a `href`.
+ * venía de otra pantalla de Oficio Seguro vuelve ahí (conserva los filtros de la búsqueda); si no, va a `href`.
  */
 export function EnlaceVolver({
   href,

@@ -37,7 +37,7 @@ async function Cuerpo({ rol }: { rol: "cliente" | "profesional" }) {
           tamano="grande"
           bloque
         >
-          Seguir a LabÍA
+          Seguir a Oficio Seguro
         </Boton>
       </div>
     );

@@ -21,7 +21,7 @@ export default function CuentaSuspendida({
 }: DatosCuentaSuspendida & { pie: DatosPie }) {
   return (
     <Layout
-      previa="Tu cuenta de LabÍA fue suspendida."
+      previa="Tu cuenta de Oficio Seguro fue suspendida."
       titulo="Tu cuenta fue suspendida"
       subtitulo={`${nombre}, te contamos por qué y qué podés hacer.`}
       variante="suspendida"

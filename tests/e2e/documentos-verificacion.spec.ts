@@ -30,7 +30,7 @@ const entrada = (b: Locator, etiqueta: string) =>
 
 // LAB-43: sin la casilla de consentimiento para datos sensibles no se puede subir nada.
 const casillaConsentimiento = (b: Locator) =>
-  b.getByRole("checkbox", { name: /Acepto que LabÍA trate mi DNI/ });
+  b.getByRole("checkbox", { name: /Acepto que Oficio Seguro trate mi DNI/ });
 
 async function consentir(page: Page) {
   await casillaConsentimiento(bloque(page)).check();

@@ -52,7 +52,7 @@ describe("nombreConInicial", () => {
     expect(nombreConInicial("Laura", "Fernández")).toBe("Laura F.");
     expect(nombreConInicial("Laura", "f")).toBe("Laura F.");
     expect(nombreConInicial("Laura", null)).toBe("Laura");
-    expect(nombreConInicial(null, "X")).toBe("Persona de LabÍA");
+    expect(nombreConInicial(null, "X")).toBe("Persona de Oficio Seguro");
   });
 });
 

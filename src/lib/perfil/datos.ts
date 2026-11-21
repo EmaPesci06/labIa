@@ -48,7 +48,7 @@ export function nombreMostrado(
 export function autorResena(nombre: string | null, apellidoInicial: string | null): string {
   const pila = (nombre ?? "").trim();
   // Autor borrado (autor_id null, LAB-33) o sin nombre público.
-  if (!pila) return "Cliente de LabÍA";
+  if (!pila) return "Cliente de Oficio Seguro";
   const inicial = (apellidoInicial ?? "").trim();
   return inicial ? `${pila} ${inicial}.` : pila;
 }
@@ -103,9 +103,9 @@ export function separarEspecialidades(especialidades: string | null): string[] {
     .slice(0, 12);
 }
 
-/** Título de la pestaña: "Martín G. · Gasista en Mar del Plata · LabÍA". */
+/** Título de la pestaña: "Martín G. · Gasista en Mar del Plata · Oficio Seguro". */
 export function tituloPerfil(nombre: string, oficios: readonly Oficio[]): string {
-  return `${nombre} · ${profesionPrincipal(oficios)} en Mar del Plata · LabÍA`;
+  return `${nombre} · ${profesionPrincipal(oficios)} en Mar del Plata · Oficio Seguro`;
 }
 
 /** Descripción corta para buscadores y vistas previas (máx. 160 caracteres). */

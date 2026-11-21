@@ -7,7 +7,7 @@ import { EncabezadoAuth } from "@/components/auth/EncabezadoAuth";
 import { FormularioIngreso } from "@/components/auth/FormularioIngreso";
 import { volverSeguro } from "@/lib/auth/rutas";
 
-export const metadata: Metadata = { title: "Ingresar · LabÍA" };
+export const metadata: Metadata = { title: "Ingresar · Oficio Seguro" };
 
 const ERRORES: Record<string, string> = {
   enlace: "El enlace venció o ya se usó. Pedí uno nuevo o ingresá con tu contraseña.",

@@ -34,8 +34,8 @@ export function ConsentimientoDatosSensibles({
           className="mt-0.5 size-6 flex-none accent-accion"
         />
         <span>
-          Acepto que LabÍA trate mi DNI y mi certificado de antecedentes solo para verificar mi
-          identidad, según la{" "}
+          Acepto que Oficio Seguro trate mi DNI y mi certificado de antecedentes solo para verificar
+          mi identidad, según la{" "}
           <Link
             href={RUTA_PRIVACIDAD}
             target="_blank"

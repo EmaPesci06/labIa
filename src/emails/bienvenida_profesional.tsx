@@ -20,7 +20,7 @@ export default function BienvenidaProfesional({
       previa="Estamos revisando tu documentación."
       titulo={`Recibimos tu perfil, ${nombre}`}
       subtitulo="Lo estamos revisando."
-      motivo="Te escribimos porque creaste una cuenta de profesional en LabÍA."
+      motivo="Te escribimos porque creaste una cuenta de profesional en Oficio Seguro."
       pie={pie}
     >
       <Tarjeta

@@ -12,7 +12,7 @@ import { definicion, type DatosPlantillas, type Plantilla } from "./plantillas";
 import { firmarTokenBaja, secretoValido } from "./token";
 
 /** Mientras no haya dominio verificado (LAB-7), Resend solo permite este remitente de prueba. */
-const REMITENTE_POR_DEFECTO = "LabÍA <onboarding@resend.dev>";
+const REMITENTE_POR_DEFECTO = "Oficio Seguro <onboarding@resend.dev>";
 
 export type EnvioEmail<K extends Plantilla> = {
   para: string;

@@ -1,4 +1,4 @@
-// Normas de seguridad de LabÍA (LAB-20). Fuente única para el paso 2 del registro, la página
+// Normas de seguridad de Oficio Seguro (LAB-20). Fuente única para el paso 2 del registro, la página
 // pública `/normas`, la re-aceptación y los términos. Si cambia el texto, subí `VERSION_NORMAS`:
 // los profesionales tienen que volver a aceptar al ingresar.
 
@@ -19,7 +19,7 @@ export const NORMAS: readonly string[] = [
   "Usar la dirección y el teléfono del cliente solo para ese trabajo.",
 ];
 
-/** Lo que hace LabÍA de su lado (sección "Qué hace LabÍA"). */
+/** Lo que hace Oficio Seguro de su lado (sección "Qué hace Oficio Seguro"). */
 export const QUE_HACE_LABIA: readonly string[] = [
   "Revisamos a mano la identidad y los antecedentes de cada profesional.",
   "Mostramos insignias solo cuando la verificación está hecha.",

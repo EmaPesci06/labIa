@@ -48,7 +48,7 @@ export function DetalleTrabajoEscritorio({
   const cuando = haceCuanto(trabajo.createdAt);
   const clienteNombreVisible = trabajo.clienteNombre
     ? `${trabajo.clienteNombre}${trabajo.clienteApellidoInicial ? ` ${trabajo.clienteApellidoInicial}.` : ""}`
-    : "Cliente de LabÍA";
+    : "Cliente de Oficio Seguro";
   const clienteNombreParaFormulario = trabajo.clienteNombre ?? "el cliente";
   const distanciaNumero =
     trabajo.distanciaKm !== null

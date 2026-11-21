@@ -70,7 +70,7 @@ test.describe("/baja con token válido", () => {
   test("el estado de baja hecha confirma sin pedir nada más", async ({ page }) => {
     await page.goto("/baja?listo=novedades");
     await expect(page.getByText("Ya no vas a recibir")).toBeVisible();
-    await expect(page.getByRole("link", { name: "Ir a LabÍA" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Ir a Oficio Seguro" })).toBeVisible();
   });
 
   test("el POST de un clic rechaza un token con la firma alterada", async ({ request }) => {

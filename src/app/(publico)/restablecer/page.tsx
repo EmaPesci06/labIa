@@ -9,7 +9,7 @@ import {
 import { obtenerSesion } from "@/lib/sesion";
 
 export const metadata: Metadata = {
-  title: "Restablecer contraseña · LabÍA",
+  title: "Restablecer contraseña · Oficio Seguro",
   robots: { index: false, follow: false },
 };
 

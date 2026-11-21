@@ -87,7 +87,7 @@ export function HojaReportar({
         <div className="flex flex-col gap-4 py-1">
           <p className="text-[15px] leading-relaxed text-texto">
             Para reportar un {objetivoTipo === "resena" ? "comentario" : objetivoTipo} necesitás
-            iniciar sesión en tu cuenta de LabÍA.
+            iniciar sesión en tu cuenta de Oficio Seguro.
           </p>
           <Boton href={hrefIngreso ?? "/ingresar"} variante="cliente" tamano="grande" bloque>
             Ingresar a mi cuenta

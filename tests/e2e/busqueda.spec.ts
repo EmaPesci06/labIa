@@ -109,7 +109,7 @@ test.describe("resultados", () => {
   }) => {
     test.skip(esCelular(page), "La columna lateral es de escritorio");
     await page.goto("/buscar?barrio=centro");
-    await page.getByLabel("Oficio").click();
+    await page.getByLabel("Oficio", { exact: true }).click();
     await page.getByRole("option", { name: "Plomería" }).click();
     await expect(page).toHaveURL(/oficio=plomeria/);
     await expect(page.getByRole("heading", { level: 1, name: /^Plomería cerca de/ })).toBeVisible();
@@ -123,7 +123,7 @@ test.describe("resultados", () => {
   }) => {
     await page.goto("/buscar?barrio=centro");
     await page.waitForLoadState("networkidle");
-    const oficio = page.getByLabel("Oficio");
+    const oficio = page.getByLabel("Oficio", { exact: true });
     await oficio.focus();
     await page.keyboard.press("Enter");
     await expect(oficio).toHaveAttribute("aria-expanded", "true");

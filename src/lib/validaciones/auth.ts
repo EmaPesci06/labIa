@@ -19,7 +19,9 @@ const contrasenaNueva = z
   .min(8, "La contraseña tiene que tener al menos 8 caracteres.")
   .max(72, "La contraseña puede tener hasta 72 caracteres.");
 
-const rolRegistrable = z.enum(ROLES_REGISTRABLES, { error: "Elegí cómo querés usar LabÍA." });
+const rolRegistrable = z.enum(ROLES_REGISTRABLES, {
+  error: "Elegí cómo querés usar Oficio Seguro.",
+});
 
 const nombre = z
   .string({ error: "Ingresá tu nombre." })
