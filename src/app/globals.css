@@ -5,7 +5,7 @@
 /*
  * Tokens de diseño de Oficio Seguro, "Verano en la costa" (docs/prototipo-nuevo/README.md).
  * Este es el ÚNICO archivo donde se escriben colores en hex. El resto del código usa las clases
- * de Tailwind que salen de acá (bg-accion, text-texto, bg-sol…).
+ * de Tailwind que salen de acá (bg-accion, text-texto, bg-destacado…).
  *
  * - Modo claro en :root (y en .claro, para forzarlo en un bloque, por ejemplo en /dev/paleta).
  * - Modo oscuro en .dark. La clase la pone el script de src/lib/tema.ts antes de pintar.
