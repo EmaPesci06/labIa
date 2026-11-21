@@ -101,6 +101,8 @@ describe("HojaResena", () => {
     expect(screen.getByRole("radio", { name: "Bien" }).closest("label")).toHaveClass(
       "bg-card",
       "text-card-foreground",
+      "hover:bg-secondary/15",
+      "hover:text-card-foreground",
     );
 
     await userEvent.keyboard("{ArrowRight}");
