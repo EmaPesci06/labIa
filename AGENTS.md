@@ -55,8 +55,8 @@ Rutas en español sin acentos: `/`, `/ingresar`, `/registro`, `/registro/cliente
 - **Idioma:** interfaz en español rioplatense con voseo ("Buscá", "Publicá tu trabajo"). Base de datos en `snake_case`
   sin acentos ni ñ (`resenas`). Código: dominio en español (`trabajo`, `postulacion`), lo demás en inglés si es más natural.
 - **Mobile first:** se diseña a 390 px; escritorio desde `lg` (1024 px), pensado a 1440 px.
-- **Accesibilidad:** táctiles de 44 px, `label` en todos los campos, foco `outline: 3px solid; outline-offset: 2px` en color
-  `texto` (claro) y `destacado` (oscuro); en campos de texto no hay outline: el foco es el borde del campo en ese color, contraste AA, `prefers-reduced-motion`, errores asociados con `aria-describedby`.
+- **Accesibilidad:** táctiles de 44 px, `label` en todos los campos, foco `outline: 3px solid; outline-offset: 2px` en el color
+  del token `foco` (`texto` en claro, `accion` en oscuro); en campos de texto no hay outline: el foco es el borde del campo en ese color, contraste AA, `prefers-reduced-motion`, errores asociados con `aria-describedby`.
 - **Formularios:** Server Action + esquema Zod + `useActionState`; errores en castellano al lado del campo.
 - **Server Components** por defecto; Server Actions para mutaciones.
 - **Teléfonos:** E.164 (`+549223…`) con `normalizarTelefono` de `src/lib/whatsapp.ts`; links con `linkWhatsApp`.
@@ -64,12 +64,18 @@ Rutas en español sin acentos: `/`, `/ingresar`, `/registro`, `/registro/cliente
 - **Fechas:** zona `America/Argentina/Buenos_Aires`, relativas en listas con `haceCuanto` ("hace 20 min").
 - **Distancias:** una decimal con coma, `formatearDistancia` ("a 1,2 km").
 - **Imágenes:** comprimidas en el navegador (máx. 1600 px, calidad 0,8, máx. 2 MB), mostradas con `next/image`.
-- **Diseño ("Verano en la costa"):** tokens de color en `src/app/globals.css` (claro y oscuro): `fondo` arena,
-  `superficie` blanca, `texto` azul mar, `accion` turquesa (botón principal y enlaces), `sobre-accion`, `encabezado`
-  turquesa con texto `sobre-encabezado` blanco, `destacado` amarillo para lo elegido (texto `sobre-destacado`), `adorno` solo de adorno
-  (nunca texto), `error`, `equipo`, `velo` (fondo de las hojas). Tipografías con `next/font`: Archivo 800 para
-  títulos y la marca (`font-titulo`), Archivo (400 y 600) para el texto y Archivo Narrow 700 en mayúsculas para etiquetas (`font-etiqueta`). Referencia de toda pantalla:
-  `docs/prototipo-nuevo/` (`README.md` y `CONSTRUCCION.md`). No usar hex fuera de `globals.css`.
+- **Diseño ("Papelería sellada", marca Oficio Seguro):** tokens de color en `src/app/globals.css` (claro y oscuro):
+  `fondo` gris verdoso claro, `superficie` y `campo` blancos, `texto` casi negro verdoso, `texto-suave`, `borde`,
+  `accion` terracota (botón principal y enlaces) con `sobre-accion`, `encabezado` tinta oscura con `sobre-encabezado`,
+  `destacado` para lo elegido (con `sobre-destacado`), `adorno` naranja obra solo de adorno (nunca texto), `exito`,
+  `error`, `equipo`, `marca` y `sobre-marca` (solo el logo), `velo` (fondo de las hojas) y `foco`. Tipografías con
+  `next/font` (`src/app/fuentes.ts`): Archivo 800 en títulos y marca (`font-titulo`), Archivo 400 y 600 en el texto
+  (`font-bold` equivale a 600) y Archivo Narrow 700 en mayúsculas para etiquetas, cupones y marcas (`font-etiqueta`).
+  Motivos de la marca: `Sello` (sello rotado, decorativo, único movimiento: `sello-estampar`), `FranjaRubro` con la
+  utilidad `trama` (solo ahí) y la utilidad `corte-cupon` (borde punteado de los cupones). No hay toldo. La distancia
+  se muestra con `Distancia`. Los emails usan los mismos valores (`src/lib/emails/Layout.tsx`). Referencia visual: la
+  hoja de identidad de LAB-90 y las piezas de `/dev/ui` y `/dev/paleta`; `docs/prototipo-nuevo/` es solo de
+  estructura de pantallas (su paleta y sus tipografías están retiradas). No usar hex fuera de `globals.css`.
 - **shadcn (excepción a "igual al boceto"):** los archivos de `src/components/shadcn/` se generan con `pnpm dlx shadcn add`
   y **no se editan a mano**. La paleta se adapta solo desde `globals.css` (las variables `--primary`, `--border`, `--ring`…
   atadas a nuestros tokens) y la forma o los 44 px se resuelven en la capa fina de `src/components/ui/` con `className`

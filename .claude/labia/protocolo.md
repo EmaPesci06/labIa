@@ -6,7 +6,7 @@ Todos los agentes `labia-*` siguen este protocolo. Si una tarea de Linear lo con
 
 - **Linear**, equipo `LAB`, proyecto **LabÍA MVP** (`P-LAB-1`).
 - **Guía para agentes** (documento de Linear `ee4f4689-09c5-43b1-9acc-ab1aa21addab`): stack, estructura, convenciones, diseño (§5), modelo de datos (§6), seguridad (§7), definición de terminado (§8), olas (§9). Leela con `mcp__claude_ai_Linear__get_document` antes de tocar código.
-- **Prototipo de interfaz** en `docs/prototipo-nuevo/`: diseño "Verano en la costa". Leé primero `README.md` (tokens, tabla pantalla → ruta → boceto, reparto entre orquestadores) y `CONSTRUCCION.md` (cómo se pasa un boceto a código). Toda pantalla y componente se construye igual a su boceto, usando los tokens (nunca hex sueltos).
+- **Prototipo de interfaz** en `docs/prototipo-nuevo/`: estructura de pantallas (el diseño visual "Verano en la costa" está retirado; la identidad vigente es "Papelería sellada", con tokens en `src/app/globals.css`, tipografías en `src/app/fuentes.ts` y motivos `Sello`, `FranjaRubro` y `corte-cupon`). Leé primero `README.md` (tokens, tabla pantalla → ruta → boceto, reparto entre orquestadores) y `CONSTRUCCION.md` (cómo se pasa un boceto a código). Cada pantalla se arma según su boceto en estructura y contenido, pero con los tokens, tipografías y motivos actuales (nunca hex sueltos).
 - `AGENTS.md` en la raíz del repo (existe desde LAB-8): resumen de la guía.
 - Repo: `github.com/EmaPesci06/labIa`, rama por defecto `main`. `gh` ya está autenticado como EmaPesci06.
 
