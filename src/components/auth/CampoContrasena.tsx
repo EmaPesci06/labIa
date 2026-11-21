@@ -47,7 +47,7 @@ export function CampoContrasena({
           type={visible ? "text" : "password"}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy}
-          className="h-[52px] min-w-0 flex-1 rounded-xl border-2 border-texto bg-campo px-3.5 text-[17px] text-texto placeholder:text-texto placeholder:opacity-60 disabled:cursor-not-allowed disabled:opacity-60 aria-invalid:border-3 aria-invalid:border-error"
+          className="h-[52px] min-w-0 flex-1 rounded-xl border-2 border-borde bg-campo px-3.5 text-[17px] text-texto placeholder:text-texto placeholder:opacity-60 disabled:cursor-not-allowed disabled:opacity-60 aria-invalid:border-3 aria-invalid:border-error"
         />
         <button
           type="button"
