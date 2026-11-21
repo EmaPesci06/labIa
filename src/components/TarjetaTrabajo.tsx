@@ -46,7 +46,7 @@ export function textoPostulantes(n: number): string {
 /**
  * Tarjeta de un trabajo publicado (bocetos App-Trabajos y Oscuro-Trabajos, LAB-78).
  * Fila superior con oficio · barrio · tiempo relativo y pastilla de urgencia ("Para hoy" en destacado,
- * resto en fondo); título en Baloo 2 800; distancia y cantidad de postulaciones abajo.
+ * resto en fondo); título en Archivo 800; distancia y cantidad de postulaciones abajo.
  */
 export function TarjetaTrabajo({
   oficio,

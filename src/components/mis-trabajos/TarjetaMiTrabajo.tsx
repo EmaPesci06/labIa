@@ -29,7 +29,7 @@ const ESTILO_ESTADO: Record<Estado, { texto: string; toldo: ColorToldo; pastilla
 
 /**
  * Tarjeta de un trabajo del cliente (boceto App-MisTrabajos). Toldo arriba, oficio y barrio en
- * etiqueta, título en Baloo 2 y la cantidad de postulantes o el estado en una pastilla.
+ * etiqueta, título en Archivo y la cantidad de postulantes o el estado en una pastilla.
  */
 export function TarjetaMiTrabajo({ trabajo, seleccionado = false, href }: Props) {
   const estilo = ESTILO_ESTADO[trabajo.estado];

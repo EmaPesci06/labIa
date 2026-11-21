@@ -48,7 +48,7 @@ const CONFIG_ESTADO: Record<
 /**
  * Lista de postulaciones del profesional para /trabajos?vista=mias (LAB-27, LAB-78).
  * Sigue los bocetos App-Postulaciones y Oscuro-Postulaciones: tarjeta con toldo superior
- * según el estado, pastilla de estado, título en Baloo 2 800, resumen y acción.
+ * según el estado, pastilla de estado, título en Archivo 800, resumen y acción.
  */
 export function ListaPostulaciones({ postulaciones }: ListaPostulacionesProps) {
   if (postulaciones.length === 0) {
