@@ -12,8 +12,8 @@ import {
 import type { CSSProperties, ReactNode } from "react";
 
 // Los clientes de correo no leen variables CSS: los colores van fijos, tomados de los tokens de
-// "Verano en la costa" (src/app/globals.css). Baloo 2 y Nunito Sans llegan por Google Fonts y, si
-// no cargan, usan la tipografía de sistema de respaldo.
+// "Verano en la costa" (src/app/globals.css). Archivo llega por Google Fonts y, si
+// no carga, usa la tipografía de sistema de respaldo.
 export const TURQUESA = "#0E7C86";
 export const TEXTO = "#123B4A";
 export const ARENA = "#FFF3D6";
