@@ -19,8 +19,8 @@ export const TEXTO = "#123B4A";
 export const ARENA = "#FFF3D6";
 const BLANCO = "#FFFFFF";
 
-const titular = "'Baloo 2', 'Trebuchet MS', Arial, sans-serif";
-const cuerpo = "'Nunito Sans', Arial, Helvetica, sans-serif";
+const titular = "'Archivo', Arial, Helvetica, sans-serif";
+const cuerpo = "'Archivo', Arial, Helvetica, sans-serif";
 
 const rayas = (color: string) =>
   `repeating-linear-gradient(90deg, ${color} 0 18px, ${BLANCO} 18px 36px)`;
@@ -130,7 +130,7 @@ export function BotonAccion({ href, children }: { href: string; children: ReactN
           padding: "19px 24px",
           fontFamily: cuerpo,
           fontSize: 19,
-          fontWeight: 700,
+          fontWeight: 600,
           lineHeight: "22px",
           textAlign: "center",
           textDecoration: "none",
@@ -148,7 +148,7 @@ export function EnlaceSecundario({ href, children }: { href: string; children: R
     <Text style={{ margin: "0 0 16px", textAlign: "center" }}>
       <Link
         href={href}
-        style={{ color: TEXTO, fontSize: 16, fontWeight: 700, textDecoration: "underline" }}
+        style={{ color: TEXTO, fontSize: 16, fontWeight: 600, textDecoration: "underline" }}
       >
         {children}
       </Link>
@@ -221,7 +221,7 @@ export function Layout({
         {/* eslint-disable-next-line @next/next/no-page-custom-font -- el email no pasa por _document */}
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito+Sans:wght@400;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&display=swap"
         />
       </Head>
       <Preview>{previa}</Preview>
@@ -247,13 +247,13 @@ export function Layout({
             Oficio Seguro, Mar del Plata
             {conPreferencias || conBaja ? <br /> : null}
             {conPreferencias ? (
-              <Link href={pie.urlPreferencias} style={{ color: TEXTO, fontWeight: 700 }}>
+              <Link href={pie.urlPreferencias} style={{ color: TEXTO, fontWeight: 600 }}>
                 Elegir qué emails recibo
               </Link>
             ) : null}
             {conPreferencias && conBaja ? " · " : null}
             {conBaja ? (
-              <Link href={pie.urlBaja} style={{ color: TEXTO, fontWeight: 700 }}>
+              <Link href={pie.urlBaja} style={{ color: TEXTO, fontWeight: 600 }}>
                 Darme de baja de estos avisos
               </Link>
             ) : null}

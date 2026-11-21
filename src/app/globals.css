@@ -193,9 +193,12 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 
   /* Las variables --fuente-* las define next/font en src/app/fuentes.ts. Texto y datos usan
-     Nunito Sans; títulos y marca, Baloo 2. */
-  --font-texto: var(--fuente-nunito), system-ui, sans-serif;
-  --font-sans: var(--fuente-nunito), system-ui, sans-serif;
+     Archivo; títulos y marca, Archivo 800; etiquetas, Archivo Narrow 700. Archivo se carga en 400,
+     600 y 800: font-bold se mapea a 600 para que no salte a 800. */
+  --font-texto: var(--fuente-archivo), system-ui, sans-serif;
+  --font-sans: var(--fuente-archivo), system-ui, sans-serif;
+  --font-etiqueta: var(--fuente-archivo-narrow), system-ui, sans-serif;
+  --font-weight-bold: 600;
 }
 
 @theme {
@@ -204,14 +207,22 @@
 }
 
 :root {
-  --font-titulo: var(--fuente-baloo), system-ui, sans-serif;
+  --font-titulo: var(--fuente-archivo), system-ui, sans-serif;
 }
 
-/* Títulos y marca: Baloo 2 800, con letter-spacing levemente negativo. */
+/* Títulos y marca: Archivo 800, con letter-spacing levemente negativo. */
 @utility font-titulo {
   font-family: var(--font-titulo);
   font-weight: 800;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
+}
+
+/* Etiquetas, números de cupón y marcas: Archivo Narrow 700 en mayúsculas, con tracking amplio. */
+@utility font-etiqueta {
+  font-family: var(--font-etiqueta);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 /*

@@ -12,17 +12,15 @@ type Props = {
 };
 
 /**
- * Etiqueta de datos (distancia, estado, tiempo): Nunito Sans 700, 13 px, mayúsculas, `letter-spacing`
- * .4 px. Reemplaza a la antigua etiqueta en IBM Plex Mono.
+ * Etiqueta de datos (distancia, estado, tiempo): Archivo Narrow 700, 13 px, mayúsculas, `letter-spacing`
+ * 0,12em (`font-etiqueta`).
  *
  * @example
  * <EtiquetaMono partes={["Gas", "La Perla", "hace 20 min", "a 0,8 km"]} />
  */
 export function EtiquetaMono({ como: Elemento = "p", partes, children, className }: Props) {
   return (
-    <Elemento
-      className={cn("text-[13px] font-bold tracking-[0.4px] text-texto uppercase", className)}
-    >
+    <Elemento className={cn("font-etiqueta text-[13px] text-texto", className)}>
       {partes ? partes.join(" · ") : children}
     </Elemento>
   );

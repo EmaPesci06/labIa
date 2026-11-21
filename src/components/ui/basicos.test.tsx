@@ -110,7 +110,7 @@ describe("EtiquetaMono", () => {
   it("une las partes con puntos medios en mayúsculas", () => {
     render(<EtiquetaMono partes={["Gas", "La Perla", "hace 20 min", "a 0,8 km"]} />);
     const etiqueta = screen.getByText("Gas · La Perla · hace 20 min · a 0,8 km");
-    expect(etiqueta).toHaveClass("uppercase", "tracking-[0.4px]", "font-bold");
+    expect(etiqueta).toHaveClass("font-etiqueta", "text-[13px]");
   });
 });
 

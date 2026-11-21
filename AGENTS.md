@@ -67,8 +67,8 @@ Rutas en español sin acentos: `/`, `/ingresar`, `/registro`, `/registro/cliente
 - **Diseño ("Verano en la costa"):** tokens de color en `src/app/globals.css` (claro y oscuro): `fondo` arena,
   `superficie` blanca, `texto` azul mar, `accion` turquesa (botón principal y enlaces), `sobre-accion`, `encabezado`
   turquesa con texto `sobre-encabezado` blanco, `destacado` amarillo para lo elegido (texto `sobre-destacado`), `adorno` solo de adorno
-  (nunca texto), `error`, `equipo`, `velo` (fondo de las hojas). Tipografías con `next/font`: Baloo 2 (700 y 800) para
-  títulos y la marca (`font-titulo`) y Nunito Sans (400 y 700) para el resto. Referencia de toda pantalla:
+  (nunca texto), `error`, `equipo`, `velo` (fondo de las hojas). Tipografías con `next/font`: Archivo 800 para
+  títulos y la marca (`font-titulo`), Archivo (400 y 600) para el texto y Archivo Narrow 700 en mayúsculas para etiquetas (`font-etiqueta`). Referencia de toda pantalla:
   `docs/prototipo-nuevo/` (`README.md` y `CONSTRUCCION.md`). No usar hex fuera de `globals.css`.
 - **shadcn (excepción a "igual al boceto"):** los archivos de `src/components/shadcn/` se generan con `pnpm dlx shadcn add`
   y **no se editan a mano**. La paleta se adapta solo desde `globals.css` (las variables `--primary`, `--border`, `--ring`…
