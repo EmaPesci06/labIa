@@ -66,7 +66,7 @@ export function CargaFotoPerfil({ foto, onElegir, onQuitar, ocupado, error }: Pr
         <div className="flex flex-wrap items-center gap-2">
           <label
             className={cn(
-              "inline-flex min-h-12 cursor-pointer items-center justify-center rounded-boton border-[3px] border-texto bg-transparent px-[18px] text-base font-bold text-texto transition-colors hover:bg-superficie has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-foco",
+              "inline-flex min-h-12 cursor-pointer items-center justify-center rounded-2xl border-[3px] border-texto bg-transparent px-[18px] text-base font-bold text-texto transition-colors hover:bg-superficie has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-foco",
               ocupado && "cursor-not-allowed opacity-60",
             )}
           >
@@ -90,7 +90,7 @@ export function CargaFotoPerfil({ foto, onElegir, onQuitar, ocupado, error }: Pr
             <button
               type="button"
               onClick={onQuitar}
-              className="min-h-11 rounded-campo px-2 text-sm font-bold text-texto underline decoration-2 underline-offset-4"
+              className="min-h-11 rounded-xl px-2 text-sm font-bold text-texto underline decoration-2 underline-offset-4"
             >
               Quitar foto de perfil
             </button>
@@ -141,7 +141,7 @@ export function CargaFotosTrabajos({ fotos, onElegir, onQuitar, ocupado, error }
         {fotos.length > 0 ? (
           <ul className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 lg:grid-cols-5">
             {fotos.map((foto, indice) => (
-              <li key={foto.id} className="relative aspect-square overflow-hidden rounded-campo">
+              <li key={foto.id} className="relative aspect-square overflow-hidden rounded-xl">
                 <Image
                   src={foto.vista}
                   alt={`Foto de trabajo ${indice + 1}`}

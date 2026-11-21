@@ -10,7 +10,7 @@ export function ListaNormasRegistro() {
       {NORMAS.map((texto, i) => (
         <li
           key={texto}
-          className="flex items-start gap-3 rounded-campo bg-superficie px-3.5 py-2.5 text-[15px] leading-[1.35] text-texto lg:p-4"
+          className="flex items-start gap-3 rounded-xl bg-superficie px-3.5 py-2.5 text-[15px] leading-[1.35] text-texto lg:p-4"
         >
           <span
             aria-hidden

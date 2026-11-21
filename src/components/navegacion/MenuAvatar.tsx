@@ -20,6 +20,7 @@ import { SIN_ANILLO } from "@/components/ui/foco";
 import { salir } from "@/lib/auth/acciones";
 import { cn } from "@/lib/cn";
 import {
+  esPreferenciaTema,
   guardarPreferencia,
   leerPreferencia,
   PREFERENCIAS_TEMA,
@@ -41,7 +42,7 @@ const leerDelNavegador = () => leerPreferencia(document.cookie);
 const leerEnServidor = () => null;
 
 const ITEM =
-  "min-h-11 cursor-pointer gap-3 rounded-campo px-3 text-[15px] font-bold text-texto focus:bg-sol focus:text-sobre-sol";
+  "min-h-11 cursor-pointer gap-3 rounded-xl px-3 text-[15px] font-bold text-texto focus:bg-sol focus:text-sobre-sol";
 
 /**
  * Avatar de la barra superior sobre `DropdownMenu` de shadcn: Mi cuenta, Tema y Salir.
@@ -53,9 +54,9 @@ export function MenuAvatar({ nombre }: Props) {
   const [anuncio, setAnuncio] = useState("");
 
   function cambiarTema(valor: string) {
-    const tema = valor as PreferenciaTema;
-    guardarPreferencia(tema);
-    setAnuncio(`Tema: ${ETIQUETAS_TEMA[tema]}`);
+    if (!esPreferenciaTema(valor)) return;
+    guardarPreferencia(valor);
+    setAnuncio(`Tema: ${ETIQUETAS_TEMA[valor]}`);
   }
 
   return (
@@ -76,7 +77,7 @@ export function MenuAvatar({ nombre }: Props) {
         <DropdownMenuContent
           align="end"
           sideOffset={8}
-          className="w-72 rounded-tarjeta border-2 border-texto bg-superficie p-2 text-texto shadow-md data-open:zoom-in-100"
+          className="w-72 rounded-3xl border-2 border-texto bg-superficie p-2 text-texto shadow-md data-open:zoom-in-100"
         >
           <DropdownMenuGroup>
             <DropdownMenuLabel className="truncate px-3 py-1.5 text-sm font-bold text-texto">
@@ -100,7 +101,7 @@ export function MenuAvatar({ nombre }: Props) {
                   key={opcion}
                   value={opcion}
                   closeOnClick={false}
-                  className="min-h-11 cursor-pointer rounded-campo px-3 pr-9 text-[15px] font-normal text-texto focus:bg-sol focus:text-sobre-sol"
+                  className="min-h-11 cursor-pointer rounded-xl px-3 pr-9 text-[15px] font-normal text-texto focus:bg-sol focus:text-sobre-sol"
                 >
                   {ETIQUETAS_TEMA[opcion]}
                 </DropdownMenuRadioItem>
@@ -112,7 +113,7 @@ export function MenuAvatar({ nombre }: Props) {
 
           <DropdownMenuItem
             onClick={() => formSalir.current?.requestSubmit()}
-            className="min-h-11 cursor-pointer gap-3 rounded-campo px-3 text-[15px] font-bold text-texto focus:bg-sol focus:text-sobre-sol"
+            className="min-h-11 cursor-pointer gap-3 rounded-xl px-3 text-[15px] font-bold text-texto focus:bg-sol focus:text-sobre-sol"
           >
             <LogOut aria-hidden strokeWidth={2} className="size-5" />
             Salir

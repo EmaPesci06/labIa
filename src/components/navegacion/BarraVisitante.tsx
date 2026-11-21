@@ -16,7 +16,7 @@ export function BarraVisitante() {
         <Link
           href="/"
           aria-label="LabÍA, inicio"
-          className="mr-auto flex min-h-11 items-center rounded-campo"
+          className="mr-auto flex min-h-11 items-center rounded-xl"
         >
           <Logo alt="" />
         </Link>

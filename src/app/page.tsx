@@ -51,7 +51,7 @@ export default function Bienvenida() {
         >
           <Link
             href="/registro/cliente"
-            className="flex flex-col gap-1 rounded-tarjeta bg-superficie px-[18px] py-4 text-texto"
+            className="flex flex-col gap-1 rounded-3xl bg-superficie px-[18px] py-4 text-texto"
           >
             <span className="font-titulo text-2xl leading-[1.1]">Necesito un profesional</span>
             <span className="text-base leading-[1.35]">
@@ -60,7 +60,7 @@ export default function Bienvenida() {
           </Link>
           <Link
             href="/registro/profesional"
-            className="flex flex-col gap-1 rounded-tarjeta bg-sol px-[18px] py-4 text-sobre-sol"
+            className="flex flex-col gap-1 rounded-3xl bg-sol px-[18px] py-4 text-sobre-sol"
           >
             <span className="font-titulo text-2xl leading-[1.1]">Ofrezco mis servicios</span>
             <span className="text-base leading-[1.35]">

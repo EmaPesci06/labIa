@@ -43,7 +43,7 @@ async function Contenido() {
   return (
     <div className="flex flex-1 flex-col gap-3.5">
       <ListaNormasRegistro />
-      <div className="-mx-5 mt-auto -mb-6 flex flex-col gap-1 rounded-t-hoja bg-superficie px-5 pt-3 pb-4 lg:mx-0 lg:mt-4 lg:mb-0 lg:rounded-tarjeta lg:p-5">
+      <div className="-mx-5 mt-auto -mb-6 flex flex-col gap-1 rounded-t-hoja bg-superficie px-5 pt-3 pb-4 lg:mx-0 lg:mt-4 lg:mb-0 lg:rounded-3xl lg:p-5">
         <FormularioNormas textoBoton="Aceptar y terminar" />
         <p className="text-center text-[13px] leading-[1.35] text-texto">
           Al continuar aceptás los{" "}

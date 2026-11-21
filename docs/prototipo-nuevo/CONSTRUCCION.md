@@ -31,7 +31,7 @@ como plano de medidas, no lo copies.
 | --- | --- |
 | `background: #FFF3D6`, `color: #123B4A`… | Clase del token (`bg-fondo`, `text-texto`…). Nunca el hex. |
 | `<header style="background: #0E7C86 …">` | `<Encabezado>` de `src/components/ui/` (variantes en la tabla de abajo) |
-| Botón turquesa de 56 px | `<Boton>` principal |
+| Botón turquesa de 56 px | `<Boton>` principal (capa fina sobre `Button` de shadcn) |
 | Botón con borde de 3 px | `<Boton variante="secundario">` |
 | `<input>`, `<select>`, `<textarea>` con borde de 2 px | `<Campo>` (trae `label`, ayuda y error) |
 | Pastilla amarilla o blanca | `<Chip>` |
@@ -42,10 +42,13 @@ como plano de medidas, no lo copies.
 | Pantalla completa de aviso (ícono, título, texto, botón) | `<AvisoPantalla titulo texto accion>` |
 | Pastilla amarilla con la distancia ("a 1,2 km") | `<Distancia km sufijo>` |
 | Cinta de distancia o cinta de pasos | No existe más: `<Distancia>` para la distancia; los pasos se muestran como lista de texto |
-| `<section role="dialog">` que sube desde abajo | `<HojaInferior>` |
+| `<section role="dialog">` que sube desde abajo | `<Hoja>` (sobre `Sheet` de shadcn) |
 | `<nav aria-label="Principal">` de abajo | Ya está en el layout: no la repitas en la página |
 | Recuadro con la palabra "Foto" | `next/image` |
+| Grilla de fotos que abre a pantalla completa | `<VisorFotos>` (`Dialog` y `Carousel` de shadcn) |
 | `width: 390px; height: 844px; overflow: hidden` | Nada: es el marco del boceto. La página real crece y hace scroll. |
+
+Los componentes de `src/components/shadcn/` no se editan: las piezas de `ui/` que tienen equivalente en shadcn son capas finas sobre él (variantes, 44 px, tokens) y las que no (Encabezado, Toldo, Logo, Distancia, EtiquetaMono, Estrellas) son propias, con `cn()`. Radios: campo `rounded-xl`, botón `rounded-2xl`, tarjeta `rounded-3xl` (los del boceto, 16, 18 y 22 px, se aproximan con los de shadcn).
 
 Los nombres exactos de tokens, componentes y props son los que queden en `src/app/globals.css` y `src/components/ui/`
 al cerrar la base (LAB-68, LAB-69, LAB-70). Miralos ahí antes de empezar; `/dev/ui` y `/dev/paleta` los muestran todos.

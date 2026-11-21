@@ -150,7 +150,7 @@ export function HojaReportar({
                     key={motivo}
                     htmlFor={inputId}
                     className={cn(
-                      "flex min-h-[50px] cursor-pointer items-center gap-3 rounded-campo px-4 py-3 text-[17px]",
+                      "flex min-h-[50px] cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-[17px]",
                       seleccionado ? "bg-sol font-bold text-sobre-sol" : "bg-superficie text-texto",
                     )}
                   >
@@ -203,7 +203,7 @@ export function HojaReportar({
               onChange={(e) => setDetalle(e.target.value)}
               aria-describedby={`${idBase}-ayuda`}
               placeholder="Contanos qué pasó con el mayor detalle posible..."
-              className="w-full resize-none rounded-campo border-2 border-texto bg-superficie p-3 text-[17px] leading-snug text-texto placeholder:text-texto/70"
+              className="w-full resize-none rounded-xl border-2 border-texto bg-superficie p-3 text-[17px] leading-snug text-texto placeholder:text-texto/70"
             />
             <p id={`${idBase}-ayuda`} className="text-sm text-texto">
               Lo lee nuestro equipo. La otra persona no ve quién reportó.
@@ -223,7 +223,7 @@ export function HojaReportar({
           {estado.mensaje ? (
             <div
               role="alert"
-              className="rounded-campo bg-sol/60 p-3 text-sm font-semibold text-sobre-sol"
+              className="rounded-xl bg-sol/60 p-3 text-sm font-semibold text-sobre-sol"
             >
               {estado.mensaje}
             </div>

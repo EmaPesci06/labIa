@@ -50,8 +50,8 @@ Hay dos orquestadores: Claude Code y vos. El reparto y las reglas para no pisars
 - **Rutas en Windows:** usá `C:/Users/WIN-10/Desktop/labia` con "Desktop" en mayúscula; con minúscula git falla en worktrees.
 - **Formato:** `pnpm format:check` es parte de la CI; corré `pnpm exec prettier --write` sobre lo que tocaste.
 - **Accesibilidad que ya falló:** ids duplicados cuando un bloque se renderiza dos veces (celular y escritorio: usá
-  `useId`), `<dl>` con wrappers inválidos, foco que no vuelve al botón al cerrar una hoja (Radix necesita
-  `Dialog.Trigger` u `onCloseAutoFocus`), táctiles de menos de 44 px.
+  `useId`), `<dl>` con wrappers inválidos, foco que no vuelve al botón al cerrar una hoja (Base UI, la librería de
+  shadcn, necesita `finalFocus` o un `Trigger`), táctiles de menos de 44 px.
 - **Seguridad que ya falló:** grants de `insert`/`update` directos que saltean la RPC security definer; helpers `privado`
   sin `revoke execute ... from public, anon`; `es_admin()` sin chequear cuenta activa; políticas de Storage que dejan
   leer al admin con su JWT (solo URLs firmadas de 60 s desde el servidor).

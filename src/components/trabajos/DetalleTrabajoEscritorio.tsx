@@ -38,7 +38,7 @@ export function DetalleTrabajoEscritorio({
     return (
       <section
         aria-label="Detalle del trabajo"
-        className="flex min-h-[380px] flex-1 items-center justify-center rounded-tarjeta bg-superficie p-8 text-center text-[17px] text-texto"
+        className="flex min-h-[380px] flex-1 items-center justify-center rounded-3xl bg-superficie p-8 text-center text-[17px] text-texto"
       >
         Elegí un trabajo para ver el detalle.
       </section>
@@ -58,7 +58,7 @@ export function DetalleTrabajoEscritorio({
   return (
     <section
       aria-label={`Detalle: ${trabajo.titulo}`}
-      className="flex flex-1 flex-col gap-5 rounded-tarjeta bg-superficie p-7 text-texto"
+      className="flex flex-1 flex-col gap-5 rounded-3xl bg-superficie p-7 text-texto"
     >
       <div className="flex flex-col gap-1">
         <p className="text-[15px] text-texto">
@@ -72,17 +72,17 @@ export function DetalleTrabajoEscritorio({
       </p>
 
       <dl className="grid grid-cols-3 gap-2">
-        <div className="rounded-campo bg-fondo px-3 py-2.5">
+        <div className="rounded-xl bg-fondo px-3 py-2.5">
           <dt className="text-sm text-texto">Barrio</dt>
           <dd className="font-bold text-texto">{trabajo.barrioNombre}</dd>
         </div>
         {distanciaNumero ? (
-          <div className="rounded-campo bg-fondo px-3 py-2.5">
+          <div className="rounded-xl bg-fondo px-3 py-2.5">
             <dt className="text-sm text-texto">Distancia</dt>
             <dd className="font-bold text-texto tabular-nums">{distanciaNumero}</dd>
           </div>
         ) : null}
-        <div className="rounded-campo bg-fondo px-3 py-2.5">
+        <div className="rounded-xl bg-fondo px-3 py-2.5">
           <dt className="text-sm text-texto">Para</dt>
           <dd aria-label={ETIQUETA_URGENCIA[trabajo.urgencia]} className="font-bold text-texto">
             {ETIQUETA_PARA[trabajo.urgencia]}

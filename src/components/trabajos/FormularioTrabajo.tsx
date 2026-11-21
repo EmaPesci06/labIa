@@ -302,7 +302,7 @@ export function FormularioTrabajo({
             <button
               type="button"
               onClick={() => entradaFotos.current?.click()}
-              className="flex min-h-12 items-center justify-center gap-2 self-start rounded-boton border-[3px] border-dashed border-texto bg-transparent px-[18px] text-base font-bold text-texto hover:bg-superficie focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-texto"
+              className="flex min-h-12 items-center justify-center gap-2 self-start rounded-2xl border-[3px] border-dashed border-texto bg-transparent px-[18px] text-base font-bold text-texto hover:bg-superficie focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-texto"
             >
               <ImagePlus aria-hidden strokeWidth={2} className="size-[22px] text-texto" />
               Sumar una foto
@@ -318,7 +318,7 @@ export function FormularioTrabajo({
                     fill
                     unoptimized
                     sizes="96px"
-                    className="rounded-campo object-cover"
+                    className="rounded-xl object-cover"
                   />
                   <button
                     type="button"

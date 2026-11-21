@@ -3,10 +3,7 @@ import { cn } from "@/lib/cn";
 /** Bloque gris que pulsa mientras carga. Sin pulso si el sistema pide menos movimiento. */
 export function Bloque({ className }: { className?: string }) {
   return (
-    <div
-      aria-hidden
-      className={cn("rounded-tarjeta bg-fondo motion-safe:animate-pulse", className)}
-    />
+    <div aria-hidden className={cn("rounded-3xl bg-fondo motion-safe:animate-pulse", className)} />
   );
 }
 

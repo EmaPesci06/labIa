@@ -92,7 +92,7 @@ export function FormularioPreferenciasEmail({
           {estado.exito}
         </p>
       ) : null}
-      <div className="rounded-t-[28px] bg-superficie px-5 pt-2.5 pb-4 lg:rounded-tarjeta lg:p-4">
+      <div className="rounded-t-[28px] bg-superficie px-5 pt-2.5 pb-4 lg:rounded-3xl lg:p-4">
         <Boton type="submit" tamano="grande" bloque cargando={pendiente}>
           Guardar preferencias
         </Boton>

@@ -46,7 +46,7 @@ export function EnlaceVolver({
       href={href}
       onClick={volver}
       className={cn(
-        "-ml-2.5 flex min-h-11 w-fit items-center justify-center gap-1 rounded-campo px-2.5 text-texto lg:ml-0 lg:px-0 lg:text-sm lg:font-semibold lg:text-texto",
+        "-ml-2.5 flex min-h-11 w-fit items-center justify-center gap-1 rounded-xl px-2.5 text-texto lg:ml-0 lg:px-0 lg:text-sm lg:font-semibold lg:text-texto",
         className,
       )}
     >

@@ -23,7 +23,7 @@ export function Logo({ variante = "completo", alt = "LabÍA", sobre = "fondo", c
       <span
         {...accesibilidad}
         className={cn(
-          "inline-flex size-10 items-center justify-center rounded-campo bg-accion font-titulo text-2xl leading-none text-sobre-accion",
+          "inline-flex size-10 items-center justify-center rounded-xl bg-accion font-titulo text-2xl leading-none text-sobre-accion",
           className,
         )}
       >

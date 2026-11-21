@@ -660,7 +660,7 @@ export function FormularioPerfilProfesional({
 
               <div
                 key="paso-1-acciones"
-                className="-mx-5 mt-auto -mb-6 rounded-t-hoja bg-superficie px-5 pt-3 pb-4 lg:mx-0 lg:mt-2 lg:mb-0 lg:rounded-tarjeta lg:p-5"
+                className="-mx-5 mt-auto -mb-6 rounded-t-hoja bg-superficie px-5 pt-3 pb-4 lg:mx-0 lg:mt-2 lg:mb-0 lg:rounded-3xl lg:p-5"
               >
                 <Boton
                   key="btn-avanzar"
@@ -716,7 +716,7 @@ export function FormularioPerfilProfesional({
 
               <div
                 key="paso-2-acciones"
-                className="-mx-5 mt-auto -mb-6 flex flex-col rounded-t-hoja bg-superficie px-5 pt-3 pb-4 lg:mx-0 lg:mt-2 lg:mb-0 lg:rounded-tarjeta lg:p-5"
+                className="-mx-5 mt-auto -mb-6 flex flex-col rounded-t-hoja bg-superficie px-5 pt-3 pb-4 lg:mx-0 lg:mt-2 lg:mb-0 lg:rounded-3xl lg:p-5"
               >
                 <Boton
                   key="btn-enviar"

@@ -49,7 +49,7 @@ src/app/(publico)/      bienvenida, ingresar, registro, normas, términos, priva
 src/app/(app)/          inicio, buscar, profesionales/[id], trabajos, mis-trabajos, cuenta
 src/app/admin/          verificaciones, reportes (solo rol admin)
 src/app/api/            route handlers puntuales (callbacks de auth, webhooks)
-src/components/ui/      componentes base (Boton, Campo, Chip, Insignia, Tarjeta, HojaInferior, Encabezado, Toldo, Avatar…)
+src/components/ui/      capa fina sobre shadcn (Boton, Campo, Chip, Insignia, Tarjeta, Hoja, Avatar…) y piezas propias (Encabezado, Toldo, Logo, Distancia, EtiquetaMono, Estrellas, VisorFotos)
 src/components/shadcn/  componentes de shadcn generados por el CLI (base-nova, Base UI); no se editan a mano
 src/components/         componentes de dominio (TarjetaProfesional, TarjetaTrabajo…)
 src/lib/supabase/       clientes server/browser/admin y tipos generados
@@ -89,7 +89,7 @@ Rutas en español sin acentos: `/`, `/ingresar`, `/registro`, `/registro/cliente
   y **no se editan a mano**. La paleta se adapta solo desde `globals.css` (las variables `--primary`, `--border`, `--ring`…
   atadas a nuestros tokens) y la forma o los 44 px se resuelven en la capa fina de `src/components/ui/` con `className`
   y `cn()` (o con una regla por `data-slot` en `globals.css`). Las diferencias de forma con el boceto se aceptan. Radios
-  de shadcn (`--radius: 0.625rem`). Los componentes de shadcn importan `cn` del paquete npm `cn` (así los sirve el registro); nuestro código sigue usando `@/lib/cn`. El foco de 3 px de los componentes de shadcn sale de `[data-slot]:focus-visible`.
+  de shadcn (`--radius: 0.625rem`). Los componentes de shadcn importan `cn` del paquete npm `cn` (así los sirve el registro); nuestro código sigue usando `@/lib/cn`. El foco de 3 px de los componentes de shadcn sale de `[data-slot]:focus-visible`. Para una pieza nueva: si shadcn tiene el componente, se arma una capa fina sobre él; si no, es propia (`cn()`, tokens y `Badge` o `Card` donde sirva). Los radios de campo, botón y tarjeta son `rounded-xl`, `rounded-2xl` y `rounded-3xl` (no hay tokens `--radius-campo`, `--radius-boton` ni `--radius-tarjeta`); hoja, `rounded-hoja`. Las clases `dark:` de los componentes de shadcn pisan sus estilos oscuros: en las capas finas se usan solo para anularlos.
 - **Sin** `console.log`, **sin** `any`, **sin** secretos en el repo. `.env.example` lista todas las variables sin valores.
 
 ## Seguridad (no negociable)

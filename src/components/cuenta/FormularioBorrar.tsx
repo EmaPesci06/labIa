@@ -75,7 +75,7 @@ export function FormularioBorrar({ pedirContrasena }: { pedirContrasena: boolean
       <button
         type="submit"
         aria-busy={pendiente || undefined}
-        className="inline-flex min-h-14 items-center justify-center rounded-boton bg-error px-6 text-lg font-bold text-sobre-accion hover:opacity-90 active:opacity-80 disabled:opacity-50 aria-busy:pointer-events-none"
+        className="inline-flex min-h-14 items-center justify-center rounded-2xl bg-error px-6 text-lg font-bold text-sobre-accion hover:opacity-90 active:opacity-80 disabled:opacity-50 aria-busy:pointer-events-none"
       >
         {pendiente ? "Borrando…" : "Borrar mi cuenta para siempre"}
       </button>

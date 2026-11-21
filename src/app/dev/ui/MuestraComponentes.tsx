@@ -138,7 +138,7 @@ export function MuestraComponentes() {
           nivel={2}
           variante="sol"
           titulo="Chips dentro de un encabezado sol"
-          className="rounded-tarjeta"
+          className="rounded-3xl"
         >
           <GrupoChips
             tipo="unica"

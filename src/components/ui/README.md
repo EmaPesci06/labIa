@@ -6,6 +6,8 @@ Componentes base del sistema de diseño "Verano en la costa" (`docs/prototipo-nu
 - Encabezado (turquesa, equipo, sol, plano), Toldo, Avatar, Aviso (nota), AvisoPantalla (pantalla completa), Vacio.
 - Distancia (pastilla sol con la distancia), EtiquetaMono, Estrellas, Logo.
 
+Los que no tienen equivalente en shadcn (Encabezado, Toldo, Logo, Distancia, EtiquetaMono, Estrellas) son propios: `cn()`, tokens y `Badge` donde sirve (Distancia). VisorFotos usa `Dialog` y `Carousel` de shadcn. Radios: `rounded-xl` (campo), `rounded-2xl` (botón) y `rounded-3xl` (tarjeta); no hay tokens propios de radio salvo `rounded-hoja`.
+
 Sin lógica de dominio ni acceso a datos. Los colores salen solo de los tokens de `src/app/globals.css`.
 
 ## Capa fina sobre shadcn (LAB-84, LAB-86)
