@@ -18,7 +18,7 @@ function estadoChip(seleccionado: boolean) {
     ? "bg-secondary text-secondary-foreground aria-pressed:bg-secondary hover:bg-secondary " +
         "hover:text-secondary-foreground en-encabezado:bg-accion en-encabezado:text-sobre-accion " +
         "en-encabezado:hover:bg-accion en-encabezado:hover:text-sobre-accion en-encabezado:aria-pressed:bg-accion"
-    : "bg-card text-card-foreground hover:bg-secondary/40 hover:text-card-foreground " +
+    : "bg-card text-card-foreground hover:bg-secondary/15 hover:text-card-foreground " +
         "en-encabezado:bg-fondo en-encabezado:text-texto en-encabezado:hover:bg-fondo en-encabezado:hover:text-texto";
 }
 
