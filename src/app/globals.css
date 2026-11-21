@@ -244,6 +244,24 @@
 }
 
 /*
+ * Campos de texto: ya tienen borde propio, así que el foco es solo ese borde con el color de foco,
+ * sin outline exterior. Con error (aria-invalid) el borde queda rojo y el foco cae al outline global.
+ */
+[data-slot="input"]:not([aria-invalid="true"]):focus-visible,
+[data-slot="textarea"]:not([aria-invalid="true"]):focus-visible,
+input:not(
+    [type="checkbox"],
+    [type="radio"],
+    [type="file"],
+    [type="range"],
+    [aria-invalid="true"]
+  ):focus-visible,
+textarea:not([aria-invalid="true"]):focus-visible {
+  outline: none;
+  border-color: var(--color-foco);
+}
+
+/*
  * Velo de las hojas y diálogos de shadcn (LAB-83): bg-black/10 no existe porque borramos la paleta
  * por defecto; acá se ata al token velo al 60 %.
  */

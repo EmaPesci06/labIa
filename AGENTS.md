@@ -56,7 +56,7 @@ Rutas en español sin acentos: `/`, `/ingresar`, `/registro`, `/registro/cliente
   sin acentos ni ñ (`resenas`). Código: dominio en español (`trabajo`, `postulacion`), lo demás en inglés si es más natural.
 - **Mobile first:** se diseña a 390 px; escritorio desde `lg` (1024 px), pensado a 1440 px.
 - **Accesibilidad:** táctiles de 44 px, `label` en todos los campos, foco `outline: 3px solid; outline-offset: 2px` en color
-  `texto` (claro) y `sol` (oscuro), contraste AA, `prefers-reduced-motion`, errores asociados con `aria-describedby`.
+  `texto` (claro) y `sol` (oscuro); en campos de texto no hay outline: el foco es el borde del campo en ese color, contraste AA, `prefers-reduced-motion`, errores asociados con `aria-describedby`.
 - **Formularios:** Server Action + esquema Zod + `useActionState`; errores en castellano al lado del campo.
 - **Server Components** por defecto; Server Actions para mutaciones.
 - **Teléfonos:** E.164 (`+549223…`) con `normalizarTelefono` de `src/lib/whatsapp.ts`; links con `linkWhatsApp`.
