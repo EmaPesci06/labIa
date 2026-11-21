@@ -24,7 +24,7 @@ export function BotonGoogle({ rol, volver, className }: Props) {
       <button
         type="submit"
         aria-busy={pendiente || undefined}
-        className="flex min-h-[52px] w-full items-center justify-center gap-2.5 rounded-boton border-2 border-texto bg-superficie px-5 text-[17px] font-bold text-texto hover:opacity-95"
+        className="flex min-h-[52px] w-full items-center justify-center gap-2.5 rounded-2xl border-2 border-texto bg-superficie px-5 text-[17px] font-bold text-texto hover:opacity-95"
       >
         Seguir con Google
       </button>

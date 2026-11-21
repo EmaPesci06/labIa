@@ -56,7 +56,7 @@ export function FotoDePerfil({ uid, nombre, fotoUrl }: Props) {
         className="size-[72px] border-[5px] bg-equipo text-[30px] text-sobre-encabezado"
       />
       <div className="flex flex-col items-start gap-1">
-        <label className="inline-flex min-h-12 cursor-pointer items-center rounded-boton border-[3px] border-texto bg-transparent px-4.5 text-base font-bold text-texto hover:bg-superficie has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-foco">
+        <label className="inline-flex min-h-12 cursor-pointer items-center rounded-2xl border-[3px] border-texto bg-transparent px-4.5 text-base font-bold text-texto hover:bg-superficie has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-foco">
           {ocupado ? "Procesando…" : "Cambiar la foto"}
           <input
             ref={entrada}
@@ -77,7 +77,7 @@ export function FotoDePerfil({ uid, nombre, fotoUrl }: Props) {
             type="button"
             onClick={quitar}
             disabled={ocupado}
-            className="min-h-11 rounded-campo px-2 text-sm font-bold text-texto underline underline-offset-2"
+            className="min-h-11 rounded-xl px-2 text-sm font-bold text-texto underline underline-offset-2"
           >
             Quitar foto
           </button>

@@ -28,6 +28,22 @@ if (typeof globalThis.ResizeObserver === "undefined") {
   };
 }
 
+// Tampoco IntersectionObserver (lo usa Embla, el carrusel de shadcn).
+if (typeof globalThis.IntersectionObserver === "undefined") {
+  globalThis.IntersectionObserver = class IntersectionObserver {
+    readonly root = null;
+    readonly rootMargin = "";
+    readonly scrollMargin = "";
+    readonly thresholds = [];
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+    takeRecords() {
+      return [];
+    }
+  };
+}
+
 if (typeof HTMLElement !== "undefined" && !HTMLElement.prototype.scrollIntoView) {
   HTMLElement.prototype.scrollIntoView = () => {};
 }

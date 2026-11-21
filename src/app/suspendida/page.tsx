@@ -48,7 +48,7 @@ async function Contenido() {
 
         <section
           aria-labelledby="motivo-suspension"
-          className="mt-5 rounded-tarjeta bg-fondo px-[18px] py-4 text-texto"
+          className="mt-5 rounded-3xl bg-fondo px-[18px] py-4 text-texto"
         >
           <h2 id="motivo-suspension" className="mb-1 text-[15px] font-bold">
             Motivo de la suspensión
@@ -77,7 +77,7 @@ async function Contenido() {
         <div className="mt-6 flex flex-col gap-2">
           <a
             href={`mailto:${emailContacto}?subject=Apelaci%C3%B3n%20de%20cuenta%20suspendida`}
-            className="flex min-h-14 items-center justify-center rounded-boton bg-sol px-6 text-lg font-bold text-sobre-sol no-underline transition-colors hover:bg-sol/90"
+            className="flex min-h-14 items-center justify-center rounded-2xl bg-sol px-6 text-lg font-bold text-sobre-sol no-underline transition-colors hover:bg-sol/90"
           >
             Pedir una apelación
           </a>

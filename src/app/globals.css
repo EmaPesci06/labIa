@@ -192,10 +192,7 @@
 }
 
 @theme {
-  /* Radios del prototipo: campo 16, botón 18, tarjeta 22, hoja y encabezado 28. Chips: rounded-full. */
-  --radius-campo: 16px;
-  --radius-boton: 18px;
-  --radius-tarjeta: 22px;
+  /* Campo, botón y tarjeta usan los radios de shadcn (rounded-xl, 2xl y 3xl). Hoja: 28. Chips: rounded-full. */
   --radius-hoja: 28px;
 }
 

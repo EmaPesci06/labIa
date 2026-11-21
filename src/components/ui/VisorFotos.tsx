@@ -1,11 +1,21 @@
 "use client";
 
-import * as Dialog from "@radix-ui/react-dialog";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { X } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useState, type KeyboardEvent } from "react";
+import { useEffect, useState } from "react";
 
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  type CarouselApi,
+} from "@/components/shadcn/carousel";
+import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/shadcn/dialog";
 import { cn } from "@/lib/cn";
+
+import { SIN_ANILLO_BOTON } from "./foco";
 
 /**
  * Las URL firmadas del bucket privado `fotos-trabajos` (LAB-52) no pasan por el optimizador de
@@ -24,46 +34,40 @@ type VisorFotosProps = {
   miniaturas?: "cuadradas" | "apaisadas";
 };
 
-const BOTON_FLECHA =
-  "absolute top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-superficie text-texto shadow-sm transition-opacity focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco disabled:pointer-events-none disabled:opacity-30";
+const BOTON_FLECHA = cn(
+  "inset-y-0 my-auto size-11 rounded-full border-0 bg-superficie text-texto shadow-sm hover:bg-superficie disabled:opacity-30 [&_svg]:size-6",
+  SIN_ANILLO_BOTON,
+);
+
+/** Con `prefers-reduced-motion` el carrusel salta de foto sin deslizar (duración 0 de Embla). */
+function movimientoReducido(): boolean {
+  return (
+    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
 
 /**
  * Grilla de fotos con visor a pantalla completa. Lo usan "Trabajos hechos" del perfil y las fotos
- * del trabajo. Tocar una miniatura abre el visor (Radix Dialog: foco atrapado y devuelto); se
- * navega con deslizamiento, botones o flechas del teclado y se cierra con Esc o la X.
+ * del trabajo. Tocar una miniatura abre el visor (`Dialog` de shadcn: foco atrapado y devuelto) con
+ * un `Carousel` de shadcn; se navega con deslizamiento, botones o flechas del teclado y se cierra
+ * con Esc o la X.
  */
 export function VisorFotos({ fotos, contexto, miniaturas = "cuadradas" }: VisorFotosProps) {
   const [abierta, setAbierta] = useState<number | null>(null);
   const [actual, setActual] = useState(0);
+  const [api, setApi] = useState<CarouselApi>();
   const total = fotos.length;
 
-  // Al abrir, el carrusel arranca en la foto tocada.
-  const alMontarCarrusel = useCallback(
-    (el: HTMLDivElement | null) => {
-      if (el && abierta !== null) el.scrollLeft = abierta * el.clientWidth;
-    },
-    [abierta],
-  );
+  useEffect(() => {
+    if (!api) return;
+    const alElegir = () => setActual(api.selectedScrollSnap());
+    api.on("select", alElegir);
+    return () => {
+      api.off("select", alElegir);
+    };
+  }, [api]);
 
   if (total === 0) return null;
-
-  function ir(contenedor: HTMLElement | null, indice: number) {
-    if (!contenedor) return;
-    const destino = Math.min(total - 1, Math.max(0, indice));
-    contenedor.scrollTo({ left: destino * contenedor.clientWidth });
-    setActual(destino);
-  }
-
-  function alTeclado(evento: KeyboardEvent<HTMLElement>) {
-    const carrusel = evento.currentTarget.querySelector<HTMLElement>("[data-carrusel]");
-    if (evento.key === "ArrowRight") {
-      evento.preventDefault();
-      ir(carrusel, actual + 1);
-    } else if (evento.key === "ArrowLeft") {
-      evento.preventDefault();
-      ir(carrusel, actual - 1);
-    }
-  }
 
   const apaisadas = miniaturas === "apaisadas";
 
@@ -107,23 +111,26 @@ export function VisorFotos({ fotos, contexto, miniaturas = "cuadradas" }: VisorF
         ))}
       </ul>
 
-      <Dialog.Root
+      <Dialog
         open={abierta !== null}
         onOpenChange={(abrir) => {
           if (!abrir) setAbierta(null);
         }}
       >
-        <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-40 bg-velo" />
-          <Dialog.Content
-            aria-describedby={undefined}
-            onKeyDown={alTeclado}
-            className="fixed inset-0 z-50 flex flex-col bg-velo text-texto"
-          >
-            <Dialog.Title className="sr-only">
-              {`Foto ${actual + 1} de ${total} de ${contexto}`}
-            </Dialog.Title>
+        <DialogContent
+          showCloseButton={false}
+          className="top-0 left-0 flex h-dvh max-w-none translate-x-0 translate-y-0 flex-col gap-0 rounded-none bg-velo p-0 text-texto ring-0 motion-reduce:animate-none motion-reduce:duration-0 sm:max-w-none"
+        >
+          <DialogTitle className="sr-only">
+            {`Foto ${actual + 1} de ${total} de ${contexto}`}
+          </DialogTitle>
 
+          <Carousel
+            opts={{ startIndex: abierta ?? 0, duration: movimientoReducido() ? 0 : 25 }}
+            setApi={setApi}
+            aria-label={`Fotos de ${contexto}`}
+            className="flex min-h-0 flex-1 flex-col"
+          >
             <div className="flex items-center justify-between gap-3 p-4">
               <span
                 aria-hidden
@@ -131,26 +138,22 @@ export function VisorFotos({ fotos, contexto, miniaturas = "cuadradas" }: VisorF
               >
                 {actual + 1} / {total}
               </span>
-              <Dialog.Close
+              <DialogClose
                 aria-label="Cerrar"
-                className="flex size-11 items-center justify-center rounded-full bg-superficie text-texto transition-colors hover:bg-superficie focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
+                className="flex size-11 items-center justify-center rounded-full bg-superficie text-texto focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco"
               >
                 <X aria-hidden strokeWidth={2} className="size-5" />
-              </Dialog.Close>
+              </DialogClose>
             </div>
 
-            <div className="relative min-h-0 flex-1">
-              <div
-                ref={alMontarCarrusel}
-                data-carrusel=""
-                onScroll={(e) => {
-                  const el = e.currentTarget;
-                  if (el.clientWidth > 0) setActual(Math.round(el.scrollLeft / el.clientWidth));
-                }}
-                className="flex h-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain"
-              >
+            <div className="relative min-h-0 flex-1 **:data-[slot=carousel-content]:h-full">
+              <CarouselContent className="ml-0 h-full">
                 {fotos.map((url, i) => (
-                  <div key={url} className="relative h-full w-full shrink-0 snap-center">
+                  <CarouselItem
+                    key={url}
+                    aria-label={`Foto ${i + 1} de ${total}`}
+                    className="relative h-full pl-0"
+                  >
                     <Image
                       src={url}
                       alt={`Foto ${i + 1} de ${total} de ${contexto}`}
@@ -159,50 +162,26 @@ export function VisorFotos({ fotos, contexto, miniaturas = "cuadradas" }: VisorF
                       sizes="100vw"
                       className="object-contain"
                     />
-                  </div>
+                  </CarouselItem>
                 ))}
-              </div>
+              </CarouselContent>
 
               {total > 1 ? (
                 <>
-                  <button
-                    type="button"
+                  <CarouselPrevious
                     aria-label="Foto anterior"
-                    disabled={actual === 0}
-                    onClick={(e) =>
-                      ir(
-                        e.currentTarget.parentElement?.querySelector<HTMLElement>(
-                          "[data-carrusel]",
-                        ) ?? null,
-                        actual - 1,
-                      )
-                    }
                     className={cn(BOTON_FLECHA, "left-3")}
-                  >
-                    <ChevronLeft aria-hidden strokeWidth={2} className="size-6" />
-                  </button>
-                  <button
-                    type="button"
+                  />
+                  <CarouselNext
                     aria-label="Foto siguiente"
-                    disabled={actual === total - 1}
-                    onClick={(e) =>
-                      ir(
-                        e.currentTarget.parentElement?.querySelector<HTMLElement>(
-                          "[data-carrusel]",
-                        ) ?? null,
-                        actual + 1,
-                      )
-                    }
                     className={cn(BOTON_FLECHA, "right-3")}
-                  >
-                    <ChevronRight aria-hidden strokeWidth={2} className="size-6" />
-                  </button>
+                  />
                 </>
               ) : null}
             </div>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+          </Carousel>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

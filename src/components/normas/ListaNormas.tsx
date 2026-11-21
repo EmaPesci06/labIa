@@ -11,7 +11,7 @@ export function ListaNormas({ dosColumnas = false }: { dosColumnas?: boolean }) 
       {NORMAS.map((texto, i) => (
         <li
           key={texto}
-          className="flex items-start gap-3 rounded-campo bg-superficie px-3.5 py-2.5 text-[15px] leading-[1.35] lg:p-4"
+          className="flex items-start gap-3 rounded-xl bg-superficie px-3.5 py-2.5 text-[15px] leading-[1.35] lg:p-4"
         >
           <span
             aria-hidden
@@ -31,7 +31,7 @@ export function QueHaceLabia() {
   return (
     <section
       aria-labelledby="que-hace-labia"
-      className="flex flex-col gap-2 rounded-tarjeta bg-equipo p-4 text-sobre-encabezado lg:p-5"
+      className="flex flex-col gap-2 rounded-3xl bg-equipo p-4 text-sobre-encabezado lg:p-5"
     >
       <h2 id="que-hace-labia" className="font-titulo text-[22px] leading-tight">
         Qué hace LabÍA

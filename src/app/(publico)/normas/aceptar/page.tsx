@@ -26,7 +26,7 @@ async function ContenidoAceptarNormas() {
         descripcion="Actualizamos las normas. Para seguir usando LabÍA, te comprometés a:"
       />
       <ListaNormasRegistro />
-      <div className="-mx-5 mt-auto -mb-8 rounded-t-hoja bg-superficie px-5 pt-3 pb-4 lg:mx-0 lg:mt-2 lg:mb-0 lg:rounded-tarjeta lg:p-5">
+      <div className="-mx-5 mt-auto -mb-8 rounded-t-hoja bg-superficie px-5 pt-3 pb-4 lg:mx-0 lg:mt-2 lg:mb-0 lg:rounded-3xl lg:p-5">
         <FormularioNormas textoBoton="Aceptar y seguir" />
       </div>
     </div>

@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { esperarHojaQuieta } from "./apoyo/hoja";
 
 // Segundo servidor (mismo build) con LABIA_ROL_DEV=profesional; ver playwright.config.ts.
 const URL_PROFESIONAL = `http://localhost:${Number(process.env.PUERTO_E2E ?? 3000) + 100}`;
@@ -282,6 +283,7 @@ test.describe("objetivos táctiles de 44 px", () => {
     test.skip(esCelular(page), "El avatar está en la barra superior de escritorio");
     await page.goto("/inicio");
     await page.getByRole("button", { name: /Cuenta de/ }).click();
+    await esperarHojaQuieta(page, page.getByRole("menu"));
     const chicos = await page.evaluate((selector) => {
       return [...document.querySelectorAll<HTMLElement>(selector)]
         .filter((el) => el.getAttribute("href") !== "#contenido")
@@ -318,6 +320,7 @@ test.describe("axe en más pantallas", () => {
       await page.goto("/inicio");
       await page.getByRole("button", { name: /Cuenta de/ }).click();
       await expect(page.getByRole("menuitem", { name: "Mi cuenta" })).toBeVisible();
+      await esperarHojaQuieta(page, page.getByRole("menu"));
       await sinViolaciones(page);
     });
   }

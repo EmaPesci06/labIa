@@ -157,7 +157,7 @@ export function BloqueVerificacion({
     <section
       aria-labelledby={`${base}-titulo`}
       className={cn(
-        "flex flex-col gap-3 rounded-tarjeta bg-superficie p-4 lg:rounded-[20px] lg:p-5",
+        "flex flex-col gap-3 rounded-3xl bg-superficie p-4 lg:rounded-[20px] lg:p-5",
         className,
       )}
     >
@@ -183,7 +183,7 @@ export function BloqueVerificacion({
 
       <div className="flex flex-col gap-2.5">
         {/* DNI: acordeón con frente y dorso */}
-        <div className="flex flex-col overflow-hidden rounded-campo border border-texto bg-superficie">
+        <div className="flex flex-col overflow-hidden rounded-xl border border-texto bg-superficie">
           <button
             type="button"
             onClick={() => setExpandirDni((prev) => !prev)}
@@ -334,7 +334,7 @@ function FilaArchivo({
   return (
     <div
       className={cn(
-        "flex min-h-[52px] items-center justify-between rounded-campo border border-texto bg-superficie px-3.5",
+        "flex min-h-[52px] items-center justify-between rounded-xl border border-texto bg-superficie px-3.5",
         envolturaBoton && "hover:bg-superficie/40",
       )}
     >

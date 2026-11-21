@@ -106,7 +106,7 @@ export function TarjetaTrabajo({
       <Link
         href={href}
         className={cn(
-          "flex flex-col gap-1 rounded-tarjeta bg-superficie px-4 py-3.5 text-texto no-underline transition-colors",
+          "flex flex-col gap-1 rounded-3xl bg-superficie px-4 py-3.5 text-texto no-underline transition-colors",
           className,
         )}
       >

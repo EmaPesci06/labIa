@@ -91,7 +91,7 @@ export function FormularioDatos({ barrios, inicial }: PropsDatos) {
         limpiar(e.target.name)
       }
       noValidate
-      className="flex flex-col gap-3 rounded-tarjeta bg-superficie p-4 text-texto"
+      className="flex flex-col gap-3 rounded-3xl bg-superficie p-4 text-texto"
     >
       <Campo
         etiqueta="Nombre y apellido"

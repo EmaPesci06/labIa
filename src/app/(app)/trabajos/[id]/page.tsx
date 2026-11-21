@@ -76,17 +76,17 @@ export default async function PaginaDetalleTrabajo({ params }: PaginaDetalleTrab
 
           {/* Barrio, distancia y urgencia (boceto App-TrabajoDetalle) */}
           <dl className="grid grid-cols-3 gap-2">
-            <div className="rounded-campo bg-superficie px-3 py-2.5">
+            <div className="rounded-xl bg-superficie px-3 py-2.5">
               <dt className="text-sm text-texto">Barrio</dt>
               <dd className="font-bold text-texto">{trabajo.barrioNombre}</dd>
             </div>
             {distanciaNumero ? (
-              <div className="rounded-campo bg-superficie px-3 py-2.5">
+              <div className="rounded-xl bg-superficie px-3 py-2.5">
                 <dt className="text-sm text-texto">Distancia</dt>
                 <dd className="font-bold text-texto tabular-nums">{distanciaNumero}</dd>
               </div>
             ) : null}
-            <div className="rounded-campo bg-superficie px-3 py-2.5">
+            <div className="rounded-xl bg-superficie px-3 py-2.5">
               <dt className="text-sm text-texto">Para</dt>
               <dd aria-label={ETIQUETA_URGENCIA[trabajo.urgencia]} className="font-bold text-texto">
                 {ETIQUETA_PARA[trabajo.urgencia]}
@@ -101,7 +101,7 @@ export default async function PaginaDetalleTrabajo({ params }: PaginaDetalleTrab
 
           {/* Presupuesto estimado si lo puso */}
           {trabajo.presupuestoEstimado !== null ? (
-            <div className="rounded-campo bg-superficie p-3.5 text-sm font-bold text-texto">
+            <div className="rounded-xl bg-superficie p-3.5 text-sm font-bold text-texto">
               El cliente estima {formatearPesos(trabajo.presupuestoEstimado)}
             </div>
           ) : null}

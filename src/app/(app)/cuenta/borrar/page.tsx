@@ -109,7 +109,7 @@ export default async function BorrarCuenta() {
       <a
         href="/api/cuenta/datos"
         download
-        className="inline-flex min-h-12 items-center justify-center rounded-boton border-[3px] border-texto bg-transparent px-5 text-base font-bold text-texto hover:bg-superficie"
+        className="inline-flex min-h-12 items-center justify-center rounded-2xl border-[3px] border-texto bg-transparent px-5 text-base font-bold text-texto hover:bg-superficie"
       >
         Antes, descargar mis datos
       </a>

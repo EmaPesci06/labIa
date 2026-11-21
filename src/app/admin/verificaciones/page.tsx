@@ -28,7 +28,7 @@ function Fila({ fila }: { fila: FilaProfesional }) {
     <li>
       <Link
         href={`/admin/verificaciones/${fila.usuarioId}`}
-        className="flex min-h-11 flex-col gap-2.5 rounded-tarjeta bg-superficie p-4 text-texto lg:flex-row lg:items-center lg:justify-between lg:gap-6"
+        className="flex min-h-11 flex-col gap-2.5 rounded-3xl bg-superficie p-4 text-texto lg:flex-row lg:items-center lg:justify-between lg:gap-6"
       >
         <div className="flex min-w-0 flex-col gap-1">
           <p className="font-titulo text-[22px] leading-tight">{nombre}</p>
