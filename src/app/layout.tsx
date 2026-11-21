@@ -55,7 +55,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {/* usePathname() en una ruta dinámica (/profesionales/[id]) exige Suspense. */}
         <Suspense fallback={null}>
           <MetricasPostHog />
-          <MetricasVercel />
+          {/* /_vercel/* solo existe en Vercel: en local y en CI el script daría 404. */}
+          {process.env.VERCEL === "1" ? <MetricasVercel /> : null}
         </Suspense>
         <RegistrarServiceWorker />
         <AvisosFlotantes />
