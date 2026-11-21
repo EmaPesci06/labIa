@@ -6,6 +6,8 @@
 export const PWA_COLORES = {
   fondoClaro: "rgb(234 240 238)",
   fondoOscuro: "rgb(15 26 23)",
-  /** Barra del sistema al abrir la app instalada: el encabezado tinta de cada pantalla. */
+  /** Barra del sistema al abrir la app instalada: el encabezado tinta de cada pantalla (claro). */
   encabezado: "rgb(22 35 31)",
+  /** Lo mismo en modo oscuro: el token `encabezado` oscuro. */
+  encabezadoOscuro: "rgb(26 41 37)",
 } as const;
