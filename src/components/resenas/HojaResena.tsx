@@ -253,7 +253,7 @@ function FormularioResena({
           aria-invalid={errorTexto ? true : undefined}
           aria-describedby={errorTexto ? "error-comentario-resena" : undefined}
           placeholder="Contá cómo fue: puntualidad, prolijidad, si respetó el presupuesto."
-          className="w-full resize-none rounded-xl border-2 border-texto bg-campo p-3.5 text-[17px] leading-snug text-texto placeholder:text-texto placeholder:opacity-60"
+          className="w-full resize-none rounded-xl border-2 border-borde bg-campo p-3.5 text-[17px] leading-snug text-texto placeholder:text-texto placeholder:opacity-60"
         />
         {errorTexto ? (
           <p id="error-comentario-resena" role="alert" className="text-sm font-semibold text-error">
