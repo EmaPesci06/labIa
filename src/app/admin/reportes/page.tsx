@@ -64,7 +64,7 @@ export default async function PaginaReportesAdmin({ searchParams }: Props) {
                     className={cn(
                       "inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-[15px] font-bold",
                       activa
-                        ? "bg-sol text-sobre-sol"
+                        ? "bg-destacado text-sobre-destacado"
                         : "border-2 border-texto bg-superficie text-texto",
                     )}
                   >
@@ -73,7 +73,9 @@ export default async function PaginaReportesAdmin({ searchParams }: Props) {
                       <span
                         className={cn(
                           "rounded-full px-2 py-0.5 text-xs font-bold",
-                          activa ? "bg-sobre-sol text-sobre-encabezado" : "bg-sol text-sobre-sol",
+                          activa
+                            ? "bg-sobre-destacado text-sobre-encabezado"
+                            : "bg-destacado text-sobre-destacado",
                         )}
                       >
                         {conteo}

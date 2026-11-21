@@ -76,7 +76,7 @@ export default async function BorrarCuenta() {
       {enCurso.length > 0 ? (
         <div
           role="alert"
-          className="flex items-start gap-2.5 rounded-[14px] bg-sol p-3.5 text-sm leading-snug text-sobre-sol"
+          className="flex items-start gap-2.5 rounded-[14px] bg-destacado p-3.5 text-sm leading-snug text-sobre-destacado"
         >
           <TriangleAlert aria-hidden strokeWidth={2} className="size-[22px] shrink-0" />
           <ul className="flex flex-col gap-1 font-bold">

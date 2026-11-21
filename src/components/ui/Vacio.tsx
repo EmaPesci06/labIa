@@ -22,7 +22,7 @@ type Props = {
 };
 
 /**
- * Estado vacío: capa fina sobre el `Empty` de shadcn. Ícono en círculo sol, título (encabezado de
+ * Estado vacío: capa fina sobre el `Empty` de shadcn. Ícono en círculo destacado, título (encabezado de
  * nivel 2), descripción opcional y una acción.
  */
 export function Vacio({ icono: Icono = SearchX, titulo, descripcion, accion, className }: Props) {

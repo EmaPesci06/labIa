@@ -56,7 +56,7 @@ Rutas en español sin acentos: `/`, `/ingresar`, `/registro`, `/registro/cliente
   sin acentos ni ñ (`resenas`). Código: dominio en español (`trabajo`, `postulacion`), lo demás en inglés si es más natural.
 - **Mobile first:** se diseña a 390 px; escritorio desde `lg` (1024 px), pensado a 1440 px.
 - **Accesibilidad:** táctiles de 44 px, `label` en todos los campos, foco `outline: 3px solid; outline-offset: 2px` en color
-  `texto` (claro) y `sol` (oscuro); en campos de texto no hay outline: el foco es el borde del campo en ese color, contraste AA, `prefers-reduced-motion`, errores asociados con `aria-describedby`.
+  `texto` (claro) y `destacado` (oscuro); en campos de texto no hay outline: el foco es el borde del campo en ese color, contraste AA, `prefers-reduced-motion`, errores asociados con `aria-describedby`.
 - **Formularios:** Server Action + esquema Zod + `useActionState`; errores en castellano al lado del campo.
 - **Server Components** por defecto; Server Actions para mutaciones.
 - **Teléfonos:** E.164 (`+549223…`) con `normalizarTelefono` de `src/lib/whatsapp.ts`; links con `linkWhatsApp`.
@@ -66,7 +66,7 @@ Rutas en español sin acentos: `/`, `/ingresar`, `/registro`, `/registro/cliente
 - **Imágenes:** comprimidas en el navegador (máx. 1600 px, calidad 0,8, máx. 2 MB), mostradas con `next/image`.
 - **Diseño ("Verano en la costa"):** tokens de color en `src/app/globals.css` (claro y oscuro): `fondo` arena,
   `superficie` blanca, `texto` azul mar, `accion` turquesa (botón principal y enlaces), `sobre-accion`, `encabezado`
-  turquesa con texto `sobre-encabezado` blanco, `sol` amarillo para lo elegido (texto `sobre-sol`), `coral` solo de adorno
+  turquesa con texto `sobre-encabezado` blanco, `destacado` amarillo para lo elegido (texto `sobre-destacado`), `adorno` solo de adorno
   (nunca texto), `error`, `equipo`, `velo` (fondo de las hojas). Tipografías con `next/font`: Baloo 2 (700 y 800) para
   títulos y la marca (`font-titulo`) y Nunito Sans (400 y 700) para el resto. Referencia de toda pantalla:
   `docs/prototipo-nuevo/` (`README.md` y `CONSTRUCCION.md`). No usar hex fuera de `globals.css`.

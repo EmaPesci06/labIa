@@ -10,7 +10,7 @@ import { SIN_ANILLO_BOTON } from "./foco";
 /**
  * Capa fina sobre el `Button` de shadcn (LAB-86). Variantes de Oficio Seguro → variantes de shadcn:
  * - principal → default: turquesa con texto sobre-accion. Una por pantalla, abajo.
- * - secundario → outline: borde de 3 px `texto` y fondo transparente, como el prototipo (el sol es el
+ * - secundario → outline: borde de 3 px `texto` y fondo transparente, como el prototipo (el destacado es el
  *   color de lo elegido, no de un botón).
  * - peligro → destructive: borde de 3 px `error` sobre superficie (cancelar, borrar, suspender).
  * - enlace → link: texto en negrita con subrayado. Nunca accion sobre arena (4,48:1).

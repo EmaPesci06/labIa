@@ -12,9 +12,9 @@ import { BotonAccionModeracion } from "./BotonAccionModeracion";
 import { ModalSuspender } from "./ModalSuspender";
 
 const ESTILO_ESTADO = {
-  abierto: "bg-sol text-sobre-sol",
+  abierto: "bg-destacado text-sobre-destacado",
   en_revision: "bg-superficie text-texto",
-  resuelto: "bg-sol text-sobre-sol",
+  resuelto: "bg-destacado text-sobre-destacado",
 } as const;
 
 const TEXTO_ESTADO = {

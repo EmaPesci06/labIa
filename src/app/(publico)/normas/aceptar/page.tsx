@@ -21,7 +21,7 @@ async function ContenidoAceptarNormas() {
   return (
     <div className="flex flex-1 flex-col gap-3.5 pt-2 lg:relative lg:left-1/2 lg:w-[min(720px,calc(100vw-80px))] lg:-translate-x-1/2 lg:gap-5">
       <Encabezado
-        variante="sol"
+        variante="destacado"
         titulo="Te abren la puerta de su casa"
         descripcion="Actualizamos las normas. Para seguir usando Oficio Seguro, te comprometés a:"
       />

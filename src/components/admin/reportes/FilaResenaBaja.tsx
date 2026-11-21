@@ -22,7 +22,7 @@ export function FilaResenaBaja({ fila }: { fila: FilaResenaBajaAdmin }) {
             ★ {fila.puntaje} / 5
           </span>
           {fila.reportada ? (
-            <span className="rounded-full bg-sol px-2.5 py-1 text-xs font-bold text-sobre-sol">
+            <span className="rounded-full bg-destacado px-2.5 py-1 text-xs font-bold text-sobre-destacado">
               Reportada
             </span>
           ) : null}

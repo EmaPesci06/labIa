@@ -104,7 +104,7 @@ function BannerDuenio({ publicado }: { publicado: boolean }) {
   return (
     <div
       role="status"
-      className="rounded-[14px] bg-sol p-3.5 text-[15px] leading-snug font-semibold text-sobre-sol"
+      className="rounded-[14px] bg-destacado p-3.5 text-[15px] leading-snug font-semibold text-sobre-destacado"
     >
       {publicado
         ? "Tu perfil está publicado."

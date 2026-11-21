@@ -36,7 +36,7 @@ describe("Boton", () => {
     }
   });
 
-  it("secundario: borde de 3 px color texto y fondo transparente, sin relleno sol", () => {
+  it("secundario: borde de 3 px color texto y fondo transparente, sin relleno destacado", () => {
     render(<Boton variante="secundario">Cancelar</Boton>);
     const boton = screen.getByRole("button", { name: "Cancelar" });
     expect(boton).toHaveClass(

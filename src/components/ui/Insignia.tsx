@@ -64,7 +64,7 @@ type Props = {
 
 /**
  * Insignia de estado o verificación: capa fina sobre el `Badge` de shadcn, píldora en negrita. Verificación y antecedentes van con
- * borde turquesa sobre superficie; matrícula y urgencia en sol; "Contratado" en turquesa.
+ * borde turquesa sobre superficie; matrícula y urgencia en destacado; "Contratado" en turquesa.
  *
  * @example
  * <Insignia variante="verificada" />

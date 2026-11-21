@@ -24,9 +24,9 @@ const MUESTRA: Record<(typeof TOKENS_COLOR)[number], string> = {
   "sobre-accion": "bg-sobre-accion",
   encabezado: "bg-encabezado",
   "sobre-encabezado": "bg-sobre-encabezado",
-  sol: "bg-sol",
-  "sobre-sol": "bg-sobre-sol",
-  coral: "bg-coral",
+  destacado: "bg-destacado",
+  "sobre-destacado": "bg-sobre-destacado",
+  adorno: "bg-adorno",
   error: "bg-error",
   equipo: "bg-equipo",
   velo: "bg-velo",
@@ -36,7 +36,7 @@ const MUESTRA: Record<(typeof TOKENS_COLOR)[number], string> = {
 const PARES = [
   { nombre: "Acción · botón principal", clases: "bg-accion text-sobre-accion" },
   { nombre: "Encabezado", clases: "bg-encabezado text-sobre-encabezado" },
-  { nombre: "Elegido · chip y dato clave", clases: "bg-sol text-sobre-sol" },
+  { nombre: "Elegido · chip y dato clave", clases: "bg-destacado text-sobre-destacado" },
   { nombre: "Equipo · panel de admin", clases: "bg-equipo text-sobre-encabezado" },
   { nombre: "Sin elegir · chip", clases: "bg-superficie text-texto" },
 ];
@@ -89,8 +89,8 @@ function Panel({ tema }: { tema: "claro" | "dark" }) {
         <p className="font-bold text-texto underline">Enlace de texto: negrita en texto.</p>
         <p className="font-bold text-error">Error: revisá este campo.</p>
         <p className="flex items-center gap-2 text-sm">
-          <span aria-hidden className="inline-block size-4 rounded-full bg-coral" />
-          Coral: solo adorno, nunca texto.
+          <span aria-hidden className="inline-block size-4 rounded-full bg-adorno" />
+          Adorno: solo adorno, nunca texto.
         </p>
       </div>
     </section>

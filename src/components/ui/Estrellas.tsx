@@ -47,7 +47,7 @@ function Estrella({ llena }: { llena: boolean }) {
     <Star
       aria-hidden
       strokeWidth={1.5}
-      // Turquesa (accion): ícono, así que alcanza 3:1 sobre superficie y arena. El sol no alcanza.
+      // Turquesa (accion): ícono, así que alcanza 3:1 sobre superficie y arena. El destacado no alcanza.
       className={cn("size-5 text-accion", llena ? "fill-current" : "fill-transparent")}
     />
   );

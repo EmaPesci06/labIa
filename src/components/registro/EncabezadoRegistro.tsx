@@ -13,7 +13,7 @@ type Props = {
 };
 
 /**
- * Encabezado amarillo (`sol`) de los tres pasos del registro profesional (`App-ProPerfil`,
+ * Encabezado amarillo (`destacado`) de los tres pasos del registro profesional (`App-ProPerfil`,
  * `App-ProDocumentos` y `App-ProNormas`). Ocupa todo el ancho y alinea el contenido con la columna
  * centrada de la pantalla.
  */
@@ -26,8 +26,8 @@ export function EncabezadoRegistro({
 }: Props) {
   return (
     <header
-      data-encabezado="sol"
-      className="w-full rounded-b-hoja bg-sol px-5 py-4 text-sobre-sol lg:rounded-b-[40px] lg:px-8 lg:pt-6 lg:pb-7"
+      data-encabezado="destacado"
+      className="w-full rounded-b-hoja bg-destacado px-5 py-4 text-sobre-destacado lg:rounded-b-[40px] lg:px-8 lg:pt-6 lg:pb-7"
     >
       <div
         className={cn(
@@ -50,7 +50,7 @@ export function EncabezadoRegistro({
                   aria-current={activo ? "step" : undefined}
                   className={cn(
                     "border-t-[6px] pt-1.5",
-                    cumplido ? "border-sobre-sol" : "border-superficie",
+                    cumplido ? "border-sobre-destacado" : "border-superficie",
                   )}
                 >
                   {etiqueta}

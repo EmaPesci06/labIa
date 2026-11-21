@@ -38,7 +38,7 @@ const TEXTO_ESTADO: Record<
   enviada: {
     titulo: "Postulación enviada",
     detalle: (cliente) => `${cliente} ve tu mensaje y, si te elige, te escribe por WhatsApp.`,
-    toldo: "sol",
+    toldo: "destacado",
     icono: true,
   },
   elegida: {
@@ -148,7 +148,7 @@ export function FormularioPostulacion({
         <p
           id={idError}
           role="alert"
-          className="rounded-xl bg-sol p-3 text-sm font-bold text-sobre-sol"
+          className="rounded-xl bg-destacado p-3 text-sm font-bold text-sobre-destacado"
         >
           {estado.mensaje}
         </p>

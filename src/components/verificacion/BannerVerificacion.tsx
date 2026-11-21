@@ -23,7 +23,7 @@ export function BannerVerificacion({ resumen }: { resumen: ResumenBanner | null 
   return (
     <div
       role="status"
-      className="flex flex-col gap-2 rounded-[14px] bg-sol p-3.5 text-sm leading-snug text-sobre-sol sm:flex-row sm:items-center sm:justify-between"
+      className="flex flex-col gap-2 rounded-[14px] bg-destacado p-3.5 text-sm leading-snug text-sobre-destacado sm:flex-row sm:items-center sm:justify-between"
     >
       <p>
         Revisá tus documentos: {resumen.documento} · {resumen.motivo}

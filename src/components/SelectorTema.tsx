@@ -40,7 +40,7 @@ export function SelectorTema({ className, etiqueta = "Tema" }: Props) {
         {PREFERENCIAS_TEMA.map((opcion) => (
           <label
             key={opcion}
-            className="flex min-h-11 min-w-11 cursor-pointer items-center justify-center gap-1.5 rounded-full bg-fondo px-2 text-[15px] text-texto has-checked:bg-sol has-checked:font-bold has-checked:text-sobre-sol has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-foco"
+            className="flex min-h-11 min-w-11 cursor-pointer items-center justify-center gap-1.5 rounded-full bg-fondo px-2 text-[15px] text-texto has-checked:bg-destacado has-checked:font-bold has-checked:text-sobre-destacado has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-foco"
           >
             <input
               type="radio"

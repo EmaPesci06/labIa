@@ -49,7 +49,7 @@ function Fila({ fila }: { fila: FilaProfesional }) {
               className={cn(
                 "rounded-full px-3 py-1 text-sm font-bold",
                 // Más de 48 h: rojo de error con texto de superficie, como en el boceto.
-                enRojo ? "bg-error text-sobre-accion" : "bg-sol text-sobre-sol",
+                enRojo ? "bg-error text-sobre-accion" : "bg-destacado text-sobre-destacado",
               )}
             >
               Envió {haceCuanto(espera)}
@@ -98,7 +98,7 @@ export default async function Verificaciones({ searchParams }: Props) {
                     className={cn(
                       "inline-flex min-h-11 items-center rounded-full px-4 text-[15px] font-bold",
                       activa
-                        ? "bg-sol text-sobre-sol"
+                        ? "bg-destacado text-sobre-destacado"
                         : "border-2 border-texto bg-superficie text-texto",
                     )}
                   >

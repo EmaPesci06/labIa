@@ -30,7 +30,7 @@ export function ProblemasFrecuentes({ problemaActual, barrio }: Props) {
             className={cn(
               "inline-flex min-h-12 items-center rounded-full px-4 text-base no-underline",
               activo
-                ? "bg-sol font-bold text-sobre-sol hover:bg-sol"
+                ? "bg-destacado font-bold text-sobre-destacado hover:bg-destacado"
                 : "bg-superficie text-texto hover:bg-superficie hover:text-texto",
               problema.soloEscritorio && "hidden lg:inline-flex",
             )}

@@ -93,7 +93,7 @@ test.describe("publicar un trabajo (cliente)", () => {
     await page.emulateMedia({ colorScheme: "dark" });
     await page.goto("/trabajos/nuevo");
     await expect(page.getByRole("heading", { level: 1, name: "Contanos qué pasó" })).toBeVisible();
-    // El radio elegido sobre fondo sol mantiene fondo sobre-sol (#123b4a) en oscuro (contraste AA).
+    // El radio elegido sobre fondo destacado mantiene fondo sobre-destacado (#123b4a) en oscuro (contraste AA).
     await expect(page.getByRole("radio", { name: "Hoy" })).toHaveCSS(
       "background-color",
       "rgb(18, 59, 74)",

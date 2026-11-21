@@ -42,7 +42,7 @@ const leerDelNavegador = () => leerPreferencia(document.cookie);
 const leerEnServidor = () => null;
 
 const ITEM =
-  "min-h-11 cursor-pointer gap-3 rounded-xl px-3 text-[15px] font-bold text-texto focus:bg-sol focus:text-sobre-sol";
+  "min-h-11 cursor-pointer gap-3 rounded-xl px-3 text-[15px] font-bold text-texto focus:bg-destacado focus:text-sobre-destacado";
 
 /**
  * Avatar de la barra superior sobre `DropdownMenu` de shadcn: Mi cuenta, Tema y Salir.
@@ -101,7 +101,7 @@ export function MenuAvatar({ nombre }: Props) {
                   key={opcion}
                   value={opcion}
                   closeOnClick={false}
-                  className="min-h-11 cursor-pointer rounded-xl px-3 pr-9 text-[15px] font-normal text-texto focus:bg-sol focus:text-sobre-sol"
+                  className="min-h-11 cursor-pointer rounded-xl px-3 pr-9 text-[15px] font-normal text-texto focus:bg-destacado focus:text-sobre-destacado"
                 >
                   {ETIQUETAS_TEMA[opcion]}
                 </DropdownMenuRadioItem>
@@ -113,7 +113,7 @@ export function MenuAvatar({ nombre }: Props) {
 
           <DropdownMenuItem
             onClick={() => formSalir.current?.requestSubmit()}
-            className="min-h-11 cursor-pointer gap-3 rounded-xl px-3 text-[15px] font-bold text-texto focus:bg-sol focus:text-sobre-sol"
+            className="min-h-11 cursor-pointer gap-3 rounded-xl px-3 text-[15px] font-bold text-texto focus:bg-destacado focus:text-sobre-destacado"
           >
             <LogOut aria-hidden strokeWidth={2} className="size-5" />
             Salir

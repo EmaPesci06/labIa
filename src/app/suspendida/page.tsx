@@ -28,7 +28,7 @@ async function Contenido() {
   const emailContacto = process.env.EMAIL_SOPORTE || "soporte@labia.com.ar";
 
   return (
-    <div className="flex min-h-dvh flex-col bg-equipo text-sobre-encabezado [&_:focus-visible]:outline-sol">
+    <div className="flex min-h-dvh flex-col bg-equipo text-sobre-encabezado [&_:focus-visible]:outline-destacado">
       <SaltarAlContenido />
       <header className="mx-auto w-full max-w-[720px] px-6 pt-4 pb-0 lg:pt-6">
         <Logo alt="Oficio Seguro" sobre="encabezado" />
@@ -77,7 +77,7 @@ async function Contenido() {
         <div className="mt-6 flex flex-col gap-2">
           <a
             href={`mailto:${emailContacto}?subject=Apelaci%C3%B3n%20de%20cuenta%20suspendida`}
-            className="flex min-h-14 items-center justify-center rounded-2xl bg-sol px-6 text-lg font-bold text-sobre-sol no-underline transition-colors hover:bg-sol/90"
+            className="flex min-h-14 items-center justify-center rounded-2xl bg-destacado px-6 text-lg font-bold text-sobre-destacado no-underline transition-colors hover:bg-destacado/90"
           >
             Pedir una apelación
           </a>

@@ -37,7 +37,7 @@ type PropsPerfil = {
 
 /**
  * Foto de perfil (`App-ProPerfil`): círculo de 72 px con borde punteado (o la foto con borde
- * `sol`) y botón secundario "Subir tu foto".
+ * `destacado`) y botón secundario "Subir tu foto".
  */
 export function CargaFotoPerfil({ foto, onElegir, onQuitar, ocupado, error }: PropsPerfil) {
   const entrada = useRef<HTMLInputElement>(null);
@@ -46,7 +46,7 @@ export function CargaFotoPerfil({ foto, onElegir, onQuitar, ocupado, error }: Pr
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center gap-3.5">
         {foto ? (
-          <div className="relative size-[72px] shrink-0 overflow-hidden rounded-full border-[3px] border-sol">
+          <div className="relative size-[72px] shrink-0 overflow-hidden rounded-full border-[3px] border-destacado">
             <Image
               src={foto.vista}
               alt="Tu foto de perfil"

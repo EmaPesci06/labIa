@@ -18,7 +18,10 @@ export function FormularioRegistro({ rol }: { rol: "cliente" | "profesional" }) 
 
   if (estado.exito) {
     return (
-      <p role="status" className="rounded-xl bg-sol p-4 text-[15px] font-semibold text-sobre-sol">
+      <p
+        role="status"
+        className="rounded-xl bg-destacado p-4 text-[15px] font-semibold text-sobre-destacado"
+      >
         {estado.exito}
       </p>
     );

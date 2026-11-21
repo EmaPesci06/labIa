@@ -32,9 +32,9 @@
   --color-sobre-accion: #ffffff;
   --color-encabezado: #0e7c86;
   --color-sobre-encabezado: #ffffff;
-  --color-sol: #f7c948;
-  --color-sobre-sol: #123b4a;
-  --color-coral: #f25c54;
+  --color-destacado: #f7c948;
+  --color-sobre-destacado: #123b4a;
+  --color-adorno: #f25c54;
   --color-error: #a62b24;
   --color-equipo: #123b4a;
   /* Logo: la insignia de la marca (naranja obra) y la llave dentro de ella. Solo para el logo. */
@@ -43,7 +43,7 @@
 
   /* Fondo detrás de las hojas inferiores (se usa con opacidad en el componente). */
   --color-velo: #123b4a;
-  /* Foco: outline de 3 px en claro; en oscuro cambia a sol. */
+  /* Foco: outline de 3 px en claro; en oscuro cambia a destacado. */
   --color-foco: #123b4a;
 }
 
@@ -60,9 +60,9 @@
   --color-sobre-accion: #0b2730;
   --color-encabezado: #0e7c86;
   --color-sobre-encabezado: #ffffff;
-  --color-sol: #f7c948;
-  --color-sobre-sol: #123b4a;
-  --color-coral: #f25c54;
+  --color-destacado: #f7c948;
+  --color-sobre-destacado: #123b4a;
+  --color-adorno: #f25c54;
   --color-error: #ff9a8f;
   --color-equipo: #17485a;
   --color-marca: #e0592a;
@@ -76,7 +76,7 @@
  * Variables de shadcn atadas a nuestros tokens (LAB-82). Se declaran en los tres selectores para que
  * un bloque .claro dentro de .dark (o al revés) resuelva los tokens de su propio tema.
  * No hay --destructive-foreground (shadcn no lo tiene): el texto sobre error se resuelve con
- * className en la capa fina. Los tokens sin equivalente (sol, coral, velo, equipo, encabezado)
+ * className en la capa fina. Los tokens sin equivalente (destacado, adorno, velo, equipo, encabezado)
  * quedan como tokens propios.
  */
 :root,
@@ -92,10 +92,10 @@
   --popover-foreground: var(--color-texto);
   --primary: var(--color-accion);
   --primary-foreground: var(--color-sobre-accion);
-  --secondary: var(--color-sol);
-  --secondary-foreground: var(--color-sobre-sol);
-  --accent: var(--color-sol);
-  --accent-foreground: var(--color-sobre-sol);
+  --secondary: var(--color-destacado);
+  --secondary-foreground: var(--color-sobre-destacado);
+  --accent: var(--color-destacado);
+  --accent-foreground: var(--color-sobre-destacado);
   --muted: var(--color-fondo);
   --muted-foreground: var(--color-texto-suave);
   --destructive: var(--color-error);
@@ -109,13 +109,13 @@
   --sidebar-foreground: var(--color-texto);
   --sidebar-primary: var(--color-accion);
   --sidebar-primary-foreground: var(--color-sobre-accion);
-  --sidebar-accent: var(--color-sol);
-  --sidebar-accent-foreground: var(--color-sobre-sol);
+  --sidebar-accent: var(--color-destacado);
+  --sidebar-accent-foreground: var(--color-sobre-destacado);
   --sidebar-border: var(--color-borde);
   --sidebar-ring: var(--color-foco);
   --chart-1: var(--color-accion);
-  --chart-2: var(--color-sol);
-  --chart-3: var(--color-coral);
+  --chart-2: var(--color-destacado);
+  --chart-3: var(--color-adorno);
   --chart-4: var(--color-texto);
   --chart-5: var(--color-texto-suave);
 }
@@ -140,9 +140,9 @@
   --color-sobre-accion: var(--color-sobre-accion);
   --color-encabezado: var(--color-encabezado);
   --color-sobre-encabezado: var(--color-sobre-encabezado);
-  --color-sol: var(--color-sol);
-  --color-sobre-sol: var(--color-sobre-sol);
-  --color-coral: var(--color-coral);
+  --color-destacado: var(--color-destacado);
+  --color-sobre-destacado: var(--color-sobre-destacado);
+  --color-adorno: var(--color-adorno);
   --color-error: var(--color-error);
   --color-equipo: var(--color-equipo);
   --color-marca: var(--color-marca);
@@ -232,7 +232,7 @@
     @apply bg-fondo font-texto text-texto;
   }
 
-  /* Foco: 3 px sólidos, color texto en claro y sol en oscuro (token foco). */
+  /* Foco: 3 px sólidos, color texto en claro y destacado en oscuro (token foco). */
   :focus-visible {
     outline: 3px solid var(--color-foco);
     outline-offset: 2px;

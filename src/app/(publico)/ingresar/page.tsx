@@ -28,7 +28,10 @@ async function Contenido({ searchParams }: PageProps<"/ingresar">) {
   return (
     <>
       {error ? (
-        <p role="alert" className="rounded-xl bg-sol p-3.5 text-sm font-bold text-sobre-sol">
+        <p
+          role="alert"
+          className="rounded-xl bg-destacado p-3.5 text-sm font-bold text-sobre-destacado"
+        >
           {error}
         </p>
       ) : null}

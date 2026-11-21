@@ -136,13 +136,13 @@ export function MuestraComponentes() {
         />
         <Encabezado
           nivel={2}
-          variante="sol"
-          titulo="Chips dentro de un encabezado sol"
+          variante="destacado"
+          titulo="Chips dentro de un encabezado destacado"
           className="rounded-3xl"
         >
           <GrupoChips
             tipo="unica"
-            etiqueta="Oficio sobre sol"
+            etiqueta="Oficio sobre destacado"
             opciones={OFICIOS}
             valor={oficio}
             onChange={setOficio}
@@ -163,7 +163,12 @@ export function MuestraComponentes() {
           titulo="Equipo"
           descripcion="Panel de administración."
         />
-        <Encabezado nivel={2} variante="sol" titulo="Sol" descripcion="Texto azul noche." />
+        <Encabezado
+          nivel={2}
+          variante="destacado"
+          titulo="Destacado"
+          descripcion="Texto azul noche."
+        />
         <Encabezado
           nivel={2}
           variante="plano"
@@ -174,9 +179,9 @@ export function MuestraComponentes() {
 
       <Seccion titulo="Toldos">
         <Toldo color="accion" alto={14} />
-        <Toldo color="sol" alto={18} />
+        <Toldo color="destacado" alto={18} />
         <Toldo color="texto" alto={22} />
-        <Toldo color="coral" alto={26} />
+        <Toldo color="adorno" alto={26} />
       </Seccion>
 
       <Seccion titulo="Insignias">

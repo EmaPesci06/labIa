@@ -7,8 +7,8 @@ import { FormularioDecision } from "./FormularioDecision";
 import { VisorDocumento } from "./VisorDocumento";
 
 const ESTILO_ESTADO = {
-  pendiente: "bg-sol text-sobre-sol",
-  aprobado: "bg-sol text-sobre-sol",
+  pendiente: "bg-destacado text-sobre-destacado",
+  aprobado: "bg-destacado text-sobre-destacado",
   rechazado: "border border-error bg-superficie text-error",
 } as const;
 
@@ -41,7 +41,7 @@ export function DocumentoRevision({ documento }: { documento: DocumentoAdmin }) 
       </p>
 
       {documento.estado === "rechazado" && documento.motivoRechazo ? (
-        <p className="rounded-[12px] bg-sol p-3 text-sm text-sobre-sol">
+        <p className="rounded-[12px] bg-destacado p-3 text-sm text-sobre-destacado">
           Motivo: {documento.motivoRechazo}
         </p>
       ) : null}
