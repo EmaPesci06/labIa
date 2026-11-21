@@ -1,3 +1,8 @@
+> **Referencia vieja.** Este prototipo es del diseño "Verano en la costa" (turquesa, sol y coral; Baloo 2 y Nunito Sans; toldo), retirado.
+> La identidad vigente es "Papelería sellada" de Oficio Seguro: paleta en `src/app/globals.css`, tipografías en `src/app/fuentes.ts`,
+> motivos `Sello`, `FranjaRubro` (`trama`) y `corte-cupon`. Sigue valiendo solo para la estructura de las pantallas
+> (qué lleva cada una, flujos y rutas); colores, tipografías, toldo y nombres de tokens (`sol`, `coral`, `turquesa`) no.
+
 # Cómo construir una pantalla de la interfaz nueva
 
 Guía para los constructores de los dos orquestadores (Claude y Gemini). Leela junto con `README.md` de esta carpeta:

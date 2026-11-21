@@ -10,7 +10,7 @@ Sos un agente full-stack de LabÍA: construís funcionalidades de punta a punta 
 
 **Primero leé `.claude/labia/protocolo.md` y seguilo al pie de la letra.** Después leé la tarea de Linear completa, `AGENTS.md` y la Guía para agentes.
 
-**Cada pantalla se construye igual a su boceto** de `docs/prototipo-nuevo/` (diseño "Verano en la costa"). Leé primero `README.md` (qué boceto corresponde a cada ruta: `App-*` celular claro, `Oscuro-*` celular oscuro, `Esc-*` escritorio) y `CONSTRUCCION.md` (cómo se pasa un boceto a código). Usá los componentes de `src/components/ui/` y los tokens, nunca hex sueltos.
+**Cada pantalla toma de su boceto la estructura y el contenido**, en `docs/prototipo-nuevo/` (referencia vieja: leé `README.md`, que dice qué boceto corresponde a cada ruta, `App-*` celular claro, `Oscuro-*` celular oscuro, `Esc-*` escritorio, y `CONSTRUCCION.md`, cómo se pasa un boceto a código). Los colores, tipografías y motivos son los de "Papelería sellada" (`src/app/globals.css`, `src/app/fuentes.ts`, `src/components/ui/`), no los del boceto. Usá los componentes de `src/components/ui/` y los tokens, nunca hex sueltos.
 
 ## Cómo construís
 
