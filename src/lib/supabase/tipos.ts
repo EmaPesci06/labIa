@@ -379,14 +379,14 @@ isOneToOne: false
                   ]
                 },"usuarios": {
                   Row: {
-                    "apellido": string | null,"barrio_id": number | null,"created_at": string,"datos_sensibles_consentido_at": string | null,"datos_sensibles_version": string | null,"estado": Database["public"]['Enums']["estado_cuenta"],"foto_path": string | null,"id": string,"nombre": string | null,"normas_aceptadas_at": string | null,"normas_version": string | null,"rol": Database["public"]['Enums']["rol"],"updated_at": string,"whatsapp": string | null
+                    "apellido": string | null,"barrio_id": number | null,"created_at": string,"datos_sensibles_consentido_at": string | null,"datos_sensibles_version": string | null,"estado": Database["public"]['Enums']["estado_cuenta"],"foto_path": string | null,"id": string,"nombre": string | null,"normas_aceptadas_at": string | null,"normas_version": string | null,"rol": Database["public"]['Enums']["rol"],"terminos_aceptados_at": string | null,"terminos_version": string | null,"updated_at": string,"whatsapp": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "apellido"?: string | null,"barrio_id"?: number | null,"created_at"?: string,"datos_sensibles_consentido_at"?: string | null,"datos_sensibles_version"?: string | null,"estado"?: Database["public"]['Enums']["estado_cuenta"],"foto_path"?: string | null,"id": string,"nombre"?: string | null,"normas_aceptadas_at"?: string | null,"normas_version"?: string | null,"rol"?: Database["public"]['Enums']["rol"],"updated_at"?: string,"whatsapp"?: string | null
+                    "apellido"?: string | null,"barrio_id"?: number | null,"created_at"?: string,"datos_sensibles_consentido_at"?: string | null,"datos_sensibles_version"?: string | null,"estado"?: Database["public"]['Enums']["estado_cuenta"],"foto_path"?: string | null,"id": string,"nombre"?: string | null,"normas_aceptadas_at"?: string | null,"normas_version"?: string | null,"rol"?: Database["public"]['Enums']["rol"],"terminos_aceptados_at"?: string | null,"terminos_version"?: string | null,"updated_at"?: string,"whatsapp"?: string | null
                   }
                   Update: {
-                    "apellido"?: string | null,"barrio_id"?: number | null,"created_at"?: string,"datos_sensibles_consentido_at"?: string | null,"datos_sensibles_version"?: string | null,"estado"?: Database["public"]['Enums']["estado_cuenta"],"foto_path"?: string | null,"id"?: string,"nombre"?: string | null,"normas_aceptadas_at"?: string | null,"normas_version"?: string | null,"rol"?: Database["public"]['Enums']["rol"],"updated_at"?: string,"whatsapp"?: string | null
+                    "apellido"?: string | null,"barrio_id"?: number | null,"created_at"?: string,"datos_sensibles_consentido_at"?: string | null,"datos_sensibles_version"?: string | null,"estado"?: Database["public"]['Enums']["estado_cuenta"],"foto_path"?: string | null,"id"?: string,"nombre"?: string | null,"normas_aceptadas_at"?: string | null,"normas_version"?: string | null,"rol"?: Database["public"]['Enums']["rol"],"terminos_aceptados_at"?: string | null,"terminos_version"?: string | null,"updated_at"?: string,"whatsapp"?: string | null
                   }
                   Relationships: [
                     {
@@ -513,6 +513,9 @@ isOneToOne: false
 { Args: { "p_version": string }; Returns: undefined
                            },
 "aceptar_normas":
+{ Args: { "p_version": string }; Returns: undefined
+                           },
+"aceptar_terminos":
 { Args: { "p_version": string }; Returns: undefined
                            },
 "actualizar_whatsapp":

@@ -1,3 +1,4 @@
+import { tokenJwt } from "./apoyo/token";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 import { writeFileSync } from "node:fs";
@@ -34,6 +35,7 @@ const RUTAS_PUBLICAS = [
   "/restablecer",
   "/sin-conexion",
   "/cuenta-eliminada",
+  "/baja",
 ];
 
 /** Pantallas del cliente (sesión falsa de rol cliente). */
@@ -58,6 +60,8 @@ const RUTAS_PROFESIONAL = [
   "/cuenta/perfil",
   "/cuenta/verificacion",
   `/profesionales/${ID_PUBLICADO}`,
+  "/registro/profesional/normas",
+  "/registro/profesional/listo",
 ];
 
 /** Pantallas del admin (sesión real contra el falso con el token de admin). */
@@ -72,7 +76,7 @@ const base64url = (texto: string) => Buffer.from(texto).toString("base64url");
 /** Cookie de sesión de @supabase/ssr contra el falso (mismo formato que reportes-moderacion). */
 async function sesionFalsa(contexto: BrowserContext, baseURL: string, token: string) {
   const sesion = {
-    access_token: token,
+    access_token: tokenJwt(token),
     refresh_token: "refresh-falso",
     token_type: "bearer",
     expires_in: 3600,
@@ -93,15 +97,20 @@ async function abrir(page: Page, ruta: string, esquema: Esquema) {
   await page.emulateMedia({ colorScheme: COLOR_ESQUEMA[esquema] });
   const respuesta = await page.goto(ruta);
   expect(respuesta?.status(), `respuesta de ${ruta}`).toBeLessThan(400);
-  await expect(page.locator("h1, main").first()).toBeVisible();
+  // Esperá al h1 visible: el contenido con Suspense llega después de <main>, y axe pide un h1.
+  await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
+  // Tras hidratar, algunas pantallas navegan solas (en escritorio /mis-trabajos agrega ?id= con
+  // router.replace) y durante esa navegación el <title> falta un instante: se espera a que se asiente.
+  await page.waitForLoadState("networkidle");
+  await expect(page).toHaveTitle(/.+/);
 }
 
-/** Axe con impacto serio o crítico. Devuelve un resumen legible para el reporte. */
-async function serias(page: Page) {
+/** Axe con todas las infracciones (LAB-81: sin excepciones, también las menores). */
+async function infracciones(page: Page) {
   const resultado = await new AxeBuilder({ page }).analyze();
-  return resultado.violations
-    .filter((v) => v.impact === "serious" || v.impact === "critical")
-    .map((v) => `${v.impact} · ${v.id}: ${v.nodes.length} nodo(s) · ${v.help}`);
+  return resultado.violations.map(
+    (v) => `${v.impact} · ${v.id}: ${v.nodes.length} nodo(s) · ${v.help}`,
+  );
 }
 
 const grupos: Array<{ nombre: string; baseURL: string; rutas: string[]; sesion?: string }> = [
@@ -116,9 +125,7 @@ test.describe("pase final · axe en todas las pantallas", () => {
 
   for (const grupo of grupos) {
     for (const esquema of ESQUEMAS) {
-      test(`${grupo.nombre} · sin violaciones serias ni críticas (${esquema})`, async ({
-        browser,
-      }) => {
+      test(`${grupo.nombre} · sin infracciones de axe (${esquema})`, async ({ browser }) => {
         const contexto = await browser.newContext({
           locale: "es-AR",
           timezoneId: "America/Argentina/Buenos_Aires",
@@ -128,7 +135,7 @@ test.describe("pase final · axe en todas las pantallas", () => {
         const fallos: string[] = [];
         for (const ruta of grupo.rutas) {
           await abrir(page, `${grupo.baseURL}${ruta}`, esquema);
-          const graves = await serias(page);
+          const graves = await infracciones(page);
           for (const g of graves) fallos.push(`${ruta} → ${g}`);
         }
         await contexto.close();

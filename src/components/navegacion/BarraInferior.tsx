@@ -24,7 +24,7 @@ function Lista({ destinos, esActivo }: PropsLista) {
               href={destino.href}
               aria-current={activo ? "page" : undefined}
               className={cn(
-                "flex min-h-12 w-full items-center justify-center rounded-campo text-[15px] text-texto",
+                "flex min-h-12 w-full items-center justify-center rounded-xl text-[15px] text-texto",
                 // Sección actual: pastilla `fondo` de radio 16, en negrita (boceto App-Buscar).
                 activo ? "bg-fondo font-bold" : "font-normal",
               )}

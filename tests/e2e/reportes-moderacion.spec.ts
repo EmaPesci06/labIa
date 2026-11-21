@@ -1,3 +1,4 @@
+import { tokenJwt } from "./apoyo/token";
 import AxeBuilder from "@axe-core/playwright";
 import {
   expect,
@@ -7,6 +8,7 @@ import {
   type Page,
   type TestInfo,
 } from "@playwright/test";
+import { esperarHojaQuieta } from "./apoyo/hoja";
 
 // LAB-32: reportes y moderación con el Supabase FALSO (tests/e2e/apoyo/supabase-falso.cjs).
 // Cubre: reportar perfil, trabajo y reseña (hoja, motivos, límite de detalle, errores junto al mensaje);
@@ -58,7 +60,7 @@ const base64url = (texto: string) => Buffer.from(texto).toString("base64url");
 async function iniciarSesion(contexto: BrowserContext, baseURL: string, token: Token) {
   const exp = Math.floor(Date.now() / 1000) + 3600;
   const sesion = {
-    access_token: token,
+    access_token: tokenJwt(token),
     refresh_token: "refresh-falso",
     token_type: "bearer",
     expires_in: 3600,
@@ -132,7 +134,7 @@ test.describe("reportes del cliente y del profesional", () => {
     await expect(hoja).toBeVisible();
     await expect(hoja.getByRole("button", { name: "Enviar reporte" })).toBeDisabled();
 
-    await hoja.getByLabel(MOTIVO_ESTAFA).check();
+    await hoja.getByRole("radio", { name: MOTIVO_ESTAFA }).check();
     await expect(hoja.getByRole("button", { name: "Enviar reporte" })).toBeEnabled();
 
     const detalle = hoja.getByLabel("Contanos qué pasó");
@@ -151,7 +153,7 @@ test.describe("reportes del cliente y del profesional", () => {
     // Segundo reporte sobre el mismo perfil (tras recargar): el servidor lo rechaza junto al formulario.
     await page.reload();
     await botonVisible(page, "Reportar este perfil").click();
-    await hoja.getByLabel(MOTIVO_CONTENIDO).check();
+    await hoja.getByRole("radio", { name: MOTIVO_CONTENIDO }).check();
     await hoja.getByRole("button", { name: "Enviar reporte" }).click();
     await expect(hoja.getByRole("alert").filter({ hasText: YA_REPORTADO })).toBeVisible();
   });
@@ -192,7 +194,7 @@ test.describe("reportes del cliente y del profesional", () => {
       .click();
     const hoja = hojaDeReporte(page);
     await expect(hoja).toBeVisible();
-    await hoja.getByLabel(MOTIVO_CONTENIDO).check();
+    await hoja.getByRole("radio", { name: MOTIVO_CONTENIDO }).check();
     await capturar(page, "reporte-resena", "claro");
     await hoja.getByRole("button", { name: "Enviar reporte" }).click();
     await expect(hoja.getByText("Gracias por avisarnos.")).toBeVisible();
@@ -211,7 +213,7 @@ test.describe("reportes del cliente y del profesional", () => {
       .getByRole("button", { name: "Reportar", exact: true })
       .click();
     const hoja = hojaDeReporte(page);
-    await hoja.getByLabel(MOTIVO_CONTENIDO).check();
+    await hoja.getByRole("radio", { name: MOTIVO_CONTENIDO }).check();
     await hoja.getByRole("button", { name: "Enviar reporte" }).click();
     await expect(
       hoja.getByRole("alert").filter({ hasText: "No podés reportar tu propia reseña." }),
@@ -230,8 +232,10 @@ test.describe("reportes del cliente y del profesional", () => {
       await page.emulateMedia({ colorScheme: tema === "oscuro" ? "dark" : "light" });
       await botonVisible(page, "Reportar este perfil").click();
       const hoja = hojaDeReporte(page);
-      await expect(hoja).toBeVisible();
-      await hoja.getByLabel(MOTIVO_ESTAFA).check();
+      await esperarHojaQuieta(page, hoja);
+      const radioEstafa = hoja.getByRole("radio", { name: MOTIVO_ESTAFA });
+      await radioEstafa.check();
+      await expect(radioEstafa).toHaveCSS("background-color", "rgb(18, 59, 74)");
       await capturar(page, "reporte-hoja", tema);
       // Solo la hoja: la página de fondo queda atenuada por el velo y axe mide ese color mezclado.
       const resultado = await new AxeBuilder({ page }).include('[role="dialog"]').analyze();
@@ -250,9 +254,9 @@ test.describe("reportes del cliente y del profesional", () => {
     );
     await page.goto(`/trabajos/${escritorio ? TRABAJO_OLOR_GAS : TRABAJO_OTRO}`);
 
-    await botonVisible(page, "Reportar trabajo").click();
+    await botonVisible(page, "Reportar este trabajo").click();
     const hoja = hojaDeReporte(page);
-    await hoja.getByLabel(MOTIVO_ESTAFA).check();
+    await hoja.getByRole("radio", { name: MOTIVO_ESTAFA }).check();
     await hoja.getByRole("button", { name: "Enviar reporte" }).click();
     await expect(hoja.getByText("Gracias por avisarnos.")).toBeVisible();
   });
@@ -357,8 +361,27 @@ test.describe("moderación del admin", () => {
       moderado.page.getByRole("heading", { name: "Tu cuenta fue suspendida" }),
     ).toBeVisible();
     await expect(moderado.page.getByText(MOTIVO_SUSPENSION)).toBeVisible();
-    await capturar(moderado.page, "suspendida", "claro");
-    expect(graves(await new AxeBuilder({ page: moderado.page }).analyze())).toEqual([]);
+    // Axe sin filtrar por gravedad, en claro y oscuro, a 1440 y a 390 px.
+    for (const ancho of [1440, 390]) {
+      await moderado.page.setViewportSize({ width: ancho, height: ancho === 390 ? 844 : 900 });
+      for (const tema of ["claro", "oscuro"] as const) {
+        await moderado.page.emulateMedia({ colorScheme: tema === "oscuro" ? "dark" : "light" });
+        await capturar(moderado.page, "suspendida", tema);
+        const resultado = await new AxeBuilder({ page: moderado.page }).analyze();
+        expect(resultado.violations, `${ancho}px ${tema}`).toEqual([]);
+      }
+    }
+    await moderado.page.setViewportSize({ width: 1440, height: 900 });
+    await moderado.page.emulateMedia({ colorScheme: "light" });
+
+    // LAB-81: sobre el fondo `equipo` el foco por teclado va en `sol` (en claro `foco` y `equipo` son
+    // el mismo azul y el anillo no se vería).
+    await moderado.page.keyboard.press("Tab");
+    const apelar = moderado.page.getByRole("link", { name: "Pedir una apelación" });
+    await apelar.focus();
+    await expect(apelar).toBeFocused();
+    await expect(apelar).toHaveCSS("outline-color", "rgb(247, 201, 72)");
+    await expect(apelar).toHaveCSS("outline-style", "solid");
     await moderado.contexto.close();
   });
 

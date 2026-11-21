@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import { elegirBarrio } from "@/lib/barrios-busqueda";
 import { barrioDeLaCuenta, obtenerBarrios } from "@/lib/busqueda-servidor";
+import { altaIncompleta, RUTA_COMPLETAR_ALTA } from "@/lib/auth/alta";
 import { inicioDelRol } from "@/lib/auth/rutas";
 import { destinoParaAceptarNormas } from "@/lib/normas";
 import { navegacionPara } from "@/lib/navegacion";
@@ -17,9 +18,15 @@ import { BarraSuperior } from "./BarraSuperior";
  * `proxy.ts` ya protege las rutas; esto es la segunda barrera si algo llega sin sesión.
  */
 export async function ShellApp({ children }: { children: ReactNode }) {
-  const sesion = await obtenerSesion();
+  // La sesión y los barrios no dependen una de otra: se piden juntas (LAB-88). Los barrios son
+  // lectura pública y están memorizados por pedido, así que las páginas que también los usan no
+  // los vuelven a pedir.
+  const [sesion, barrios] = await Promise.all([obtenerSesion(), obtenerBarrios()]);
   if (!sesion) redirect("/ingresar");
   if (sesion.rol === "admin") redirect(inicioDelRol("admin"));
+
+  // LAB-81: un cliente que no aceptó "mayor de 18 y términos" termina el alta antes de seguir.
+  if (altaIncompleta(sesion)) redirect(RUTA_COMPLETAR_ALTA);
 
   // LAB-20: un profesional sin las normas vigentes las acepta antes de seguir.
   const aceptarNormas = destinoParaAceptarNormas(sesion.rol, sesion.normasVersion);
@@ -30,7 +37,6 @@ export async function ShellApp({ children }: { children: ReactNode }) {
   // LAB-71: el cliente ve su barrio en la barra superior ("Estás en …") y puede cambiarlo.
   let barrio: { actual: string; barrios: Awaited<ReturnType<typeof obtenerBarrios>> } | undefined;
   if (sesion.rol === "cliente") {
-    const barrios = await obtenerBarrios();
     barrio = {
       actual: elegirBarrio(barrios, undefined, await barrioDeLaCuenta(sesion)),
       barrios,

@@ -5,11 +5,12 @@ import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { altaIncompleta, MENSAJE_ALTA_INCOMPLETA } from "@/lib/auth/alta";
 import { rolFalso } from "@/lib/auth/sesion-falsa";
 import type { EstadoFormulario } from "@/lib/auth/estado";
 import { registrarEventoServidor } from "@/lib/metricas-servidor";
 import { limitarPersistente } from "@/lib/rate-limit-persistente";
-import { obtenerSesion } from "@/lib/sesion";
+import { obtenerSesionVerificada } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import { avisarEleccion, avisarNuevaPostulacion } from "@/lib/emails/avisos";
 import {
@@ -57,11 +58,12 @@ export async function publicarTrabajo(
     presupuesto: texto(datos, "presupuesto"),
   };
 
-  const sesion = await obtenerSesion();
+  const sesion = await obtenerSesionVerificada();
   if (!sesion) return { mensaje: "Ingresá para publicar un trabajo.", valores };
   if (sesion.rol !== "cliente") {
     return { mensaje: "Solo los clientes pueden publicar trabajos.", valores };
   }
+  if (altaIncompleta(sesion)) return { mensaje: MENSAJE_ALTA_INCOMPLETA, valores };
 
   const resultado = esquemaTrabajo.safeParse({
     ...valores,
@@ -135,8 +137,8 @@ export async function publicarTrabajo(
 
 /** Guarda en el trabajo las rutas de las fotos que el navegador ya subió. */
 export async function adjuntarFotos(trabajoId: string, rutas: string[]): Promise<{ ok: boolean }> {
-  const sesion = await obtenerSesion();
-  if (!sesion || sesion.rol !== "cliente") return { ok: false };
+  const sesion = await obtenerSesionVerificada();
+  if (!sesion || sesion.rol !== "cliente" || altaIncompleta(sesion)) return { ok: false };
   if (!esUuid(trabajoId)) return { ok: false };
   const validas = esquemaFotos(trabajoId, sesion.usuario.id).safeParse(rutas);
   if (!validas.success) return { ok: false };
@@ -161,7 +163,7 @@ export async function adjuntarFotos(trabajoId: string, rutas: string[]): Promise
 export async function retirarPostulacion(
   postulacionId: string,
 ): Promise<{ ok: boolean; mensaje?: string }> {
-  const sesion = await obtenerSesion();
+  const sesion = await obtenerSesionVerificada();
   if (!sesion || sesion.rol !== "profesional") {
     return { ok: false, mensaje: "Solo un profesional puede retirar su postulación." };
   }
@@ -227,7 +229,7 @@ export async function postularme(
   _anterior: EstadoPostulacion,
   datos: FormData,
 ): Promise<EstadoPostulacion> {
-  const sesion = await obtenerSesion();
+  const sesion = await obtenerSesionVerificada();
   if (!sesion) {
     return { mensaje: "Tu sesión venció. Ingresá de nuevo para postularte." };
   }
@@ -367,10 +369,11 @@ export async function elegirPostulante(
   postulacionId: string,
   trabajoId: string,
 ): Promise<{ ok: boolean; profesionalId?: string; mensaje?: string }> {
-  const sesion = await obtenerSesion();
+  const sesion = await obtenerSesionVerificada();
   if (!sesion || sesion.rol !== "cliente") {
     return { ok: false, mensaje: "Solo el cliente dueño del trabajo puede elegir un postulante." };
   }
+  if (altaIncompleta(sesion)) return { ok: false, mensaje: MENSAJE_ALTA_INCOMPLETA };
 
   if (!esUuid(postulacionId) || !esUuid(trabajoId)) {
     return { ok: false, mensaje: "Identificador inválido." };
@@ -419,10 +422,11 @@ export async function elegirPostulante(
 export async function cambiarProfesional(
   trabajoId: string,
 ): Promise<{ ok: boolean; mensaje?: string }> {
-  const sesion = await obtenerSesion();
+  const sesion = await obtenerSesionVerificada();
   if (!sesion || sesion.rol !== "cliente") {
     return { ok: false, mensaje: "Solo el cliente dueño puede cambiar de profesional." };
   }
+  if (altaIncompleta(sesion)) return { ok: false, mensaje: MENSAJE_ALTA_INCOMPLETA };
 
   if (!esUuid(trabajoId)) {
     return { ok: false, mensaje: "Identificador inválido." };
@@ -461,10 +465,11 @@ export async function cambiarProfesional(
 export async function marcarTrabajoTerminado(
   trabajoId: string,
 ): Promise<{ ok: boolean; mensaje?: string }> {
-  const sesion = await obtenerSesion();
+  const sesion = await obtenerSesionVerificada();
   if (!sesion || sesion.rol !== "cliente") {
     return { ok: false, mensaje: "Solo el cliente dueño puede marcar el trabajo como terminado." };
   }
+  if (altaIncompleta(sesion)) return { ok: false, mensaje: MENSAJE_ALTA_INCOMPLETA };
 
   if (!esUuid(trabajoId)) {
     return { ok: false, mensaje: "Identificador inválido." };
@@ -503,10 +508,11 @@ export async function marcarTrabajoTerminado(
 export async function cancelarTrabajo(
   trabajoId: string,
 ): Promise<{ ok: boolean; mensaje?: string }> {
-  const sesion = await obtenerSesion();
+  const sesion = await obtenerSesionVerificada();
   if (!sesion || sesion.rol !== "cliente") {
     return { ok: false, mensaje: "Solo el cliente dueño puede cancelar el trabajo." };
   }
+  if (altaIncompleta(sesion)) return { ok: false, mensaje: MENSAJE_ALTA_INCOMPLETA };
 
   if (!esUuid(trabajoId)) {
     return { ok: false, mensaje: "Identificador inválido." };

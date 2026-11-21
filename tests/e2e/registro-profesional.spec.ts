@@ -41,6 +41,23 @@ test.describe("registro de profesional · paso 1", () => {
     await expect(page.getByLabel(/Matrícula/)).toHaveAttribute("aria-invalid", "true");
   });
 
+  test("en el paso 2 la contraseña no queda en el DOM como input oculto", async ({ page }) => {
+    await page.goto("/registro/profesional");
+    await expect(siguiente(page)).toBeEnabled();
+    await page.getByRole("button", { name: "Plomería" }).click();
+    await page.getByLabel("Nombre y apellido").fill("Martín Gómez");
+    await page.getByLabel("WhatsApp").fill("223 555-0000");
+    await page.getByLabel("Email").fill("martin@example.com");
+    await page.getByLabel("Contraseña").fill("clave-de-prueba-123");
+    await page.getByLabel("Barrio desde donde salís").click();
+    await page.getByRole("option", { name: "La Perla" }).click();
+    await page.getByRole("button", { name: "Toda la ciudad" }).click();
+    await siguiente(page).click();
+    await expect(page.getByRole("group", { name: /Paso 2 de 3/ })).toBeVisible();
+    await expect(page.locator('input[name="contrasena"]')).toHaveCount(0);
+    await expect(page.locator('input[type="hidden"][value="clave-de-prueba-123"]')).toHaveCount(0);
+  });
+
   test("sin datos muestra los errores en castellano junto a cada campo", async ({ page }) => {
     await page.goto("/registro/profesional");
     await siguiente(page).click();
@@ -84,6 +101,16 @@ test.describe("registro de profesional · paso 1", () => {
     ).toBeVisible();
     await expect(page.getByRole("button", { name: "Aceptar y terminar" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Volver a documentos" })).toBeVisible();
+    const aviso = page.getByText(/Al continuar aceptás los/);
+    await expect(aviso).toBeVisible();
+    await expect(aviso.getByRole("link", { name: "Términos" })).toHaveAttribute(
+      "href",
+      "/terminos",
+    );
+    await expect(aviso.getByRole("link", { name: "Política de privacidad" })).toHaveAttribute(
+      "href",
+      "/privacidad",
+    );
 
     await page.goto("/registro/profesional/listo");
     await expect(page.getByRole("heading", { level: 1, name: /¡Listo/ })).toBeVisible();
@@ -179,7 +206,7 @@ test.describe("registro de profesional · formulario completo", () => {
       await expect(page.getByText("2 de 10 fotos")).toBeVisible();
       const gas = page.getByRole("button", { name: "Gas" });
       await gas.click();
-      await expect(gas.locator("span")).toHaveCSS("background-color", "rgb(247, 201, 72)");
+      await expect(gas).toHaveCSS("background-color", "rgb(247, 201, 72)");
       await siguiente(page).click();
       await expect(page.getByText("Ingresá tu nombre y apellido.")).toBeVisible();
       const resultado = await new AxeBuilder({ page }).analyze();
@@ -217,7 +244,8 @@ test.describe("cuenta real", () => {
     await page.getByLabel("WhatsApp").fill("223 555-0000");
     await page.getByLabel("Email").fill(email);
     await page.getByLabel("Contraseña").fill("clave-de-prueba-123");
-    await page.getByLabel("Barrio desde donde salís").selectOption({ label: "La Perla" });
+    await page.getByLabel("Barrio desde donde salís").click();
+    await page.getByRole("option", { name: "La Perla" }).click();
     await page.getByRole("button", { name: "Plomería" }).click();
     await page.getByRole("button", { name: "Gas" }).click();
     await page.getByLabel(/Matrícula/).fill("MG-1234");
@@ -232,7 +260,8 @@ test.describe("cuenta real", () => {
     await page.getByRole("button", { name: "Volver al perfil" }).click();
     await expect(page.getByLabel("Nombre y apellido")).toHaveValue("Martín Gómez");
     await expect(page.getByLabel(/Matrícula/)).toHaveValue("MG-1234");
-    await expect(page.getByLabel("Barrio desde donde salís")).toHaveValue(/\d+/);
+    await expect(page.getByLabel("Barrio desde donde salís")).toContainText("La Perla");
+    await expect(page.locator('input[name="barrioId"]')).toHaveValue(/\d+/);
     await expect(page.getByRole("button", { name: "Gas" })).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByRole("button", { name: "Centro", exact: true })).toHaveAttribute(
       "aria-pressed",

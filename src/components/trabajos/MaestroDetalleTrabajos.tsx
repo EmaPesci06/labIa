@@ -89,6 +89,7 @@ export function MaestroDetalleTrabajos({
                 distanciaKm={t.distanciaKm}
                 yaMePostule={t.yaMePostule}
                 href={`/trabajos/${t.id}`}
+                nivelTitulo={2}
                 className={seleccionado ? "ring-3 ring-texto" : undefined}
               />
             </li>

@@ -150,7 +150,7 @@ Los PRs que mergeó otro modelo sin revisión tuvieron 2 hallazgos ALTO de segur
 
 ### 3.4 Interfaz ("Verano en la costa")
 
-- El diseño vigente es **"Verano en la costa"** en `docs/prototipo-nuevo/` (`README.md` y `CONSTRUCCION.md`). `docs/prototipo/` es el diseño viejo y no se usa.
+- El diseño vigente es **"Verano en la costa"** en `docs/prototipo-nuevo/` (`README.md` y `CONSTRUCCION.md`). El diseño viejo (`docs/prototipo/`) se borró en LAB-81.
 - La paleta y los tokens viven en `src/app/globals.css` (claro y oscuro): `fondo` arena, `superficie` blanca, `texto` azul mar, `accion` turquesa (botón principal y enlaces), `sobre-accion`, `encabezado` turquesa con texto `sobre-encabezado` blanco, `sol` amarillo para lo elegido (texto `sobre-sol`), `coral` solo de adorno (nunca texto), `error`, `equipo`, `velo` (fondo de las hojas). Nunca hex sueltos fuera de `globals.css`, sin `style=` y sin `dark:` en páginas (los tokens cambian solos).
 - Tipografías con `next/font`: Baloo 2 (700 y 800) para títulos y la marca (`font-titulo`) y Nunito Sans (400 y 700) para el resto.
 - Accesibilidad que ya falló (no repetir):
@@ -158,6 +158,11 @@ Los PRs que mergeó otro modelo sin revisión tuvieron 2 hallazgos ALTO de segur
   - `<dl>` con wrappers inválidos.
   - Foco que no vuelve al botón al cerrar una hoja: Radix necesita `Dialog.Trigger` o `onCloseAutoFocus`.
   - Táctiles de menos de 44 px.
+  - Foco invisible sobre `bg-equipo` en modo claro (`foco` y `equipo` valen lo mismo): usar `[&_:focus-visible]:outline-sol` en el contenedor.
+  - Casillas de consentimiento pre-tildadas o sin validar en el servidor: sin `defaultChecked`, con Zod en cliente y Server Action.
+  - Listas de tarjetas con `h3` debajo del `h1` (axe `heading-order`): `TarjetaTrabajo` acepta `nivelTitulo={2}`.
+  - Datos sensibles (contraseña) en `<input type="hidden">`: sumarlos al `FormData` en memoria.
+- `@axe-core/playwright` quedó en 4.14.0 (LAB-81); `tests/e2e/pase-final.spec.ts` corre axe sin filtrar impacto en las pantallas con sesión falsa.
 
 ### 3.5 Comandos, formato y procesos
 

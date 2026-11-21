@@ -45,9 +45,8 @@ export function EnlaceVolver({
     <Link
       href={href}
       onClick={volver}
-      aria-label={mostrarEtiquetaMovil ? undefined : "Volver"}
       className={cn(
-        "-ml-2.5 flex min-h-11 w-fit items-center justify-center gap-1 rounded-campo px-2.5 text-texto lg:ml-0 lg:px-0 lg:text-sm lg:font-semibold lg:text-texto",
+        "-ml-2.5 flex min-h-11 w-fit items-center justify-center gap-1 rounded-xl px-2.5 text-texto lg:ml-0 lg:px-0 lg:text-sm lg:font-semibold lg:text-texto",
         className,
       )}
     >
@@ -55,8 +54,11 @@ export function EnlaceVolver({
       {mostrarEtiquetaMovil ? (
         <span>{etiquetaEscritorio}</span>
       ) : (
-        <span aria-hidden className="hidden lg:inline">
-          ← {etiquetaEscritorio}
+        <span className="sr-only lg:not-sr-only">
+          <span aria-hidden className="hidden lg:inline">
+            ←{" "}
+          </span>
+          {etiquetaEscritorio}
         </span>
       )}
     </Link>

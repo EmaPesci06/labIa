@@ -4,7 +4,8 @@ import { limiteContactoPorIp } from "@/lib/limites";
 import { obtenerPerfil } from "@/lib/perfil/cargar";
 import { profesionPrincipal } from "@/lib/perfil/datos";
 import { limitarPersistente } from "@/lib/rate-limit-persistente";
-import { obtenerSesion } from "@/lib/sesion";
+import { altaIncompleta, MENSAJE_ALTA_INCOMPLETA } from "@/lib/auth/alta";
+import { obtenerSesionVerificada } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import { datosDeFormularioContacto, esquemaContacto } from "@/lib/validaciones/contacto";
 import { linkWhatsApp } from "@/lib/whatsapp";
@@ -39,11 +40,12 @@ export async function contactarProfesional(
   _anterior: EstadoContacto,
   datos: FormData,
 ): Promise<EstadoContacto> {
-  const sesion = await obtenerSesion();
+  const sesion = await obtenerSesionVerificada();
   if (!sesion) return { mensaje: "Tu sesión venció. Ingresá de nuevo para contactar." };
   if (sesion.rol !== "cliente") {
     return { mensaje: "Solo las cuentas de cliente pueden contactar profesionales." };
   }
+  if (altaIncompleta(sesion)) return { mensaje: MENSAJE_ALTA_INCOMPLETA };
 
   const entrada = esquemaContacto.safeParse(datosDeFormularioContacto(datos));
   if (!entrada.success) return { mensaje: mensajeDeError("23514") };

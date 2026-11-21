@@ -49,8 +49,36 @@ test.describe("publicar un trabajo (cliente)", () => {
 
     await expect(page).toHaveURL(/\/mis-trabajos\/[0-9a-f-]{36}\?publicado=1/);
     await expect(
-      page.getByText("¡Publicado! Te avisamos por email cuando alguien se postule."),
+      page
+        .getByRole("status")
+        .filter({ hasText: "¡Publicado! Te avisamos por email cuando alguien se postule." }),
     ).toBeVisible();
+  });
+
+  test("el toast de confirmación respeta prefers-reduced-motion", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce", colorScheme: "light" });
+    await page.goto("/trabajos/nuevo?oficio=gas");
+    await page.getByLabel("Título").fill("Pérdida de gas en calefón");
+    await page
+      .getByLabel("Contalo con tus palabras")
+      .fill("Hay olor a gas cuando prendo el calefón de la cocina desde ayer.");
+    await page.getByRole("button", { name: "Publicar el trabajo" }).click();
+
+    await expect(page).toHaveURL(/\/mis-trabajos\/[0-9a-f-]{36}\?publicado=1/);
+    const aviso = page
+      .getByRole("status")
+      .filter({ hasText: "¡Publicado! Te avisamos por email cuando alguien se postule." });
+    await expect(aviso).toBeVisible();
+
+    const duracion = await page
+      .locator("[data-sonner-toast]")
+      .first()
+      .evaluate((el) => {
+        const s = getComputedStyle(el);
+        return { transition: s.transitionDuration, animation: s.animationDuration };
+      });
+    expect(["0s", "0.01ms", "1e-05s"]).toContain(duracion.transition);
+    expect(["0s", "0.01ms", "1e-05s"]).toContain(duracion.animation);
   });
 
   test("sin errores de accesibilidad graves", async ({ page }) => {
@@ -65,6 +93,11 @@ test.describe("publicar un trabajo (cliente)", () => {
     await page.emulateMedia({ colorScheme: "dark" });
     await page.goto("/trabajos/nuevo");
     await expect(page.getByRole("heading", { level: 1, name: "Contanos qué pasó" })).toBeVisible();
+    // El radio elegido sobre fondo sol mantiene fondo sobre-sol (#123b4a) en oscuro (contraste AA).
+    await expect(page.getByRole("radio", { name: "Hoy" })).toHaveCSS(
+      "background-color",
+      "rgb(18, 59, 74)",
+    );
     const resultado = await new AxeBuilder({ page }).analyze();
     expect(
       resultado.violations.filter((v) => v.impact === "critical" || v.impact === "serious"),

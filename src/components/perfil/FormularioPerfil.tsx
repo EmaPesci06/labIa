@@ -111,7 +111,7 @@ export function FormularioPerfil({ valores, barrios, hrefPerfil }: Props) {
           ))}
         </div>
         <p className="text-sm leading-snug text-texto">
-          Si sumás uno, lo revisamos de nuevo. Para ofrecer gas necesitás la matrícula verificada.
+          Para ofrecer gas necesitás la matrícula verificada.
         </p>
         {errores.oficios ? (
           <p id="e-oficios" className="text-[15px] font-bold text-error">
@@ -158,7 +158,7 @@ export function FormularioPerfil({ valores, barrios, hrefPerfil }: Props) {
         </p>
       ) : null}
 
-      <div className="rounded-t-[28px] bg-superficie px-5 pt-2.5 pb-4 lg:rounded-tarjeta lg:p-4">
+      <div className="rounded-t-[28px] bg-superficie px-5 pt-2.5 pb-4 lg:rounded-3xl lg:p-4">
         <Boton type="submit" tamano="grande" bloque cargando={pendiente}>
           Guardar cambios
         </Boton>

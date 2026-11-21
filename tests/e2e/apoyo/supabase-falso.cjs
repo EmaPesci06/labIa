@@ -24,6 +24,8 @@ const ID_RECHAZADO = "55555555-5555-4555-8555-555555555555";
 // Clientes para los errores de contacto (LAB-25). Cada token tiene su propio usuario: así las pruebas
 // no comparten estado (el límite diario se simula por token, no con un contador global).
 const ID_CLIENTE_LIMITE = "66666666-6666-4666-8666-666666666666";
+// LAB-81: cliente que entró con Google y todavía no aceptó "mayor de 18 y términos".
+const ID_CLIENTE_SIN_TERMINOS = "66666666-6666-4666-8666-666666666667";
 const ID_CLIENTE_DESPUBLICADO = "77777777-7777-4777-8777-777777777777";
 // LAB-32: profesional que se modera (suspensión, reseñas bajas). Sus datos son propios de la moderación.
 const ID_MODERADO = "99999999-9999-4999-8999-999999999999";
@@ -44,6 +46,14 @@ const USUARIOS = {
     nombre: "Laura",
     apellido: "Fernández",
     barrio_id: 1,
+  },
+  "tok-cliente-sin-terminos": {
+    id: ID_CLIENTE_SIN_TERMINOS,
+    rol: "cliente",
+    nombre: "Gabi",
+    apellido: "Soto",
+    barrio_id: null,
+    sinTerminos: true,
   },
   "tok-cliente-limite": {
     id: ID_CLIENTE_LIMITE,
@@ -596,9 +606,23 @@ const ARCHIVOS = {
 
 // ---------------------------------------------------------------------------------------------
 
+// LAB-88: la app verifica la sesión con getClaims(), que decodifica el JWT. Los tests mandan un JWT
+// de forma válida (ver tests/e2e/apoyo/token.ts) con el nombre del usuario en el claim `tok`.
+// También se acepta el token suelto ("tok-cliente"), que usan las llamadas directas.
+function nombreDeToken(token) {
+  const partes = token.split(".");
+  if (partes.length !== 3) return token;
+  try {
+    const carga = JSON.parse(Buffer.from(partes[1], "base64url").toString("utf8"));
+    return typeof carga.tok === "string" ? carga.tok : token;
+  } catch {
+    return token;
+  }
+}
+
 function usuarioDe(req) {
   const m = /^Bearer (.+)$/.exec(req.headers.authorization ?? "");
-  return (m && USUARIOS[m[1]]) || null;
+  return (m && USUARIOS[nombreDeToken(m[1])]) || null;
 }
 
 function filaPerfil(id, yo) {
@@ -1391,6 +1415,7 @@ const server = http.createServer((req, res) => {
         nombre: yo.nombre,
         apellido: yo.apellido,
         normas_version: "2026-10",
+        terminos_aceptados_at: yo.sinTerminos ? null : "2026-11-20T12:00:00Z",
         barrio_id: yo.barrio_id,
       };
       return responder(res, 200, unObjeto ? fila : [fila]);
@@ -1576,9 +1601,10 @@ const server = http.createServer((req, res) => {
     }
     if (ruta === "/rest/v1/barrios") {
       const lista = [
-        { id: 1, nombre: "Centro" },
-        { id: 2, nombre: "La Perla" },
-        { id: 3, nombre: "Güemes" },
+        { id: 1, nombre: "Centro", slug: "centro" },
+        { id: 2, nombre: "La Perla", slug: "la-perla" },
+        { id: 3, nombre: "Güemes", slug: "guemes" },
+        { id: 20, nombre: "Chauvín", slug: "chauvin" },
       ];
       const en = url.searchParams.get("id");
       if (en && en.startsWith("in.")) {
@@ -1600,6 +1626,12 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PUERTO, "127.0.0.1", () => {
-  process.stdout.write(`Supabase falso en http://localhost:${PUERTO}\n`);
-});
+// LAB-88: `tests/e2e/apoyo/token.ts` importa este archivo solo para leer los ids de USUARIOS (el
+// `sub` del JWT de prueba tiene que ser el id real). Importado, no levanta el servidor.
+if (require.main === module) {
+  server.listen(PUERTO, "127.0.0.1", () => {
+    process.stdout.write(`Supabase falso en http://localhost:${PUERTO}\n`);
+  });
+}
+
+module.exports = { USUARIOS };

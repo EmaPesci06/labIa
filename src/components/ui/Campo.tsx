@@ -1,16 +1,32 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
 import {
   useId,
   useState,
   type InputHTMLAttributes,
   type ReactNode,
-  type SelectHTMLAttributes,
   type TextareaHTMLAttributes,
 } from "react";
 
+import { Input } from "@/components/shadcn/input";
+import { Label } from "@/components/shadcn/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/shadcn/select";
+import { Textarea } from "@/components/shadcn/textarea";
 import { cn } from "@/lib/cn";
+
+import { SIN_ANILLO } from "./foco";
+
+export type OpcionSeleccion = {
+  valor: string;
+  etiqueta: string;
+  disabled?: boolean;
+};
 
 type PropsBase = {
   /** Texto de la etiqueta (siempre visible, arriba del campo). */
@@ -38,23 +54,33 @@ type PropsArea = PropsBase & {
 
 type PropsSeleccion = PropsBase & {
   variante: "seleccion";
-  /** Las `<option>`. */
-  children: ReactNode;
-} & Omit<SelectHTMLAttributes<HTMLSelectElement>, "className" | "children">;
+  opciones: readonly OpcionSeleccion[];
+  placeholder?: string;
+  name?: string;
+  id?: string;
+  value?: string;
+  defaultValue?: string;
+  onValueChange?: (valor: string) => void;
+  disabled?: boolean;
+  required?: boolean;
+  "aria-describedby"?: string;
+};
 
 export type CampoProps = PropsTexto | PropsArea | PropsSeleccion;
 
-// Borde de 2 px color texto (3 px con error, como en el prototipo), radio 16, fondo `campo`
-// (blanco en claro, fondo de página en oscuro). Texto 17 px: evita el zoom de iOS.
+// Capa fina sobre `Input`, `Textarea` y `Select` de shadcn. Radio de shadcn, borde de 2 px color
+// `borde` (3:1 sobre superficie y fondo, más visible que el `--input` de shadcn), 3 px con error.
+// Fondo `campo` en los dos temas (shadcn pinta `input/30` en oscuro). Texto de 17 px: evita el zoom
+// de iOS. Un solo foco: el outline de globals.css, sin el anillo de shadcn.
 const CONTROL =
-  "w-full rounded-campo border-2 border-texto bg-campo px-3.5 text-[17px] text-texto " +
-  "placeholder:text-texto placeholder:opacity-60 " +
-  "aria-invalid:border-3 aria-invalid:border-error " +
-  "disabled:cursor-not-allowed disabled:opacity-60";
+  "w-full border-2 border-borde bg-campo px-3.5 text-[17px] text-foreground md:text-[17px] dark:bg-campo " +
+  "focus-visible:border-borde aria-invalid:border-[3px] aria-invalid:border-error " +
+  "dark:aria-invalid:border-error " +
+  SIN_ANILLO;
 
 /**
- * Campo de formulario con etiqueta, ayuda y error asociados. Alto 52 px, radio 16, borde de 2 px
- * color texto. Variantes: texto, teléfono, pesos (prefijo `$`), área (con contador) y selección.
+ * Campo de formulario con etiqueta, ayuda y error asociados: capa fina sobre `Input`, `Textarea` y
+ * `Label` de shadcn. Alto 52 px, borde de 2 px color `borde`. Variantes: texto, teléfono, pesos (prefijo `$`), área (con contador) y selección.
  *
  * @example
  * <Campo etiqueta="Nombre" name="nombre" error={errores.nombre} />
@@ -72,6 +98,7 @@ export function Campo(props: CampoProps) {
     const inicial = props.variante === "area" ? (props.value ?? props.defaultValue ?? "") : "";
     return String(inicial).length;
   });
+  const [anuncio, setAnuncio] = useState("");
 
   const maxLength = props.variante === "area" ? props.maxLength : undefined;
   const describedBy =
@@ -103,7 +130,7 @@ export function Campo(props: CampoProps) {
     } = props;
     void [_variante, _e, _a, _r, _c];
     control = (
-      <textarea
+      <Textarea
         {...area}
         {...comunes}
         rows={area.rows ?? 4}
@@ -115,31 +142,64 @@ export function Campo(props: CampoProps) {
       />
     );
   } else if (props.variante === "seleccion") {
-    const {
-      variante: _variante,
-      etiqueta: _e,
-      ayuda: _a,
-      error: _r,
-      className: _c,
-      children,
-      ...seleccion
-    } = props;
-    void [_variante, _e, _a, _r, _c];
+    const { opciones, placeholder, name, value, defaultValue, onValueChange, disabled, required } =
+      props;
+    const tieneVacio = opciones.some((o) => o.valor === "");
+    const valorNormalizado =
+      value === undefined ? undefined : value === "" && !tieneVacio ? null : value;
+    const valorInicialNormalizado =
+      defaultValue === undefined
+        ? undefined
+        : defaultValue === "" && !tieneVacio
+          ? null
+          : defaultValue;
+    const items = opciones.map((o) => ({ value: o.valor, label: o.etiqueta }));
+
     control = (
-      <div className="relative">
-        <select
-          {...seleccion}
-          {...comunes}
-          className={cn(CONTROL, "h-[52px] appearance-none pr-10")}
+      <>
+        <Select
+          name={name}
+          items={items}
+          value={valorNormalizado}
+          defaultValue={valorInicialNormalizado}
+          disabled={disabled}
+          required={required}
+          onValueChange={(nuevo) => {
+            const valor = nuevo ?? "";
+            onValueChange?.(valor);
+            const elegida = opciones.find((o) => o.valor === valor);
+            if (elegida) setAnuncio(`${etiqueta}: ${elegida.etiqueta}`);
+          }}
         >
-          {children}
-        </select>
-        <ChevronDown
-          aria-hidden
-          strokeWidth={2.5}
-          className="pointer-events-none absolute top-1/2 right-3.5 size-5 -translate-y-1/2 text-texto"
-        />
-      </div>
+          <SelectTrigger
+            {...comunes}
+            className={cn(
+              CONTROL,
+              "h-[52px] w-full cursor-pointer justify-between rounded-lg data-[size=default]:h-[52px] dark:hover:bg-campo",
+            )}
+          >
+            <SelectValue placeholder={placeholder} />
+          </SelectTrigger>
+          <SelectContent
+            alignItemWithTrigger={false}
+            className="rounded-lg border-2 border-borde bg-popover text-popover-foreground shadow-md"
+          >
+            {opciones.map((opcion) => (
+              <SelectItem
+                key={opcion.valor}
+                value={opcion.valor}
+                disabled={opcion.disabled}
+                className="min-h-11 cursor-pointer rounded-md px-3 text-base font-normal text-texto focus:bg-sol focus:font-bold focus:text-sobre-sol"
+              >
+                {opcion.etiqueta}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <span role="status" aria-live="polite" className="sr-only">
+          {anuncio}
+        </span>
+      </>
     );
   } else {
     const {
@@ -167,7 +227,7 @@ export function Campo(props: CampoProps) {
             $
           </span>
         ) : null}
-        <input
+        <Input
           {...entrada}
           {...comunes}
           type={type ?? (esTelefono ? "tel" : "text")}
@@ -184,9 +244,9 @@ export function Campo(props: CampoProps) {
 
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
-      <label htmlFor={id} className="text-base font-bold text-texto">
+      <Label htmlFor={id} className="text-base leading-normal font-bold text-foreground">
         {etiqueta}
-      </label>
+      </Label>
       {control}
       {error ? (
         <p id={idError} className="text-[15px] font-bold text-error">

@@ -72,22 +72,20 @@ export default async function PerfilDelProfesional({ params }: Props) {
   // No existe, no está publicado o la cuenta está suspendida (salvo para el dueño y los admins).
   if (!perfil) notFound();
 
-  const supabase = await crearClienteServidor();
-  const sesion = await obtenerSesion();
+  const [supabase, sesion] = await Promise.all([crearClienteServidor(), obtenerSesion()]);
 
-  // La distancia es entre centros de barrio y solo se muestra a un cliente con sesión.
-  let distanciaKm: number | null = null;
-  if (sesion?.rol === "cliente" && esIdValido(sesion.usuario.id)) {
-    const { data: yo } = await supabase
-      .from("usuarios")
-      .select("barrio_id")
-      .eq("id", sesion.usuario.id)
-      .maybeSingle();
-    distanciaKm = await distanciaEntreBarrios(supabase, yo?.barrio_id ?? null, perfil.barrioId);
-  }
-
-  const resenas = await obtenerResenas(supabase, perfil.id, 0, RESENAS_INICIALES);
-  const elegibilidad = await consultarElegibilidadResena(perfil.id);
+  // La distancia es entre centros de barrio y solo se muestra a un cliente con sesión. El barrio
+  // de la cuenta ya viene en la sesión; reseñas, elegibilidad y distancia no dependen entre sí
+  // y se piden juntas (LAB-88).
+  const calcularDistancia =
+    sesion?.rol === "cliente" && esIdValido(sesion.usuario.id)
+      ? distanciaEntreBarrios(supabase, sesion.barrioId ?? null, perfil.barrioId)
+      : Promise.resolve<number | null>(null);
+  const [distanciaKm, resenas, elegibilidad] = await Promise.all([
+    calcularDistancia,
+    obtenerResenas(supabase, perfil.id, 0, RESENAS_INICIALES),
+    consultarElegibilidadResena(perfil.id),
+  ]);
 
   return (
     <>

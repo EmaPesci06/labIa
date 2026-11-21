@@ -1,3 +1,4 @@
+import { Badge } from "@/components/shadcn/badge";
 import { formatearDistancia } from "@/lib/formato";
 import { cn } from "@/lib/cn";
 
@@ -10,7 +11,7 @@ type Props = {
 };
 
 /**
- * Distancia en una pastilla sol con texto azul noche: "a 1,2 km" (o "a 1,2 km de vos"). La distancia
+ * Distancia en una pastilla (`Badge` de shadcn) sol con texto azul noche: "a 1,2 km" (o "a 1,2 km de vos"). La distancia
  * es entre barrios; nunca se muestra una dirección.
  *
  * @example
@@ -18,14 +19,14 @@ type Props = {
  */
 export function Distancia({ km, sufijo, className }: Props) {
   return (
-    <span
+    <Badge
       className={cn(
-        "inline-flex items-center rounded-full bg-sol px-3 py-1 text-sm font-bold text-sobre-sol",
+        "h-auto rounded-full bg-sol px-3 py-1 text-sm font-bold text-sobre-sol",
         className,
       )}
     >
       {formatearDistancia(km)}
       {sufijo ? ` ${sufijo}` : ""}
-    </span>
+    </Badge>
   );
 }

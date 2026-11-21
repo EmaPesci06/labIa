@@ -68,21 +68,21 @@ describe("Encabezado", () => {
         />
       </Encabezado>,
     );
-    const elegido = screen.getByRole("radio", { name: "Todos" }).querySelector("span");
+    const elegido = screen.getByRole("radio", { name: "Todos" });
     expect(elegido).toHaveClass(
-      "bg-sol",
+      "bg-secondary",
       "in-data-[encabezado=sol]:bg-sobre-sol",
       "in-data-[encabezado=sol]:text-sobre-encabezado",
     );
-    const sinElegir = screen.getByRole("radio", { name: "Gas" }).querySelector("span");
-    expect(sinElegir).toHaveClass("bg-superficie");
+    const sinElegir = screen.getByRole("radio", { name: "Gas" });
+    expect(sinElegir).toHaveClass("bg-card");
   });
 
   it("un chip suelto (fuera de un encabezado) elegido queda sol con texto azul noche", () => {
     render(<Chip seleccionado>Gas</Chip>);
-    expect(screen.getByRole("button", { name: "Gas" }).querySelector("span")).toHaveClass(
-      "bg-sol",
-      "text-sobre-sol",
+    expect(screen.getByRole("button", { name: "Gas" })).toHaveClass(
+      "bg-secondary",
+      "text-secondary-foreground",
     );
   });
 });

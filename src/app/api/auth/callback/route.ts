@@ -1,6 +1,7 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { RUTA_COMPLETAR_ALTA } from "@/lib/auth/alta";
 import { inicioDelRol, volverSeguro } from "@/lib/auth/rutas";
 import { guardarDatosDeCliente } from "@/lib/auth/datos-de-cliente";
 import { registrarEventoServidor } from "@/lib/metricas-servidor";
@@ -8,7 +9,7 @@ import { urlDelSitio } from "@/lib/sitio";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import { ROLES_REGISTRABLES, type RolRegistrable } from "@/lib/validaciones/auth";
 import { esquemaNombreDeProveedor } from "@/lib/validaciones/cuenta";
-import { esquemaCompletarCliente } from "@/lib/validaciones/registro-cliente";
+import { esquemaDatosDeContacto } from "@/lib/validaciones/registro-cliente";
 
 const TIPOS_OTP: readonly EmailOtpType[] = [
   "signup",
@@ -84,7 +85,7 @@ export async function GET(request: NextRequest) {
 
   const { data: fila } = await supabase
     .from("usuarios")
-    .select("rol, nombre, apellido, whatsapp")
+    .select("rol, nombre, apellido, whatsapp, terminos_aceptados_at")
     .eq("id", usuario.id)
     .maybeSingle();
 
@@ -110,8 +111,11 @@ export async function GET(request: NextRequest) {
 
   // Cliente que confirmó el email: el registro guardó WhatsApp y barrio en la metadata del
   // usuario porque todavía no había sesión. Se aplican acá (LAB-17); se validan de nuevo.
-  if (fila && !fila.whatsapp && fila.rol === "cliente") {
-    const datos = esquemaCompletarCliente.safeParse({
+  // Solo si el servidor ya tiene su consentimiento (lo graba el trigger del alta con email): la
+  // metadata la puede escribir el propio usuario, así que una cuenta de Google que la cargue a mano
+  // no se saltea la casilla de mayor de 18 y términos por acá (LAB-81).
+  if (fila && !fila.whatsapp && fila.rol === "cliente" && fila.terminos_aceptados_at) {
+    const datos = esquemaDatosDeContacto.safeParse({
       whatsapp: String(usuario.user_metadata?.whatsapp ?? ""),
       barrio: String(usuario.user_metadata?.barrio_id ?? ""),
     });
@@ -129,6 +133,10 @@ export async function GET(request: NextRequest) {
 
   // Sin WhatsApp todavía no completó el registro: el profesional sigue en su formulario y el
   // cliente (Google, o datos que no se pudieron aplicar) va a "un último paso".
+  if (fila?.rol === "cliente" && fila.whatsapp && !fila.terminos_aceptados_at) {
+    // Tiene sus datos pero nunca aceptó mayor de 18 y términos: la casilla es obligatoria.
+    return NextResponse.redirect(`${base}${RUTA_COMPLETAR_ALTA}`);
+  }
   if (!fila?.whatsapp) {
     const camino = rolElegido ?? (fila?.rol === "profesional" ? "profesional" : "cliente");
     return NextResponse.redirect(

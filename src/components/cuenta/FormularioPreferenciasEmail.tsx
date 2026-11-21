@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 
+import { Checkbox } from "@/components/shadcn/checkbox";
 import { Boton } from "@/components/ui/Boton";
 import { ESTADO_INICIAL } from "@/lib/auth/estado";
 import { guardarPreferenciasEmail } from "@/lib/emails/acciones";
@@ -31,19 +32,21 @@ function Interruptor({
       className="flex min-h-11 cursor-pointer items-center justify-between gap-3.5 rounded-[20px] bg-superficie px-4 py-3.5 text-texto"
     >
       <span className="flex flex-1 flex-col gap-0.5">
-        <span className="text-[17px] font-bold">{titulo}</span>
+        <span id={`${id}-t`} className="text-[17px] font-bold">
+          {titulo}
+        </span>
         <span id={`${id}-d`} className="text-sm text-texto">
           {descripcion}
         </span>
       </span>
-      <input
+      <Checkbox
         id={id}
         name={name}
-        type="checkbox"
         role="switch"
         defaultChecked={marcado}
+        aria-labelledby={`${id}-t`}
         aria-describedby={`${id}-d`}
-        className="size-7 shrink-0 cursor-pointer accent-accion"
+        className="size-7 shrink-0 cursor-pointer border-2 border-texto bg-campo"
       />
     </label>
   );
@@ -89,7 +92,7 @@ export function FormularioPreferenciasEmail({
           {estado.exito}
         </p>
       ) : null}
-      <div className="rounded-t-[28px] bg-superficie px-5 pt-2.5 pb-4 lg:rounded-tarjeta lg:p-4">
+      <div className="rounded-t-[28px] bg-superficie px-5 pt-2.5 pb-4 lg:rounded-3xl lg:p-4">
         <Boton type="submit" tamano="grande" bloque cargando={pendiente}>
           Guardar preferencias
         </Boton>

@@ -7,6 +7,7 @@ import { BloqueVerificacion } from "@/components/registro/BloqueVerificacion";
 import { Boton } from "@/components/ui/Boton";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { registrarEvento } from "@/lib/metricas";
+import { faltaAprobarDocumentos } from "@/lib/registro/documentos-estado";
 import { subirDocumentos } from "@/lib/registro/subir-documentos";
 import type { ItemVerificacion } from "@/lib/registro/tipos";
 import type { TipoDocumento } from "@/lib/validaciones/documentos";
@@ -84,15 +85,21 @@ export function DocumentosCuenta({ uid, tieneGas, verificaciones }: Props) {
       >
         Enviar documentos
       </Boton>
-      <Tarjeta como="section" aria-labelledby="mientras-tanto" className="mt-1 flex flex-col gap-1">
-        <h2 id="mientras-tanto" className="font-titulo text-xl leading-tight">
-          Mientras tanto
-        </h2>
-        <p className="text-[15px] leading-snug text-texto">
-          Tu perfil no aparece en las búsquedas y no podés postularte. Apenas aprobemos lo que
-          falta, se publica solo y te avisamos por email.
-        </p>
-      </Tarjeta>
+      {faltaAprobarDocumentos(verificaciones, tieneGas) ? (
+        <Tarjeta
+          como="section"
+          aria-labelledby="mientras-tanto"
+          className="mt-1 flex flex-col gap-1"
+        >
+          <h2 id="mientras-tanto" className="font-titulo text-xl leading-tight">
+            Mientras tanto
+          </h2>
+          <p className="text-[15px] leading-snug text-texto">
+            Tu perfil no aparece en las búsquedas y no podés postularte. Apenas aprobemos lo que
+            falta, se publica solo y te avisamos por email.
+          </p>
+        </Tarjeta>
+      ) : null}
       <p className="text-sm leading-snug text-texto">
         Los archivos ya subidos no se pueden volver a ver ni descargar, ni siquiera desde tu cuenta.
       </p>

@@ -1,3 +1,4 @@
+import { tokenJwt } from "./apoyo/token";
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 
 // LAB-25: contacto por WhatsApp desde el perfil, con el Supabase FALSO (tests/e2e/apoyo/supabase-falso.cjs).
@@ -23,7 +24,7 @@ const base64url = (texto: string) => Buffer.from(texto).toString("base64url");
 async function iniciarSesion(contexto: BrowserContext, baseURL: string, token: Token) {
   const exp = Math.floor(Date.now() / 1000) + 3600;
   const sesion = {
-    access_token: token,
+    access_token: tokenJwt(token),
     refresh_token: "refresh-falso",
     token_type: "bearer",
     expires_in: 3600,
@@ -124,7 +125,7 @@ test.describe("contacto: teclado y foco", () => {
     // Recorremos el diálogo dando varias vueltas de Tab: el foco no sale hacia la página de atrás.
     for (let i = 0; i < 12; i++) {
       await page.keyboard.press("Tab");
-      expect(await focoDentroDeLaHoja(page)).toBe(true);
+      await expect.poll(() => focoDentroDeLaHoja(page)).toBe(true);
     }
 
     await page.keyboard.press("Escape");

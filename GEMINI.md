@@ -10,7 +10,7 @@ Este archivo agrega **cómo trabajar** y **dónde quedó todo**.
    Si no tenés acceso a Linear, pedile a Emanuel el texto de la tarea.
 2. `.claude/labia/protocolo.md`: protocolo común (estados de Linear, ramas, PR, HANDOFF, trabajo en paralelo).
 3. `.claude/agents/labia-*.md`: instrucciones de cada rol. Usalas como checklist de cada fase (ver abajo).
-4. `docs/prototipo-nuevo/`: el diseño nuevo, "Verano en la costa". Empezá por `README.md` (tokens, qué boceto es cada pantalla y cuáles te tocan: milestone "Fase 7 · Interfaz nueva", tareas LAB-76 a LAB-80) y seguí con `CONSTRUCCION.md` (cómo se pasa un boceto a código). Toda pantalla se construye igual a su boceto, con tokens, nunca hex sueltos. `docs/prototipo/` es el diseño viejo: no lo uses.
+4. `docs/prototipo-nuevo/`: el diseño nuevo, "Verano en la costa". Empezá por `README.md` (tokens, qué boceto es cada pantalla y cuáles te tocan: milestone "Fase 7 · Interfaz nueva", tareas LAB-76 a LAB-80) y seguí con `CONSTRUCCION.md` (cómo se pasa un boceto a código). Toda pantalla se construye igual a su boceto, con tokens, nunca hex sueltos. El diseño viejo ya no está en el repo (se borró en LAB-81).
 5. Estado, contexto y decisiones del proyecto (documento único de traspaso): @docs/traspaso-agentes.md
 
 ## Flujo por tarea (orquestás subagentes)
@@ -50,8 +50,8 @@ Hay dos orquestadores: Claude Code y vos. El reparto y las reglas para no pisars
 - **Rutas en Windows:** usá `C:/Users/WIN-10/Desktop/labia` con "Desktop" en mayúscula; con minúscula git falla en worktrees.
 - **Formato:** `pnpm format:check` es parte de la CI; corré `pnpm exec prettier --write` sobre lo que tocaste.
 - **Accesibilidad que ya falló:** ids duplicados cuando un bloque se renderiza dos veces (celular y escritorio: usá
-  `useId`), `<dl>` con wrappers inválidos, foco que no vuelve al botón al cerrar una hoja (Radix necesita
-  `Dialog.Trigger` u `onCloseAutoFocus`), táctiles de menos de 44 px.
+  `useId`), `<dl>` con wrappers inválidos, foco que no vuelve al botón al cerrar una hoja (Base UI, la librería de
+  shadcn, necesita `finalFocus` o un `Trigger`), táctiles de menos de 44 px.
 - **Seguridad que ya falló:** grants de `insert`/`update` directos que saltean la RPC security definer; helpers `privado`
   sin `revoke execute ... from public, anon`; `es_admin()` sin chequear cuenta activa; políticas de Storage que dejan
   leer al admin con su JWT (solo URLs firmadas de 60 s desde el servidor).

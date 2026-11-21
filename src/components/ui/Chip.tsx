@@ -2,7 +2,24 @@
 
 import { useId, type KeyboardEvent, type ReactNode } from "react";
 
+import { Toggle } from "@/components/shadcn/toggle";
 import { cn } from "@/lib/cn";
+
+import { SIN_ANILLO_BOTON } from "./foco";
+
+// Pastilla de 46 px (objetivo táctil de 44 px mínimo), radio completo, texto 16 en negrita.
+const CHIP = `h-[46px] min-h-11 rounded-full px-4 text-base font-bold transition-colors ${SIN_ANILLO_BOTON}`;
+
+// Elegido: sol con texto azul noche. Sin elegir: superficie. Dentro de un encabezado sol
+// (`data-encabezado="sol"`) el elegido pasa a azul noche con texto blanco, y el hover no lo pisa.
+function estadoChip(seleccionado: boolean) {
+  return seleccionado
+    ? "bg-secondary text-secondary-foreground aria-pressed:bg-secondary hover:bg-secondary " +
+        "hover:text-secondary-foreground in-data-[encabezado=sol]:bg-sobre-sol " +
+        "in-data-[encabezado=sol]:text-sobre-encabezado in-data-[encabezado=sol]:hover:bg-sobre-sol " +
+        "in-data-[encabezado=sol]:hover:text-sobre-encabezado in-data-[encabezado=sol]:aria-pressed:bg-sobre-sol"
+    : "bg-card text-card-foreground hover:bg-secondary/40 hover:text-card-foreground";
+}
 
 type PropsChip = {
   /** Si el chip está elegido (sol; azul noche dentro de un encabezado sol). */
@@ -20,7 +37,8 @@ type PropsChip = {
 };
 
 /**
- * Chip de filtro: pastilla de 46 px de alto dentro de un objetivo táctil de 44 px mínimo.
+ * Chip de filtro: capa fina sobre el `Toggle` de shadcn, pastilla de 46 px de alto (objetivo táctil de
+ * 44 px mínimo).
  * Sin elegir: superficie blanca. Elegido: sol con texto azul noche.
  *
  * Dentro de un `<Encabezado variante="sol">` (ese encabezado marca `data-encabezado="sol"`), el chip
@@ -38,30 +56,19 @@ export function Chip({
 }: PropsChip) {
   const radio = modo === "radio";
   return (
-    <button
-      type="button"
+    <Toggle
+      pressed={seleccionado}
+      onPressedChange={() => onClick?.()}
       role={radio ? "radio" : undefined}
+      // `Toggle` pone `aria-pressed`; en modo radio se quita porque ese rol usa `aria-checked`.
       aria-pressed={radio ? undefined : seleccionado}
       aria-checked={radio ? seleccionado : undefined}
       disabled={disabled}
       tabIndex={tabIndex}
-      onClick={onClick}
-      className={cn(
-        "group inline-flex min-h-11 items-center rounded-full disabled:opacity-50",
-        className,
-      )}
+      className={cn(CHIP, estadoChip(seleccionado), className)}
     >
-      <span
-        className={cn(
-          "flex h-[46px] items-center rounded-full px-4 text-base font-bold whitespace-nowrap transition-colors",
-          seleccionado
-            ? "bg-sol text-sobre-sol in-data-[encabezado=sol]:bg-sobre-sol in-data-[encabezado=sol]:text-sobre-encabezado"
-            : "bg-superficie text-texto group-hover:bg-sol/40",
-        )}
-      >
-        {children}
-      </span>
-    </button>
+      {children}
+    </Toggle>
   );
 }
 
@@ -86,8 +93,10 @@ export type GrupoChipsProps = (PropsGrupoUnica | PropsGrupoMultiple) & {
 };
 
 /**
- * Grupo de chips. `tipo="unica"` es un `radiogroup` (flechas del teclado para moverse y elegir);
- * `tipo="multiple"` es un `group` de botones con `aria-pressed`.
+ * Grupo de chips. `tipo="multiple"` es un `group` de `Chip` con `aria-pressed`; `tipo="unica"` es un
+ * `radiogroup` (flechas del teclado para moverse y elegir) con `Chip` en modo radio. No se usa
+ * `ToggleGroup` de shadcn: su foco itinerante (una sola parada con Tab) cambiaría el teclado de las
+ * pantallas, y no tiene el rol `radio` de la selección única.
  */
 export function GrupoChips(props: GrupoChipsProps) {
   const { opciones, etiqueta, className } = props;
@@ -96,7 +105,11 @@ export function GrupoChips(props: GrupoChipsProps) {
   if (props.tipo === "multiple") {
     const { valor, onChange } = props;
     return (
-      <div role="group" aria-label={etiqueta} className={cn("flex flex-wrap gap-x-2", className)}>
+      <div
+        role="group"
+        aria-label={etiqueta}
+        className={cn("flex flex-wrap gap-x-2 gap-y-1", className)}
+      >
         {opciones.map((opcion) => {
           const activo = valor.includes(opcion.valor);
           return (
@@ -145,7 +158,7 @@ export function GrupoChips(props: GrupoChipsProps) {
       aria-label={etiqueta}
       id={idGrupo}
       onKeyDown={mover}
-      className={cn("flex flex-wrap gap-x-2", className)}
+      className={cn("flex flex-wrap gap-x-2 gap-y-1", className)}
     >
       {opciones.map((opcion, i) => (
         <Chip

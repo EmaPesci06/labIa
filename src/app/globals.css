@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
 /*
  * Tokens de diseño de LabÍA, "Verano en la costa" (docs/prototipo-nuevo/README.md).
@@ -10,6 +12,11 @@
  * - "sobre-X" es el color del texto que va encima de X.
  * - "campo" no está en la tabla del README: es el fondo de los campos de formulario (blanco en
  *   claro, fondo de página en oscuro). Se agregó para que el componente Campo no use `dark:`.
+ * - "borde" y "texto-suave" tampoco están en la tabla: los pide shadcn (--border y
+ *   --muted-foreground, LAB-82). borde llega a 3:1 (componentes de interfaz) y texto-suave a 4,5:1
+ *   (texto) sobre fondo y superficie, en los dos temas.
+ * - shadcn: sus variables (--background, --primary…) se atan más abajo a estos tokens. Los archivos de
+ *   src/components/shadcn/ no se editan a mano (AGENTS.md).
  */
 :root,
 .claro {
@@ -19,6 +26,8 @@
   --color-superficie: #ffffff;
   --color-campo: #ffffff;
   --color-texto: #123b4a;
+  --color-texto-suave: #48646f;
+  --color-borde: #6f8790;
   --color-accion: #0e7c86;
   --color-sobre-accion: #ffffff;
   --color-encabezado: #0e7c86;
@@ -42,6 +51,8 @@
   --color-superficie: #17485a;
   --color-campo: #0b2730;
   --color-texto: #fff3d6;
+  --color-texto-suave: #c4d6d8;
+  --color-borde: #7aa3ae;
   --color-accion: #45c4cc;
   --color-sobre-accion: #0b2730;
   --color-encabezado: #0e7c86;
@@ -54,6 +65,54 @@
 
   --color-velo: #05161b;
   --color-foco: #f7c948;
+}
+
+/*
+ * Variables de shadcn atadas a nuestros tokens (LAB-82). Se declaran en los tres selectores para que
+ * un bloque .claro dentro de .dark (o al revés) resuelva los tokens de su propio tema.
+ * No hay --destructive-foreground (shadcn no lo tiene): el texto sobre error se resuelve con
+ * className en la capa fina. Los tokens sin equivalente (sol, coral, velo, equipo, encabezado)
+ * quedan como tokens propios.
+ */
+:root,
+.claro,
+.dark {
+  --radius: 0.625rem;
+
+  --background: var(--color-fondo);
+  --foreground: var(--color-texto);
+  --card: var(--color-superficie);
+  --card-foreground: var(--color-texto);
+  --popover: var(--color-superficie);
+  --popover-foreground: var(--color-texto);
+  --primary: var(--color-accion);
+  --primary-foreground: var(--color-sobre-accion);
+  --secondary: var(--color-sol);
+  --secondary-foreground: var(--color-sobre-sol);
+  --accent: var(--color-sol);
+  --accent-foreground: var(--color-sobre-sol);
+  --muted: var(--color-fondo);
+  --muted-foreground: var(--color-texto-suave);
+  --destructive: var(--color-error);
+  --border: var(--color-borde);
+  --input: var(--color-campo);
+  --ring: var(--color-foco);
+
+  /* Sidebar y gráficos: LabÍA no los usa; se atan a los tokens más cercanos por si un componente
+     de shadcn los referencia. */
+  --sidebar: var(--color-superficie);
+  --sidebar-foreground: var(--color-texto);
+  --sidebar-primary: var(--color-accion);
+  --sidebar-primary-foreground: var(--color-sobre-accion);
+  --sidebar-accent: var(--color-sol);
+  --sidebar-accent-foreground: var(--color-sobre-sol);
+  --sidebar-border: var(--color-borde);
+  --sidebar-ring: var(--color-foco);
+  --chart-1: var(--color-accion);
+  --chart-2: var(--color-sol);
+  --chart-3: var(--color-coral);
+  --chart-4: var(--color-texto);
+  --chart-5: var(--color-texto-suave);
 }
 
 /* `dark:` aplica dentro de .dark, salvo en un bloque forzado a claro con .claro. */
@@ -70,6 +129,8 @@
   --color-superficie: var(--color-superficie);
   --color-campo: var(--color-campo);
   --color-texto: var(--color-texto);
+  --color-texto-suave: var(--color-texto-suave);
+  --color-borde: var(--color-borde);
   --color-accion: var(--color-accion);
   --color-sobre-accion: var(--color-sobre-accion);
   --color-encabezado: var(--color-encabezado);
@@ -82,6 +143,48 @@
   --color-velo: var(--color-velo);
   --color-foco: var(--color-foco);
 
+  /* shadcn: nombres que usan sus componentes (bg-primary, text-muted-foreground, border-border…). */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Radios de shadcn, derivados de --radius (0.625rem). */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
   /* Las variables --fuente-* las define next/font en src/app/fuentes.ts. Texto y datos usan
      Nunito Sans; títulos y marca, Baloo 2. */
   --font-texto: var(--fuente-nunito), system-ui, sans-serif;
@@ -89,10 +192,7 @@
 }
 
 @theme {
-  /* Radios del prototipo: campo 16, botón 18, tarjeta 22, hoja y encabezado 28. Chips: rounded-full. */
-  --radius-campo: 16px;
-  --radius-boton: 18px;
-  --radius-tarjeta: 22px;
+  /* Campo, botón y tarjeta usan los radios de shadcn (rounded-xl, 2xl y 3xl). Hoja: 28. Chips: rounded-full. */
   --radius-hoja: 28px;
 }
 
@@ -130,6 +230,26 @@
     outline: 3px solid var(--color-foco);
     outline-offset: 2px;
   }
+}
+
+/*
+ * Componentes de shadcn (src/components/shadcn/, no se editan): usan `outline-none` y su propio
+ * anillo, así que el foco de 3 px se impone desde acá. Va fuera de @layer para ganarle a las
+ * utilidades; por eso las capas finas no pueden cambiar este outline con clases (focus-visible:outline-*). Los 44 px no son global: los pone cada capa fina con className o con una regla por
+ * data-slot.
+ */
+[data-slot]:focus-visible {
+  outline: 3px solid var(--color-foco);
+  outline-offset: 2px;
+}
+
+/*
+ * Velo de las hojas y diálogos de shadcn (LAB-83): bg-black/10 no existe porque borramos la paleta
+ * por defecto; acá se ata al token velo al 60 %.
+ */
+[data-slot="sheet-overlay"],
+[data-slot="dialog-overlay"] {
+  background-color: color-mix(in srgb, var(--color-velo) 60%, transparent);
 }
 
 /*

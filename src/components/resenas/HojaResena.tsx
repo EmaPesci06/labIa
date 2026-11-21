@@ -5,7 +5,7 @@ import { useEffect, useState, useTransition } from "react";
 import { Aviso } from "@/components/ui/Aviso";
 import { Boton } from "@/components/ui/Boton";
 import { Chip } from "@/components/ui/Chip";
-import { HojaInferior } from "@/components/ui/HojaInferior";
+import { Hoja } from "@/components/ui/Hoja";
 import {
   consultarElegibilidadResena,
   guardarResena,
@@ -88,7 +88,7 @@ export function HojaResena({
     : `¿Cómo te fue con ${nombreProfesional}?`;
 
   return (
-    <HojaInferior
+    <Hoja
       abierta={abierta}
       onCambioAbierta={onCambioAbierta}
       titulo={titulo}
@@ -106,7 +106,7 @@ export function HojaResena({
           }}
         />
       ) : null}
-    </HojaInferior>
+    </Hoja>
   );
 }
 
@@ -253,7 +253,7 @@ function FormularioResena({
           aria-invalid={errorTexto ? true : undefined}
           aria-describedby={errorTexto ? "error-comentario-resena" : undefined}
           placeholder="Contá cómo fue: puntualidad, prolijidad, si respetó el presupuesto."
-          className="w-full resize-none rounded-campo border-2 border-texto bg-campo p-3.5 text-[17px] leading-snug text-texto placeholder:text-texto placeholder:opacity-60"
+          className="w-full resize-none rounded-xl border-2 border-texto bg-campo p-3.5 text-[17px] leading-snug text-texto placeholder:text-texto placeholder:opacity-60"
         />
         {errorTexto ? (
           <p id="error-comentario-resena" role="alert" className="text-sm font-semibold text-error">

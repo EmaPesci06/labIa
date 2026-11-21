@@ -1,6 +1,8 @@
+import { tokenJwt } from "./apoyo/token";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext } from "@playwright/test";
 import { reiniciarFalso } from "./apoyo/reiniciar-falso";
+import { esperarHojaQuieta } from "./apoyo/hoja";
 
 // LAB-29: flujo completo de Mis Trabajos del cliente:
 // ver postulantes, comparar, elegir a uno atómicamente, flujo de WhatsApp con origen 'postulacion',
@@ -21,7 +23,7 @@ const TRABAJO_PARA_TERMINAR = "88888888-8888-4888-8888-888888888882";
 async function iniciarSesion(contexto: BrowserContext, baseURL: string, token: string) {
   const exp = Math.floor(Date.now() / 1000) + 3600;
   const sesion = {
-    access_token: token,
+    access_token: tokenJwt(token),
     refresh_token: "refresh-falso",
     token_type: "bearer",
     expires_in: 3600,
@@ -55,7 +57,9 @@ test.describe("Mis trabajos del cliente (LAB-29)", () => {
 
     // Trabajo publicado en la lista
     // La lista está dos veces en el DOM (celular y escritorio): se mira solo la visible.
-    await expect(page.getByText("Olor a gas en la cocina").filter({ visible: true })).toBeVisible();
+    await expect(
+      page.getByText("Olor a gas en la cocina").filter({ visible: true }).first(),
+    ).toBeVisible();
     await expect(page.getByText("Gas · La Perla").filter({ visible: true }).first()).toBeVisible();
     await expect(page.getByText("Abierto").filter({ visible: true }).first()).toBeVisible();
   });
@@ -97,7 +101,7 @@ test.describe("Mis trabajos del cliente (LAB-29)", () => {
     await botonElegir.click();
 
     // Diálogo de confirmación accesible
-    await expect(page.getByRole("dialog")).toBeVisible();
+    await esperarHojaQuieta(page);
     await expect(page.getByText("¿Elegís a Martín?")).toBeVisible();
 
     // Confirmar elección

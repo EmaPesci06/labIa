@@ -1,5 +1,7 @@
+import { tokenJwt } from "./apoyo/token";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
+import { esperarHojaQuieta } from "./apoyo/hoja";
 
 // LAB-24: perfil público y edición, con un Supabase FALSO (tests/e2e/apoyo/supabase-falso.cjs).
 // Sirve en máquinas sin Docker. Para correr:
@@ -26,7 +28,7 @@ const base64url = (texto: string) => Buffer.from(texto).toString("base64url");
 async function iniciarSesion(contexto: BrowserContext, baseURL: string, token: Token) {
   const exp = Math.floor(Date.now() / 1000) + 3600;
   const sesion = {
-    access_token: token,
+    access_token: tokenJwt(token),
     refresh_token: "refresh-falso",
     token_type: "bearer",
     expires_in: 3600,
@@ -181,7 +183,7 @@ test.describe("contacto por WhatsApp: cliente con sesión", () => {
     await abrirHoja.click();
 
     const hoja = page.getByRole("dialog", { name: /Escribile a .+ por WhatsApp/ });
-    await expect(hoja).toBeVisible();
+    await esperarHojaQuieta(page, hoja);
     await expect(hoja.getByRole("listitem")).toHaveCount(4);
     await expect(hoja.getByText("Pedí el presupuesto por escrito.")).toBeVisible();
     await capturar(page, "contacto-hoja", "claro");
@@ -296,7 +298,10 @@ for (const tema of ["light", "dark"] as const) {
         .filter({ visible: true })
         .first()
         .click();
-      await expect(page.getByRole("dialog", { name: /Escribile a .+ por WhatsApp/ })).toBeVisible();
+      await esperarHojaQuieta(
+        page,
+        page.getByRole("dialog", { name: /Escribile a .+ por WhatsApp/ }),
+      );
       await capturar(page, "contacto-hoja", nombreTema);
       await sinViolacionesGraves(page);
       await page.keyboard.press("Escape");

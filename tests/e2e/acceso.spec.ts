@@ -172,7 +172,9 @@ test.describe("cuenta real", () => {
     await page.getByLabel("Tu WhatsApp").fill("223 555 1234");
     await page.getByLabel("Email").fill(email);
     await page.getByLabel("Contraseña", { exact: true }).fill(contrasena);
-    await page.getByLabel("Tu barrio").selectOption({ label: "Centro" });
+    await page.getByLabel("Tu barrio").click();
+    await page.getByRole("option", { name: "Centro" }).click();
+    await page.getByLabel(/mayor de 18/).check();
     await page.getByRole("button", { name: "Crear cuenta" }).click();
     await expect(page).toHaveURL(/\/(inicio|buscar\?barrio=[a-z0-9-]+)$/);
 

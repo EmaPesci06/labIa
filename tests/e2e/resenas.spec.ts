@@ -1,5 +1,7 @@
+import { tokenJwt } from "./apoyo/token";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
+import { esperarHojaQuieta, focoDentroDelDialogo } from "./apoyo/hoja";
 
 // LAB-31: reseñas de clientes a profesionales, con el Supabase FALSO (tests/e2e/apoyo/supabase-falso.cjs).
 // Cubre: elegibilidad (contactó o eligió), alta desde el perfil, edición dentro de las 24 h, reseña
@@ -38,7 +40,7 @@ const base64url = (texto: string) => Buffer.from(texto).toString("base64url");
 async function iniciarSesion(contexto: BrowserContext, baseURL: string, token: Token) {
   const exp = Math.floor(Date.now() / 1000) + 3600;
   const sesion = {
-    access_token: token,
+    access_token: tokenJwt(token),
     refresh_token: "refresh-falso",
     token_type: "bearer",
     expires_in: 3600,
@@ -166,10 +168,8 @@ test.describe("reseñas: cliente elegible", () => {
     await page.keyboard.press("Enter");
 
     await expect(hoja(page)).toBeVisible();
-    const focoDentro = await page.evaluate(() =>
-      Boolean(document.activeElement?.closest('[role="dialog"]')),
-    );
-    expect(focoDentro).toBe(true);
+    // El foco entra a la hoja en el cuadro siguiente a abrirla: se espera a que se asiente.
+    await expect.poll(() => focoDentroDelDialogo(page)).toBe(true);
 
     await page.keyboard.press("Escape");
     await expect(hoja(page)).toBeHidden();
@@ -221,7 +221,7 @@ test.describe("reseñas: cliente elegible", () => {
       await page.emulateMedia({ colorScheme: esquema });
       await page.goto(RUTA_PERFIL);
       await botonDejarResena(page).click();
-      await expect(hoja(page)).toBeVisible();
+      await esperarHojaQuieta(page, hoja(page));
       const resultado = await new AxeBuilder({ page })
         .include('[role="dialog"]')
         .withTags(["wcag2a", "wcag2aa"])

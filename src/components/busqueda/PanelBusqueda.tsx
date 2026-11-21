@@ -5,6 +5,7 @@ import { useTransition, type ReactNode } from "react";
 
 import { Bloque } from "@/components/navegacion/Esqueleto";
 import { Chip } from "@/components/ui/Chip";
+import { Combobox } from "@/components/ui/Combobox";
 import { Encabezado } from "@/components/ui/Encabezado";
 import type { Barrio } from "@/lib/barrios-busqueda";
 import type { Oficio, OrdenBusqueda } from "@/lib/busqueda";
@@ -104,12 +105,15 @@ export function PanelBusqueda({
               aplicar({ oficio: elegido });
             }}
           />
-          <SelectorPastilla
+          <Combobox
+            aspecto="pastilla"
             etiqueta="Tu barrio"
-            valor={barrio}
+            value={barrio}
             opciones={opcionesBarrio}
             disabled={barrios.length === 0}
-            onCambio={(slug) => aplicar({ barrio: slug })}
+            placeholderBusqueda="Buscá tu barrio…"
+            sinResultados="No encontramos ese barrio."
+            onValueChange={(slug) => aplicar({ barrio: slug })}
           />
           <SelectorPastilla
             etiqueta="Distancia"

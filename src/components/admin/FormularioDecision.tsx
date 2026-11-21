@@ -55,18 +55,11 @@ export function FormularioDecision({ verificacionId }: { verificacionId: string 
             etiqueta="Motivo del rechazo"
             name="motivo"
             defaultValue=""
+            placeholder="Elegí un motivo"
+            opciones={MOTIVOS_RECHAZO.map((motivo) => ({ valor: motivo, etiqueta: motivo }))}
             required
             error={estado.errores?.motivo}
-          >
-            <option value="" disabled>
-              Elegí un motivo
-            </option>
-            {MOTIVOS_RECHAZO.map((motivo) => (
-              <option key={motivo} value={motivo}>
-                {motivo}
-              </option>
-            ))}
-          </Campo>
+          />
           <Campo
             variante="area"
             etiqueta="Detalle (opcional; obligatorio con Otro)"

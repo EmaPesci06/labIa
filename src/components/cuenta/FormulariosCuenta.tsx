@@ -5,6 +5,7 @@ import { useActionState, useState, type FormEvent } from "react";
 import { CampoContrasena } from "@/components/auth/CampoContrasena";
 import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
+import { Combobox } from "@/components/ui/Combobox";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { ESTADO_INICIAL, type EstadoFormulario } from "@/lib/auth/estado";
 import { cambiarContrasena, cambiarEmail, guardarDatos } from "@/lib/cuenta/acciones";
@@ -90,7 +91,7 @@ export function FormularioDatos({ barrios, inicial }: PropsDatos) {
         limpiar(e.target.name)
       }
       noValidate
-      className="flex flex-col gap-3 rounded-tarjeta bg-superficie p-4 text-texto"
+      className="flex flex-col gap-3 rounded-3xl bg-superficie p-4 text-texto"
     >
       <Campo
         etiqueta="Nombre y apellido"
@@ -109,20 +110,17 @@ export function FormularioDatos({ barrios, inicial }: PropsDatos) {
         error={errores.whatsapp}
         required
       />
-      <Campo
-        variante="seleccion"
+      <Combobox
         etiqueta="Barrio"
         name="barrio"
+        opciones={opcionesBarrios.map((b) => ({ valor: String(b.id), etiqueta: b.nombre }))}
         defaultValue={v.barrio}
+        placeholder="Elegí tu barrio"
+        placeholderBusqueda="Buscá tu barrio…"
+        sinResultados="No encontramos ese barrio."
         error={errores.barrio}
-      >
-        <option value="">Elegí tu barrio</option>
-        {opcionesBarrios.map((b) => (
-          <option key={b.id} value={String(b.id)}>
-            {b.nombre}
-          </option>
-        ))}
-      </Campo>
+        onValueChange={() => limpiar("barrio")}
+      />
       <Resultado estado={estado} />
       <Boton type="submit" bloque cargando={pendiente}>
         Guardar

@@ -1,7 +1,7 @@
 "use client";
 
 import { Hammer, MessageCircle, ShieldCheck } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 
 import { Aviso } from "@/components/ui/Aviso";
 import { AvisoPantalla } from "@/components/ui/AvisoPantalla";
@@ -13,7 +13,7 @@ import { Encabezado } from "@/components/ui/Encabezado";
 import { GrupoChips } from "@/components/ui/Chip";
 import { EtiquetaMono } from "@/components/ui/EtiquetaMono";
 import { Estrellas } from "@/components/ui/Estrellas";
-import { HojaInferior } from "@/components/ui/HojaInferior";
+import { Hoja } from "@/components/ui/Hoja";
 import { Insignia } from "@/components/ui/Insignia";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { Toldo } from "@/components/ui/Toldo";
@@ -46,11 +46,19 @@ export function MuestraComponentes() {
   const [filtros, setFiltros] = useState<string[]>(["matriculados"]);
   const [puntaje, setPuntaje] = useState(4);
   const [hoja, setHoja] = useState(false);
+  const botonHoja = useRef<HTMLElement | null>(null);
 
   return (
     <div className="space-y-7">
       <Seccion titulo="Botones">
-        <Boton tamano="grande" bloque onClick={() => setHoja(true)}>
+        <Boton
+          tamano="grande"
+          bloque
+          onClick={(evento) => {
+            botonHoja.current = evento.currentTarget;
+            setHoja(true);
+          }}
+        >
           Contactar por WhatsApp
         </Boton>
         <div className="flex flex-wrap gap-2.5">
@@ -98,11 +106,16 @@ export function MuestraComponentes() {
             maxLength={500}
             placeholder="Se me rompió la llave de paso…"
           />
-          <Campo variante="seleccion" etiqueta="Tu barrio" defaultValue="La Perla">
-            <option>La Perla</option>
-            <option>Centro</option>
-            <option>Chauvín</option>
-          </Campo>
+          <Campo
+            variante="seleccion"
+            etiqueta="Oficio"
+            defaultValue="plomeria"
+            opciones={[
+              { valor: "plomeria", etiqueta: "Plomería" },
+              { valor: "gas", etiqueta: "Gas" },
+              { valor: "electricidad", etiqueta: "Electricidad" },
+            ]}
+          />
         </div>
       </Seccion>
 
@@ -125,7 +138,7 @@ export function MuestraComponentes() {
           nivel={2}
           variante="sol"
           titulo="Chips dentro de un encabezado sol"
-          className="rounded-tarjeta"
+          className="rounded-3xl"
         >
           <GrupoChips
             tipo="unica"
@@ -237,7 +250,12 @@ export function MuestraComponentes() {
         </Tarjeta>
       </Seccion>
 
-      <HojaInferior abierta={hoja} onCambioAbierta={setHoja} titulo="Antes de contactar">
+      <Hoja
+        abierta={hoja}
+        onCambioAbierta={setHoja}
+        titulo="Antes de contactar"
+        devolverFocoA={botonHoja}
+      >
         <ul className="list-disc space-y-2 pl-5 text-base leading-snug">
           <li>Pedí el presupuesto por escrito.</li>
           <li>Pasá tu dirección exacta recién cuando haya acuerdo.</li>
@@ -250,7 +268,7 @@ export function MuestraComponentes() {
         <Boton variante="enlace" bloque onClick={() => setHoja(false)}>
           Cancelar
         </Boton>
-      </HojaInferior>
+      </Hoja>
     </div>
   );
 }

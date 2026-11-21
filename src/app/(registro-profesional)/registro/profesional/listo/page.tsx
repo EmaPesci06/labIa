@@ -50,7 +50,7 @@ function ContenidoListo({ nombre }: { nombre: string | null }) {
         <div className="mt-auto flex flex-col pt-4">
           <Link
             href="/trabajos"
-            className="flex min-h-14 items-center justify-center rounded-boton bg-superficie px-6 text-lg font-bold text-texto no-underline transition-colors hover:bg-superficie/90 focus-visible:outline-sobre-encabezado"
+            className="flex min-h-14 items-center justify-center rounded-2xl bg-superficie px-6 text-lg font-bold text-texto no-underline transition-colors hover:bg-superficie/90 focus-visible:outline-sobre-encabezado"
           >
             Ver trabajos de mi zona
           </Link>

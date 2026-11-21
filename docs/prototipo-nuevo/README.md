@@ -3,7 +3,7 @@
 Copia del lienzo de Claude **"LabÍA · Exploración de UI nueva"**, página "Verano en la costa":
 https://claude.ai/artifact/BCphX9KfTW2pSMyupZXBwc (privado; esta carpeta es la copia que leen los agentes).
 
-Este prototipo **reemplaza** a `docs/prototipo/`. La interfaz actual se rehace entera con este diseño. La lógica, los
+Este prototipo reemplazó al diseño anterior (`docs/prototipo/`, borrado en LAB-81). La interfaz actual se rehace entera con este diseño. La lógica, los
 datos, la seguridad y las rutas no cambian: solo cambian el marcado, los estilos y los textos de pantalla.
 
 Cómo se pasa un boceto a código: [`CONSTRUCCION.md`](CONSTRUCCION.md). Las tareas están en Linear, milestone

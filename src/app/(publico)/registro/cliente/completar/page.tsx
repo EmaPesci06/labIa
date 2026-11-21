@@ -20,11 +20,11 @@ async function Contenido({ searchParams }: PageProps<"/registro/cliente/completa
     const supabase = await crearClienteServidor();
     const { data: fila } = await supabase
       .from("usuarios")
-      .select("whatsapp, barrio_id")
+      .select("whatsapp, barrio_id, terminos_aceptados_at")
       .eq("id", sesion.usuario.id)
       .maybeSingle();
-    // Ya tiene todo: no hay nada que completar.
-    if (fila?.whatsapp && fila.barrio_id) redirect("/inicio");
+    // Ya tiene todo, también el consentimiento (LAB-81): no hay nada que completar.
+    if (fila?.whatsapp && fila.barrio_id && fila.terminos_aceptados_at) redirect("/inicio");
   } else {
     redirect("/inicio");
   }
@@ -36,7 +36,7 @@ async function Contenido({ searchParams }: PageProps<"/registro/cliente/completa
   return (
     <>
       {aviso ? (
-        <p role="alert" className="rounded-campo bg-sol p-3.5 text-sm font-bold text-sobre-sol">
+        <p role="alert" className="rounded-xl bg-sol p-3.5 text-sm font-bold text-sobre-sol">
           Creamos tu cuenta pero no pudimos guardar tus datos. Completalos acá para seguir.
         </p>
       ) : null}

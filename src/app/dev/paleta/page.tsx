@@ -18,6 +18,8 @@ const MUESTRA: Record<(typeof TOKENS_COLOR)[number], string> = {
   superficie: "bg-superficie",
   campo: "bg-campo",
   texto: "bg-texto",
+  "texto-suave": "bg-texto-suave",
+  borde: "bg-borde",
   accion: "bg-accion",
   "sobre-accion": "bg-sobre-accion",
   encabezado: "bg-encabezado",
@@ -44,7 +46,7 @@ function Panel({ tema }: { tema: "claro" | "dark" }) {
   return (
     <section
       aria-labelledby={`titulo-${tema}`}
-      className={cn(tema, "rounded-tarjeta border-2 border-texto bg-fondo p-4 text-texto lg:p-6")}
+      className={cn(tema, "rounded-3xl border-2 border-texto bg-fondo p-4 text-texto lg:p-6")}
     >
       <h2 id={`titulo-${tema}`} className="mb-4 font-titulo text-2xl">
         {titulo}
@@ -54,7 +56,7 @@ function Panel({ tema }: { tema: "claro" | "dark" }) {
         {TOKENS_COLOR.map((token) => (
           <li
             key={token}
-            className="flex items-center gap-2 rounded-campo border-2 border-texto bg-superficie p-2"
+            className="flex items-center gap-2 rounded-xl border-2 border-texto bg-superficie p-2"
           >
             <span
               aria-hidden
@@ -82,7 +84,7 @@ function Panel({ tema }: { tema: "claro" | "dark" }) {
         ))}
       </div>
 
-      <div className="mt-6 space-y-1 rounded-tarjeta bg-superficie p-4">
+      <div className="mt-6 space-y-1 rounded-3xl bg-superficie p-4">
         <p className="text-texto">Texto principal sobre superficie.</p>
         <p className="font-bold text-texto underline">Enlace de texto: negrita en texto.</p>
         <p className="font-bold text-error">Error: revisá este campo.</p>
@@ -121,7 +123,7 @@ export default function PaginaPaleta() {
         <h2 id="titulo-tipografias" className="font-titulo text-2xl">
           Tipografías
         </h2>
-        <div className="space-y-4 rounded-tarjeta border-2 border-texto bg-superficie p-4 lg:p-6">
+        <div className="space-y-4 rounded-3xl border-2 border-texto bg-superficie p-4 lg:p-6">
           <div>
             <p className="text-xs font-bold tracking-[0.4px] text-texto uppercase">
               Baloo 2 800 · font-titulo
@@ -152,11 +154,11 @@ export default function PaginaPaleta() {
         <h2 id="titulo-marca" className="font-titulo text-2xl">
           Logo
         </h2>
-        <div className="flex flex-wrap items-center gap-6 rounded-tarjeta border-2 border-texto bg-superficie p-4 lg:p-6">
-          <div className="rounded-campo bg-fondo p-4">
+        <div className="flex flex-wrap items-center gap-6 rounded-3xl border-2 border-texto bg-superficie p-4 lg:p-6">
+          <div className="rounded-xl bg-fondo p-4">
             <Logo className="text-4xl" />
           </div>
-          <div className="rounded-campo bg-encabezado p-4">
+          <div className="rounded-xl bg-encabezado p-4">
             <Logo className="text-4xl" sobre="encabezado" />
           </div>
           <Logo variante="icono" />

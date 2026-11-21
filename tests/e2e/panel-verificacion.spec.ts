@@ -1,3 +1,4 @@
+import { tokenJwt } from "./apoyo/token";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext, type Locator, type Page } from "@playwright/test";
 
@@ -29,7 +30,7 @@ const DIEGO = /Diego Paz/;
 async function iniciarSesionAdmin(contexto: BrowserContext, baseURL: string) {
   const exp = Math.floor(Date.now() / 1000) + 3600;
   const sesion = {
-    access_token: "tok-admin",
+    access_token: tokenJwt("tok-admin"),
     refresh_token: "refresh-falso",
     token_type: "bearer",
     expires_in: 3600,
@@ -191,7 +192,8 @@ test.describe("panel de verificación: camino feliz del admin", () => {
     const antecedentes = tarjetaDe(page, "Certificado de antecedentes");
 
     await antecedentes.getByRole("button", { name: "Rechazar…" }).click();
-    await antecedentes.getByLabel("Motivo del rechazo").selectOption("Foto borrosa");
+    await antecedentes.getByLabel("Motivo del rechazo").click();
+    await page.getByRole("option", { name: "Foto borrosa" }).click();
     await antecedentes.getByRole("button", { name: "Confirmar rechazo" }).click();
 
     await expect(
@@ -216,7 +218,8 @@ test.describe("panel de verificación: camino feliz del admin", () => {
     const antecedentes = tarjetaDe(page, "Certificado de antecedentes");
 
     await antecedentes.getByRole("button", { name: "Rechazar…" }).click();
-    await antecedentes.getByLabel("Motivo del rechazo").selectOption("Otro");
+    await antecedentes.getByLabel("Motivo del rechazo").click();
+    await page.getByRole("option", { name: "Otro" }).click();
     await antecedentes.getByRole("button", { name: "Confirmar rechazo" }).click();
 
     const detalle = antecedentes.getByLabel("Detalle (opcional; obligatorio con Otro)");
@@ -233,7 +236,8 @@ test.describe("panel de verificación: camino feliz del admin", () => {
     const antecedentes = tarjetaDe(page, "Certificado de antecedentes");
 
     await antecedentes.getByRole("button", { name: "Rechazar…" }).click();
-    await antecedentes.getByLabel("Motivo del rechazo").selectOption("Otro");
+    await antecedentes.getByLabel("Motivo del rechazo").click();
+    await page.getByRole("option", { name: "Otro" }).click();
     await antecedentes
       .getByLabel("Detalle (opcional; obligatorio con Otro)")
       .fill("Falta la hoja 2 del certificado");

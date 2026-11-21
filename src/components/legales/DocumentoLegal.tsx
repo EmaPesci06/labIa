@@ -87,7 +87,7 @@ export function DocumentoLegal({
         </Aviso>
       )}
 
-      <nav aria-label="Índice" className="rounded-tarjeta bg-superficie p-4">
+      <nav aria-label="Índice" className="rounded-3xl bg-superficie p-4">
         <h2 className="mb-2 font-texto text-xs font-bold tracking-wider text-texto uppercase">
           Índice
         </h2>
@@ -96,7 +96,7 @@ export function DocumentoLegal({
             <li key={s.id}>
               <a
                 href={`#${s.id}`}
-                className="flex min-h-11 items-center gap-2.5 rounded-campo font-bold text-texto underline-offset-2 hover:underline"
+                className="flex min-h-11 items-center gap-2.5 rounded-xl font-bold text-texto underline-offset-2 hover:underline"
               >
                 <span className="w-6 font-texto text-[13px] text-texto">{i + 1}.</span>
                 {s.titulo}

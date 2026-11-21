@@ -4,10 +4,11 @@ import { randomUUID } from "node:crypto";
 
 import { revalidatePath } from "next/cache";
 
+import { altaIncompleta, MENSAJE_ALTA_INCOMPLETA } from "@/lib/auth/alta";
 import { rolFalso } from "@/lib/auth/sesion-falsa";
 import { registrarEventoServidor } from "@/lib/metricas-servidor";
 import { limitarPersistente } from "@/lib/rate-limit-persistente";
-import { obtenerSesion } from "@/lib/sesion";
+import { obtenerSesion, obtenerSesionVerificada } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import { esquemaGuardarResena, type EntradaGuardarResena } from "@/lib/validaciones/resenas";
 
@@ -33,6 +34,8 @@ const MENSAJE_FALLA = "No pudimos guardar tu reseña. Probá de nuevo en unos mi
 
 /**
  * Consulta si el cliente en sesión puede dejar una reseña (o editar la suya) para el profesional.
+ * Es una lectura que se hace al pintar el perfil: usa `obtenerSesion` (getClaims, sin ir a Auth).
+ * Guardar la reseña (`guardarResena`) sí valida el token contra Auth (LAB-88).
  */
 export async function consultarElegibilidadResena(
   profesionalId: string,
@@ -123,13 +126,14 @@ export async function consultarElegibilidadResena(
 export async function guardarResena(
   entrada: EntradaGuardarResena,
 ): Promise<ResultadoGuardarResena> {
-  const sesion = await obtenerSesion();
+  const sesion = await obtenerSesionVerificada();
   if (!sesion) {
     return { ok: false, error: "Tu sesión venció. Ingresá de nuevo para dejar tu reseña." };
   }
   if (sesion.rol !== "cliente") {
     return { ok: false, error: "Solo los clientes pueden dejar reseñas." };
   }
+  if (altaIncompleta(sesion)) return { ok: false, error: MENSAJE_ALTA_INCOMPLETA };
 
   const parseo = esquemaGuardarResena.safeParse(entrada);
   if (!parseo.success) {

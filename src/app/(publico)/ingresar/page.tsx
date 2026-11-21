@@ -28,18 +28,18 @@ async function Contenido({ searchParams }: PageProps<"/ingresar">) {
   return (
     <>
       {error ? (
-        <p role="alert" className="rounded-campo bg-sol p-3.5 text-sm font-bold text-sobre-sol">
+        <p role="alert" className="rounded-xl bg-sol p-3.5 text-sm font-bold text-sobre-sol">
           {error}
         </p>
       ) : null}
       <BotonGoogle volver={volver} />
       <SeparadorO />
       <FormularioIngreso volver={volver} />
-      <div className="-mx-5 mt-auto -mb-8 flex items-center justify-between rounded-t-hoja bg-superficie px-5 pt-4 pb-5 lg:mx-0 lg:mt-6 lg:mb-0 lg:rounded-tarjeta">
+      <div className="-mx-5 mt-auto -mb-8 flex items-center justify-between rounded-t-hoja bg-superficie px-5 pt-4 pb-5 lg:mx-0 lg:mt-6 lg:mb-0 lg:rounded-3xl">
         <span className="text-base text-texto">¿Primera vez?</span>
         <Link
           href="/"
-          className="inline-flex min-h-12 items-center rounded-boton border-[3px] border-texto px-5 text-base font-bold text-texto hover:bg-fondo"
+          className="inline-flex min-h-12 items-center rounded-2xl border-[3px] border-texto px-5 text-base font-bold text-texto hover:bg-fondo"
         >
           Crear cuenta
         </Link>

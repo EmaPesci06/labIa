@@ -28,10 +28,7 @@ async function Cuerpo({ rol }: { rol: "cliente" | "profesional" }) {
   if (sesion) {
     return (
       <div className="flex flex-col gap-4">
-        <p
-          role="status"
-          className="rounded-campo bg-sol p-4 text-[15px] font-semibold text-sobre-sol"
-        >
+        <p role="status" className="rounded-xl bg-sol p-4 text-[15px] font-semibold text-sobre-sol">
           Tu cuenta ya está creada. Muy pronto vas a poder completar tus datos desde acá.
         </p>
         <Boton

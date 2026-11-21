@@ -17,7 +17,7 @@ export function FormularioPedirRestablecer() {
 
   if (estado.exito) {
     return (
-      <p role="status" className="rounded-campo bg-sol p-4 text-[15px] font-bold text-sobre-sol">
+      <p role="status" className="rounded-xl bg-sol p-4 text-[15px] font-bold text-sobre-sol">
         {estado.exito}
       </p>
     );

@@ -2,14 +2,18 @@ import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode, Ref } from "react";
 
+import { Button, buttonVariants } from "@/components/shadcn/button";
 import { cn } from "@/lib/cn";
 
+import { SIN_ANILLO_BOTON } from "./foco";
+
 /**
- * Variantes del prototipo "Verano en la costa":
- * - principal: turquesa con texto sobre-accion. Una por pantalla, abajo.
- * - secundario: borde de 3 px color texto, fondo transparente.
- * - peligro: borde y texto en error (cancelar, borrar, suspender).
- * - enlace: texto en negrita con subrayado. Nunca accion sobre arena (4,48:1).
+ * Capa fina sobre el `Button` de shadcn (LAB-86). Variantes de LabÍA → variantes de shadcn:
+ * - principal → default: turquesa con texto sobre-accion. Una por pantalla, abajo.
+ * - secundario → outline: borde de 3 px `texto` y fondo transparente, como el prototipo (el sol es el
+ *   color de lo elegido, no de un botón).
+ * - peligro → destructive: borde de 3 px `error` sobre superficie (cancelar, borrar, suspender).
+ * - enlace → link: texto en negrita con subrayado. Nunca accion sobre arena (4,48:1).
  *
  * Los nombres viejos siguen funcionando para no romper las pantallas que todavía no se rehacen:
  * cliente, profesional y exito son "principal"; fantasma es "enlace".
@@ -38,20 +42,29 @@ const VARIANTE_REAL: Record<VarianteBoton, VarianteReal> = {
   fantasma: "enlace",
 };
 
+const VARIANTE_SHADCN = {
+  principal: "default",
+  secundario: "outline",
+  peligro: "destructive",
+  enlace: "link",
+} as const;
+
+// El texto del enlace va en `foreground` (azul mar): `primary` sobre arena no llega a 4,5:1.
 const VARIANTES: Record<VarianteReal, string> = {
-  principal: "bg-accion text-sobre-accion hover:bg-accion/90 active:opacity-90",
+  principal: "active:opacity-90",
+  // Se pisa lo de oscuro de `outline` (borde `input`, fondo `input/30`): el prototipo es igual en los dos temas.
   secundario:
-    "border-[3px] border-texto bg-transparent text-texto hover:bg-superficie active:bg-superficie",
+    "border-[3px] border-foreground bg-transparent text-foreground hover:bg-card hover:text-foreground aria-expanded:bg-card dark:border-foreground dark:bg-transparent dark:hover:bg-card",
+  // El tinte `destructive/20` de shadcn en oscuro deja el texto en 3,6:1: se usa superficie y borde.
   peligro:
-    "border-[3px] border-error bg-transparent text-error hover:bg-error/10 active:bg-error/15",
-  enlace:
-    "min-h-11 bg-transparent px-1 font-bold text-texto underline decoration-2 underline-offset-4",
+    "border-[3px] border-destructive bg-card hover:bg-destructive/10 dark:border-destructive dark:bg-card dark:hover:bg-destructive/10",
+  enlace: "h-auto min-h-11 px-1 font-bold text-foreground underline decoration-2 hover:underline",
 };
 
-// Alto y radio del prototipo: grande 56 (texto 18), normal 52 (texto 17). Radio 18 en todos.
+// Alto del prototipo: grande 56 (texto 18), normal 52 (texto 17), como mínimo (las pantallas lo ajustan con min-h-*). El radio es el de shadcn.
 const TAMANOS: Record<TamanoBoton, string> = {
-  grande: "min-h-14 rounded-boton px-6 text-lg font-bold",
-  normal: "min-h-[52px] rounded-boton px-5 text-[17px] font-bold",
+  grande: "h-auto min-h-14 px-6 text-lg font-bold",
+  normal: "h-auto min-h-[52px] px-5 text-[17px] font-bold",
 };
 
 type PropsComunes = {
@@ -79,8 +92,9 @@ export type BotonProps = PropsComunes &
   );
 
 /**
- * Botón de LabÍA. Con `href` se dibuja como enlace (`next/link`); sin `href`, como `<button>`.
- * Estados: hover, presionado, deshabilitado (`disabled`) y cargando (spinner + `aria-busy`).
+ * Botón de LabÍA. Con `href` se dibuja como enlace (`next/link`) con las clases de `Button`; sin
+ * `href`, como `Button` de shadcn. Estados: hover, presionado, deshabilitado (`disabled`) y cargando
+ * (spinner + `aria-busy`).
  *
  * @example
  * <Boton tamano="grande" bloque>Buscar</Boton>
@@ -99,13 +113,16 @@ export function Boton({
 }: BotonProps) {
   const real = VARIANTE_REAL[variante];
   const clases = cn(
-    "inline-flex items-center justify-center gap-2 text-center transition-colors select-none",
-    "disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:cursor-not-allowed",
+    // transition-colors: el transition-all de shadcn anima también la opacidad y axe mide a mitad de camino.
+    "gap-2 text-center transition-colors",
+    "aria-disabled:cursor-not-allowed",
     VARIANTES[real],
     real !== "enlace" && TAMANOS[tamano],
+    SIN_ANILLO_BOTON,
     bloque && "w-full",
     className,
   );
+  const shadcn = VARIANTE_SHADCN[real];
 
   const contenido = (
     <>
@@ -120,9 +137,14 @@ export function Boton({
       <Link
         {...enlace}
         href={href}
+        data-slot="button"
         // Sin manejador propio: así el botón-enlace también sirve en Server Components (una función
         // creada acá no se puede pasar a <Link>). Cargando se bloquea con CSS y sale del tab.
-        className={cn(clases, cargando && "pointer-events-none")}
+        className={cn(
+          buttonVariants({ variant: shadcn }),
+          clases,
+          cargando && "pointer-events-none",
+        )}
         aria-busy={cargando || undefined}
         aria-disabled={cargando || undefined}
         tabIndex={cargando ? -1 : tabIndex}
@@ -139,10 +161,11 @@ export function Boton({
     ...boton
   } = resto as ButtonHTMLAttributes<HTMLButtonElement>;
   return (
-    <button
+    <Button
       {...boton}
       ref={ref}
       type={type}
+      variant={shadcn}
       className={clases}
       // Cargando no usa `disabled` para no perder el foco del teclado: solo se bloquea el clic.
       aria-busy={cargando || undefined}
@@ -156,6 +179,6 @@ export function Boton({
       }}
     >
       {contenido}
-    </button>
+    </Button>
   );
 }

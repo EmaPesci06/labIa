@@ -14,21 +14,13 @@ export const obtenerBarrios = cache(async (): Promise<Barrio[]> => {
 
 /**
  * Slug del barrio guardado en la cuenta del usuario, o `undefined` (visitante, sin barrio, sesión
- * de desarrollo o error). Solo lee la fila propia: la RLS lo permite (`usuarios_leer_propio`).
+ * de desarrollo o error). El id viene en la sesión (`obtenerSesion` ya leyó la fila propia de
+ * `usuarios`), así que solo queda buscar el slug en la lista de barrios: ninguna consulta extra (LAB-88).
  */
 export const barrioDeLaCuenta = cache(
   async (sesion: SesionActual | null): Promise<string | undefined> => {
-    if (!sesion || !supabaseConfigurado()) return undefined;
-    // La sesión falsa de desarrollo no tiene id de base: un uuid inválido solo daría error.
-    if (!/^[0-9a-f-]{36}$/i.test(sesion.usuario.id)) return undefined;
-    const supabase = await crearClienteServidor();
-    const { data } = await supabase
-      .from("usuarios")
-      .select("barrio_id")
-      .eq("id", sesion.usuario.id)
-      .maybeSingle();
-    if (!data?.barrio_id) return undefined;
+    if (!sesion?.barrioId) return undefined;
     const barrios = await obtenerBarrios();
-    return barrios.find((b) => b.id === data.barrio_id)?.slug;
+    return barrios.find((b) => b.id === sesion.barrioId)?.slug;
   },
 );

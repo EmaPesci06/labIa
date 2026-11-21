@@ -4,7 +4,7 @@ import { Check } from "lucide-react";
 import { useActionState, useEffect, useRef } from "react";
 
 import { Boton } from "@/components/ui/Boton";
-import { HojaInferior } from "@/components/ui/HojaInferior";
+import { Hoja } from "@/components/ui/Hoja";
 import { contactarProfesional } from "@/lib/contacto/acciones";
 import { ESTADO_CONTACTO_INICIAL, type EstadoContacto } from "@/lib/contacto/estado";
 import { registrarEvento } from "@/lib/metricas";
@@ -83,7 +83,7 @@ export function HojaContacto({
   }, [estado, onCambioAbierta, origen]);
 
   return (
-    <HojaInferior
+    <Hoja
       abierta={abierta}
       onCambioAbierta={onCambioAbierta}
       titulo={titulo}
@@ -140,6 +140,6 @@ export function HojaContacto({
           {textoCancelar}
         </Boton>
       </form>
-    </HojaInferior>
+    </Hoja>
   );
 }

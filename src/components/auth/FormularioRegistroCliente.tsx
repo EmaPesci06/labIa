@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState, useState, type FormEvent } from "react";
 
+import { Checkbox } from "@/components/shadcn/checkbox";
 import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
 import { ESTADO_INICIAL } from "@/lib/auth/estado";
@@ -14,7 +15,14 @@ import { CampoContrasena } from "./CampoContrasena";
 import { ConfirmarEmail } from "./ConfirmarEmail";
 import { SelectorBarrio } from "./SelectorBarrio";
 
-const CAMPOS = ["nombreCompleto", "whatsapp", "email", "contrasena", "barrio"] as const;
+const CAMPOS = [
+  "nombreCompleto",
+  "whatsapp",
+  "email",
+  "contrasena",
+  "barrio",
+  "mayorEdad",
+] as const;
 
 /**
  * Registro de cliente con email (LAB-17, rehecho en LAB-76): boceto `App-RegistroCliente`.
@@ -102,14 +110,17 @@ export function FormularioRegistroCliente({ barrios }: { barrios: BarrioOpcion[]
         alCambiar={() => limpiarError("barrio")}
       />
 
-      <label className="flex min-h-11 items-center gap-3 text-[15px] leading-[1.3] text-texto">
-        <input
-          type="checkbox"
+      <label className="flex min-h-11 cursor-pointer items-center gap-3 text-[15px] leading-[1.3] text-texto">
+        <Checkbox
           name="mayorEdad"
-          defaultChecked
-          className="size-6 shrink-0 accent-accion"
+          required
+          aria-labelledby="etiqueta-mayor-edad"
+          aria-invalid={errores.mayorEdad ? true : undefined}
+          aria-describedby={errores.mayorEdad ? "error-mayor-edad" : undefined}
+          onCheckedChange={() => limpiarError("mayorEdad")}
+          className="size-6 shrink-0 border-2 border-texto bg-campo"
         />
-        <span>
+        <span id="etiqueta-mayor-edad">
           Soy mayor de 18 y acepto los{" "}
           <Link
             href="/terminos"
@@ -129,6 +140,11 @@ export function FormularioRegistroCliente({ barrios }: { barrios: BarrioOpcion[]
           .
         </span>
       </label>
+      {errores.mayorEdad ? (
+        <p id="error-mayor-edad" className="-mt-1 text-[15px] font-bold text-error">
+          {errores.mayorEdad}
+        </p>
+      ) : null}
 
       {estado.mensaje ? (
         <p role="alert" className="text-[15px] font-bold text-error">

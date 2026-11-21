@@ -148,7 +148,7 @@ export function FormularioPostulacion({
         <p
           id={idError}
           role="alert"
-          className="rounded-campo bg-sol p-3 text-sm font-bold text-sobre-sol"
+          className="rounded-xl bg-sol p-3 text-sm font-bold text-sobre-sol"
         >
           {estado.mensaje}
         </p>
@@ -234,7 +234,7 @@ function DatosPostulacion({
   const tienePrecio = postulacion.precioEstimado !== null;
   const tieneSena = postulacion.senaPropuesta !== null;
   return (
-    <div className="rounded-campo bg-fondo p-4 text-texto">
+    <div className="rounded-xl bg-fondo p-4 text-texto">
       <p className="text-xs font-bold tracking-[0.4px] text-texto uppercase">{titulo}</p>
       <p className="mt-1.5 text-[15px] whitespace-pre-line text-texto">{postulacion.mensaje}</p>
       {tienePrecio || tieneSena ? (

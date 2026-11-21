@@ -27,6 +27,8 @@ export type TarjetaTrabajoProps = {
   yaMePostule?: boolean;
   /** Si viene, la tarjeta entera es un enlace. */
   href?: string;
+  /** Nivel del título: 3 por defecto; 2 cuando la lista cuelga directo del `h1` de la pantalla. */
+  nivelTitulo?: 2 | 3;
   className?: string;
 };
 
@@ -57,6 +59,7 @@ export function TarjetaTrabajo({
   distanciaKm,
   yaMePostule,
   href,
+  nivelTitulo = 3,
   className,
 }: TarjetaTrabajoProps) {
   void descripcion;
@@ -66,6 +69,7 @@ export function TarjetaTrabajo({
       ? formatearDistancia(distanciaKm).replace(/^a /, "A ")
       : null;
 
+  const Titulo = nivelTitulo === 2 ? "h2" : "h3";
   const contenido = (
     <>
       <span className="flex flex-wrap items-center justify-between gap-2 text-sm text-texto">
@@ -77,7 +81,9 @@ export function TarjetaTrabajo({
             aria-label={ETIQUETA_URGENCIA[urgencia]}
             className={cn(
               "rounded-[12px] px-2.5 py-1 font-bold",
-              urgencia === "lo_antes_posible" ? "bg-sol text-sobre-sol" : "bg-fondo text-texto",
+              urgencia === "lo_antes_posible"
+                ? "bg-sobre-sol text-sobre-encabezado"
+                : "bg-fondo text-texto",
             )}
           >
             {ETIQUETA_URGENCIA_CORTA[urgencia]}
@@ -85,9 +91,9 @@ export function TarjetaTrabajo({
           {yaMePostule ? <Insignia variante="verificada">Te postulaste</Insignia> : null}
         </span>
       </span>
-      <h3 className="font-titulo text-[22px] leading-[1.1] break-words text-texto">
+      <Titulo className="font-titulo text-[22px] leading-[1.1] break-words text-texto">
         {titulo || "Tu título va acá"}
-      </h3>
+      </Titulo>
       <span className="text-[15px] text-texto tabular-nums">
         {distanciaTexto ? `${distanciaTexto} · ` : ""}
         {textoPostulantes(postulantes)}
@@ -100,7 +106,7 @@ export function TarjetaTrabajo({
       <Link
         href={href}
         className={cn(
-          "flex flex-col gap-1 rounded-tarjeta bg-superficie px-4 py-3.5 text-texto no-underline transition-colors",
+          "flex flex-col gap-1 rounded-3xl bg-superficie px-4 py-3.5 text-texto no-underline transition-colors",
           className,
         )}
       >

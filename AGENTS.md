@@ -44,6 +44,8 @@ La primera vez: `pnpm exec playwright install chromium`. Variables: copiá `.env
 
 ## Rutas
 
+`src/components/shadcn/` lo genera el CLI de shadcn (base-nova, Base UI): no se edita a mano; `src/components/ui/` es la capa fina encima.
+
 Rutas en español sin acentos: `/`, `/ingresar`, `/registro`, `/registro/cliente`, `/registro/profesional`, `/normas`,
 `/inicio`, `/buscar`, `/profesionales/[id]`, `/trabajos`, `/trabajos/nuevo`, `/trabajos/[id]`, `/mis-trabajos`, `/cuenta`,
 `/admin/verificaciones`, `/admin/reportes`, `/terminos`, `/privacidad`.
@@ -68,6 +70,11 @@ Rutas en español sin acentos: `/`, `/ingresar`, `/registro`, `/registro/cliente
   (nunca texto), `error`, `equipo`, `velo` (fondo de las hojas). Tipografías con `next/font`: Baloo 2 (700 y 800) para
   títulos y la marca (`font-titulo`) y Nunito Sans (400 y 700) para el resto. Referencia de toda pantalla:
   `docs/prototipo-nuevo/` (`README.md` y `CONSTRUCCION.md`). No usar hex fuera de `globals.css`.
+- **shadcn (excepción a "igual al boceto"):** los archivos de `src/components/shadcn/` se generan con `pnpm dlx shadcn add`
+  y **no se editan a mano**. La paleta se adapta solo desde `globals.css` (las variables `--primary`, `--border`, `--ring`…
+  atadas a nuestros tokens) y la forma o los 44 px se resuelven en la capa fina de `src/components/ui/` con `className`
+  y `cn()` (o con una regla por `data-slot` en `globals.css`). Las diferencias de forma con el boceto se aceptan. Radios
+  de shadcn (`--radius: 0.625rem`). Los componentes de shadcn importan `cn` del paquete npm `cn` (así los sirve el registro); nuestro código sigue usando `@/lib/cn`. El foco de 3 px de los componentes de shadcn sale de `[data-slot]:focus-visible`. Para una pieza nueva: si shadcn tiene el componente, se arma una capa fina sobre él; si no, es propia (`cn()`, tokens y `Badge` o `Card` donde sirva). Los radios de campo, botón y tarjeta son `rounded-xl`, `rounded-2xl` y `rounded-3xl` (no hay tokens `--radius-campo`, `--radius-boton` ni `--radius-tarjeta`); hoja, `rounded-hoja`. Las clases `dark:` de los componentes de shadcn pisan sus estilos oscuros: en las capas finas se usan solo para anularlos.
 - **Sin** `console.log`, **sin** `any`, **sin** secretos en el repo. `.env.example` lista todas las variables sin valores.
 
 ## Seguridad (no negociable)

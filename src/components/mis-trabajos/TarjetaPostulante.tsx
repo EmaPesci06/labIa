@@ -126,7 +126,7 @@ export function TarjetaPostulante({
         </Boton>
 
         {esElegido ? (
-          <span className="inline-flex min-h-[52px] items-center justify-center rounded-boton bg-sol px-4 text-center text-base font-bold text-sobre-sol sm:w-auto">
+          <span className="inline-flex min-h-[52px] items-center justify-center rounded-2xl bg-sol px-4 text-center text-base font-bold text-sobre-sol sm:w-auto">
             Elegido
           </span>
         ) : trabajoEstado === "abierto" ? (
@@ -154,7 +154,7 @@ export function TarjetaPostulante({
             />
           </>
         ) : (
-          <span className="inline-flex min-h-[44px] items-center justify-center rounded-boton bg-fondo px-4 text-center text-sm font-bold text-texto opacity-60 sm:w-auto">
+          <span className="inline-flex min-h-[44px] items-center justify-center rounded-2xl bg-fondo px-4 text-center text-sm font-bold text-texto opacity-60 sm:w-auto">
             {hayElegido ? "Descartado" : "No disponible"}
           </span>
         )}

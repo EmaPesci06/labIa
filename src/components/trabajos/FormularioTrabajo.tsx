@@ -3,13 +3,16 @@
 import { ImagePlus, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useId, useRef, useState } from "react";
 
+import { RadioGroup, RadioGroupItem } from "@/components/shadcn/radio-group";
 import { TarjetaTrabajo } from "@/components/TarjetaTrabajo";
 import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
 import { Chip, GrupoChips } from "@/components/ui/Chip";
+import { Combobox } from "@/components/ui/Combobox";
 import { OFICIOS, type Oficio } from "@/lib/busqueda";
+import { cn } from "@/lib/cn";
 import { comprimirImagen } from "@/lib/imagen";
 import { crearClienteNavegador } from "@/lib/supabase/navegador";
 import { adjuntarFotos, publicarTrabajo, type EstadoPublicar } from "@/lib/trabajos/acciones";
@@ -50,6 +53,7 @@ export function FormularioTrabajo({
   sinAlmacenamiento = false,
 }: Props) {
   const router = useRouter();
+  const idBase = useId();
   const entradaFotos = useRef<HTMLInputElement>(null);
 
   const [oficio, setOficio] = useState<string | null>(oficioInicial);
@@ -143,7 +147,6 @@ export function FormularioTrabajo({
       >
         <input type="hidden" name="oficio" value={oficio ?? ""} />
         <input type="hidden" name="barrioId" value={barrioId ?? ""} />
-        <input type="hidden" name="urgencia" value={urgencia} />
 
         <fieldset className="flex flex-col gap-1.5">
           <legend className="mb-1.5 text-sm font-semibold text-texto">
@@ -209,19 +212,15 @@ export function FormularioTrabajo({
             </Chip>
           </div>
           {otroBarrio ? (
-            <Campo
-              variante="seleccion"
+            <Combobox
               etiqueta="Elegí el barrio"
-              value={barrioId ?? ""}
-              onChange={(e) => setBarrioId(e.target.value ? Number(e.target.value) : null)}
-            >
-              <option value="">Elegí un barrio</option>
-              {barrios.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.nombre}
-                </option>
-              ))}
-            </Campo>
+              opciones={barrios.map((b) => ({ valor: String(b.id), etiqueta: b.nombre }))}
+              value={barrioId ? String(barrioId) : ""}
+              onValueChange={(v) => setBarrioId(v ? Number(v) : null)}
+              placeholder="Elegí un barrio"
+              placeholderBusqueda="Buscá tu barrio…"
+              sinResultados="No encontramos ese barrio."
+            />
           ) : null}
           {errores.barrioId ? (
             <p role="alert" className="text-sm font-semibold text-error">
@@ -236,13 +235,55 @@ export function FormularioTrabajo({
 
         <fieldset className="flex flex-col gap-1.5">
           <legend className="mb-1.5 text-base font-bold text-texto">¿Para cuándo?</legend>
-          <GrupoChips
-            tipo="unica"
-            etiqueta="¿Para cuándo?"
-            opciones={opcionesUrgencia}
-            valor={urgencia}
-            onChange={(v) => setUrgencia(v as UrgenciaTrabajo)}
-          />
+          <RadioGroup
+            name="urgencia"
+            value={urgencia}
+            onValueChange={(v) => setUrgencia(v as UrgenciaTrabajo)}
+            aria-label="¿Para cuándo?"
+            aria-describedby={errores.urgencia ? `${idBase}-error-urgencia` : undefined}
+            aria-invalid={errores.urgencia ? true : undefined}
+            className="flex flex-wrap gap-2"
+          >
+            {opcionesUrgencia.map((opcion) => {
+              const inputId = `${idBase}-urgencia-${opcion.valor}`;
+              const textoId = `${inputId}-texto`;
+              const seleccionado = urgencia === opcion.valor;
+              return (
+                <label
+                  key={opcion.valor}
+                  htmlFor={inputId}
+                  className={cn(
+                    "flex min-h-[46px] cursor-pointer items-center gap-2 rounded-full px-4 text-base font-bold whitespace-nowrap transition-colors",
+                    seleccionado
+                      ? "bg-sol text-sobre-sol"
+                      : "bg-superficie text-texto hover:bg-sol/40",
+                  )}
+                >
+                  <RadioGroupItem
+                    id={inputId}
+                    value={opcion.valor}
+                    aria-labelledby={textoId}
+                    className={cn(
+                      "size-5 shrink-0 border-2",
+                      seleccionado
+                        ? "border-sobre-sol bg-campo data-checked:border-sobre-sol! data-checked:bg-sobre-sol! [&_[data-slot=radio-group-indicator]>span]:bg-sol"
+                        : "border-texto bg-campo",
+                    )}
+                  />
+                  <span id={textoId}>{opcion.etiqueta}</span>
+                </label>
+              );
+            })}
+          </RadioGroup>
+          {errores.urgencia ? (
+            <p
+              id={`${idBase}-error-urgencia`}
+              role="alert"
+              className="text-sm font-semibold text-error"
+            >
+              {errores.urgencia}
+            </p>
+          ) : null}
         </fieldset>
 
         <div className="flex flex-col gap-2">
@@ -261,7 +302,7 @@ export function FormularioTrabajo({
             <button
               type="button"
               onClick={() => entradaFotos.current?.click()}
-              className="flex min-h-12 items-center justify-center gap-2 self-start rounded-boton border-[3px] border-dashed border-texto bg-transparent px-[18px] text-base font-bold text-texto hover:bg-superficie focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-texto"
+              className="flex min-h-12 items-center justify-center gap-2 self-start rounded-2xl border-[3px] border-dashed border-texto bg-transparent px-[18px] text-base font-bold text-texto hover:bg-superficie focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-texto"
             >
               <ImagePlus aria-hidden strokeWidth={2} className="size-[22px] text-texto" />
               Sumar una foto
@@ -277,7 +318,7 @@ export function FormularioTrabajo({
                     fill
                     unoptimized
                     sizes="96px"
-                    className="rounded-campo object-cover"
+                    className="rounded-xl object-cover"
                   />
                   <button
                     type="button"

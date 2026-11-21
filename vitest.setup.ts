@@ -19,6 +19,35 @@ if (typeof window !== "undefined" && !window.matchMedia) {
     }) satisfies MediaQueryList;
 }
 
+// jsdom no implementa ResizeObserver ni scrollIntoView (usados por cmdk y Base UI).
+if (typeof globalThis.ResizeObserver === "undefined") {
+  globalThis.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
+
+// Tampoco IntersectionObserver (lo usa Embla, el carrusel de shadcn).
+if (typeof globalThis.IntersectionObserver === "undefined") {
+  globalThis.IntersectionObserver = class IntersectionObserver {
+    readonly root = null;
+    readonly rootMargin = "";
+    readonly scrollMargin = "";
+    readonly thresholds = [];
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+    takeRecords() {
+      return [];
+    }
+  };
+}
+
+if (typeof HTMLElement !== "undefined" && !HTMLElement.prototype.scrollIntoView) {
+  HTMLElement.prototype.scrollIntoView = () => {};
+}
+
 afterEach(() => {
   cleanup();
 });

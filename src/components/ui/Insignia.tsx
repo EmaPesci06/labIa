@@ -8,38 +8,48 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { Badge } from "@/components/shadcn/badge";
 import { cn } from "@/lib/cn";
 
 export type VarianteInsignia = "verificada" | "antecedentes" | "matriculado" | "urgencia" | "exito";
 
-const DEFINICIONES: Record<VarianteInsignia, { texto: string; icono: LucideIcon; clases: string }> =
-  {
-    verificada: {
-      texto: "Identidad verificada",
-      icono: BadgeCheck,
-      clases: "border-2 border-accion bg-superficie text-texto",
-    },
-    antecedentes: {
-      texto: "Sin antecedentes",
-      icono: ShieldCheck,
-      clases: "border-2 border-accion bg-superficie text-texto",
-    },
-    matriculado: {
-      texto: "Matriculado",
-      icono: Wrench,
-      clases: "bg-sol text-sobre-sol",
-    },
-    urgencia: {
-      texto: "Lo antes posible",
-      icono: Clock,
-      clases: "bg-sol text-sobre-sol",
-    },
-    exito: {
-      texto: "Contratado",
-      icono: CheckCircle2,
-      clases: "bg-accion text-sobre-accion",
-    },
-  };
+type VarianteBadge = "default" | "secondary" | "outline";
+
+const DEFINICIONES: Record<
+  VarianteInsignia,
+  { texto: string; icono: LucideIcon; badge: VarianteBadge; clases: string }
+> = {
+  verificada: {
+    texto: "Identidad verificada",
+    icono: BadgeCheck,
+    badge: "outline",
+    clases: "border-2 border-primary bg-card text-foreground",
+  },
+  antecedentes: {
+    texto: "Sin antecedentes",
+    icono: ShieldCheck,
+    badge: "outline",
+    clases: "border-2 border-primary bg-card text-foreground",
+  },
+  matriculado: {
+    texto: "Matriculado",
+    icono: Wrench,
+    badge: "secondary",
+    clases: "",
+  },
+  urgencia: {
+    texto: "Lo antes posible",
+    icono: Clock,
+    badge: "secondary",
+    clases: "",
+  },
+  exito: {
+    texto: "Contratado",
+    icono: CheckCircle2,
+    badge: "default",
+    clases: "",
+  },
+};
 
 type Props = {
   variante: VarianteInsignia;
@@ -53,7 +63,7 @@ type Props = {
 };
 
 /**
- * Insignia de estado o verificación: píldora en negrita. Verificación y antecedentes van con
+ * Insignia de estado o verificación: capa fina sobre el `Badge` de shadcn, píldora en negrita. Verificación y antecedentes van con
  * borde turquesa sobre superficie; matrícula y urgencia en sol; "Contratado" en turquesa.
  *
  * @example
@@ -67,11 +77,12 @@ export function Insignia({
   conIcono = false,
   className,
 }: Props) {
-  const { texto, icono: Icono, clases } = DEFINICIONES[variante];
+  const { texto, icono: Icono, badge, clases } = DEFINICIONES[variante];
   return (
-    <span
+    <Badge
+      variant={badge}
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full font-bold",
+        "h-auto gap-1.5 font-bold [&>svg]:size-4!",
         tamano === "chica" ? "px-3 py-1 text-xs" : "px-3.5 py-1.5 text-[15px]",
         clases,
         className,
@@ -79,6 +90,6 @@ export function Insignia({
     >
       {conIcono ? <Icono aria-hidden strokeWidth={2.5} className="size-4" /> : null}
       {children ?? texto}
-    </span>
+    </Badge>
   );
 }
