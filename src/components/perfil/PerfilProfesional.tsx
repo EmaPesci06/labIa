@@ -159,7 +159,10 @@ export function PerfilProfesional({
     <article className={cn("flex flex-col gap-6 lg:gap-8", !esPropio && "pb-52 lg:pb-0")}>
       {esPropio ? <BannerDuenio publicado={perfil.publicado} /> : null}
 
-      <header className="flex flex-col gap-5 rounded-b-[28px] bg-encabezado px-5 pt-3 pb-6 text-sobre-encabezado lg:rounded-b-[40px] lg:px-8 lg:pt-6 lg:pb-9">
+      <header
+        data-encabezado="turquesa"
+        className="flex flex-col gap-5 rounded-b-[28px] bg-encabezado px-5 pt-3 pb-6 text-sobre-encabezado lg:rounded-b-[40px] lg:px-8 lg:pt-6 lg:pb-9"
+      >
         <EnlaceVolver
           href="/buscar"
           etiquetaEscritorio={`Volver a ${profesion.toLowerCase()}s`}

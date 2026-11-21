@@ -10,15 +10,16 @@ import { SIN_ANILLO_BOTON } from "./foco";
 // Pastilla de 46 px (objetivo táctil de 44 px mínimo), radio completo, texto 16 en negrita.
 const CHIP = `h-[46px] min-h-11 rounded-full px-4 text-base font-bold transition-colors ${SIN_ANILLO_BOTON}`;
 
-// Elegido: destacado con texto azul noche. Sin elegir: superficie. Dentro de un encabezado destacado
-// (`data-encabezado="destacado"`) el elegido pasa a azul noche con texto blanco, y el hover no lo pisa.
+// Elegido: destacado con su texto. Sin elegir: superficie. Dentro de un encabezado de color
+// (`data-encabezado`, salvo "plano") destacado y superficie pueden confundirse con el bloque, así
+// que el elegido pasa a acción y el que no está elegido a fondo; el hover no los pisa.
 function estadoChip(seleccionado: boolean) {
   return seleccionado
     ? "bg-secondary text-secondary-foreground aria-pressed:bg-secondary hover:bg-secondary " +
-        "hover:text-secondary-foreground in-data-[encabezado=destacado]:bg-sobre-destacado " +
-        "in-data-[encabezado=destacado]:text-sobre-encabezado in-data-[encabezado=destacado]:hover:bg-sobre-destacado " +
-        "in-data-[encabezado=destacado]:hover:text-sobre-encabezado in-data-[encabezado=destacado]:aria-pressed:bg-sobre-destacado"
-    : "bg-card text-card-foreground hover:bg-secondary/40 hover:text-card-foreground";
+        "hover:text-secondary-foreground en-encabezado:bg-accion en-encabezado:text-sobre-accion " +
+        "en-encabezado:hover:bg-accion en-encabezado:hover:text-sobre-accion en-encabezado:aria-pressed:bg-accion"
+    : "bg-card text-card-foreground hover:bg-secondary/40 hover:text-card-foreground " +
+        "en-encabezado:bg-fondo en-encabezado:text-texto en-encabezado:hover:bg-fondo en-encabezado:hover:text-texto";
 }
 
 type PropsChip = {
@@ -39,11 +40,10 @@ type PropsChip = {
 /**
  * Chip de filtro: capa fina sobre el `Toggle` de shadcn, pastilla de 46 px de alto (objetivo táctil de
  * 44 px mínimo).
- * Sin elegir: superficie blanca. Elegido: destacado con texto azul noche.
+ * Sin elegir: superficie. Elegido: destacado con su texto.
  *
  * Dentro de un `<Encabezado variante="destacado">` (ese encabezado marca `data-encabezado="destacado"`), el chip
- * elegido pasa a azul noche (token sobre-destacado) con texto blanco en los dos modos: sobre destacado el amarillo no
- * se distingue. Se resuelve con la variante `in-data-*` de Tailwind, sin prop extra.
+ * elegido pasa a acción y el no elegido a fondo (variante `en-encabezado` de globals.css), sin prop extra.
  */
 export function Chip({
   seleccionado,

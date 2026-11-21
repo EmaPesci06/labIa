@@ -177,7 +177,7 @@ export function Combobox(props: ComboboxProps) {
               }
             }}
             className={cn(
-              "inline-flex h-11 min-w-0 cursor-pointer items-center gap-2 rounded-full bg-superficie pr-3 pl-4 text-base font-bold text-texto disabled:cursor-not-allowed disabled:opacity-60",
+              "inline-flex h-11 min-w-0 cursor-pointer items-center gap-2 rounded-full bg-fondo pr-3 pl-4 text-base font-bold text-texto disabled:cursor-not-allowed disabled:opacity-60",
               borde && "border-2 border-texto",
               SIN_ANILLO,
               className,

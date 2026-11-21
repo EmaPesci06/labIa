@@ -69,7 +69,7 @@ export function SelectorPastilla({
           id={id}
           aria-label={prefijo ? `${prefijo}: ${etiqueta}` : etiqueta}
           className={cn(
-            "h-11 min-w-0 cursor-pointer gap-2 rounded-full border-0 bg-superficie pr-3 pl-4 text-base font-bold text-texto data-[size=default]:h-11 dark:bg-superficie dark:hover:bg-superficie",
+            "h-11 min-w-0 cursor-pointer gap-2 rounded-full border-0 bg-fondo pr-3 pl-4 text-base font-bold text-texto data-[size=default]:h-11 dark:bg-fondo dark:hover:bg-fondo",
             borde && "border-2 border-texto",
             SIN_ANILLO,
             className,

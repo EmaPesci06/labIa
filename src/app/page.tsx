@@ -17,7 +17,10 @@ export const metadata: Metadata = {
  */
 export default function Bienvenida() {
   return (
-    <div className="flex flex-1 flex-col bg-encabezado text-sobre-encabezado">
+    <div
+      data-encabezado="turquesa"
+      className="flex flex-1 flex-col bg-encabezado text-sobre-encabezado"
+    >
       <SaltarAlContenido />
       <Toldo color="destacado" alto={26} />
       <header className="mx-auto flex w-full max-w-[1200px] items-center justify-between px-5 pt-3 lg:px-8 lg:pt-6">

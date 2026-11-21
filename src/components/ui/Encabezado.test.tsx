@@ -71,11 +71,11 @@ describe("Encabezado", () => {
     const elegido = screen.getByRole("radio", { name: "Todos" });
     expect(elegido).toHaveClass(
       "bg-secondary",
-      "in-data-[encabezado=destacado]:bg-sobre-destacado",
-      "in-data-[encabezado=destacado]:text-sobre-encabezado",
+      "en-encabezado:bg-accion",
+      "en-encabezado:text-sobre-accion",
     );
     const sinElegir = screen.getByRole("radio", { name: "Gas" });
-    expect(sinElegir).toHaveClass("bg-card");
+    expect(sinElegir).toHaveClass("bg-card", "en-encabezado:bg-fondo");
   });
 
   it("un chip suelto (fuera de un encabezado) elegido queda destacado con texto azul noche", () => {
