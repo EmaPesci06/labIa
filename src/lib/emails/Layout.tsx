@@ -4,6 +4,7 @@ import {
   Container,
   Head,
   Html,
+  Img,
   Link,
   Preview,
   Section,
@@ -11,57 +12,53 @@ import {
 } from "@react-email/components";
 import type { CSSProperties, ReactNode } from "react";
 
-// Los clientes de correo no leen variables CSS: los colores van fijos, tomados de los tokens de
-// "Verano en la costa" (src/app/globals.css). Archivo llega por Google Fonts y, si
-// no carga, usa la tipografía de sistema de respaldo.
-export const TURQUESA = "#0E7C86";
-export const TEXTO = "#123B4A";
-export const ARENA = "#FFF3D6";
-const BLANCO = "#FFFFFF";
+import { urlDelSitio } from "@/lib/sitio";
 
+// Los clientes de correo no leen variables CSS: los colores van fijos, tomados de los tokens
+// claros de "Papelería sellada" (src/app/globals.css). Si cambia la paleta, se actualizan acá.
+export const FONDO = "#eaf0ee"; // --color-fondo
+export const TEXTO = "#16231f"; // --color-texto
+export const ACCION = "#b8441b"; // --color-accion (botón; texto blanco, contraste 5,6:1)
+export const ENCABEZADO = "#16231f"; // --color-encabezado
+export const SOBRE_ENCABEZADO = "#eaf0ee"; // --color-sobre-encabezado
+export const SUSPENDIDA = "#47564f"; // --color-texto-suave: cabecera de la cuenta suspendida
+const BLANCO = "#ffffff"; // --color-superficie y --color-sobre-accion
+
+// Archivo llega por Google Fonts y, si no carga, usa la tipografía de sistema de respaldo.
 const titular = "'Archivo', Arial, Helvetica, sans-serif";
 const cuerpo = "'Archivo', Arial, Helvetica, sans-serif";
 
-const rayas = (color: string) =>
-  `repeating-linear-gradient(90deg, ${color} 0 18px, ${BLANCO} 18px 36px)`;
+// Logo PNG alojado en public/emails/logo.png (640 x 254, sale de docs/marca/png): los clientes de
+// email no muestran SVG. Va sobre la franja blanca de la tarjeta, que se ve igual en modo oscuro.
+const LOGO = { ancho: 160, alto: 64, ruta: "/emails/logo.png" };
 
 const estilos = {
   cuerpo: {
-    backgroundColor: ARENA,
+    backgroundColor: FONDO,
     color: TEXTO,
     margin: 0,
     padding: "24px 12px",
     fontFamily: cuerpo,
   },
   contenedor: { maxWidth: 600, margin: "0 auto" },
-  marca: {
-    margin: "0 0 16px",
-    textAlign: "center",
-    color: TURQUESA,
-    fontFamily: titular,
-    fontSize: 30,
-    lineHeight: "30px",
-    fontWeight: 800,
-  },
   tarjeta: {
     backgroundColor: BLANCO,
     borderRadius: 28,
     overflow: "hidden",
   },
-  toldo: { height: 18, backgroundColor: TURQUESA, backgroundImage: rayas(TURQUESA) },
-  toldoSuspendida: { height: 18, backgroundColor: TEXTO, backgroundImage: rayas(TEXTO) },
-  toldoTexto: { margin: 0, fontSize: 1, lineHeight: "18px", color: BLANCO },
-  cabecera: { padding: "24px 32px 20px", backgroundColor: TURQUESA, color: BLANCO },
-  cabeceraSuspendida: { padding: "24px 32px 20px", backgroundColor: TEXTO, color: BLANCO },
+  franjaLogo: { padding: "20px 32px 16px", backgroundColor: BLANCO },
+  logo: { display: "block", border: 0, outline: "none", height: "auto" },
+  cabecera: { padding: "24px 32px 20px", backgroundColor: ENCABEZADO, color: SOBRE_ENCABEZADO },
+  cabeceraSuspendida: { padding: "24px 32px 20px", backgroundColor: SUSPENDIDA, color: BLANCO },
   titulo: {
     margin: 0,
-    color: BLANCO,
+    color: SOBRE_ENCABEZADO,
     fontFamily: titular,
     fontSize: 40,
     lineHeight: "39px",
     fontWeight: 800,
   },
-  subtitulo: { margin: "8px 0 0", color: BLANCO, fontSize: 18, lineHeight: "25px" },
+  subtitulo: { margin: "8px 0 0", color: SOBRE_ENCABEZADO, fontSize: 18, lineHeight: "25px" },
   contenido: { padding: "24px 32px" },
   pie: { margin: "16px 0 0", textAlign: "center", fontSize: 14, lineHeight: "21px" },
 } satisfies Record<string, CSSProperties>;
@@ -75,7 +72,7 @@ export function Parrafo({ children }: { children: ReactNode }) {
   );
 }
 
-/** Caja de color arena (radio 20) con una etiqueta chica, un dato grande y un detalle opcional. */
+/** Caja de color fondo (radio 20) con una etiqueta chica, un dato grande y un detalle opcional. */
 export function Tarjeta({
   etiqueta,
   titulo,
@@ -88,7 +85,7 @@ export function Tarjeta({
   return (
     <Section
       style={{
-        backgroundColor: ARENA,
+        backgroundColor: FONDO,
         borderRadius: 20,
         padding: "14px 20px",
         margin: "0 0 16px",
@@ -116,7 +113,7 @@ export function Tarjeta({
   );
 }
 
-/** Botón principal: turquesa, alto 60, radio 18, texto blanco. */
+/** Botón principal: color acción, alto 60, radio 18, texto blanco. */
 export function BotonAccion({ href, children }: { href: string; children: ReactNode }) {
   return (
     <Section style={{ margin: "8px 0 16px" }}>
@@ -124,7 +121,7 @@ export function BotonAccion({ href, children }: { href: string; children: ReactN
         href={href}
         style={{
           display: "block",
-          backgroundColor: TURQUESA,
+          backgroundColor: ACCION,
           color: BLANCO,
           borderRadius: 18,
           padding: "19px 24px",
@@ -156,14 +153,14 @@ export function EnlaceSecundario({ href, children }: { href: string; children: R
   );
 }
 
-/** Nota al pie de la tarjeta, separada por una línea arena de 2 px. */
+/** Nota al pie de la tarjeta, separada por una línea de fondo de 2 px. */
 export function Nota({ children }: { children: ReactNode }) {
   return (
     <Text
       style={{
         margin: "8px 0 0",
         paddingTop: 14,
-        borderTop: `2px solid ${ARENA}`,
+        borderTop: `2px solid ${FONDO}`,
         fontSize: 15,
         lineHeight: "22px",
         color: TEXTO,
@@ -191,8 +188,8 @@ type Props = {
   titulo: string;
   /** Línea debajo del título, dentro de la cabecera. */
   subtitulo: string;
-  /** `suspendida` cambia la cabecera y el toldo a azul noche. */
-  variante?: "turquesa" | "suspendida";
+  /** `suspendida` cambia la cabecera a gris verdoso. */
+  variante?: "normal" | "suspendida";
   /** Por qué le llega este email. Va en el pie. */
   motivo: string;
   pie: DatosPie;
@@ -207,7 +204,7 @@ export function Layout({
   previa,
   titulo,
   subtitulo,
-  variante = "turquesa",
+  variante = "normal",
   motivo,
   pie,
   conPreferencias = false,
@@ -227,10 +224,15 @@ export function Layout({
       <Preview>{previa}</Preview>
       <Body style={estilos.cuerpo}>
         <Container style={estilos.contenedor}>
-          <Text style={estilos.marca}>Oficio Seguro</Text>
           <Section style={estilos.tarjeta}>
-            <Section style={suspendida ? estilos.toldoSuspendida : estilos.toldo}>
-              <Text style={estilos.toldoTexto}>&nbsp;</Text>
+            <Section style={estilos.franjaLogo}>
+              <Img
+                src={`${urlDelSitio()}${LOGO.ruta}`}
+                width={LOGO.ancho}
+                height={LOGO.alto}
+                alt="Oficio Seguro"
+                style={estilos.logo}
+              />
             </Section>
             <Section style={suspendida ? estilos.cabeceraSuspendida : estilos.cabecera}>
               {/* Un párrafo con rol de título: el texto plano no lo pasa a mayúsculas, como sí hace con h1. */}

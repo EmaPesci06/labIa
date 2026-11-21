@@ -9,3 +9,4 @@ y `PreviewProps`; el diseño común (marca, botón, pie con baja) está en `src/
   (`avisarBienvenidaCliente(usuarioId)`, `avisarNuevaPostulacion(postulacionId)`, …).
 - Ningún email lleva DNI, teléfonos ni direcciones: solo nombres, barrios y links.
 - Los hex de la marca viven en `Layout.tsx` (los clientes de correo no soportan variables CSS).
+- El logo va como PNG alojado (`public/emails/logo.png`, desde `docs/marca/png`): los clientes de correo no muestran SVG. Vistas previas de cada plantilla en `docs/marca/previa-emails/`.
