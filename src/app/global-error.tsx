@@ -32,7 +32,7 @@ export default function ErrorGlobal({
           colorScheme: "light dark",
         }}
       >
-        <title>Algo salió mal · LabÍA</title>
+        <title>Algo salió mal · Oficio Seguro</title>
         <h1 style={{ fontSize: 24, margin: 0 }}>Algo salió mal</h1>
         <p style={{ margin: 0 }}>Ya nos avisaron del error. Probá de nuevo en un rato.</p>
         <button

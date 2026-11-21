@@ -9,7 +9,7 @@ import { listarBarrios } from "@/lib/barrios";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 
-export const metadata: Metadata = { title: "Completá tus datos · LabÍA" };
+export const metadata: Metadata = { title: "Completá tus datos · Oficio Seguro" };
 
 async function Contenido({ searchParams }: PageProps<"/registro/cliente/completar">) {
   const sesion = await obtenerSesion();

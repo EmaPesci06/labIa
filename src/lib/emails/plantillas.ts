@@ -53,17 +53,17 @@ type Registro = { [K in Plantilla]: DefinicionPlantilla<K> };
 export const PLANTILLAS: Registro = {
   bienvenida_cliente: {
     componente: BienvenidaCliente,
-    asunto: () => "Te damos la bienvenida a LabÍA",
+    asunto: () => "Te damos la bienvenida a Oficio Seguro",
     preferencia: null,
   },
   bienvenida_profesional: {
     componente: BienvenidaProfesional,
-    asunto: () => "Recibimos tu perfil en LabÍA",
+    asunto: () => "Recibimos tu perfil en Oficio Seguro",
     preferencia: null,
   },
   perfil_publicado: {
     componente: PerfilPublicado,
-    asunto: () => "Tu perfil ya está publicado en LabÍA",
+    asunto: () => "Tu perfil ya está publicado en Oficio Seguro",
     preferencia: null,
   },
   documento_rechazado: {
@@ -73,7 +73,7 @@ export const PLANTILLAS: Registro = {
   },
   cuenta_suspendida: {
     componente: CuentaSuspendida,
-    asunto: () => "Tu cuenta de LabÍA fue suspendida",
+    asunto: () => "Tu cuenta de Oficio Seguro fue suspendida",
     preferencia: null,
   },
   nueva_postulacion: {

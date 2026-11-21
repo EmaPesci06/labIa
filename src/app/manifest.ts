@@ -5,8 +5,8 @@ import { PWA_COLORES } from "@/lib/pwa";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/inicio",
-    name: "LabÍA",
-    short_name: "LabÍA",
+    name: "Oficio Seguro",
+    short_name: "Oficio Seguro",
     description: "Oficios de confianza en Mar del Plata.",
     lang: "es-AR",
     start_url: "/inicio",

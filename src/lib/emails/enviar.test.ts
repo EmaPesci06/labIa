@@ -27,7 +27,7 @@ describe("enviarEmail", () => {
     capturarMock.mockReset();
     vi.stubEnv("RESEND_API_KEY", "re_test");
     vi.stubEnv("EMAILS_SECRET", "ssssssssssssssssssssssssssssssssssssssss");
-    vi.stubEnv("EMAIL_REMITENTE", "LabÍA <hola@labia.example>");
+    vi.stubEnv("EMAIL_REMITENTE", "Oficio Seguro <hola@labia.example>");
     vi.stubEnv("EMAIL_SOPORTE", "soporte@labia.example");
   });
   afterEach(() => vi.unstubAllEnvs());
@@ -45,9 +45,9 @@ describe("enviarEmail", () => {
     expect(enviarMock).toHaveBeenCalledTimes(1);
     const mensaje = enviarMock.mock.calls[0]?.[0];
     expect(mensaje).toMatchObject({
-      from: "LabÍA <hola@labia.example>",
+      from: "Oficio Seguro <hola@labia.example>",
       to: "laura@correo.com",
-      subject: "Te damos la bienvenida a LabÍA",
+      subject: "Te damos la bienvenida a Oficio Seguro",
       replyTo: "soporte@labia.example",
     });
     expect(mensaje.html).toContain("Laura");

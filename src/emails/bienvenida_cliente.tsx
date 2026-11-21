@@ -9,10 +9,10 @@ export default function BienvenidaCliente({
 }: DatosBienvenidaCliente & { pie: DatosPie }) {
   return (
     <Layout
-      previa="Tu cuenta en LabÍA ya está lista."
+      previa="Tu cuenta en Oficio Seguro ya está lista."
       titulo={`Hola, ${nombre}`}
-      subtitulo="Tu cuenta en LabÍA ya está lista."
-      motivo="Te escribimos porque creaste una cuenta en LabÍA."
+      subtitulo="Tu cuenta en Oficio Seguro ya está lista."
+      motivo="Te escribimos porque creaste una cuenta en Oficio Seguro."
       pie={pie}
     >
       <Parrafo>

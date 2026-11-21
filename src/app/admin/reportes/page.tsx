@@ -10,7 +10,7 @@ import { listarReportes, listarResenasBajas } from "@/lib/admin/reportes-datos";
 
 type Props = { searchParams: Promise<{ pestana?: string }> };
 
-export const metadata: Metadata = { title: "Reportes y moderación · LabÍA" };
+export const metadata: Metadata = { title: "Reportes y moderación · Oficio Seguro" };
 
 type PestanaReportes = "abiertos" | "en_revision" | "resueltos" | "resenas_bajas";
 

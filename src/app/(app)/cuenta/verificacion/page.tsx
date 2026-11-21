@@ -8,7 +8,7 @@ import { Boton } from "@/components/ui/Boton";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { cargarDatosRegistro } from "@/lib/registro/borrador";
 
-export const metadata: Metadata = { title: "Mi verificación · LabÍA" };
+export const metadata: Metadata = { title: "Mi verificación · Oficio Seguro" };
 
 /** Volver a subir documentos de verificación (LAB-19). Solo para profesionales. */
 export default async function Verificacion() {

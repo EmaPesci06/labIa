@@ -84,7 +84,9 @@ describe("HojaReportar", () => {
       />,
     );
 
-    expect(screen.getByText(/necesitás iniciar sesión en tu cuenta de LabÍA/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/necesitás iniciar sesión en tu cuenta de Oficio Seguro/),
+    ).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Ingresar a mi cuenta" })).toHaveAttribute(
       "href",
       "/ingresar?volver=%2Fprofesionales%2F123",

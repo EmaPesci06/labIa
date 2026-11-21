@@ -8,7 +8,7 @@ import { FormularioRegistroCliente } from "@/components/auth/FormularioRegistroC
 import { listarBarrios } from "@/lib/barrios";
 import { obtenerSesion } from "@/lib/sesion";
 
-export const metadata: Metadata = { title: "Crear cuenta · LabÍA" };
+export const metadata: Metadata = { title: "Crear cuenta · Oficio Seguro" };
 
 async function Formulario() {
   // Con sesión (volvió de Google o confirmó el email) solo falta completar WhatsApp y barrio.

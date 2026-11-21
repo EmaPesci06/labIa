@@ -12,7 +12,7 @@ import { inicioDelRol } from "@/lib/auth/rutas";
 import { cargarDatosRegistro } from "@/lib/registro/borrador";
 import { faltantesRegistrados } from "@/lib/registro/documentos-estado";
 
-export const metadata: Metadata = { title: "Normas de seguridad · LabÍA" };
+export const metadata: Metadata = { title: "Normas de seguridad · Oficio Seguro" };
 
 async function Contenido() {
   const { sesion, rol, borrador, verificaciones } = await cargarDatosRegistro();
@@ -21,7 +21,7 @@ async function Contenido() {
     return (
       <AvisoPantalla
         titulo="Tu cuenta no es de profesional"
-        texto="Las normas de seguridad son para quienes ofrecen sus servicios en LabÍA."
+        texto="Las normas de seguridad son para quienes ofrecen sus servicios en Oficio Seguro."
         accion={
           <Boton href={inicioDelRol(rol)} tamano="grande" bloque>
             Ir a mi inicio

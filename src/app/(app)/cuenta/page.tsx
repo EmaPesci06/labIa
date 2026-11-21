@@ -11,7 +11,7 @@ import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import { resumenBannerVerificacion } from "@/lib/verificacion/logica";
 
-export const metadata: Metadata = { title: "Mi cuenta · LabÍA" };
+export const metadata: Metadata = { title: "Mi cuenta · Oficio Seguro" };
 
 async function datosDeEncabezado(uid: string) {
   if (!supabaseConfigurado()) return { barrio: null, foto: null };
@@ -132,7 +132,7 @@ export default async function Cuenta() {
           <div className="flex flex-col gap-0.5 rounded-[20px] border-[3px] border-dashed border-texto px-4 py-3.5">
             <span className="text-[17px] font-bold">¿Ofrecés un oficio?</span>
             <span className="text-[15px]">
-              Para trabajar en LabÍA necesitás una cuenta de profesional.
+              Para trabajar en Oficio Seguro necesitás una cuenta de profesional.
             </span>
           </div>
         ) : null}

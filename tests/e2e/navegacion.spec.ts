@@ -153,8 +153,8 @@ test.describe("PWA", () => {
 
     const manifest = await (await request.get("/manifest.webmanifest")).json();
     expect(manifest).toMatchObject({
-      name: "LabÍA",
-      short_name: "LabÍA",
+      name: "Oficio Seguro",
+      short_name: "Oficio Seguro",
       lang: "es-AR",
       start_url: "/inicio",
       display: "standalone",

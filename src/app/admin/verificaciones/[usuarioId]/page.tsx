@@ -11,7 +11,7 @@ import { obtenerDetalleProfesional } from "@/lib/verificacion/datos";
 
 type Props = { params: Promise<{ usuarioId: string }> };
 
-export const metadata: Metadata = { title: "Revisar verificación · LabÍA" };
+export const metadata: Metadata = { title: "Revisar verificación · Oficio Seguro" };
 
 const CHECKLIST = [
   "El nombre del DNI coincide con el del perfil.",

@@ -154,7 +154,7 @@ describe("contactarProfesional con origen postulacion (LAB-29)", () => {
 
     expect(consultas).not.toContain("trabajos");
     expect(rpcLlamadas[0]?.args).toEqual({ p_profesional: PROFESIONAL, p_origen: "perfil" });
-    expect(decodeURIComponent(r.url ?? "")).toContain("te encontré en LabÍA");
+    expect(decodeURIComponent(r.url ?? "")).toContain("te encontré en Oficio Seguro");
   });
 
   it("sin sesión no contacta a nadie", async () => {

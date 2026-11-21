@@ -8,7 +8,7 @@ import { cn } from "@/lib/cn";
 import { MuestraComponentes } from "./MuestraComponentes";
 
 export const metadata: Metadata = {
-  title: "Componentes · LabÍA",
+  title: "Componentes · Oficio Seguro",
   robots: { index: false, follow: false },
 };
 

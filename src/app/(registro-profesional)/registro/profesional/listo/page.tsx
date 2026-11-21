@@ -7,7 +7,7 @@ import { SaltarAlContenido } from "@/components/navegacion/SaltarAlContenido";
 import { Toldo } from "@/components/ui/Toldo";
 import { obtenerSesion } from "@/lib/sesion";
 
-export const metadata: Metadata = { title: "Perfil enviado · LabÍA" };
+export const metadata: Metadata = { title: "Perfil enviado · Oficio Seguro" };
 
 const PUNTOS = [
   "La revisión la hace una persona y suele tardar uno o dos días hábiles.",

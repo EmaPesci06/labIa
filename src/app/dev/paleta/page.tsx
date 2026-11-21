@@ -8,7 +8,7 @@ import { cn, TOKENS_COLOR } from "@/lib/cn";
 import { ValorToken } from "./ValorToken";
 
 export const metadata: Metadata = {
-  title: "Paleta · LabÍA",
+  title: "Paleta · Oficio Seguro",
   robots: { index: false, follow: false },
 };
 

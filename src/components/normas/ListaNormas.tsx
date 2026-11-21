@@ -26,7 +26,7 @@ export function ListaNormas({ dosColumnas = false }: { dosColumnas?: boolean }) 
   );
 }
 
-/** Sección "Qué hace LabÍA" (la parte que le toca a la plataforma). */
+/** Sección "Qué hace Oficio Seguro" (la parte que le toca a la plataforma). */
 export function QueHaceLabia() {
   return (
     <section
@@ -34,7 +34,7 @@ export function QueHaceLabia() {
       className="flex flex-col gap-2 rounded-3xl bg-equipo p-4 text-sobre-encabezado lg:p-5"
     >
       <h2 id="que-hace-labia" className="font-titulo text-[22px] leading-tight">
-        Qué hace LabÍA
+        Qué hace Oficio Seguro
       </h2>
       <ul className="flex list-disc flex-col gap-1.5 pl-5 text-[15px] leading-[1.35]">
         {QUE_HACE_LABIA.map((texto) => (

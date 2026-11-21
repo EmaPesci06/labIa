@@ -3,7 +3,7 @@
 @import "shadcn/tailwind.css";
 
 /*
- * Tokens de diseño de LabÍA, "Verano en la costa" (docs/prototipo-nuevo/README.md).
+ * Tokens de diseño de Oficio Seguro, "Verano en la costa" (docs/prototipo-nuevo/README.md).
  * Este es el ÚNICO archivo donde se escriben colores en hex. El resto del código usa las clases
  * de Tailwind que salen de acá (bg-accion, text-texto, bg-sol…).
  *
@@ -37,6 +37,9 @@
   --color-coral: #f25c54;
   --color-error: #a62b24;
   --color-equipo: #123b4a;
+  /* Logo: la insignia de la marca (naranja obra) y la llave dentro de ella. Solo para el logo. */
+  --color-marca: #e0592a;
+  --color-sobre-marca: #f6f4ef;
 
   /* Fondo detrás de las hojas inferiores (se usa con opacidad en el componente). */
   --color-velo: #123b4a;
@@ -62,6 +65,8 @@
   --color-coral: #f25c54;
   --color-error: #ff9a8f;
   --color-equipo: #17485a;
+  --color-marca: #e0592a;
+  --color-sobre-marca: #f6f4ef;
 
   --color-velo: #05161b;
   --color-foco: #f7c948;
@@ -98,7 +103,7 @@
   --input: var(--color-campo);
   --ring: var(--color-foco);
 
-  /* Sidebar y gráficos: LabÍA no los usa; se atan a los tokens más cercanos por si un componente
+  /* Sidebar y gráficos: Oficio Seguro no los usa; se atan a los tokens más cercanos por si un componente
      de shadcn los referencia. */
   --sidebar: var(--color-superficie);
   --sidebar-foreground: var(--color-texto);
@@ -140,6 +145,8 @@
   --color-coral: var(--color-coral);
   --color-error: var(--color-error);
   --color-equipo: var(--color-equipo);
+  --color-marca: var(--color-marca);
+  --color-sobre-marca: var(--color-sobre-marca);
   --color-velo: var(--color-velo);
   --color-foco: var(--color-foco);
 

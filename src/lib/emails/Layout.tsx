@@ -227,7 +227,7 @@ export function Layout({
       <Preview>{previa}</Preview>
       <Body style={estilos.cuerpo}>
         <Container style={estilos.contenedor}>
-          <Text style={estilos.marca}>LabÍA</Text>
+          <Text style={estilos.marca}>Oficio Seguro</Text>
           <Section style={estilos.tarjeta}>
             <Section style={suspendida ? estilos.toldoSuspendida : estilos.toldo}>
               <Text style={estilos.toldoTexto}>&nbsp;</Text>
@@ -244,7 +244,7 @@ export function Layout({
           <Text style={estilos.pie}>
             {motivo}
             <br />
-            LabÍA, Mar del Plata
+            Oficio Seguro, Mar del Plata
             {conPreferencias || conBaja ? <br /> : null}
             {conPreferencias ? (
               <Link href={pie.urlPreferencias} style={{ color: TEXTO, fontWeight: 700 }}>

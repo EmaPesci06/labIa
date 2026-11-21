@@ -8,7 +8,7 @@ import { Boton } from "@/components/ui/Boton";
 import { inicioDelRol } from "@/lib/auth/rutas";
 import { cargarDatosRegistro } from "@/lib/registro/borrador";
 
-export const metadata: Metadata = { title: "Armá tu perfil de profesional · LabÍA" };
+export const metadata: Metadata = { title: "Armá tu perfil de profesional · Oficio Seguro" };
 
 async function Contenido({ searchParams }: PageProps<"/registro/profesional">) {
   const [{ sesion, rol, borrador, barrios, urls, verificaciones }, consulta] = await Promise.all([

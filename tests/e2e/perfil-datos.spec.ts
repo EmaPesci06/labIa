@@ -116,7 +116,7 @@ test.describe("perfil público: visitante sin sesión", () => {
     await page.getByRole("button", { name: "Ver todas (27)" }).click();
     await expect(reseñas).toHaveCount(13);
     // La reseña número 2 tiene el autor borrado (autor_id null en el falso).
-    await expect(reseñas.nth(3)).toContainText("Cliente de LabÍA");
+    await expect(reseñas.nth(3)).toContainText("Cliente de Oficio Seguro");
     await page.getByRole("button", { name: "Ver más reseñas (14)" }).click();
     await expect(reseñas).toHaveCount(23);
     await page.getByRole("button", { name: "Ver más reseñas (4)" }).click();
@@ -202,7 +202,7 @@ test.describe("contacto por WhatsApp: cliente con sesión", () => {
     const wa = await pestana;
     await expect(wa).toHaveURL(new RegExp(`^https://wa\\.me/${WHATSAPP_FALSO}\\?text=`));
     const texto = decodeURIComponent(new URL(wa.url()).searchParams.get("text") ?? "");
-    expect(texto).toContain("Hola Martín Gómez, te encontré en LabÍA.");
+    expect(texto).toContain("Hola Martín Gómez, te encontré en Oficio Seguro.");
     expect(texto).toContain("Necesito un/a gasista en Centro.");
   });
 

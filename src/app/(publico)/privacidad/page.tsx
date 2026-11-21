@@ -4,7 +4,7 @@ import Link from "next/link";
 import { DocumentoLegal, Marcador, type SeccionLegal } from "@/components/legales/DocumentoLegal";
 import { MARCADORES, RUTA_TERMINOS } from "@/lib/legales";
 
-export const metadata: Metadata = { title: "Política de privacidad · LabÍA" };
+export const metadata: Metadata = { title: "Política de privacidad · Oficio Seguro" };
 
 // BORRADOR (LAB-35) para revisión de un abogado (LAB-36). Describe lo que la app hace de verdad:
 // si cambia el comportamiento (datos, proveedores, plazos), actualizá el texto y `VERSION_LEGALES`.
@@ -68,8 +68,8 @@ const secciones: readonly SeccionLegal[] = [
         </p>
         {/* REVISAR ABOGADO: base legal de cada tratamiento y si hace falta registrar la base de datos ante la AAIP (Ley 25.326, art. 21). */}
         <p>
-          No usamos tus datos para publicidad de terceros y no los vendemos. LabÍA no tiene chat
-          interno ni cobra pagos: esas conversaciones y acuerdos pasan por WhatsApp, fuera de
+          No usamos tus datos para publicidad de terceros y no los vendemos. Oficio Seguro no tiene
+          chat interno ni cobra pagos: esas conversaciones y acuerdos pasan por WhatsApp, fuera de
           nuestro control.
         </p>
       </>
@@ -106,8 +106,8 @@ const secciones: readonly SeccionLegal[] = [
           de nuevo.
         </li>
         <li>
-          Solo el equipo de verificación de LabÍA los ve, desde un panel interno, con enlaces
-          temporales que vencen a los 60 segundos.
+          Solo el equipo de verificación de Oficio Seguro los ve, desde un panel interno, con
+          enlaces temporales que vencen a los 60 segundos.
         </li>
         <li>No aparecen en ninguna pantalla pública, ni en emails, ni en métricas.</li>
       </ul>
@@ -139,8 +139,8 @@ const secciones: readonly SeccionLegal[] = [
           </li>
         </ul>
         <p>
-          Al usar LabÍA aceptás que tus datos se traten en esos servicios. Pedimos a cada proveedor
-          medidas de seguridad acordes.
+          Al usar Oficio Seguro aceptás que tus datos se traten en esos servicios. Pedimos a cada
+          proveedor medidas de seguridad acordes.
         </p>
       </>
     ),
@@ -227,8 +227,8 @@ const secciones: readonly SeccionLegal[] = [
     titulo: "Menores de edad",
     contenido: (
       <p>
-        LabÍA es solo para mayores de 18 años. Si nos enteramos de que una persona menor creó una
-        cuenta, la vamos a borrar.
+        Oficio Seguro es solo para mayores de 18 años. Si nos enteramos de que una persona menor
+        creó una cuenta, la vamos a borrar.
       </p>
     ),
   },
@@ -240,7 +240,7 @@ const secciones: readonly SeccionLegal[] = [
         Si cambia el modo en que tratamos tus datos, actualizamos esta política y te avisamos por
         email y en la app. Al pie de la página ves la versión y la fecha vigentes. Los{" "}
         <Link href={RUTA_TERMINOS}>Términos y condiciones</Link> también se aplican a tu uso de
-        LabÍA.
+        Oficio Seguro.
       </p>
     ),
   },

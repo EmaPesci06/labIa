@@ -9,7 +9,7 @@ import { tieneContrasena } from "@/lib/cuenta/proveedor";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 
-export const metadata: Metadata = { title: "Mis datos · LabÍA" };
+export const metadata: Metadata = { title: "Mis datos · Oficio Seguro" };
 
 export default async function MisDatos() {
   const sesion = await obtenerSesion();

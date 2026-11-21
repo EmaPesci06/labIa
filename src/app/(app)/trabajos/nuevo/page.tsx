@@ -8,7 +8,7 @@ import { rolFalso } from "@/lib/auth/sesion-falsa";
 import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 
-export const metadata: Metadata = { title: "Publicar un trabajo · LabÍA" };
+export const metadata: Metadata = { title: "Publicar un trabajo · Oficio Seguro" };
 
 // Barrios frecuentes como chips (por slug); el resto va en "Otro barrio".
 const SLUGS_FRECUENTES = ["la-perla", "centro", "chauvin", "los-troncos"];

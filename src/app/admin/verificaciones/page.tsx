@@ -12,7 +12,7 @@ import { listarProfesionales, type FilaProfesional } from "@/lib/verificacion/da
 
 type Props = { searchParams: Promise<{ pestana?: string }> };
 
-export const metadata: Metadata = { title: "Verificaciones · LabÍA" };
+export const metadata: Metadata = { title: "Verificaciones · Oficio Seguro" };
 
 const ESTADO_TEXTO = {
   pendiente: "pendiente",

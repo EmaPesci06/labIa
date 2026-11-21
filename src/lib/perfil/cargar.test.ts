@@ -78,7 +78,7 @@ describe("obtenerResenas (LAB-56)", () => {
     });
   });
 
-  it("muestra 'Cliente de LabÍA' cuando el autor no tiene nombre público (cuenta borrada)", async () => {
+  it("muestra 'Cliente de Oficio Seguro' cuando el autor no tiene nombre público (cuenta borrada)", async () => {
     const falso = clienteFalso([
       {
         id: "33333333-3333-4333-8333-333333333333",
@@ -92,7 +92,7 @@ describe("obtenerResenas (LAB-56)", () => {
 
     const pagina = await obtenerResenas(falso.cliente, PROFESIONAL, 0, 5, AHORA);
 
-    expect(pagina.resenas[0]?.autor).toBe("Cliente de LabÍA");
+    expect(pagina.resenas[0]?.autor).toBe("Cliente de Oficio Seguro");
   });
 
   it("no consulta nada si el id del profesional no es un uuid", async () => {

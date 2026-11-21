@@ -6,7 +6,7 @@ import { esperarHojaQuieta, focoDentroDelDialogo } from "./apoyo/hoja";
 // LAB-31: reseñas de clientes a profesionales, con el Supabase FALSO (tests/e2e/apoyo/supabase-falso.cjs).
 // Cubre: elegibilidad (contactó o eligió), alta desde el perfil, edición dentro de las 24 h, reseña
 // vencida, errores de la Server Action junto a la hoja, teclado (foco en la hoja, Esc, foco que vuelve
-// al botón), apertura con #resena, autor null ("Cliente de LabÍA") y axe.
+// al botón), apertura con #resena, autor null ("Cliente de Oficio Seguro") y axe.
 // Para correr: ver perfil-datos.spec.ts (mismo servidor falso y mismos puertos). Como el falso guarda las
 // reseñas en memoria, reiniciarlo antes de cada corrida.
 // Sin LABIA_E2E_SUPABASE_FALSO=1 se saltean: no pueden correr contra el Supabase real del CI.
@@ -72,7 +72,7 @@ const botonEditarResena = (page: Page) =>
 const hoja = (page: Page) => page.getByRole("dialog");
 
 test.describe("reseñas: elegibilidad", () => {
-  test("sin cuenta no se ofrece reseñar, pero las reseñas se ven y el autor null dice Cliente de LabÍA", async ({
+  test("sin cuenta no se ofrece reseñar, pero las reseñas se ven y el autor null dice Cliente de Oficio Seguro", async ({
     page,
   }) => {
     await page.goto(RUTA_PERFIL);
@@ -81,7 +81,7 @@ test.describe("reseñas: elegibilidad", () => {
     await expect(botonEditarResena(page)).toHaveCount(0);
     // La lista arranca con 3 reseñas: el autor borrado está más abajo, después de "Ver todas".
     await page.getByRole("button", { name: /^Ver todas \(/ }).click();
-    await expect(page.getByText("Cliente de LabÍA").first()).toBeVisible();
+    await expect(page.getByText("Cliente de Oficio Seguro").first()).toBeVisible();
   });
 
   test("un cliente que no contactó ni contrató al profesional no ve el botón", async ({

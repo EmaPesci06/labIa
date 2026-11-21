@@ -11,7 +11,7 @@ import {
 } from "@/lib/trabajos/consulta";
 
 export const metadata: Metadata = {
-  title: "Mis trabajos · LabÍA",
+  title: "Mis trabajos · Oficio Seguro",
   description: "Consultá tus trabajos publicados, compará postulantes y elegí a un profesional.",
 };
 

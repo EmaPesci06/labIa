@@ -16,10 +16,10 @@ describe("colores de la PWA", () => {
 describe("manifest", () => {
   const m = manifest();
 
-  it("es la app LabÍA, instalable y en español", () => {
+  it("es la app Oficio Seguro, instalable y en español", () => {
     expect(m).toMatchObject({
-      name: "LabÍA",
-      short_name: "LabÍA",
+      name: "Oficio Seguro",
+      short_name: "Oficio Seguro",
       lang: "es-AR",
       start_url: "/inicio",
       display: "standalone",

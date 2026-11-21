@@ -185,7 +185,7 @@ export async function cambiarContrasena(
   const sesion = await sesionDeCuenta();
   if ("error" in sesion) return { mensaje: sesion.error };
   if (!tieneContrasena(sesion.usuario)) {
-    return { mensaje: "Tu cuenta ingresa con Google: no tiene contraseña de LabÍA." };
+    return { mensaje: "Tu cuenta ingresa con Google: no tiene contraseña de Oficio Seguro." };
   }
   const limite = await superaElLimite("contrasena", sesion.usuario.id);
   if (limite) return { mensaje: limite };

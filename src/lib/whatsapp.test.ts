@@ -38,8 +38,8 @@ describe("normalizarTelefono", () => {
 
 describe("linkWhatsApp", () => {
   it("saca el + y codifica el mensaje", () => {
-    expect(linkWhatsApp("+5492235551234", "Hola, te vi en LabÍA. ¿Podés mañana?")).toBe(
-      "https://wa.me/5492235551234?text=Hola%2C%20te%20vi%20en%20Lab%C3%8DA.%20%C2%BFPod%C3%A9s%20ma%C3%B1ana%3F",
+    expect(linkWhatsApp("+5492235551234", "Hola, te vi en Oficio Seguro. ¿Podés mañana?")).toBe(
+      "https://wa.me/5492235551234?text=Hola%2C%20te%20vi%20en%20Oficio%20Seguro.%20%C2%BFPod%C3%A9s%20ma%C3%B1ana%3F",
     );
   });
 

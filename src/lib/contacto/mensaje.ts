@@ -21,8 +21,8 @@ export type DatosMensajeContacto = {
 export function armarMensajeContacto(datos: DatosMensajeContacto): string {
   if (datos.origen === "postulacion") {
     const titulo = datos.tituloTrabajo ?? "tu trabajo";
-    return `Hola ${datos.nombreProfesional}, te elegí en LabÍA para el trabajo "${titulo}". ¿Coordinamos?`;
+    return `Hola ${datos.nombreProfesional}, te elegí en Oficio Seguro para el trabajo "${titulo}". ¿Coordinamos?`;
   }
   const lugar = datos.barrioCliente ? ` en ${datos.barrioCliente}` : "";
-  return `Hola ${datos.nombreProfesional}, te encontré en LabÍA. Necesito un/a ${datos.profesion}${lugar}. ¿Podés ayudarme?`;
+  return `Hola ${datos.nombreProfesional}, te encontré en Oficio Seguro. Necesito un/a ${datos.profesion}${lugar}. ¿Podés ayudarme?`;
 }

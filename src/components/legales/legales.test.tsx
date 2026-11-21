@@ -48,7 +48,7 @@ describe("ConsentimientoDatosSensibles", () => {
   it("tiene el texto exacto, se tilda y manda la versión", async () => {
     const { container } = render(<Prueba />);
     const casilla = screen.getByRole("checkbox", {
-      name: /Acepto que LabÍA trate mi DNI y mi certificado de antecedentes solo para verificar mi identidad, según la Política de privacidad\./,
+      name: /Acepto que Oficio Seguro trate mi DNI y mi certificado de antecedentes solo para verificar mi identidad, según la Política de privacidad\./,
     });
     expect(casilla).not.toBeChecked();
     await userEvent.click(casilla);

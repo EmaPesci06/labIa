@@ -186,8 +186,8 @@ export function FormularioPostulacion({
       </div>
 
       <p className="text-sm leading-snug text-texto">
-        La seña se acuerda con el cliente y queda escrita en el presupuesto. LabÍA no cobra ni
-        retiene pagos.
+        La seña se acuerda con el cliente y queda escrita en el presupuesto. Oficio Seguro no cobra
+        ni retiene pagos.
       </p>
 
       <Boton type="submit" variante="principal" tamano="grande" bloque cargando={isPending}>

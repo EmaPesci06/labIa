@@ -14,13 +14,13 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const sesion = await obtenerSesion();
-  if (!sesion) return { title: "Detalle del trabajo · LabÍA" };
+  if (!sesion) return { title: "Detalle del trabajo · Oficio Seguro" };
 
   const trabajo = await obtenerDetalleMiTrabajoCliente(id, sesion.usuario.id);
-  if (!trabajo) return { title: "Trabajo no encontrado · LabÍA" };
+  if (!trabajo) return { title: "Trabajo no encontrado · Oficio Seguro" };
 
   return {
-    title: `${trabajo.titulo} · Mis trabajos · LabÍA`,
+    title: `${trabajo.titulo} · Mis trabajos · Oficio Seguro`,
     description: trabajo.descripcion.slice(0, 160),
   };
 }

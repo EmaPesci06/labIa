@@ -7,7 +7,7 @@ export function BotonErrorForzado() {
 
   if (romper) {
     throw new Error(
-      "Error de prueba de LabÍA para Sentry: prueba@ejemplo.com, +54 9 223 555-1234, dni 30123456",
+      "Error de prueba de Oficio Seguro para Sentry: prueba@ejemplo.com, +54 9 223 555-1234, dni 30123456",
     );
   }
 

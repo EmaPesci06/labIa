@@ -5,7 +5,7 @@ import { AvisoPantalla } from "@/components/ui/AvisoPantalla";
 import { Boton } from "@/components/ui/Boton";
 
 export const metadata: Metadata = {
-  title: "Sin conexión · LabÍA",
+  title: "Sin conexión · Oficio Seguro",
   robots: { index: false, follow: false },
 };
 

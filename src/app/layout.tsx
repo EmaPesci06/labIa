@@ -24,11 +24,11 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "LabÍA",
+  title: "Oficio Seguro",
   description: "Oficios de confianza en Mar del Plata.",
-  applicationName: "LabÍA",
+  applicationName: "Oficio Seguro",
   // iOS: abre en pantalla completa al agregarla a la pantalla de inicio.
-  appleWebApp: { capable: true, title: "LabÍA", statusBarStyle: "default" },
+  appleWebApp: { capable: true, title: "Oficio Seguro", statusBarStyle: "default" },
   other: { "apple-mobile-web-app-capable": "yes" },
   icons: {
     icon: [

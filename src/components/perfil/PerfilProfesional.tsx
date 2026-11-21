@@ -262,7 +262,9 @@ export function PerfilProfesional({
             />
           </section>
 
-          <Aviso className="lg:hidden">Se comprometió con las normas de seguridad de LabÍA.</Aviso>
+          <Aviso className="lg:hidden">
+            Se comprometió con las normas de seguridad de Oficio Seguro.
+          </Aviso>
         </div>
 
         <aside
@@ -293,7 +295,7 @@ export function PerfilProfesional({
             )}
           </div>
           <Aviso className="items-start rounded-2xl p-[18px] text-[15px]">
-            Se comprometió con las normas de seguridad de LabÍA.
+            Se comprometió con las normas de seguridad de Oficio Seguro.
           </Aviso>
         </aside>
       </div>

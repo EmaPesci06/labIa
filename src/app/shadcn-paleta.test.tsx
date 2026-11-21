@@ -7,7 +7,7 @@ import { contraste, CSS_GLOBALS, hexDe } from "@/lib/tokens-css";
 /*
  * LAB-82: el botón de shadcn (sin editar) sale con la paleta "Verano en la costa". jsdom no
  * calcula CSS, así que se verifica la cadena completa: clase del botón → variable de shadcn →
- * token de LabÍA → hex de cada tema.
+ * token de Oficio Seguro → hex de cada tema.
  */
 
 function variable(nombre: string): string {
@@ -18,7 +18,7 @@ function variable(nombre: string): string {
   return coincidencia[1];
 }
 
-describe("Button de shadcn con la paleta de LabÍA", () => {
+describe("Button de shadcn con la paleta de Oficio Seguro", () => {
   it("se renderiza como botón accesible con la variante principal", () => {
     render(<Button>Buscar</Button>);
     const boton = screen.getByRole("button", { name: "Buscar" });

@@ -9,7 +9,7 @@ import { Logo } from "@/components/ui/Logo";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 
 export const metadata: Metadata = {
-  title: "Cuenta suspendida · LabÍA",
+  title: "Cuenta suspendida · Oficio Seguro",
 };
 
 // El motivo es de cada usuario: el contenido se lee en cada pedido (dentro de Suspense, como en
@@ -31,7 +31,7 @@ async function Contenido() {
     <div className="flex min-h-dvh flex-col bg-equipo text-sobre-encabezado [&_:focus-visible]:outline-sol">
       <SaltarAlContenido />
       <header className="mx-auto w-full max-w-[720px] px-6 pt-4 pb-0 lg:pt-6">
-        <Logo alt="LabÍA" sobre="encabezado" />
+        <Logo alt="Oficio Seguro" sobre="encabezado" />
       </header>
 
       <main
@@ -43,7 +43,7 @@ async function Contenido() {
           Tu cuenta fue suspendida
         </h1>
         <p className="mt-3.5 text-lg leading-[1.4]">
-          Se detectó una infracción a las normas de la comunidad de LabÍA.
+          Se detectó una infracción a las normas de la comunidad de Oficio Seguro.
         </p>
 
         <section

@@ -12,7 +12,7 @@ describe("armarMensajeContacto", () => {
         barrioCliente: "La Perla",
       }),
     ).toBe(
-      "Hola Martín Gómez, te encontré en LabÍA. Necesito un/a gasista en La Perla. ¿Podés ayudarme?",
+      "Hola Martín Gómez, te encontré en Oficio Seguro. Necesito un/a gasista en La Perla. ¿Podés ayudarme?",
     );
   });
 
@@ -24,7 +24,7 @@ describe("armarMensajeContacto", () => {
         profesion: "plomero",
         barrioCliente: null,
       }),
-    ).toBe("Hola Martín G., te encontré en LabÍA. Necesito un/a plomero. ¿Podés ayudarme?");
+    ).toBe("Hola Martín G., te encontré en Oficio Seguro. Necesito un/a plomero. ¿Podés ayudarme?");
   });
 
   it("desde una postulación menciona el trabajo y propone coordinar", () => {
@@ -36,6 +36,8 @@ describe("armarMensajeContacto", () => {
         barrioCliente: "Centro",
         tituloTrabajo: "Caldera sin gas",
       }),
-    ).toBe('Hola Martín Gómez, te elegí en LabÍA para el trabajo "Caldera sin gas". ¿Coordinamos?');
+    ).toBe(
+      'Hola Martín Gómez, te elegí en Oficio Seguro para el trabajo "Caldera sin gas". ¿Coordinamos?',
+    );
   });
 });

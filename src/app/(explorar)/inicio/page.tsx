@@ -19,7 +19,7 @@ import { obtenerSesion } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 
 export const metadata: Metadata = {
-  title: "Buscá un profesional en Mar del Plata · LabÍA",
+  title: "Buscá un profesional en Mar del Plata · Oficio Seguro",
   description:
     "Gas, electricidad, plomería, cerrajería, carpintería, pintura y mecánica: profesionales verificados cerca de tu barrio.",
 };
@@ -90,7 +90,7 @@ export default async function Inicio({ searchParams }: Props) {
       >
         <div className="flex min-w-0 flex-1 flex-col gap-4 lg:gap-6">
           <div className="flex items-center justify-between gap-3 lg:hidden">
-            <Logo alt="LabÍA" sobre="encabezado" />
+            <Logo alt="Oficio Seguro" sobre="encabezado" />
             <SelectorBarrio barrios={barrios} valor={barrio} ruta="/inicio" />
           </div>
           <div className="flex flex-col gap-3">

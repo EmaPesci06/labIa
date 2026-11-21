@@ -40,10 +40,10 @@ const vista = (c: ConVistaPrevia) =>
   createElement(c as unknown as ComponentType<object>, c.PreviewProps);
 
 describe.each(Object.entries(PLANTILLAS))("plantilla %s", (nombre, Plantilla) => {
-  it("renderiza HTML con la marca y el pie de LabÍA", async () => {
+  it("renderiza HTML con la marca y el pie de Oficio Seguro", async () => {
     const html = await render(vista(Plantilla));
-    expect(html).toContain("LabÍA");
-    expect(html).toContain("LabÍA, Mar del Plata");
+    expect(html).toContain("Oficio Seguro");
+    expect(html).toContain("Oficio Seguro, Mar del Plata");
   });
 
   it("pone el enlace de baja y el de preferencias solo donde corresponde", async () => {
@@ -54,7 +54,7 @@ describe.each(Object.entries(PLANTILLAS))("plantilla %s", (nombre, Plantilla) =>
 
   it("renderiza la versión de texto plano", async () => {
     const texto = await render(vista(Plantilla), { plainText: true });
-    expect(texto).toContain("LabÍA, Mar del Plata");
+    expect(texto).toContain("Oficio Seguro, Mar del Plata");
     expect(texto).not.toContain("<");
   });
 

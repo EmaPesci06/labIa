@@ -20,7 +20,7 @@ export default function ErrorDePagina({
 
   return (
     <main className="mx-auto flex w-full max-w-[480px] flex-1 flex-col items-center justify-center gap-5 px-5 py-10 text-center">
-      <Logo alt="LabÍA" />
+      <Logo alt="Oficio Seguro" />
       <Toldo color="sol" alto={18} className="w-24" />
       <h1 className="font-titulo text-[28px]">Algo salió mal</h1>
       <p className="text-base text-texto">Ya nos avisaron del error. Probá de nuevo en un rato.</p>

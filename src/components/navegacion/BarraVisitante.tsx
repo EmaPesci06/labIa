@@ -15,7 +15,7 @@ export function BarraVisitante() {
       <div className={FILA_BARRA}>
         <Link
           href="/"
-          aria-label="LabÍA, inicio"
+          aria-label="Oficio Seguro, inicio"
           className="mr-auto flex min-h-11 items-center rounded-xl"
         >
           <Logo alt="" />

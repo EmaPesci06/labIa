@@ -26,7 +26,7 @@ import {
 } from "@/lib/trabajos/paginacion";
 import { resumenBannerVerificacion } from "@/lib/verificacion/logica";
 
-export const metadata: Metadata = { title: "Trabajos · LabÍA" };
+export const metadata: Metadata = { title: "Trabajos · Oficio Seguro" };
 
 type PaginaTrabajosProps = {
   searchParams: Promise<{

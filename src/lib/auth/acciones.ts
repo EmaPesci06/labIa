@@ -150,7 +150,8 @@ export async function continuarConGoogle(
     rol: texto(datos, "rol") || undefined,
     volver: texto(datos, "volver") || undefined,
   });
-  if (!resultado.success) return { mensaje: "Elegí cómo querés usar LabÍA antes de continuar." };
+  if (!resultado.success)
+    return { mensaje: "Elegí cómo querés usar Oficio Seguro antes de continuar." };
 
   const bloqueado = await superaElLimite("google");
   if (bloqueado) return bloqueado;

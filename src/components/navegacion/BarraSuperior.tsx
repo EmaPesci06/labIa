@@ -28,7 +28,7 @@ export function BarraSuperior({ navegacion, nombre, barrio }: Props) {
       <div className={FILA_BARRA}>
         <Link
           href="/inicio"
-          aria-label="LabÍA, inicio"
+          aria-label="Oficio Seguro, inicio"
           className="flex min-h-11 items-center rounded-xl"
         >
           <Logo alt="" />

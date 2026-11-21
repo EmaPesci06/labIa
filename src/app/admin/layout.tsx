@@ -32,7 +32,7 @@ async function MarcoAdmin({ children }: { children: ReactNode }) {
         <div className="mx-auto flex w-full max-w-[1264px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 py-3 lg:px-8">
           <div className="flex flex-wrap items-center gap-4 sm:gap-6">
             <p className="text-sm font-bold tracking-[0.08em] uppercase">
-              <span translate="no">LabÍA</span> · Equipo
+              <span translate="no">Oficio Seguro</span> · Equipo
             </p>
             <NavegacionAdmin />
           </div>

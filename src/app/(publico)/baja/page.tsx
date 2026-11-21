@@ -7,7 +7,10 @@ import { AvisoPantalla } from "@/components/ui/AvisoPantalla";
 import { Boton } from "@/components/ui/Boton";
 import { secretoValido, verificarTokenBaja } from "@/lib/emails/token";
 
-export const metadata: Metadata = { title: "Darte de baja · LabÍA", robots: { index: false } };
+export const metadata: Metadata = {
+  title: "Darte de baja · Oficio Seguro",
+  robots: { index: false },
+};
 
 type Params = { t?: string; listo?: string; error?: string };
 
@@ -47,7 +50,7 @@ async function Contenido({ searchParams }: { searchParams: Promise<Params> }) {
         texto={`Ya no vas a recibir ${TEXTO_CATEGORIA[listo as keyof typeof TEXTO_CATEGORIA]}. Podés volver a activarlos cuando quieras desde Mi cuenta, en Preferencias de email.`}
         accion={
           <Boton href="/ingresar" tamano="grande" bloque>
-            Ir a LabÍA
+            Ir a Oficio Seguro
           </Boton>
         }
         className="min-h-[60dvh] pt-4"

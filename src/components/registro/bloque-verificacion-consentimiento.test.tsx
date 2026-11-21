@@ -4,7 +4,8 @@ import { describe, expect, it, vi } from "vitest";
 
 import { BloqueVerificacion } from "./BloqueVerificacion";
 
-const casilla = () => screen.getByRole("checkbox", { name: /Acepto que LabÍA trate mi DNI/ });
+const casilla = () =>
+  screen.getByRole("checkbox", { name: /Acepto que Oficio Seguro trate mi DNI/ });
 
 describe("BloqueVerificacion: consentimiento para datos sensibles (LAB-43)", () => {
   it("sin consentimiento tildado, la entrada de antecedentes queda deshabilitada", () => {
@@ -32,7 +33,9 @@ describe("BloqueVerificacion: consentimiento para datos sensibles (LAB-43)", () 
   it("sin la prop consentimiento no muestra la casilla (uso sin formulario)", () => {
     render(<BloqueVerificacion />);
 
-    expect(screen.queryByRole("checkbox", { name: /Acepto que LabÍA/ })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("checkbox", { name: /Acepto que Oficio Seguro/ }),
+    ).not.toBeInTheDocument();
     expect(screen.getByLabelText(/Certificado de antecedentes/)).toBeEnabled();
   });
 });

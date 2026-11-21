@@ -32,7 +32,9 @@ describe("textos del perfil", () => {
     expect(lineaOficio(["gas"], null)).toBe("Gasista");
   });
   it("arma el título de la pestaña", () => {
-    expect(tituloPerfil("Martín G.", ["gas"])).toBe("Martín G. · Gasista en Mar del Plata · LabÍA");
+    expect(tituloPerfil("Martín G.", ["gas"])).toBe(
+      "Martín G. · Gasista en Mar del Plata · Oficio Seguro",
+    );
   });
   it("recorta la descripción larga", () => {
     expect(descripcionCorta("Martín G.", ["gas"], "a".repeat(300)).length).toBeLessThanOrEqual(160);
@@ -40,7 +42,7 @@ describe("textos del perfil", () => {
   });
   it("formatea reseñas y autores", () => {
     expect(autorResena("Laura", "F")).toBe("Laura F.");
-    expect(autorResena(null, null)).toBe("Cliente de LabÍA");
+    expect(autorResena(null, null)).toBe("Cliente de Oficio Seguro");
     expect(textoPuntaje(1)).toBe("1 estrella");
     expect(textoPuntaje(5)).toBe("5 estrellas");
     expect(textoCantidadResenas(1)).toBe("1 reseña");

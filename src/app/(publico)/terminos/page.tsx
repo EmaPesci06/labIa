@@ -5,7 +5,7 @@ import { DocumentoLegal, Marcador, type SeccionLegal } from "@/components/legale
 import { ListaNormas } from "@/components/normas/ListaNormas";
 import { MARCADORES, RUTA_PRIVACIDAD } from "@/lib/legales";
 
-export const metadata: Metadata = { title: "Términos y condiciones · LabÍA" };
+export const metadata: Metadata = { title: "Términos y condiciones · Oficio Seguro" };
 
 // BORRADOR (LAB-35) para revisión de un abogado (LAB-36). Cada punto que necesita criterio legal
 // lleva `{/* REVISAR ABOGADO */}`. Los valores a completar están en `MARCADORES` (src/lib/legales.ts).
@@ -13,13 +13,13 @@ export const metadata: Metadata = { title: "Términos y condiciones · LabÍA" }
 const secciones: readonly SeccionLegal[] = [
   {
     id: "quienes-somos",
-    titulo: "Qué es LabÍA y quién lo opera",
+    titulo: "Qué es Oficio Seguro y quién lo opera",
     contenido: (
       <>
         <p>
-          LabÍA es una plataforma web que ayuda a vecinos de Mar del Plata a encontrar profesionales
-          de oficios (carpintería, plomería, cerrajería, gas, pintura, mecánica y electricidad) y a
-          ponerse en contacto con ellos.
+          Oficio Seguro es una plataforma web que ayuda a vecinos de Mar del Plata a encontrar
+          profesionales de oficios (carpintería, plomería, cerrajería, gas, pintura, mecánica y
+          electricidad) y a ponerse en contacto con ellos.
         </p>
         <p>
           La opera <Marcador>{MARCADORES.razonSocial}</Marcador>, CUIT{" "}
@@ -27,28 +27,32 @@ const secciones: readonly SeccionLegal[] = [
           <Marcador>{MARCADORES.domicilio}</Marcador>. Podés escribirnos a{" "}
           <Marcador>{MARCADORES.emailContacto}</Marcador>.
         </p>
-        <p>Al crear una cuenta o usar LabÍA aceptás estos términos y la Política de privacidad.</p>
+        <p>
+          Al crear una cuenta o usar Oficio Seguro aceptás estos términos y la Política de
+          privacidad.
+        </p>
       </>
     ),
   },
   {
     id: "intermediario",
-    titulo: "LabÍA es un intermediario",
+    titulo: "Oficio Seguro es un intermediario",
     contenido: (
       <>
         <p>
-          LabÍA conecta a clientes con profesionales, pero no presta los servicios. El acuerdo de
-          trabajo se hace directamente entre el cliente y el profesional, y es entre ellos.
+          Oficio Seguro conecta a clientes con profesionales, pero no presta los servicios. El
+          acuerdo de trabajo se hace directamente entre el cliente y el profesional, y es entre
+          ellos.
         </p>
         <p>
-          LabÍA no garantiza resultados, precios, plazos ni disponibilidad, ni que un profesional
-          responda o acepte un trabajo. La verificación de identidad y antecedentes que hacemos es
-          una ayuda para generar confianza: no es una garantía sobre la calidad del trabajo ni sobre
-          la conducta futura de nadie.
+          Oficio Seguro no garantiza resultados, precios, plazos ni disponibilidad, ni que un
+          profesional responda o acepte un trabajo. La verificación de identidad y antecedentes que
+          hacemos es una ayuda para generar confianza: no es una garantía sobre la calidad del
+          trabajo ni sobre la conducta futura de nadie.
         </p>
         <p>
-          El contacto es siempre por WhatsApp. LabÍA no tiene chat interno y no interviene en lo que
-          se hable o acuerde por ahí.
+          El contacto es siempre por WhatsApp. Oficio Seguro no tiene chat interno y no interviene
+          en lo que se hable o acuerde por ahí.
         </p>
       </>
     ),
@@ -63,7 +67,9 @@ const secciones: readonly SeccionLegal[] = [
           <li>Ser mayor de 18 años y usar su identidad real.</li>
           <li>Subir su DNI (frente y dorso) y un certificado de antecedentes vigente.</li>
           <li>Si trabaja en gas, subir además su matrícula vigente.</li>
-          <li>Aceptar las normas de seguridad de LabÍA y volver a aceptarlas si cambian.</li>
+          <li>
+            Aceptar las normas de seguridad de Oficio Seguro y volver a aceptarlas si cambian.
+          </li>
         </ul>
         <p>
           Revisamos esos documentos a mano. Solo se muestran las insignias de verificación, nunca
@@ -84,12 +90,14 @@ const secciones: readonly SeccionLegal[] = [
         <ul>
           <li>Ser mayor de 18 años.</li>
           <li>Dar datos reales y mantenerlos al día.</li>
-          <li>Usar LabÍA de buena fe: publicar solo trabajos que de verdad querés contratar.</li>
+          <li>
+            Usar Oficio Seguro de buena fe: publicar solo trabajos que de verdad querés contratar.
+          </li>
           <li>Tratar con respeto a los profesionales.</li>
         </ul>
         <p>
           Nunca te pedimos tu dirección exacta: elegís un barrio. La dirección se la das vos al
-          profesional que elijas, por fuera de LabÍA.
+          profesional que elijas, por fuera de Oficio Seguro.
         </p>
       </>
     ),
@@ -101,8 +109,8 @@ const secciones: readonly SeccionLegal[] = [
       <>
         <p>
           Los precios, las señas, los materiales y las formas de pago se acuerdan entre cliente y
-          profesional, por fuera de LabÍA. En esta versión LabÍA no cobra, no retiene ni gestiona
-          dinero, y no cobra comisión.
+          profesional, por fuera de Oficio Seguro. En esta versión Oficio Seguro no cobra, no
+          retiene ni gestiona dinero, y no cobra comisión.
         </p>
         <p>
           Te recomendamos pedir el presupuesto por escrito antes de empezar, con precio, materiales
@@ -137,7 +145,7 @@ const secciones: readonly SeccionLegal[] = [
     titulo: "Contenido prohibido, reportes y suspensión",
     contenido: (
       <>
-        <p>No se puede publicar ni enviar por LabÍA:</p>
+        <p>No se puede publicar ni enviar por Oficio Seguro:</p>
         <ul>
           <li>Datos falsos, o hacerse pasar por otra persona.</li>
           <li>Contenido ofensivo, discriminatorio, violento o sexual.</li>
@@ -166,10 +174,10 @@ const secciones: readonly SeccionLegal[] = [
       <>
         {/* REVISAR ABOGADO: alcance de la limitación de responsabilidad (límites de la Ley 24.240 y del Código Civil y Comercial). */}
         <p>
-          LabÍA presta el servicio de conexión «tal como está». En la medida que la ley lo permita,
-          no respondemos por los daños que surjan del trabajo que un profesional hace o deja de
-          hacer, ni de los acuerdos entre clientes y profesionales, ni por la información que los
-          usuarios cargan, ni por interrupciones del servicio.
+          Oficio Seguro presta el servicio de conexión «tal como está». En la medida que la ley lo
+          permita, no respondemos por los daños que surjan del trabajo que un profesional hace o
+          deja de hacer, ni de los acuerdos entre clientes y profesionales, ni por la información
+          que los usuarios cargan, ni por interrupciones del servicio.
         </p>
         <p>
           Esto no limita los derechos que la ley te da como consumidor ni la responsabilidad que no
@@ -187,12 +195,12 @@ const secciones: readonly SeccionLegal[] = [
         <p>
           Podemos actualizar estos términos. Si el cambio es importante, te avisamos por email y con
           un aviso en la app antes de que empiece a regir. Al pie de esta página siempre ves la
-          versión y la fecha vigentes. Si seguís usando LabÍA después del aviso, entendemos que
-          aceptás los cambios; si no estás de acuerdo, podés borrar tu cuenta desde «Mi cuenta».
+          versión y la fecha vigentes. Si seguís usando Oficio Seguro después del aviso, entendemos
+          que aceptás los cambios; si no estás de acuerdo, podés borrar tu cuenta desde «Mi cuenta».
         </p>
         <p>
           Si cambian las normas de seguridad, los profesionales tienen que aceptarlas de nuevo para
-          seguir usando LabÍA.
+          seguir usando Oficio Seguro.
         </p>
       </>
     ),
@@ -216,10 +224,11 @@ const secciones: readonly SeccionLegal[] = [
     titulo: "Defensa del consumidor",
     contenido: (
       <>
-        {/* REVISAR ABOGADO: ¿aplica el botón de arrepentimiento (Res. 424/2020 de la Secretaría de Comercio)? LabÍA no cobra, así que probablemente no, pero confirmar. */}
+        {/* REVISAR ABOGADO: ¿aplica el botón de arrepentimiento (Res. 424/2020 de la Secretaría de Comercio)? Oficio Seguro no cobra, así que probablemente no, pero confirmar. */}
         <p>
-          Como LabÍA no vende productos ni servicios con costo para vos, creemos que el botón de
-          arrepentimiento no aplica en esta versión. Igual podés borrar tu cuenta cuando quieras.
+          Como Oficio Seguro no vende productos ni servicios con costo para vos, creemos que el
+          botón de arrepentimiento no aplica en esta versión. Igual podés borrar tu cuenta cuando
+          quieras.
         </p>
         <p>
           Si tenés un reclamo como consumidor, podés presentarlo ante la Dirección de Defensa del
@@ -243,7 +252,7 @@ export default function Terminos() {
   return (
     <DocumentoLegal
       titulo="Términos y condiciones"
-      introduccion="Las reglas para usar LabÍA, en lenguaje claro."
+      introduccion="Las reglas para usar Oficio Seguro, en lenguaje claro."
       secciones={secciones}
       otroDocumento={{ href: RUTA_PRIVACIDAD, etiqueta: "Leer la Política de privacidad" }}
     />
