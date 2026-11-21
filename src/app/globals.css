@@ -249,7 +249,13 @@
  */
 [data-slot="input"]:not([aria-invalid="true"]):focus-visible,
 [data-slot="textarea"]:not([aria-invalid="true"]):focus-visible,
-input:not([type="checkbox"], [type="radio"], [type="file"], [type="range"], [aria-invalid="true"]):focus-visible,
+input:not(
+    [type="checkbox"],
+    [type="radio"],
+    [type="file"],
+    [type="range"],
+    [aria-invalid="true"]
+  ):focus-visible,
 textarea:not([aria-invalid="true"]):focus-visible {
   outline: none;
   border-color: var(--color-foco);
