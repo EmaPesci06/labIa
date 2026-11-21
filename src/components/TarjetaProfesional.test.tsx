@@ -27,7 +27,8 @@ describe("TarjetaProfesional", () => {
     render(<TarjetaProfesional profesional={base} />);
     expect(screen.getByRole("link")).toHaveAttribute("href", "/profesionales/abc");
     expect(screen.getByText("Martín G.")).toBeInTheDocument();
-    expect(screen.getByText("Gasista · 12 años")).toBeInTheDocument();
+    expect(screen.getByText("Gasista")).toBeInTheDocument();
+    expect(screen.getByText("12 años")).toBeInTheDocument();
     expect(screen.getByText("4,9 en 10 reseñas")).toBeInTheDocument();
     expect(screen.getByText("a 1,2 km")).toBeInTheDocument();
     expect(screen.getByText("Identidad verificada")).toBeInTheDocument();

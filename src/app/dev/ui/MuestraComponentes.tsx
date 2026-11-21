@@ -16,7 +16,9 @@ import { Estrellas } from "@/components/ui/Estrellas";
 import { Hoja } from "@/components/ui/Hoja";
 import { Insignia } from "@/components/ui/Insignia";
 import { Tarjeta } from "@/components/ui/Tarjeta";
-import { Toldo } from "@/components/ui/Toldo";
+import { TarjetaProfesional } from "@/components/TarjetaProfesional";
+import { Sello } from "@/components/ui/Sello";
+import { FranjaRubro } from "@/components/ui/FranjaRubro";
 import { Vacio } from "@/components/ui/Vacio";
 
 function Seccion({ titulo, children }: { titulo: string; children: ReactNode }) {
@@ -177,11 +179,30 @@ export function MuestraComponentes() {
         />
       </Seccion>
 
-      <Seccion titulo="Toldos">
-        <Toldo color="accion" alto={14} />
-        <Toldo color="destacado" alto={18} />
-        <Toldo color="texto" alto={22} />
-        <Toldo color="adorno" alto={26} />
+      <Seccion titulo="Motivos">
+        <div className="flex items-center gap-6">
+          <Sello className="size-24" />
+          <Sello className="size-14" texto="Verificado ·" />
+        </div>
+        <FranjaRubro>Gasista</FranjaRubro>
+        <TarjetaProfesional
+          profesional={{
+            usuarioId: "muestra",
+            nombre: "Martín",
+            apellidoInicial: "G",
+            fotoPath: null,
+            oficios: ["gas"],
+            aniosExperiencia: 12,
+            zonasTexto: "La Perla, Centro",
+            promedio: 4.9,
+            cantidadResenas: 10,
+            identidadVerificada: true,
+            antecedentesOk: true,
+            matriculado: true,
+            distanciaKm: 1.2,
+          }}
+        />
+        <div aria-hidden className="corte-cupon" />
       </Seccion>
 
       <Seccion titulo="Insignias">

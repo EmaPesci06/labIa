@@ -1,10 +1,9 @@
-import { Check } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 
 import { SaltarAlContenido } from "@/components/navegacion/SaltarAlContenido";
-import { Toldo } from "@/components/ui/Toldo";
+import { Sello } from "@/components/ui/Sello";
 import { obtenerSesion } from "@/lib/sesion";
 
 export const metadata: Metadata = { title: "Perfil enviado · Oficio Seguro" };
@@ -22,19 +21,13 @@ function ContenidoListo({ nombre }: { nombre: string | null }) {
       className="flex min-h-dvh flex-col bg-encabezado text-sobre-encabezado"
     >
       <SaltarAlContenido />
-      <Toldo color="destacado" alto={26} />
       <main
         id="contenido"
         tabIndex={-1}
-        className="mx-auto flex w-full max-w-[560px] flex-1 flex-col px-6 pt-8 pb-5 focus:outline-none"
+        className="mx-auto flex w-full max-w-[560px] flex-1 flex-col px-6 pt-10 pb-5 focus:outline-none"
       >
         <div className="my-auto py-4">
-          <span
-            aria-hidden
-            className="flex size-24 items-center justify-center rounded-full bg-accion text-sobre-accion"
-          >
-            <Check strokeWidth={3} className="size-[52px]" />
-          </span>
+          <Sello estampar className="size-28" />
           <h1 className="mt-[22px] font-titulo text-[48px] leading-[0.98] font-extrabold lg:text-[56px]">
             {nombre ? `¡Listo, ${nombre}!` : "¡Listo!"}
           </h1>

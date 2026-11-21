@@ -3,10 +3,9 @@ import type { ReactNode } from "react";
 
 import { SaltarAlContenido } from "@/components/navegacion/SaltarAlContenido";
 import { Logo } from "@/components/ui/Logo";
-import { Toldo } from "@/components/ui/Toldo";
 
 /**
- * Pantallas sin sesión (LAB-13): sin navegación, toldo de la marca arriba, logo a la izquierda y el
+ * Pantallas sin sesión (LAB-13): sin navegación, logo a la izquierda y el
  * contenido centrado en una columna de 480 px (celular) o 560 px (escritorio) (boceto App-Ingresar). Una pantalla a dos columnas,
  * como la bienvenida de escritorio, tiene que salirse de este grupo o ampliarlo.
  */
@@ -14,8 +13,7 @@ export default function LayoutPublico({ children }: { children: ReactNode }) {
   return (
     <>
       <SaltarAlContenido />
-      <Toldo color="accion" alto={26} />
-      <header className="px-5 pt-3 pb-0 lg:px-10 lg:pt-4">
+      <header className="px-5 pt-4 pb-0 lg:px-10 lg:pt-6">
         <Link
           href="/"
           aria-label="Oficio Seguro, inicio"

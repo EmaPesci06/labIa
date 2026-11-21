@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { SaltarAlContenido } from "@/components/navegacion/SaltarAlContenido";
 import { Logo } from "@/components/ui/Logo";
-import { Toldo } from "@/components/ui/Toldo";
+import { Sello } from "@/components/ui/Sello";
 
 export const metadata: Metadata = {
   title: "Oficio Seguro · Oficios de confianza en Mar del Plata",
@@ -22,8 +22,7 @@ export default function Bienvenida() {
       className="flex flex-1 flex-col bg-encabezado text-sobre-encabezado"
     >
       <SaltarAlContenido />
-      <Toldo color="destacado" alto={26} />
-      <header className="mx-auto flex w-full max-w-[1200px] items-center justify-between px-5 pt-3 lg:px-8 lg:pt-6">
+      <header className="mx-auto flex w-full max-w-[1200px] items-center justify-between px-5 pt-4 lg:px-8 lg:pt-6">
         <Logo sobre="encabezado" className="text-[32px]" />
         <Link
           href="/ingresar"
@@ -46,6 +45,7 @@ export default function Bienvenida() {
           <p className="mt-3.5 text-lg leading-[1.4] lg:text-xl">
             Todos con identidad y antecedentes verificados.
           </p>
+          <Sello estampar className="mt-6 size-24 lg:mt-10 lg:size-32" />
         </div>
 
         <section

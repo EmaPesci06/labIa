@@ -233,16 +233,56 @@
 }
 
 /*
- * Toldo: franja rayada de adorno (repeating-linear-gradient). El componente Toldo fija
- * --toldo-alto (14 a 26 px, igual al ancho de cada franja) y --toldo-color; alterna con superficie.
+ * Motivos de la marca "Papelería sellada" (LAB-95). Reemplazan al toldo.
+ *
+ * trama: trama de seguridad (líneas onduladas finas), solo en la franja de rubro de las credenciales.
+ *   Se dibuja en un ::before enmascarado con color currentColor, así el texto de adentro no se ve
+ *   afectado. El color de las líneas es el del texto del elemento.
+ * corte-cupon: borde punteado entre la cabecera y el cuerpo de los cupones (trabajos, postulaciones).
+ * sello-estampar: único movimiento de la marca; solo si la persona no pidió menos movimiento.
  */
-@utility toldo {
-  height: var(--toldo-alto, 14px);
-  background: repeating-linear-gradient(
-    90deg,
-    var(--toldo-color, var(--color-accion)) 0 var(--toldo-alto, 14px),
-    var(--color-superficie) var(--toldo-alto, 14px) calc(var(--toldo-alto, 14px) * 2)
-  );
+@utility trama {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: currentColor;
+    opacity: 0.28;
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='8'%3E%3Cpath d='M0 4Q6 0 12 4T24 4' fill='none' stroke='black' stroke-width='1'/%3E%3C/svg%3E");
+    mask-size: 24px 8px;
+  }
+}
+
+@utility corte-cupon {
+  border-top: 2px dashed var(--color-borde);
+}
+
+@keyframes sello-estampar {
+  0% {
+    opacity: 0;
+    rotate: -28deg;
+    scale: 1.7;
+  }
+  60% {
+    opacity: 1;
+    rotate: -12deg;
+    scale: 0.94;
+  }
+  100% {
+    opacity: 1;
+    rotate: -12deg;
+    scale: 1;
+  }
+}
+
+@utility sello-estampar {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: sello-estampar 450ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  }
 }
 
 @layer base {

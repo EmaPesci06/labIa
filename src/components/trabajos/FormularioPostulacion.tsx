@@ -6,7 +6,6 @@ import { useActionState, useId, type ReactNode } from "react";
 import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
 import { Tarjeta } from "@/components/ui/Tarjeta";
-import { Toldo, type ColorToldo } from "@/components/ui/Toldo";
 import { formatearPesos } from "@/lib/formato";
 import { postularme } from "@/lib/trabajos/acciones";
 import type { EstadoPostulacion as TipoEstadoPostulacion } from "@/lib/trabajos/consulta";
@@ -33,31 +32,27 @@ type FormularioPostulacionProps = {
 /** Título y detalle de cada estado de la postulación, desde el punto de vista del profesional. */
 const TEXTO_ESTADO: Record<
   TipoEstadoPostulacion,
-  { titulo: string; detalle: (cliente: string) => string; toldo: ColorToldo; icono: boolean }
+  { titulo: string; detalle: (cliente: string) => string; icono: boolean }
 > = {
   enviada: {
     titulo: "Postulación enviada",
     detalle: (cliente) => `${cliente} ve tu mensaje y, si te elige, te escribe por WhatsApp.`,
-    toldo: "destacado",
     icono: true,
   },
   elegida: {
     titulo: "Te eligieron",
     detalle: (cliente) => `${cliente} te va a escribir por WhatsApp.`,
-    toldo: "accion",
     icono: true,
   },
   descartada: {
     titulo: "Eligieron a otra persona",
     detalle: () =>
       "Esta vez el cliente eligió a otra persona. Seguí postulándote a otros trabajos.",
-    toldo: "texto",
     icono: false,
   },
   retirada: {
     titulo: "Retiraste tu postulación",
     detalle: () => "El cliente ya no la tiene en cuenta.",
-    toldo: "texto",
     icono: false,
   },
 };
@@ -209,13 +204,13 @@ function CajaEstado({
 }) {
   const texto = TEXTO_ESTADO[estado];
   return (
-    <Tarjeta className="flex flex-col overflow-hidden p-0">
-      <Toldo color={texto.toldo} alto={14} />
+    <Tarjeta className="flex flex-col overflow-hidden border-2 border-borde p-0">
+      <div className="flex items-center gap-2 px-5 pt-4 pb-3 font-titulo text-[22px] leading-tight text-texto">
+        {texto.icono ? <Check aria-hidden strokeWidth={3} className="size-5 shrink-0" /> : null}
+        <span>{texto.titulo}</span>
+      </div>
+      <div aria-hidden className="corte-cupon" />
       <div className="flex flex-col gap-3 p-5">
-        <div className="flex items-center gap-2 font-titulo text-[22px] leading-tight text-texto">
-          {texto.icono ? <Check aria-hidden strokeWidth={3} className="size-5 shrink-0" /> : null}
-          <span>{texto.titulo}</span>
-        </div>
         <p className="text-[15px] leading-relaxed text-texto">{texto.detalle(clienteNombre)}</p>
         {children}
       </div>

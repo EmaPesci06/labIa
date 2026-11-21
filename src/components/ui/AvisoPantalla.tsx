@@ -3,8 +3,6 @@ import type { ReactNode } from "react";
 
 import { cn } from "@/lib/cn";
 
-import { Toldo } from "./Toldo";
-
 type Props = {
   /** Ícono en círculo destacado. Por defecto un escudo. */
   icono?: LucideIcon;
@@ -19,8 +17,8 @@ type Props = {
 };
 
 /**
- * Pantalla de aviso completa (molde de `App-Aviso`): ícono, título, texto y un botón, con un toldo
- * de adorno abajo. Para casos como sin conexión, cuenta eliminada o enlace vencido.
+ * Pantalla de aviso completa (molde de `App-Aviso`): ícono, título, texto y un botón, con un corte
+ * punteado de cupón abajo. Para casos como sin conexión, cuenta eliminada o enlace vencido.
  *
  * @example
  * <AvisoPantalla titulo="Te quedaste sin conexión" texto="Revisá tu internet y volvé a intentar." accion={<Boton>Reintentar</Boton>} />
@@ -37,7 +35,7 @@ export function AvisoPantalla({
   return (
     <section
       className={cn(
-        "flex min-h-[70dvh] flex-col items-center justify-center gap-5 px-6 pt-10 pb-0 text-center",
+        "flex min-h-[70dvh] flex-col items-center justify-center gap-5 px-6 pt-10 pb-6 text-center",
         className,
       )}
     >
@@ -50,7 +48,7 @@ export function AvisoPantalla({
       <Titulo className="font-titulo text-[38px] leading-none text-texto">{titulo}</Titulo>
       {texto ? <p className="max-w-sm text-lg text-texto">{texto}</p> : null}
       {accion ? <div className="w-full max-w-sm">{accion}</div> : null}
-      <Toldo color="accion" alto={14} className="mt-auto" />
+      <div aria-hidden className="mt-auto w-full corte-cupon" />
     </section>
   );
 }
