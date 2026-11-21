@@ -1,3 +1,4 @@
+import { tokenJwt } from "./apoyo/token";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext } from "@playwright/test";
 import { reiniciarFalso } from "./apoyo/reiniciar-falso";
@@ -11,7 +12,7 @@ test.skip(!ACTIVO, "Necesita el Supabase falso: LABIA_E2E_SUPABASE_FALSO=1");
 async function iniciarSesion(contexto: BrowserContext, baseURL: string, token: string) {
   const exp = Math.floor(Date.now() / 1000) + 3600;
   const sesion = {
-    access_token: token,
+    access_token: tokenJwt(token),
     refresh_token: "refresh-falso",
     token_type: "bearer",
     expires_in: 3600,

@@ -3,13 +3,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { obtenerPerfil } from "@/lib/perfil/cargar";
 import { limitarPersistente, limitarPorIp } from "@/lib/rate-limit-persistente";
 import { MENSAJE_ALTA_INCOMPLETA } from "@/lib/auth/alta";
-import { obtenerSesion } from "@/lib/sesion";
+import { obtenerSesionVerificada } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 
 import { contactarProfesional } from "./acciones";
 
 vi.mock("server-only", () => ({}));
-vi.mock("@/lib/sesion", () => ({ obtenerSesion: vi.fn() }));
+vi.mock("@/lib/sesion", () => ({ obtenerSesionVerificada: vi.fn() }));
 vi.mock("@/lib/ip-del-pedido", () => ({
   IP_DESCONOCIDA: "desconocida",
   ipDelPedido: vi.fn(async () => "190.1.2.3"),
@@ -64,7 +64,7 @@ function preparar(opciones: { rpc?: Resultado; sinTrabajo?: boolean } = {}) {
       return opciones.rpc ?? { data: NUMERO, error: null };
     },
   };
-  vi.mocked(obtenerSesion).mockResolvedValue({
+  vi.mocked(obtenerSesionVerificada).mockResolvedValue({
     rol: "cliente",
     terminosAceptados: true,
     usuario: { id: CLIENTE },
@@ -159,7 +159,7 @@ describe("contactarProfesional con origen postulacion (LAB-29)", () => {
 
   it("sin sesión no contacta a nadie", async () => {
     preparar();
-    vi.mocked(obtenerSesion).mockResolvedValue(null);
+    vi.mocked(obtenerSesionVerificada).mockResolvedValue(null);
 
     const r = await contactarProfesional(
       estadoInicial,
@@ -173,7 +173,7 @@ describe("contactarProfesional con origen postulacion (LAB-29)", () => {
 describe("contactarProfesional: alta incompleta (LAB-81)", () => {
   it("un cliente que no aceptó mayor de 18 y términos no contacta ni recibe el WhatsApp", async () => {
     const { rpcLlamadas } = preparar();
-    vi.mocked(obtenerSesion).mockResolvedValue({
+    vi.mocked(obtenerSesionVerificada).mockResolvedValue({
       rol: "cliente",
       terminosAceptados: false,
       usuario: { id: CLIENTE },

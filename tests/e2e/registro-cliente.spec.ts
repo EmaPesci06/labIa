@@ -1,3 +1,4 @@
+import { tokenJwt } from "./apoyo/token";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext } from "@playwright/test";
 
@@ -10,7 +11,7 @@ const CON_FALSO = process.env.LABIA_E2E_SUPABASE_FALSO === "1";
 /** Cookie de sesión de un cliente que entró con Google y todavía no aceptó los términos. */
 async function entrarSinTerminos(context: BrowserContext, baseURL: string) {
   const sesion = {
-    access_token: "tok-cliente-sin-terminos",
+    access_token: tokenJwt("tok-cliente-sin-terminos"),
     refresh_token: "refresh-falso",
     token_type: "bearer",
     expires_in: 3600,

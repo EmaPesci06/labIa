@@ -29,8 +29,8 @@ const primero = (valor: string | string[] | undefined) => (Array.isArray(valor) 
 
 /** Barrio efectivo: el de la URL, si no el de la cuenta, si no el Centro. */
 async function resolverBarrio(crudo: ParametrosUrl) {
-  const barrios = await obtenerBarrios();
-  const sesion = await obtenerSesion();
+  // Independientes entre sí: juntas (LAB-88).
+  const [barrios, sesion] = await Promise.all([obtenerBarrios(), obtenerSesion()]);
   const slug = elegirBarrio(
     barrios,
     primero(crudo.barrio)?.trim() || undefined,
@@ -51,10 +51,11 @@ function leer(crudo: ParametrosUrl, slug: string): ParametrosBusqueda | ErrorBus
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   // Primero el acceso a searchParams (lo hace dinámico en el build); después el tope por IP (M-03).
   const crudo = await searchParams;
-  if (await bloqueoLecturaPublica("busqueda")) {
-    return { title: "Buscar · LabÍA", robots: { index: false } };
-  }
-  const { barrios, slug } = await resolverBarrio(crudo);
+  const [bloqueo, { barrios, slug }] = await Promise.all([
+    bloqueoLecturaPublica("busqueda"),
+    resolverBarrio(crudo),
+  ]);
+  if (bloqueo) return { title: "Buscar · LabÍA", robots: { index: false } };
   const params = leer(crudo, slug);
   const oficio = params instanceof ErrorBusqueda ? undefined : params.oficio;
   return {
@@ -163,10 +164,12 @@ function AsideBusqueda() {
 
 export default async function Buscar({ searchParams }: Props) {
   const crudo = await searchParams;
-  const bloqueo = await bloqueoLecturaPublica("busqueda");
+  // El tope por IP y el barrio no dependen uno del otro: se piden juntos (LAB-88).
+  const [bloqueo, { barrios, slug }] = await Promise.all([
+    bloqueoLecturaPublica("busqueda"),
+    resolverBarrio(crudo),
+  ]);
   if (bloqueo) return <ErrorEnBusqueda mensaje={bloqueo} />;
-
-  const { barrios, slug } = await resolverBarrio(crudo);
   const params = leer(crudo, slug);
 
   // Parámetros inválidos: se muestra el error con los filtros por defecto, sin romper la pantalla.

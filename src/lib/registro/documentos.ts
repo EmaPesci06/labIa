@@ -29,8 +29,10 @@ function mensajeDeError(codigo: string | undefined): string {
 export async function obtenerMisVerificaciones(): Promise<ItemVerificacion[]> {
   if (!supabaseConfigurado()) return [];
   const supabase = await crearClienteServidor();
-  const { data: auth } = await supabase.auth.getUser();
-  if (!auth.user) return [];
+  // Solo lectura de la vista `mis_verificaciones` (la RLS la limita a la cuenta propia): alcanza con
+  // verificar la firma del token sin ir a Auth (LAB-88). Escribir documentos sigue con getUser().
+  const { data: claims } = await supabase.auth.getClaims();
+  if (!claims?.claims.sub) return [];
 
   const { data, error } = await supabase
     .from("mis_verificaciones")

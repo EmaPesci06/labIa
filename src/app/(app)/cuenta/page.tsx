@@ -35,11 +35,13 @@ export default async function Cuenta() {
   const sesion = await obtenerSesion();
   if (!sesion) return null;
   const esProfesional = sesion.rol === "profesional";
-  const { barrio, foto } = await datosDeEncabezado(sesion.usuario.id);
+  // Independientes entre sí: juntas (LAB-88).
+  const [{ barrio, foto }, verificaciones] = await Promise.all([
+    datosDeEncabezado(sesion.usuario.id),
+    esProfesional ? obtenerMisVerificaciones() : null,
+  ]);
   const soporte = process.env.EMAIL_SOPORTE || null;
-  const resumen = esProfesional
-    ? resumenBannerVerificacion(await obtenerMisVerificaciones())
-    : null;
+  const resumen = verificaciones ? resumenBannerVerificacion(verificaciones) : null;
 
   return (
     <>

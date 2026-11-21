@@ -4,7 +4,7 @@ import { altaIncompleta, MENSAJE_ALTA_INCOMPLETA } from "@/lib/auth/alta";
 import { limiteReportePorIp } from "@/lib/limites";
 import { registrarEventoServidor } from "@/lib/metricas-servidor";
 import { limitarPersistente } from "@/lib/rate-limit-persistente";
-import { obtenerSesion } from "@/lib/sesion";
+import { obtenerSesionVerificada } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import { esquemaReporte, type DatosReporte } from "@/lib/validaciones/reportes";
 
@@ -36,7 +36,7 @@ export async function enviarReporte(
 
   const datos: DatosReporte = parseo.data;
 
-  const sesion = await obtenerSesion();
+  const sesion = await obtenerSesionVerificada();
   if (!sesion) {
     return {
       mensaje: "Necesitás iniciar sesión para enviar un reporte.",

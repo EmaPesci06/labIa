@@ -10,7 +10,8 @@ import type { CookieOptionsWithName } from "@supabase/ssr";
  *   apagado para que `http://localhost` funcione.
  * - `httpOnly: false`: a propósito. El cliente del navegador (`createBrowserClient`) lee la sesión
  *   desde `document.cookie`; con `httpOnly` la sesión dejaría de funcionar en el navegador. La
- *   protección de la sesión es la validación con `auth.getUser()` en el servidor y la RLS.
+ *   protección de la sesión es la verificación de la firma del JWT en el servidor (`getClaims()` al
+ *   pintar pantallas, `getUser()` en las Server Actions y `/admin`; ver `obtenerSesion`) y la RLS.
  * - `path: "/"`: la sesión vale para toda la app.
  *
  * Este módulo no importa `server-only` ni `next/headers`: lo usa también el proxy (edge).

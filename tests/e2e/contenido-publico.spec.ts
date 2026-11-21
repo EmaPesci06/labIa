@@ -1,3 +1,4 @@
+import { tokenJwt } from "./apoyo/token";
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 
 // LAB-53: los campos libres públicos no aceptan teléfonos, emails ni direcciones. Este spec muestra el
@@ -22,7 +23,7 @@ const base64url = (texto: string) => Buffer.from(texto).toString("base64url");
 async function iniciarSesionProfesional(contexto: BrowserContext, baseURL: string) {
   const exp = Math.floor(Date.now() / 1000) + 3600;
   const sesion = {
-    access_token: "tok-dueno",
+    access_token: tokenJwt("tok-dueno"),
     refresh_token: "refresh-falso",
     token_type: "bearer",
     expires_in: 3600,

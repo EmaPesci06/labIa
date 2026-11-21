@@ -1,3 +1,4 @@
+import { tokenJwt } from "./apoyo/token";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext, type Locator, type Page } from "@playwright/test";
 
@@ -29,7 +30,7 @@ const DIEGO = /Diego Paz/;
 async function iniciarSesionAdmin(contexto: BrowserContext, baseURL: string) {
   const exp = Math.floor(Date.now() / 1000) + 3600;
   const sesion = {
-    access_token: "tok-admin",
+    access_token: tokenJwt("tok-admin"),
     refresh_token: "refresh-falso",
     token_type: "bearer",
     expires_in: 3600,

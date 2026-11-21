@@ -44,14 +44,18 @@ export async function refrescarSesion(request: NextRequest): Promise<SesionProxy
     },
   });
 
-  // getUser() valida el token con el servidor de Auth (no se confía en la cookie sola).
-  const { data } = await supabase.auth.getUser();
-  if (!data.user) return { respuesta, rol: null, estado: null };
+  // getClaims() verifica la firma del JWT con la clave pública del proyecto (JWKS en memoria): no
+  // se confía en la cookie sola y tampoco hay una ida y vuelta a Auth en cada pedido (LAB-88).
+  // Refresca el token si venció. Quien sí revisa a la cuenta es la lectura de `usuarios`: una
+  // cuenta suspendida o dada de baja no pasa aunque el token siga vigente.
+  const { data } = await supabase.auth.getClaims();
+  const idUsuario = data?.claims.sub;
+  if (!idUsuario) return { respuesta, rol: null, estado: null };
 
   const { data: fila } = await supabase
     .from("usuarios")
     .select("rol, estado")
-    .eq("id", data.user.id)
+    .eq("id", idUsuario)
     .maybeSingle();
   const estado = fila ? (fila.estado as EstadoUsuario) : null;
   const rol = fila && fila.estado === "activa" ? fila.rol : null;

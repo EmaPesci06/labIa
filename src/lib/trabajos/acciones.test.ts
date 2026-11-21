@@ -5,7 +5,7 @@ import { MENSAJE_CONTACTO_POSTULACION, MENSAJE_SENA_MAYOR } from "@/lib/validaci
 import { avisarEleccion, avisarNuevaPostulacion } from "@/lib/emails/avisos";
 import { registrarEventoServidor } from "@/lib/metricas-servidor";
 import { limitarPersistente } from "@/lib/rate-limit-persistente";
-import { obtenerSesion } from "@/lib/sesion";
+import { obtenerSesionVerificada } from "@/lib/sesion";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 
 import {
@@ -21,7 +21,7 @@ import {
 vi.mock("server-only", () => ({}));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("next/navigation", () => ({ redirect: vi.fn() }));
-vi.mock("@/lib/sesion", () => ({ obtenerSesion: vi.fn() }));
+vi.mock("@/lib/sesion", () => ({ obtenerSesionVerificada: vi.fn() }));
 vi.mock("@/lib/auth/sesion-falsa", () => ({ rolFalso: vi.fn(() => null) }));
 vi.mock("@/lib/supabase/servidor", () => ({
   crearClienteServidor: vi.fn(),
@@ -134,7 +134,7 @@ const trabajoOk = { id: TRABAJO, oficio: "plomeria", estado: "abierto" };
 
 function preparar(config: Config, sesion: unknown = sesionProfesional()) {
   const { cliente, llamadas } = crearSupabase(config);
-  vi.mocked(obtenerSesion).mockResolvedValue(sesion as never);
+  vi.mocked(obtenerSesionVerificada).mockResolvedValue(sesion as never);
   vi.mocked(supabaseConfigurado).mockReturnValue(!config.sinConexion);
   vi.mocked(crearClienteServidor).mockResolvedValue(cliente as never);
   return { llamadas };

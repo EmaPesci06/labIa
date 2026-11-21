@@ -61,8 +61,8 @@ async function cargarOficios(
  */
 export default async function Inicio({ searchParams }: Props) {
   const crudo = await searchParams;
-  const sesion = await obtenerSesion();
-  const barrios = await obtenerBarrios();
+  // Independientes entre sí: juntas (LAB-88).
+  const [sesion, barrios] = await Promise.all([obtenerSesion(), obtenerBarrios()]);
   const barrio = elegirBarrio(
     barrios,
     primero(crudo.barrio)?.trim() || undefined,

@@ -34,6 +34,7 @@ vi.mock("@/lib/rate-limit-persistente", () => ({
 
 vi.mock("@/lib/sesion", () => ({
   obtenerSesion: mockObtenerSesion,
+  obtenerSesionVerificada: mockObtenerSesion,
 }));
 
 vi.mock("@/lib/supabase/servidor", () => ({

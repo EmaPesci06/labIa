@@ -606,9 +606,23 @@ const ARCHIVOS = {
 
 // ---------------------------------------------------------------------------------------------
 
+// LAB-88: la app verifica la sesión con getClaims(), que decodifica el JWT. Los tests mandan un JWT
+// de forma válida (ver tests/e2e/apoyo/token.ts) con el nombre del usuario en el claim `tok`.
+// También se acepta el token suelto ("tok-cliente"), que usan las llamadas directas.
+function nombreDeToken(token) {
+  const partes = token.split(".");
+  if (partes.length !== 3) return token;
+  try {
+    const carga = JSON.parse(Buffer.from(partes[1], "base64url").toString("utf8"));
+    return typeof carga.tok === "string" ? carga.tok : token;
+  } catch {
+    return token;
+  }
+}
+
 function usuarioDe(req) {
   const m = /^Bearer (.+)$/.exec(req.headers.authorization ?? "");
-  return (m && USUARIOS[m[1]]) || null;
+  return (m && USUARIOS[nombreDeToken(m[1])]) || null;
 }
 
 function filaPerfil(id, yo) {
@@ -1612,6 +1626,12 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PUERTO, "127.0.0.1", () => {
-  process.stdout.write(`Supabase falso en http://localhost:${PUERTO}\n`);
-});
+// LAB-88: `tests/e2e/apoyo/token.ts` importa este archivo solo para leer los ids de USUARIOS (el
+// `sub` del JWT de prueba tiene que ser el id real). Importado, no levanta el servidor.
+if (require.main === module) {
+  server.listen(PUERTO, "127.0.0.1", () => {
+    process.stdout.write(`Supabase falso en http://localhost:${PUERTO}\n`);
+  });
+}
+
+module.exports = { USUARIOS };

@@ -46,11 +46,18 @@ export default async function Trabajos({ searchParams }: PaginaTrabajosProps) {
   const params = await searchParams;
   const esVistaMias = params.vista === "mias";
 
+  // Verificaciones, perfil y postulaciones no dependen entre sí: se piden juntas, apenas se sabe
+  // cuáles hacen falta, y no una detrás de otra (LAB-88).
+  const promesaVerificaciones = obtenerMisVerificaciones();
+  const promesaPerfil = esVistaMias ? null : obtenerPerfilParaTrabajos(sesion.usuario.id);
+  // Mis postulaciones: la vista "mias" o el detalle de un trabajo elegido.
+  const promesaMias = esVistaMias || params.trabajo ? obtenerMisPostulaciones() : null;
+
   // Banner según estado de verificación (LAB-21)
-  const resumen = resumenBannerVerificacion(await obtenerMisVerificaciones());
+  const resumen = resumenBannerVerificacion(await promesaVerificaciones);
 
   if (esVistaMias) {
-    const postulaciones = await obtenerMisPostulaciones();
+    const postulaciones = (await promesaMias) ?? [];
 
     return (
       <>
@@ -69,7 +76,7 @@ export default async function Trabajos({ searchParams }: PaginaTrabajosProps) {
   }
 
   // Vista principal de trabajos disponibles
-  const perfil = await obtenerPerfilParaTrabajos(sesion.usuario.id);
+  const perfil = await promesaPerfil;
   const oficiosValidos = perfil?.oficios ?? [];
   const oficioFiltrado =
     params.oficio && oficiosValidos.includes(params.oficio as Oficio)
@@ -96,7 +103,7 @@ export default async function Trabajos({ searchParams }: PaginaTrabajosProps) {
   // Solo en escritorio hace falta el detalle: buscamos la postulación propia del trabajo elegido.
   let miPostulacionSeleccionada: MiPostulacionInfo | null = null;
   if (params.trabajo) {
-    const mias = await obtenerMisPostulaciones();
+    const mias = (await promesaMias) ?? [];
     const propia = mias.find((p) => p.trabajoId === params.trabajo);
     if (propia) {
       miPostulacionSeleccionada = {
