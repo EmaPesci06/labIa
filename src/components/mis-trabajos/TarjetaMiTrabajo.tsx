@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { EtiquetaMono } from "@/components/ui/EtiquetaMono";
-import { Toldo, type ColorToldo } from "@/components/ui/Toldo";
+import { Sello } from "@/components/ui/Sello";
 import { cn } from "@/lib/cn";
 import { haceCuanto } from "@/lib/formato";
 import type { TrabajoClienteItem } from "@/lib/trabajos/consulta";
@@ -15,21 +15,20 @@ type Props = {
 
 type Estado = TrabajoClienteItem["estado"];
 
-/** Color del toldo y pastilla de estado. Cada estado tiene un texto propio: el color solo no lo dice. */
-const ESTILO_ESTADO: Record<Estado, { texto: string; toldo: ColorToldo; pastilla: string }> = {
-  abierto: { texto: "Abierto", toldo: "accion", pastilla: "bg-destacado text-sobre-destacado" },
-  asignado: {
-    texto: "Contratado",
-    toldo: "destacado",
-    pastilla: "bg-destacado text-sobre-destacado",
-  },
-  cerrado: { texto: "Terminado", toldo: "texto", pastilla: "bg-fondo text-texto" },
-  cancelado: { texto: "Cancelado", toldo: "texto", pastilla: "bg-fondo text-texto" },
+/**
+ * Pastilla de estado del cupón: verde abierto, tinta contratado, rojo anulado. Cada estado tiene un
+ * texto propio: el color solo no lo dice.
+ */
+const ESTILO_ESTADO: Record<Estado, { texto: string; pastilla: string }> = {
+  abierto: { texto: "Abierto", pastilla: "bg-exito text-fondo" },
+  asignado: { texto: "Contratado", pastilla: "bg-destacado text-sobre-destacado" },
+  cerrado: { texto: "Terminado", pastilla: "border-2 border-borde bg-fondo text-texto" },
+  cancelado: { texto: "Cancelado", pastilla: "bg-error text-fondo" },
 };
 
 /**
- * Tarjeta de un trabajo del cliente (boceto App-MisTrabajos). Toldo arriba, oficio y barrio en
- * etiqueta, título en Archivo y la cantidad de postulantes o el estado en una pastilla.
+ * Cupón de un trabajo del cliente: cabecera con oficio, barrio y hora en etiqueta, borde punteado
+ * de talonario y cuerpo con el título y el estado. Un trabajo contratado lleva el sello.
  */
 export function TarjetaMiTrabajo({ trabajo, seleccionado = false, href }: Props) {
   const estilo = ESTILO_ESTADO[trabajo.estado];
@@ -45,16 +44,20 @@ export function TarjetaMiTrabajo({ trabajo, seleccionado = false, href }: Props)
     <Link
       href={href}
       className={cn(
-        "group flex flex-col overflow-hidden rounded-[22px] bg-superficie text-texto transition-shadow focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco",
+        "group relative flex flex-col overflow-hidden rounded-[22px] border-2 border-borde bg-superficie text-texto transition-shadow focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco",
         seleccionado && "ring-[3px] ring-accion",
       )}
     >
-      <Toldo color={estilo.toldo} alto={14} />
+      <EtiquetaMono
+        como="span"
+        partes={[ETIQUETA_OFICIO[trabajo.oficio], trabajo.barrioNombre, cuando]}
+        className={cn("px-4 pt-3 pb-2.5 lg:px-[18px]", trabajo.estado === "asignado" && "pr-16")}
+      />
+      <span aria-hidden className="corte-cupon" />
+      {trabajo.estado === "asignado" ? (
+        <Sello className="absolute top-1.5 right-2 size-12" />
+      ) : null}
       <span className="flex flex-col gap-1 p-4 pt-3 lg:p-[18px]">
-        <EtiquetaMono
-          como="span"
-          partes={[ETIQUETA_OFICIO[trabajo.oficio], trabajo.barrioNombre, cuando]}
-        />
         <span className="font-titulo text-[22px] leading-[1.1] font-extrabold text-texto">
           {trabajo.titulo}
         </span>

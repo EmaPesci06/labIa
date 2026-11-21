@@ -1,8 +1,8 @@
 import { Briefcase } from "lucide-react";
 import Link from "next/link";
 
+import { Sello } from "@/components/ui/Sello";
 import { Tarjeta } from "@/components/ui/Tarjeta";
-import { Toldo, type ColorToldo } from "@/components/ui/Toldo";
 import { Vacio } from "@/components/ui/Vacio";
 import { cn } from "@/lib/cn";
 import { formatearPesos, haceCuanto } from "@/lib/formato";
@@ -18,28 +18,23 @@ type ListaPostulacionesProps = {
 const CONFIG_ESTADO: Record<
   EstadoPostulacion,
   {
-    toldo: ColorToldo;
     etiqueta: string;
     clasesPastilla: string;
   }
 > = {
   elegida: {
-    toldo: "accion",
     etiqueta: "Te eligieron",
     clasesPastilla: "bg-encabezado text-sobre-encabezado",
   },
   enviada: {
-    toldo: "destacado",
     etiqueta: "Esperando respuesta",
     clasesPastilla: "bg-destacado text-sobre-destacado",
   },
   descartada: {
-    toldo: "texto",
     etiqueta: "Eligieron a otra persona",
     clasesPastilla: "bg-fondo text-texto",
   },
   retirada: {
-    toldo: "texto",
     etiqueta: "Retiraste tu postulación",
     clasesPastilla: "bg-fondo text-texto",
   },
@@ -47,8 +42,8 @@ const CONFIG_ESTADO: Record<
 
 /**
  * Lista de postulaciones del profesional para /trabajos?vista=mias (LAB-27, LAB-78).
- * Sigue los bocetos App-Postulaciones y Oscuro-Postulaciones: tarjeta con toldo superior
- * según el estado, pastilla de estado, título en Archivo 800, resumen y acción.
+ * Cada postulación es un cupón: cabecera con la pastilla de estado, borde punteado de talonario y
+ * cuerpo con título, resumen y acción. Si te eligieron, lleva el sello.
  */
 export function ListaPostulaciones({ postulaciones }: ListaPostulacionesProps) {
   if (postulaciones.length === 0) {
@@ -82,18 +77,24 @@ export function ListaPostulaciones({ postulaciones }: ListaPostulacionesProps) {
               : `${oficioEtiqueta} · ${barrioTrabajo} · ${cuando}`;
 
         return (
-          <Tarjeta key={p.id} como="article" className="flex flex-col overflow-hidden p-0">
-            <Toldo color={config.toldo} alto={14} />
-            <div className="flex flex-col gap-1.5 px-4 pt-3 pb-4">
+          <Tarjeta
+            key={p.id}
+            como="article"
+            className="relative flex flex-col overflow-hidden border-2 border-borde p-0"
+          >
+            <div className="flex items-center px-4 pt-3 pb-2.5">
               <span
                 className={cn(
-                  "self-start rounded-[14px] px-3 py-[5px] text-[15px] font-bold",
+                  "rounded-[14px] px-3 py-[5px] text-[15px] font-bold",
                   config.clasesPastilla,
                 )}
               >
                 {config.etiqueta}
               </span>
-
+            </div>
+            <div aria-hidden className="corte-cupon" />
+            {p.estado === "elegida" ? <Sello className="absolute top-1.5 right-2 size-12" /> : null}
+            <div className="flex flex-col gap-1.5 px-4 pt-3 pb-4">
               <h2 className="font-titulo text-[22px] leading-[1.1] text-texto">
                 <Link
                   href={`/trabajos/${p.trabajoId}`}
