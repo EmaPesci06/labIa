@@ -168,12 +168,13 @@ describe("obtenerSesion con Supabase (LAB-88)", () => {
 });
 
 describe("obtenerSesionVerificada (Server Actions y /admin)", () => {
-  function armarCliente(fila: unknown) {
-    const getClaims = vi.fn();
-    const getUser = vi.fn(async () => ({
-      data: { user: { id: "u-9", email: "a@x.com" } },
-      error: null,
-    }));
+  function armarCliente(
+    fila: unknown,
+    usuario: { id: string; email: string } | null = { id: "u-9", email: "a@x.com" },
+  ) {
+    // Los claims "valen" (token firmado y vigente), pero Auth ya no reconoce la sesión.
+    const getClaims = vi.fn(async () => ({ data: { claims: { sub: "u-9" } }, error: null }));
+    const getUser = vi.fn(async () => ({ data: { user: usuario }, error: null }));
     const maybeSingle = vi.fn(async () => ({ data: fila, error: null }));
     const from = vi.fn(() => ({ select: () => ({ eq: () => ({ maybeSingle }) }) }));
     estado.configurado = true;
@@ -194,6 +195,13 @@ describe("obtenerSesionVerificada (Server Actions y /admin)", () => {
     });
     expect(await obtenerSesionVerificada()).toMatchObject({ rol: "admin", usuario: { id: "u-9" } });
     expect(c.getUser).toHaveBeenCalledTimes(1);
+    expect(c.getClaims).not.toHaveBeenCalled();
+  });
+
+  it("con claims válidos pero getUser en null (sesión revocada) devuelve null", async () => {
+    vi.stubEnv("LABIA_ROL_DEV", "");
+    const c = armarCliente({ rol: "admin", estado: "activa" }, null);
+    expect(await obtenerSesionVerificada()).toBeNull();
     expect(c.getClaims).not.toHaveBeenCalled();
   });
 

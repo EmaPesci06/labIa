@@ -1,6 +1,8 @@
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { decidirAcceso } from "@/lib/auth/rutas";
+
 import { refrescarSesion } from "./proxy";
 
 // El cliente de `@supabase/ssr` se reemplaza por uno que cuenta las llamadas a Auth y a la base.
@@ -70,5 +72,30 @@ describe("refrescarSesion (LAB-88)", () => {
     const r = await refrescarSesion(pedido());
     expect(r.rol).toBeNull();
     expect(falso.getClaims).not.toHaveBeenCalled();
+  });
+
+  describe("en /admin valida contra Auth", () => {
+    const pedidoAdmin = () => new NextRequest("http://localhost:3000/admin/verificaciones");
+
+    it("usa getUser y no getClaims", async () => {
+      falso.getUser.mockResolvedValue({ data: { user: { id: "u-1" } }, error: null });
+      filaDeUsuarios({ rol: "admin", estado: "activa" });
+      const r = await refrescarSesion(pedidoAdmin());
+      expect(r.rol).toBe("admin");
+      expect(falso.getUser).toHaveBeenCalledTimes(1);
+      expect(falso.getClaims).not.toHaveBeenCalled();
+    });
+
+    it("con getUser en null (sesión revocada) no hay rol y /admin responde 404", async () => {
+      falso.getUser.mockResolvedValue({ data: { user: null }, error: null });
+      // Aunque el token todavía pase getClaims, en /admin no se consulta.
+      falso.getClaims.mockResolvedValue({ data: { claims: { sub: "u-1" } }, error: null });
+      const r = await refrescarSesion(pedidoAdmin());
+      expect(r.rol).toBeNull();
+      expect(falso.from).not.toHaveBeenCalled();
+      expect(decidirAcceso("/admin/verificaciones", "", r.rol, r.estado)).toEqual({
+        tipo: "no-encontrada",
+      });
+    });
   });
 });

@@ -1,5 +1,6 @@
 "use server";
 
+import { obtenerSesion } from "@/lib/sesion";
 import { limitarPorIp } from "@/lib/rate-limit-persistente";
 import { crearClienteServidor, supabaseConfigurado } from "@/lib/supabase/servidor";
 import {
@@ -28,11 +29,11 @@ function mensajeDeError(codigo: string | undefined): string {
  */
 export async function obtenerMisVerificaciones(): Promise<ItemVerificacion[]> {
   if (!supabaseConfigurado()) return [];
-  const supabase = await crearClienteServidor();
   // Solo lectura de la vista `mis_verificaciones` (la RLS la limita a la cuenta propia): alcanza con
-  // verificar la firma del token sin ir a Auth (LAB-88). Escribir documentos sigue con getUser().
-  const { data: claims } = await supabase.auth.getClaims();
-  if (!claims?.claims.sub) return [];
+  // `obtenerSesion` (getClaims + estado de la cuenta, sin ir a Auth; LAB-88). Escribir documentos
+  // sigue con getUser().
+  if (!(await obtenerSesion())) return [];
+  const supabase = await crearClienteServidor();
 
   const { data, error } = await supabase
     .from("mis_verificaciones")
