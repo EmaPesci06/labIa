@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { esperarColoresEstables } from "./apoyo/hoja";
 
 // LAB-33: Mi cuenta. Corre contra los servidores con sesión falsa (cliente y profesional); el
 // guardado, el borrado y la descarga necesitan Supabase y se prueban con pruebas de unidad y pgTAP.
@@ -99,6 +100,7 @@ test.describe("mi cuenta (cliente)", () => {
     for (const ruta of ["/cuenta", "/cuenta/datos", "/cuenta/borrar"]) {
       test(`${ruta} sin problemas de accesibilidad (${esquema})`, async ({ page }) => {
         await page.emulateMedia({ colorScheme: esquema });
+        await esperarColoresEstables(page);
         await page.goto(ruta);
         await expect(page.getByRole("heading", { level: 1 }).first()).toBeAttached();
         const resultado = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();

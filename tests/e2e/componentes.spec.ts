@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { esperarHojaQuieta } from "./apoyo/hoja";
+import { esperarHojaQuieta, esperarColoresEstables } from "./apoyo/hoja";
 
 test.describe("/dev/ui", () => {
   test("no tiene errores de axe (claro y oscuro a la vez)", async ({ page }) => {
@@ -41,6 +41,7 @@ test.describe("/dev/ui", () => {
       page,
     }) => {
       await page.emulateMedia({ colorScheme: esquema });
+      await esperarColoresEstables(page);
       await page.goto("/dev/ui");
       await page.getByRole("button", { name: "Contactar por WhatsApp" }).first().click();
 

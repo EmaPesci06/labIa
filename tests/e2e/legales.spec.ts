@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { esperarColoresEstables } from "./apoyo/hoja";
 
 // LAB-35, LAB-80: no necesitan Supabase; las páginas son estáticas.
 for (const { ruta, titulo, otra } of [
@@ -67,6 +68,7 @@ for (const esquema of ["light", "dark"] as const) {
   for (const ruta of ["/normas", "/terminos", "/privacidad", "/cuenta-eliminada"]) {
     test(`${ruta} sin violaciones de accesibilidad (${esquema})`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: esquema });
+      await esperarColoresEstables(page);
       await page.goto(ruta);
       await page.waitForLoadState("networkidle");
       expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);

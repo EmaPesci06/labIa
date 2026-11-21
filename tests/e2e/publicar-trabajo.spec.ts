@@ -2,6 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
 import { hexDe, rgbComas } from "../../src/lib/tokens-css";
+import { esperarColoresEstables } from "./apoyo/hoja";
 
 const PUERTO = Number(process.env.PUERTO_E2E ?? 3000);
 // Sesión falsa de cliente (sin base de datos: la publicación se simula) y de profesional.
@@ -59,6 +60,7 @@ test.describe("publicar un trabajo (cliente)", () => {
 
   test("el toast de confirmación respeta prefers-reduced-motion", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce", colorScheme: "light" });
+    await esperarColoresEstables(page);
     await page.goto("/trabajos/nuevo?oficio=gas");
     await page.getByLabel("Título").fill("Pérdida de gas en calefón");
     await page
@@ -93,6 +95,7 @@ test.describe("publicar un trabajo (cliente)", () => {
 
   test("sin errores graves en modo oscuro", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "dark" });
+    await esperarColoresEstables(page);
     await page.goto("/trabajos/nuevo");
     await expect(page.getByRole("heading", { level: 1, name: "Contanos qué pasó" })).toBeVisible();
     // El radio elegido sobre fondo destacado mantiene fondo sobre-destacado en oscuro (contraste AA).

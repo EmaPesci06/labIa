@@ -47,9 +47,7 @@ function SelectorPuntaje({ valor, onChange }: { valor: number; onChange: (n: num
             key={n}
             className={cn(
               "relative flex h-[60px] cursor-pointer items-center justify-center rounded-[18px] font-titulo text-2xl font-extrabold transition-colors has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-foco",
-              elegido
-                ? "bg-sobre-destacado text-sobre-encabezado"
-                : "bg-destacado text-sobre-destacado",
+              elegido ? "bg-sobre-destacado text-destacado" : "bg-destacado text-sobre-destacado",
             )}
           >
             <input

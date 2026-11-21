@@ -133,7 +133,7 @@ export default function PaginaPaleta() {
           </div>
           <div>
             <p className="text-xs font-bold tracking-[0.4px] text-texto uppercase">
-              Archivo 400 y 600 · font-texto
+              Archivo 400, 500 y 600 · font-texto
             </p>
             <p className="text-lg">
               Publicá tu trabajo y elegí entre profesionales verificados de tu barrio.

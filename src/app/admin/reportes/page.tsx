@@ -74,7 +74,7 @@ export default async function PaginaReportesAdmin({ searchParams }: Props) {
                         className={cn(
                           "rounded-full px-2 py-0.5 text-xs font-bold",
                           activa
-                            ? "bg-sobre-destacado text-sobre-encabezado"
+                            ? "bg-sobre-destacado text-destacado"
                             : "bg-destacado text-sobre-destacado",
                         )}
                       >

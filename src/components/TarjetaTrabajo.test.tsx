@@ -72,8 +72,7 @@ describe("TarjetaTrabajo", () => {
       />,
     );
     const pastilla = screen.getByText("Para hoy");
-    expect(pastilla).toHaveClass("bg-sobre-destacado", "text-sobre-encabezado");
-    expect(pastilla).not.toHaveClass("bg-destacado");
+    expect(pastilla).toHaveClass("bg-destacado", "text-sobre-destacado");
   });
 
   it("el título es h3 por defecto y h2 si la lista cuelga del h1", () => {

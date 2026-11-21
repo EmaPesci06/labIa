@@ -1,6 +1,7 @@
 import { tokenJwt } from "./apoyo/token";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext, type Locator, type Page } from "@playwright/test";
+import { esperarColoresEstables } from "./apoyo/hoja";
 
 // LAB-21: camino feliz del panel de verificación del admin, con el Supabase FALSO
 // (tests/e2e/apoyo/supabase-falso.cjs). Para correrlo:
@@ -269,6 +270,7 @@ test.describe("panel de verificación: camino feliz del admin", () => {
       ["dark", "oscuro"],
     ] as const) {
       await page.emulateMedia({ colorScheme: modo });
+      await esperarColoresEstables(page);
 
       await page.goto("/admin/verificaciones");
       await expect(page.getByRole("link", { name: SOFIA })).toBeVisible();

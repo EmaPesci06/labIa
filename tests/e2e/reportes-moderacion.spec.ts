@@ -231,6 +231,7 @@ test.describe("reportes del cliente y del profesional", () => {
 
     for (const tema of ["claro", "oscuro"] as const) {
       await page.emulateMedia({ colorScheme: tema === "oscuro" ? "dark" : "light" });
+      await esperarColoresEstables(page);
       await botonVisible(page, "Reportar este perfil").click();
       const hoja = hojaDeReporte(page);
       await esperarHojaQuieta(page, hoja);

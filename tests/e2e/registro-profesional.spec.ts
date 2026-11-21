@@ -2,6 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 import { hexDe, rgbComas } from "../../src/lib/tokens-css";
+import { esperarColoresEstables } from "./apoyo/hoja";
 
 // LAB-18: registro de profesional, paso 1 (el perfil).
 // Las pruebas de validación y de interfaz no necesitan Supabase; la de punta a punta crea una
@@ -203,6 +204,7 @@ test.describe("registro de profesional · formulario completo", () => {
   for (const esquema of ["light", "dark"] as const) {
     test(`axe sin violaciones con fotos y errores (${esquema})`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: esquema });
+      await esperarColoresEstables(page);
       await hidratada(page);
       await page.locator('input[type="file"][multiple]').setInputFiles([foto(1), foto(2)]);
       await expect(page.getByText("2 de 10 fotos")).toBeVisible();
@@ -222,6 +224,7 @@ test.describe("registro de profesional · formulario completo", () => {
       page,
     }) => {
       await page.emulateMedia({ colorScheme: esquema });
+      await esperarColoresEstables(page);
       await page.goto("/registro/profesional/normas");
       await expect(
         page.getByRole("heading", { level: 1, name: "Te abren la puerta de su casa" }),

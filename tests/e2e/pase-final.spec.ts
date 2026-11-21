@@ -2,6 +2,7 @@ import { tokenJwt } from "./apoyo/token";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 import { writeFileSync } from "node:fs";
+import { esperarColoresEstables } from "./apoyo/hoja";
 
 // LAB-34 (pase final, parte 2): accesibilidad sobre todas las pantallas alcanzables, objetivos táctiles,
 // foco visible, movimiento reducido y métricas de rendimiento en celular. Usa los mismos servidores que el
@@ -95,6 +96,7 @@ async function sesionFalsa(contexto: BrowserContext, baseURL: string, token: str
 /** Abre una ruta con el esquema de color pedido y espera a que haya contenido principal. */
 async function abrir(page: Page, ruta: string, esquema: Esquema) {
   await page.emulateMedia({ colorScheme: COLOR_ESQUEMA[esquema] });
+  await esperarColoresEstables(page);
   const respuesta = await page.goto(ruta);
   expect(respuesta?.status(), `respuesta de ${ruta}`).toBeLessThan(400);
   // Esperá al h1 visible: el contenido con Suspense llega después de <main>, y axe pide un h1.
@@ -202,6 +204,7 @@ test.describe("pase final · objetivos táctiles y foco (celular)", () => {
     page,
   }) => {
     await page.emulateMedia({ reducedMotion: "reduce", colorScheme: "light" });
+    await esperarColoresEstables(page);
     await abrir(page, `${URL_BASE}/`, "claro");
     const largas = await page.evaluate(() => {
       const aTiempo = (t: string) =>
