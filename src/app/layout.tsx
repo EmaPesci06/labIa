@@ -10,6 +10,7 @@ import { clasesFuentes } from "./fuentes";
 import "./globals.css";
 
 import { MetricasPostHog } from "@/components/MetricasPostHog";
+import { MetricasVercel } from "@/components/MetricasVercel";
 import { PieLegal } from "@/components/PieLegal";
 import { AvisosFlotantes } from "@/components/ui/AvisosFlotantes";
 
@@ -54,6 +55,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {/* usePathname() en una ruta dinámica (/profesionales/[id]) exige Suspense. */}
         <Suspense fallback={null}>
           <MetricasPostHog />
+          {/* /_vercel/* solo existe en Vercel: en local y en CI el script daría 404. */}
+          {process.env.VERCEL === "1" ? <MetricasVercel /> : null}
         </Suspense>
         <RegistrarServiceWorker />
         <AvisosFlotantes />

@@ -57,9 +57,9 @@ const secciones: readonly SeccionLegal[] = [
             con tu consentimiento expreso, que te pedimos con una casilla antes de subirlos.
           </li>
           <li>
-            <strong>Datos técnicos:</strong> usamos PostHog para medir qué partes de la app se usan
-            y Sentry para detectar errores. Los configuramos para no enviar datos personales (ni
-            nombres, ni emails, ni teléfonos, ni documentos).
+            <strong>Datos técnicos:</strong> usamos PostHog y Vercel Analytics para medir qué partes
+            de la app se usan y Sentry para detectar errores. Los configuramos para no enviar datos
+            personales (ni nombres, ni emails, ni teléfonos, ni documentos).
           </li>
         </ul>
         <p>
@@ -134,8 +134,8 @@ const secciones: readonly SeccionLegal[] = [
             <strong>Resend</strong> (envío de emails).
           </li>
           <li>
-            <strong>PostHog</strong> (métricas de uso, sin datos personales) y{" "}
-            <strong>Sentry</strong> (errores, sin datos personales).
+            <strong>PostHog</strong> y <strong>Vercel Analytics</strong> (métricas de uso, sin datos
+            personales) y <strong>Sentry</strong> (errores, sin datos personales).
           </li>
         </ul>
         <p>
@@ -214,7 +214,8 @@ const secciones: readonly SeccionLegal[] = [
             <strong>Recordar tu tema</strong> claro u oscuro, y algunas preferencias de pantalla.
           </li>
           <li>
-            <strong>Medir el uso</strong> de forma anónima (PostHog), sin datos personales.
+            <strong>Medir el uso</strong> de forma anónima (PostHog y Vercel Analytics), sin datos
+            personales.
           </li>
         </ul>
         {/* REVISAR ABOGADO: si hace falta pedir consentimiento para la analítica. */}
