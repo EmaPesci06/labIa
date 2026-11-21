@@ -12,7 +12,7 @@ type Props = {
   volverTexto?: string;
 };
 
-/** Cabecera de las pantallas de acceso: enlace de volver, título en Baloo 2 y bajada opcional. */
+/** Cabecera de las pantallas de acceso: enlace de volver, título en Archivo y bajada opcional. */
 export function EncabezadoAuth({
   titulo,
   bajada,

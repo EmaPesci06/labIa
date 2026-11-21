@@ -1,27 +1,25 @@
-import { Baloo_2, Nunito_Sans } from "next/font/google";
+import { Archivo, Archivo_Narrow } from "next/font/google";
 
 /**
- * Títulos y marca: Baloo 2 (700 y 800). Se usa 800; el 700 queda disponible para etiquetas fuertes.
- * Reemplaza a Archivo (LAB-68).
+ * Títulos, marca y texto: Archivo (LAB-90). Se usa 800 en títulos y 400 y 600 en el texto
+ * (`font-bold` queda mapeado a 600 en globals.css, así que el 700 no hace falta).
+ * Reemplaza a Baloo 2 y a Nunito Sans (LAB-94).
  */
-export const baloo = Baloo_2({
+export const archivo = Archivo({
   subsets: ["latin"],
-  weight: ["700", "800"],
+  weight: ["400", "600", "800"],
   display: "swap",
   adjustFontFallback: true,
-  variable: "--fuente-baloo",
+  variable: "--fuente-archivo",
 });
 
-/**
- * Texto, etiquetas y datos: Nunito Sans (400 y 700). Reemplaza a Atkinson Hyperlegible Next y a
- * IBM Plex Mono (LAB-68).
- */
-export const nunito = Nunito_Sans({
+/** Etiquetas, números de cupón y marcas: Archivo Narrow 700, en mayúsculas (clase `font-etiqueta`). */
+export const archivoNarrow = Archivo_Narrow({
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["700"],
   display: "swap",
   adjustFontFallback: true,
-  variable: "--fuente-nunito",
+  variable: "--fuente-archivo-narrow",
 });
 
-export const clasesFuentes = `${baloo.variable} ${nunito.variable}`;
+export const clasesFuentes = `${archivo.variable} ${archivoNarrow.variable}`;

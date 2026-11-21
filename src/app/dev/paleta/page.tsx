@@ -127,13 +127,13 @@ export default function PaginaPaleta() {
         <div className="space-y-4 rounded-3xl border-2 border-texto bg-superficie p-4 lg:p-6">
           <div>
             <p className="text-xs font-bold tracking-[0.4px] text-texto uppercase">
-              Baloo 2 800 · font-titulo
+              Archivo 800 · font-titulo
             </p>
             <p className="font-titulo text-4xl">Buscá tu plomero de confianza</p>
           </div>
           <div>
             <p className="text-xs font-bold tracking-[0.4px] text-texto uppercase">
-              Nunito Sans 400 y 700 · font-texto
+              Archivo 400 y 600 · font-texto
             </p>
             <p className="text-lg">
               Publicá tu trabajo y elegí entre profesionales verificados de tu barrio.
@@ -142,11 +142,9 @@ export default function PaginaPaleta() {
           </div>
           <div>
             <p className="text-xs font-bold tracking-[0.4px] text-texto uppercase">
-              Etiquetas · Nunito Sans 700 en mayúsculas
+              Etiquetas · Archivo Narrow 700 en mayúsculas · font-etiqueta
             </p>
-            <p className="text-sm font-bold tracking-[0.4px] uppercase">
-              Gas · La Perla · hace 20 min · a 0,8 km
-            </p>
+            <p className="font-etiqueta text-sm">Gas · La Perla · hace 20 min · a 0,8 km</p>
           </div>
         </div>
       </section>
