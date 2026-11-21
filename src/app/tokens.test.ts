@@ -8,41 +8,43 @@ import { contraste, CSS_GLOBALS, hexDe } from "@/lib/tokens-css";
 
 const RAIZ_SRC = join(__dirname, "..");
 
-/** Valores de la tabla de tokens de docs/prototipo-nuevo/README.md. `campo` no está en la tabla. */
+/** Valores aprobados en LAB-90 (Papelería sellada). `campo` y `exito` completan la tabla. */
 const CLARO_README = {
-  fondo: "#FFF3D6",
+  fondo: "#EAF0EE",
   superficie: "#FFFFFF",
   campo: "#FFFFFF",
-  texto: "#123B4A",
-  accion: "#0E7C86",
+  texto: "#16231F",
+  accion: "#B8441B",
   "sobre-accion": "#FFFFFF",
-  encabezado: "#0E7C86",
-  "sobre-encabezado": "#FFFFFF",
-  destacado: "#F7C948",
-  "sobre-destacado": "#123B4A",
-  adorno: "#F25C54",
-  error: "#A62B24",
-  equipo: "#123B4A",
-  velo: "#123B4A",
-  foco: "#123B4A",
+  encabezado: "#16231F",
+  "sobre-encabezado": "#EAF0EE",
+  destacado: "#16231F",
+  "sobre-destacado": "#EAF0EE",
+  adorno: "#E0592A",
+  exito: "#1F7A4A",
+  error: "#B3261E",
+  equipo: "#16231F",
+  velo: "#16231F",
+  foco: "#16231F",
 };
 
 const OSCURO_README = {
-  fondo: "#0B2730",
-  superficie: "#17485A",
-  campo: "#0B2730",
-  texto: "#FFF3D6",
-  accion: "#45C4CC",
-  "sobre-accion": "#0B2730",
-  encabezado: "#0E7C86",
-  "sobre-encabezado": "#FFFFFF",
-  destacado: "#F7C948",
-  "sobre-destacado": "#123B4A",
-  adorno: "#F25C54",
-  error: "#FF9A8F",
-  equipo: "#17485A",
-  velo: "#05161B",
-  foco: "#F7C948",
+  fondo: "#0F1A17",
+  superficie: "#1A2925",
+  campo: "#0F1A17",
+  texto: "#E6EEEB",
+  accion: "#F07A4A",
+  "sobre-accion": "#0F1A17",
+  encabezado: "#1A2925",
+  "sobre-encabezado": "#E6EEEB",
+  destacado: "#E6EEEB",
+  "sobre-destacado": "#0F1A17",
+  adorno: "#E0592A",
+  exito: "#5CC48A",
+  error: "#FF8A80",
+  equipo: "#2C3D38",
+  velo: "#050A09",
+  foco: "#F07A4A",
 };
 
 describe("tokens de la paleta nueva", () => {
@@ -65,17 +67,17 @@ describe("tokens de la paleta nueva", () => {
     }
   });
 
-  it("los nombres de TOKENS_COLOR son los del README más campo, borde y texto-suave", () => {
+  it("los nombres de TOKENS_COLOR son los de LAB-90 más borde y texto-suave", () => {
     expect([...TOKENS_COLOR].sort()).toEqual(
       [...Object.keys(CLARO_README), "borde", "texto-suave"].sort(),
     );
   });
 
   it("borde y texto-suave tienen el hex pensado en cada tema", () => {
-    expect(hexDe("claro", "texto-suave")).toBe("#48646F");
-    expect(hexDe("claro", "borde")).toBe("#6F8790");
-    expect(hexDe("oscuro", "texto-suave")).toBe("#C4D6D8");
-    expect(hexDe("oscuro", "borde")).toBe("#7AA3AE");
+    expect(hexDe("claro", "texto-suave")).toBe("#47564F");
+    expect(hexDe("claro", "borde")).toBe("#6B7F78");
+    expect(hexDe("oscuro", "texto-suave")).toBe("#A7B8B1");
+    expect(hexDe("oscuro", "borde")).toBe("#6F8A80");
   });
 
   it("cada token de TOKENS_COLOR está mapeado en el @theme de Tailwind", () => {
@@ -88,7 +90,6 @@ describe("tokens de la paleta nueva", () => {
     const viejos = [
       "azul",
       "naranja",
-      "exito",
       "acento",
       "superficie-elevada",
       "texto-secundario",
@@ -116,6 +117,10 @@ describe("contraste AA (≥ 4,5:1) de cada par texto/fondo, en claro y oscuro", 
     ["sobre-destacado", "destacado"],
     ["error", "fondo"],
     ["error", "superficie"],
+    ["exito", "fondo"],
+    ["exito", "superficie"],
+    ["accion", "fondo"],
+    ["accion", "superficie"],
     ["texto-suave", "fondo"],
     ["texto-suave", "superficie"],
     ["texto-suave", "campo"],
@@ -134,26 +139,27 @@ describe("contraste AA (≥ 4,5:1) de cada par texto/fondo, en claro y oscuro", 
     });
   }
 
-  // Pares que NO se usan para texto y no se exigen AA (se documentan con su número real):
-  // - adorno: solo adorno (toldos). Nunca texto.
-  // - accion sobre fondo en claro: 4,49:1, queda a 0,01 de AA. Sirve para íconos, enlaces grandes
-  //   o acentos; para texto chico usar texto o superficie.
-  it("accion claro sobre fondo queda en 4,49:1 (no usar para texto chico)", () => {
-    expect(contraste(hexDe("claro", "accion"), hexDe("claro", "fondo"))).toBeCloseTo(4.49, 2);
-  });
-
+  // Pares que NO se usan para texto y no se exigen AA:
+  // - adorno: el sello y los motivos. Nunca texto.
   it("adorno sobre fondo y superficie no llega a AA: solo adorno, nunca texto", () => {
     expect(contraste(hexDe("claro", "adorno"), hexDe("claro", "fondo"))).toBeLessThan(4.5);
     expect(contraste(hexDe("claro", "adorno"), hexDe("claro", "superficie"))).toBeLessThan(4.5);
   });
 
+  // Foco y bordes de los controles: componentes de interfaz, 3:1 (WCAG 1.4.11).
+  for (const tema of ["claro", "oscuro"] as const) {
+    it.each(["fondo", "superficie"])(`${tema}: foco sobre %s llega a 3:1`, (fondo) => {
+      expect(contraste(hexDe(tema, "foco"), hexDe(tema, fondo))).toBeGreaterThanOrEqual(3);
+    });
+  }
+
   it("la fórmula da los valores conocidos", () => {
     expect(contraste("#FFFFFF", "#000000")).toBeCloseTo(21, 5);
-    // Blanco sobre turquesa de encabezado: 4,95:1, apto para texto normal.
-    expect(contraste("#FFFFFF", "#0E7C86")).toBeCloseTo(4.95, 1);
+    // Blanco sobre el naranja de acción en claro: 5,4:1 (LAB-90).
+    expect(contraste("#FFFFFF", "#B8441B")).toBeCloseTo(5.4, 1);
   });
 
-  it("el texto de los enlaces (texto) pasa AA sobre el fondo arena y la superficie", () => {
+  it("el texto pasa AA sobre el fondo y la superficie", () => {
     expect(contraste(hexDe("claro", "texto"), hexDe("claro", "fondo"))).toBeGreaterThanOrEqual(4.5);
     expect(contraste(hexDe("claro", "texto"), hexDe("claro", "superficie"))).toBeGreaterThanOrEqual(
       4.5,

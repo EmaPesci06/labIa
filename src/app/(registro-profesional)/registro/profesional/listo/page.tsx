@@ -17,7 +17,10 @@ const PUNTOS = [
 
 function ContenidoListo({ nombre }: { nombre: string | null }) {
   return (
-    <div className="flex min-h-dvh flex-col bg-encabezado text-sobre-encabezado">
+    <div
+      data-encabezado="turquesa"
+      className="flex min-h-dvh flex-col bg-encabezado text-sobre-encabezado"
+    >
       <SaltarAlContenido />
       <Toldo color="destacado" alto={26} />
       <main
@@ -28,7 +31,7 @@ function ContenidoListo({ nombre }: { nombre: string | null }) {
         <div className="my-auto py-4">
           <span
             aria-hidden
-            className="flex size-24 items-center justify-center rounded-full bg-destacado text-sobre-destacado"
+            className="flex size-24 items-center justify-center rounded-full bg-accion text-sobre-accion"
           >
             <Check strokeWidth={3} className="size-[52px]" />
           </span>
@@ -41,10 +44,7 @@ function ContenidoListo({ nombre }: { nombre: string | null }) {
           <ul className="mt-6 flex flex-col gap-3 text-[17px] leading-[1.35]">
             {PUNTOS.map((texto) => (
               <li key={texto} className="flex gap-3">
-                <span
-                  aria-hidden
-                  className="mt-[7px] size-2.5 flex-none rounded-full bg-destacado"
-                />
+                <span aria-hidden className="mt-[7px] size-2.5 flex-none rounded-full bg-accion" />
                 <span>{texto}</span>
               </li>
             ))}

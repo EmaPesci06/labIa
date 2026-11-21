@@ -1,7 +1,7 @@
 import { tokenJwt } from "./apoyo/token";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
-import { esperarHojaQuieta, focoDentroDelDialogo } from "./apoyo/hoja";
+import { esperarColoresEstables, esperarHojaQuieta, focoDentroDelDialogo } from "./apoyo/hoja";
 
 // LAB-31: reseñas de clientes a profesionales, con el Supabase FALSO (tests/e2e/apoyo/supabase-falso.cjs).
 // Cubre: elegibilidad (contactó o eligió), alta desde el perfil, edición dentro de las 24 h, reseña
@@ -222,6 +222,7 @@ test.describe("reseñas: cliente elegible", () => {
       await page.goto(RUTA_PERFIL);
       await botonDejarResena(page).click();
       await esperarHojaQuieta(page, hoja(page));
+      await esperarColoresEstables(page);
       const resultado = await new AxeBuilder({ page })
         .include('[role="dialog"]')
         .withTags(["wcag2a", "wcag2aa"])

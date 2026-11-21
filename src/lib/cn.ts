@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { extendTailwindMerge } from "tailwind-merge";
 
-/** Tokens de color "Verano en la costa" (globals.css, sin el prefijo --color-). */
+/** Tokens de color "Papelería sellada" (globals.css, sin el prefijo --color-). */
 export const TOKENS_COLOR = [
   "fondo",
   "superficie",
@@ -16,6 +16,7 @@ export const TOKENS_COLOR = [
   "destacado",
   "sobre-destacado",
   "adorno",
+  "exito",
   "error",
   "equipo",
   "velo",

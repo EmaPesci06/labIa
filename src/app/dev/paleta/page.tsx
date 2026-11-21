@@ -27,6 +27,7 @@ const MUESTRA: Record<(typeof TOKENS_COLOR)[number], string> = {
   destacado: "bg-destacado",
   "sobre-destacado": "bg-sobre-destacado",
   adorno: "bg-adorno",
+  exito: "bg-exito",
   error: "bg-error",
   equipo: "bg-equipo",
   velo: "bg-velo",
@@ -107,8 +108,8 @@ export default function PaginaPaleta() {
           <Logo className="text-4xl" />
           <h1 className="font-titulo text-3xl lg:text-4xl">Paleta y tipografías</h1>
           <p className="text-texto">
-            Página interna (solo en desarrollo) para revisar los tokens de &quot;Verano en la
-            costa&quot;.
+            Página interna (solo en desarrollo) para revisar los tokens de &quot;Papelería
+            sellada&quot;.
           </p>
         </div>
         <SelectorTema />

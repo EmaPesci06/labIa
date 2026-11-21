@@ -1,3 +1,4 @@
+import { hexDe, rgbComas } from "../../src/lib/tokens-css";
 import { tokenJwt } from "./apoyo/token";
 import AxeBuilder from "@axe-core/playwright";
 import {
@@ -8,7 +9,7 @@ import {
   type Page,
   type TestInfo,
 } from "@playwright/test";
-import { esperarHojaQuieta } from "./apoyo/hoja";
+import { esperarColoresEstables, esperarHojaQuieta } from "./apoyo/hoja";
 
 // LAB-32: reportes y moderación con el Supabase FALSO (tests/e2e/apoyo/supabase-falso.cjs).
 // Cubre: reportar perfil, trabajo y reseña (hoja, motivos, límite de detalle, errores junto al mensaje);
@@ -235,7 +236,10 @@ test.describe("reportes del cliente y del profesional", () => {
       await esperarHojaQuieta(page, hoja);
       const radioEstafa = hoja.getByRole("radio", { name: MOTIVO_ESTAFA });
       await radioEstafa.check();
-      await expect(radioEstafa).toHaveCSS("background-color", "rgb(18, 59, 74)");
+      await expect(radioEstafa).toHaveCSS(
+        "background-color",
+        rgbComas(hexDe(tema, "sobre-destacado")),
+      );
       await capturar(page, "reporte-hoja", tema);
       // Solo la hoja: la página de fondo queda atenuada por el velo y axe mide ese color mezclado.
       const resultado = await new AxeBuilder({ page }).include('[role="dialog"]').analyze();
@@ -277,6 +281,7 @@ test.describe("moderación del admin", () => {
     await admin.page.emulateMedia({ colorScheme: "dark" });
     await admin.page.reload();
     await expect(admin.page.getByRole("heading", { name: "Reportes y moderación" })).toBeVisible();
+    await esperarColoresEstables(admin.page);
     expect(graves(await new AxeBuilder({ page: admin.page }).analyze())).toEqual([]);
     await capturar(admin.page, "admin-reportes", "oscuro");
     await admin.contexto.close();
@@ -366,6 +371,7 @@ test.describe("moderación del admin", () => {
       await moderado.page.setViewportSize({ width: ancho, height: ancho === 390 ? 844 : 900 });
       for (const tema of ["claro", "oscuro"] as const) {
         await moderado.page.emulateMedia({ colorScheme: tema === "oscuro" ? "dark" : "light" });
+        await esperarColoresEstables(moderado.page);
         await capturar(moderado.page, "suspendida", tema);
         const resultado = await new AxeBuilder({ page: moderado.page }).analyze();
         expect(resultado.violations, `${ancho}px ${tema}`).toEqual([]);
@@ -374,13 +380,13 @@ test.describe("moderación del admin", () => {
     await moderado.page.setViewportSize({ width: 1440, height: 900 });
     await moderado.page.emulateMedia({ colorScheme: "light" });
 
-    // LAB-81: sobre el fondo `equipo` el foco por teclado va en `destacado` (en claro `foco` y `equipo` son
-    // el mismo azul y el anillo no se vería).
+    // LAB-81: sobre el fondo `equipo` el foco por teclado va en `sobre-encabezado` (en claro `foco` y la tinta
+    // del bloque son el mismo color y el anillo no se vería).
     await moderado.page.keyboard.press("Tab");
     const apelar = moderado.page.getByRole("link", { name: "Pedir una apelación" });
     await apelar.focus();
     await expect(apelar).toBeFocused();
-    await expect(apelar).toHaveCSS("outline-color", "rgb(247, 201, 72)");
+    await expect(apelar).toHaveCSS("outline-color", rgbComas(hexDe("claro", "sobre-encabezado")));
     await expect(apelar).toHaveCSS("outline-style", "solid");
     await moderado.contexto.close();
   });

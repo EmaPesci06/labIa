@@ -10,6 +10,7 @@ describe("colores de la PWA", () => {
     expect(PWA_COLORES.fondoClaro).toBe(rgbDe(hexDe("claro", "fondo")));
     expect(PWA_COLORES.fondoOscuro).toBe(rgbDe(hexDe("oscuro", "fondo")));
     expect(PWA_COLORES.encabezado).toBe(rgbDe(hexDe("claro", "encabezado")));
+    expect(PWA_COLORES.encabezadoOscuro).toBe(rgbDe(hexDe("oscuro", "encabezado")));
   });
 });
 

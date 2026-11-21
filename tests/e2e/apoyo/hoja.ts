@@ -27,3 +27,24 @@ export async function esperarHojaQuieta(page: Page, hoja?: Locator): Promise<voi
  */
 export const focoDentroDelDialogo = (page: Page): Promise<boolean> =>
   page.evaluate(() => Boolean(document.activeElement?.closest('[role="dialog"]')));
+
+/**
+ * Espera a que no quede ninguna transición ni animación corriendo (también las infinitas no cuentan: se
+ * ignoran). Tras `emulateMedia` o un cambio de tema los componentes pasan de un color al otro con
+ * `transition-colors`; si axe mide a mitad de camino ve colores mezclados y marca contraste falso.
+ * Se dan dos cuadros para que el cambio de estilo arranque las transiciones antes de mirarlas.
+ */
+export async function esperarColoresEstables(page: Page): Promise<void> {
+  await page.evaluate(
+    () =>
+      new Promise<void>((listo) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => listo())),
+      ),
+  );
+  await page.waitForFunction(() =>
+    document.getAnimations().every((animacion) => {
+      const iteraciones = animacion.effect?.getComputedTiming().iterations ?? 1;
+      return !Number.isFinite(iteraciones) || animacion.playState === "finished";
+    }),
+  );
+}

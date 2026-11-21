@@ -5,7 +5,7 @@ import { Button } from "@/components/shadcn/button";
 import { contraste, CSS_GLOBALS, hexDe } from "@/lib/tokens-css";
 
 /*
- * LAB-82: el botón de shadcn (sin editar) sale con la paleta "Verano en la costa". jsdom no
+ * LAB-82: el botón de shadcn (sin editar) sale con la paleta "Papelería sellada". jsdom no
  * calcula CSS, así que se verifica la cadena completa: clase del botón → variable de shadcn →
  * token de Oficio Seguro → hex de cada tema.
  */
@@ -39,13 +39,13 @@ describe("Button de shadcn con la paleta de Oficio Seguro", () => {
     expect(contraste(texto, fondo)).toBeGreaterThanOrEqual(4.5);
   });
 
-  it("el foco de 3 px sale del token foco: texto en claro, destacado en oscuro", () => {
+  it("el foco de 3 px sale del token foco: texto en claro, accion en oscuro", () => {
     expect(variable("ring")).toBe("foco");
     expect(CSS_GLOBALS).toMatch(
       /\[data-slot\]:focus-visible\s*\{\s*outline:\s*3px solid var\(--color-foco\);\s*outline-offset:\s*2px;/,
     );
     expect(hexDe("claro", "foco")).toBe(hexDe("claro", "texto"));
-    expect(hexDe("oscuro", "foco")).toBe(hexDe("oscuro", "destacado"));
+    expect(hexDe("oscuro", "foco")).toBe(hexDe("oscuro", "accion"));
   });
 
   it("las variables de shadcn apuntan a los tokens pedidos en LAB-82", () => {

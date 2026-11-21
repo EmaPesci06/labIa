@@ -15,12 +15,12 @@ import { PieLegal } from "@/components/PieLegal";
 import { AvisosFlotantes } from "@/components/ui/AvisosFlotantes";
 
 // viewport-fit=cover deja que la página llegue al borde en celulares con notch; las barras usan
-// env(safe-area-inset-*). theme-color es el encabezado turquesa, que es igual en los dos temas.
+// env(safe-area-inset-*). theme-color es el encabezado tinta de cada tema (claro y oscuro).
 export const viewport: Viewport = {
   viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: PWA_COLORES.encabezado },
-    { media: "(prefers-color-scheme: dark)", color: PWA_COLORES.encabezado },
+    { media: "(prefers-color-scheme: dark)", color: PWA_COLORES.encabezadoOscuro },
   ],
 };
 

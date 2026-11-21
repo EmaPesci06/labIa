@@ -3,7 +3,7 @@
 @import "shadcn/tailwind.css";
 
 /*
- * Tokens de diseño de Oficio Seguro, "Verano en la costa" (docs/prototipo-nuevo/README.md).
+ * Tokens de diseño de Oficio Seguro, "Papelería sellada" (LAB-90; valores aprobados el 21/11).
  * Este es el ÚNICO archivo donde se escriben colores en hex. El resto del código usa las clases
  * de Tailwind que salen de acá (bg-accion, text-texto, bg-destacado…).
  *
@@ -22,54 +22,56 @@
 .claro {
   color-scheme: light;
 
-  --color-fondo: #fff3d6;
+  --color-fondo: #eaf0ee;
   --color-superficie: #ffffff;
   --color-campo: #ffffff;
-  --color-texto: #123b4a;
-  --color-texto-suave: #48646f;
-  --color-borde: #6f8790;
-  --color-accion: #0e7c86;
+  --color-texto: #16231f;
+  --color-texto-suave: #47564f;
+  --color-borde: #6b7f78;
+  --color-accion: #b8441b;
   --color-sobre-accion: #ffffff;
-  --color-encabezado: #0e7c86;
-  --color-sobre-encabezado: #ffffff;
-  --color-destacado: #f7c948;
-  --color-sobre-destacado: #123b4a;
-  --color-adorno: #f25c54;
-  --color-error: #a62b24;
-  --color-equipo: #123b4a;
+  --color-encabezado: #16231f;
+  --color-sobre-encabezado: #eaf0ee;
+  --color-destacado: #16231f;
+  --color-sobre-destacado: #eaf0ee;
+  --color-adorno: #e0592a;
+  --color-exito: #1f7a4a;
+  --color-error: #b3261e;
+  --color-equipo: #16231f;
   /* Logo: la insignia de la marca (naranja obra) y la llave dentro de ella. Solo para el logo. */
   --color-marca: #e0592a;
   --color-sobre-marca: #f6f4ef;
 
   /* Fondo detrás de las hojas inferiores (se usa con opacidad en el componente). */
-  --color-velo: #123b4a;
+  --color-velo: #16231f;
   /* Foco: outline de 3 px en claro; en oscuro cambia a destacado. */
-  --color-foco: #123b4a;
+  --color-foco: #16231f;
 }
 
 .dark {
   color-scheme: dark;
 
-  --color-fondo: #0b2730;
-  --color-superficie: #17485a;
-  --color-campo: #0b2730;
-  --color-texto: #fff3d6;
-  --color-texto-suave: #c4d6d8;
-  --color-borde: #7aa3ae;
-  --color-accion: #45c4cc;
-  --color-sobre-accion: #0b2730;
-  --color-encabezado: #0e7c86;
-  --color-sobre-encabezado: #ffffff;
-  --color-destacado: #f7c948;
-  --color-sobre-destacado: #123b4a;
-  --color-adorno: #f25c54;
-  --color-error: #ff9a8f;
-  --color-equipo: #17485a;
+  --color-fondo: #0f1a17;
+  --color-superficie: #1a2925;
+  --color-campo: #0f1a17;
+  --color-texto: #e6eeeb;
+  --color-texto-suave: #a7b8b1;
+  --color-borde: #6f8a80;
+  --color-accion: #f07a4a;
+  --color-sobre-accion: #0f1a17;
+  --color-encabezado: #1a2925;
+  --color-sobre-encabezado: #e6eeeb;
+  --color-destacado: #e6eeeb;
+  --color-sobre-destacado: #0f1a17;
+  --color-adorno: #e0592a;
+  --color-exito: #5cc48a;
+  --color-error: #ff8a80;
+  --color-equipo: #2c3d38;
   --color-marca: #e0592a;
   --color-sobre-marca: #f6f4ef;
 
-  --color-velo: #05161b;
-  --color-foco: #f7c948;
+  --color-velo: #050a09;
+  --color-foco: #f07a4a;
 }
 
 /*
@@ -120,6 +122,10 @@
   --chart-5: var(--color-texto-suave);
 }
 
+/* Dentro de un bloque de encabezado de color (Encabezado, salvo "plano"): ahí destacado y superficie
+   pueden coincidir con el fondo del bloque, así que los chips usan otros pares de tokens. */
+@custom-variant en-encabezado (&:where([data-encabezado]:not([data-encabezado="plano"]) *));
+
 /* `dark:` aplica dentro de .dark, salvo en un bloque forzado a claro con .claro. */
 @custom-variant dark (&:where(.dark, .dark *):where(:not(.claro, .claro *)));
 
@@ -143,6 +149,7 @@
   --color-destacado: var(--color-destacado);
   --color-sobre-destacado: var(--color-sobre-destacado);
   --color-adorno: var(--color-adorno);
+  --color-exito: var(--color-exito);
   --color-error: var(--color-error);
   --color-equipo: var(--color-equipo);
   --color-marca: var(--color-marca);
@@ -243,7 +250,7 @@
     @apply bg-fondo font-texto text-texto;
   }
 
-  /* Foco: 3 px sólidos, color texto en claro y destacado en oscuro (token foco). */
+  /* Foco: 3 px sólidos, color texto en claro y accion en oscuro (token foco). */
   :focus-visible {
     outline: 3px solid var(--color-foco);
     outline-offset: 2px;
@@ -259,6 +266,12 @@
 [data-slot]:focus-visible {
   outline: 3px solid var(--color-foco);
   outline-offset: 2px;
+}
+
+/* Foco dentro de un bloque de encabezado de color: el token foco (tinta en claro) se confunde con
+   el bloque, así que ahí el contorno usa sobre-encabezado. */
+[data-encabezado]:not([data-encabezado="plano"]) :focus-visible {
+  outline-color: var(--color-sobre-encabezado);
 }
 
 /*
