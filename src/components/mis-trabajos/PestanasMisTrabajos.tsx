@@ -32,7 +32,9 @@ export function PestanasMisTrabajos({ tabActiva }: Props) {
             href={`/mis-trabajos?tab=${tab.clave}`}
             className={cn(
               "inline-flex min-h-11 items-center justify-center rounded-full px-4 text-base font-bold transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-foco",
-              activa ? "bg-sol text-sobre-sol" : "bg-superficie text-texto hover:bg-sol/40",
+              activa
+                ? "bg-destacado text-sobre-destacado"
+                : "bg-superficie text-texto hover:bg-destacado/40",
             )}
           >
             {tab.etiqueta}

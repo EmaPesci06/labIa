@@ -6,17 +6,17 @@ import { cn } from "@/lib/cn";
 import { nombreOficio, OFICIOS_ORDENADOS, type Oficio } from "@/lib/oficios";
 
 /**
- * Colores de cada carpa, como en el boceto: turquesa, sol, azul noche y superficie con toldo coral.
+ * Colores de cada carpa, como en el boceto: turquesa, destacado, azul noche y superficie con toldo adorno.
  * Todos son tokens; el texto sobre cada fondo sale del par de la tabla de tokens.
  */
 const CARPA: Record<Oficio, { fondo: string; texto: string; toldo: ColorToldo }> = {
   plomeria: { fondo: "bg-accion", texto: "text-sobre-accion", toldo: "accion" },
-  electricidad: { fondo: "bg-sol", texto: "text-sobre-sol", toldo: "sol" },
+  electricidad: { fondo: "bg-destacado", texto: "text-sobre-destacado", toldo: "destacado" },
   gas: { fondo: "bg-texto", texto: "text-superficie", toldo: "texto" },
-  cerrajeria: { fondo: "bg-superficie", texto: "text-texto", toldo: "coral" },
-  pintura: { fondo: "bg-sol", texto: "text-sobre-sol", toldo: "sol" },
+  cerrajeria: { fondo: "bg-superficie", texto: "text-texto", toldo: "adorno" },
+  pintura: { fondo: "bg-destacado", texto: "text-sobre-destacado", toldo: "destacado" },
   carpinteria: { fondo: "bg-accion", texto: "text-sobre-accion", toldo: "accion" },
-  mecanica: { fondo: "bg-superficie", texto: "text-texto", toldo: "coral" },
+  mecanica: { fondo: "bg-superficie", texto: "text-texto", toldo: "adorno" },
 };
 
 type Props = {

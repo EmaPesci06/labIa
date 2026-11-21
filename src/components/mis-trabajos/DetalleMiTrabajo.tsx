@@ -169,7 +169,7 @@ export function DetalleMiTrabajo({
           <span
             className={
               trabajo.estado === "asignado"
-                ? "rounded-full bg-sol px-2.5 py-1 text-xs font-bold text-sobre-sol"
+                ? "rounded-full bg-destacado px-2.5 py-1 text-xs font-bold text-sobre-destacado"
                 : trabajo.estado === "abierto"
                   ? "rounded-full bg-superficie px-2.5 py-1 text-xs font-bold text-texto"
                   : "rounded-full bg-fondo px-2.5 py-1 text-xs font-bold text-texto"
@@ -247,11 +247,11 @@ export function DetalleMiTrabajo({
       {trabajo.estado === "asignado" ? (
         <section
           aria-label="Profesional contratado"
-          className="flex flex-col gap-4 rounded-[22px] bg-sol p-5 text-sobre-sol lg:p-6"
+          className="flex flex-col gap-4 rounded-[22px] bg-destacado p-5 text-sobre-destacado lg:p-6"
         >
           <div className="flex items-start gap-3">
             <CheckCircle aria-hidden className="size-6 shrink-0 text-texto" />
-            <p className="text-[15px] leading-relaxed text-sobre-sol lg:text-base">
+            <p className="text-[15px] leading-relaxed text-sobre-destacado lg:text-base">
               Elegiste a <strong>{nombreElegido}</strong>. Escribile por WhatsApp para coordinar.
               Cuando termine, dejale una reseña.
             </p>

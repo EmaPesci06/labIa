@@ -61,7 +61,7 @@ export default async function PaginaDetalleTrabajo({ params }: PaginaDetalleTrab
   return (
     <>
       <Encabezado
-        variante="sol"
+        variante="destacado"
         titulo={trabajo.titulo}
         descripcion={`${ETIQUETA_OFICIO[trabajo.oficio]} · publicado ${cuando}`}
         volver={{ href: "/trabajos", etiqueta: "Trabajos" }}

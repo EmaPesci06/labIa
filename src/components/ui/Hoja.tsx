@@ -69,7 +69,7 @@ export function Hoja({
           <SheetClose
             aria-label="Cerrar"
             className={cn(
-              "-mt-2 -mr-2 flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full text-texto hover:bg-sol/40",
+              "-mt-2 -mr-2 flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-full text-texto hover:bg-destacado/40",
               ocultarCierreEnEscritorio && "lg:hidden",
             )}
           >

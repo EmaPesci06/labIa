@@ -39,13 +39,13 @@ describe("Button de shadcn con la paleta de Oficio Seguro", () => {
     expect(contraste(texto, fondo)).toBeGreaterThanOrEqual(4.5);
   });
 
-  it("el foco de 3 px sale del token foco: texto en claro, sol en oscuro", () => {
+  it("el foco de 3 px sale del token foco: texto en claro, destacado en oscuro", () => {
     expect(variable("ring")).toBe("foco");
     expect(CSS_GLOBALS).toMatch(
       /\[data-slot\]:focus-visible\s*\{\s*outline:\s*3px solid var\(--color-foco\);\s*outline-offset:\s*2px;/,
     );
     expect(hexDe("claro", "foco")).toBe(hexDe("claro", "texto"));
-    expect(hexDe("oscuro", "foco")).toBe(hexDe("oscuro", "sol"));
+    expect(hexDe("oscuro", "foco")).toBe(hexDe("oscuro", "destacado"));
   });
 
   it("las variables de shadcn apuntan a los tokens pedidos en LAB-82", () => {
@@ -58,10 +58,10 @@ describe("Button de shadcn con la paleta de Oficio Seguro", () => {
       "popover-foreground": "texto",
       primary: "accion",
       "primary-foreground": "sobre-accion",
-      secondary: "sol",
-      "secondary-foreground": "sobre-sol",
-      accent: "sol",
-      "accent-foreground": "sobre-sol",
+      secondary: "destacado",
+      "secondary-foreground": "sobre-destacado",
+      accent: "destacado",
+      "accent-foreground": "sobre-destacado",
       destructive: "error",
       ring: "foco",
       input: "campo",

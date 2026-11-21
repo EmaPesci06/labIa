@@ -4,19 +4,19 @@ import type { ReactNode } from "react";
 
 import { cn } from "@/lib/cn";
 
-export type VarianteEncabezado = "turquesa" | "equipo" | "sol" | "plano";
+export type VarianteEncabezado = "turquesa" | "equipo" | "destacado" | "plano";
 
 const VARIANTES: Record<VarianteEncabezado, string> = {
   turquesa: "bg-encabezado text-sobre-encabezado",
   equipo: "bg-equipo text-sobre-encabezado",
-  sol: "bg-sol text-sobre-sol",
+  destacado: "bg-destacado text-sobre-destacado",
   // Sin bloque de color: el título va directo sobre el fondo arena (postulaciones, cuenta).
   plano: "bg-transparent text-texto",
 };
 
 type Props = {
   /**
-   * "turquesa" (por defecto), "equipo" (panel de admin, azul noche), "sol" (listas con chips, texto
+   * "turquesa" (por defecto), "equipo" (panel de admin, azul noche), "destacado" (listas con chips, texto
    * azul noche) o "plano" (sin bloque de color). Todas menos "plano" tienen esquinas inferiores
    * redondeadas (28 px; 40 desde `lg`).
    */
@@ -36,10 +36,10 @@ type Props = {
 /**
  * Encabezado de pantalla: bloque de color con volver (opcional), título y contenido (opcional).
  * Marca `data-encabezado` con la variante: los chips elegidos lo leen para cambiar a azul noche
- * dentro de un encabezado `sol`.
+ * dentro de un encabezado `destacado`.
  *
  * @example
- * <Encabezado titulo="Trabajos para vos" variante="sol">…chips…</Encabezado>
+ * <Encabezado titulo="Trabajos para vos" variante="destacado">…chips…</Encabezado>
  * <Encabezado variante="plano" titulo="Mis postulaciones" />
  */
 export function Encabezado({

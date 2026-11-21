@@ -19,7 +19,7 @@ export default function Bienvenida() {
   return (
     <div className="flex flex-1 flex-col bg-encabezado text-sobre-encabezado">
       <SaltarAlContenido />
-      <Toldo color="sol" alto={26} />
+      <Toldo color="destacado" alto={26} />
       <header className="mx-auto flex w-full max-w-[1200px] items-center justify-between px-5 pt-3 lg:px-8 lg:pt-6">
         <Logo sobre="encabezado" className="text-[32px]" />
         <Link
@@ -60,7 +60,7 @@ export default function Bienvenida() {
           </Link>
           <Link
             href="/registro/profesional"
-            className="flex flex-col gap-1 rounded-3xl bg-sol px-[18px] py-4 text-sobre-sol"
+            className="flex flex-col gap-1 rounded-3xl bg-destacado px-[18px] py-4 text-sobre-destacado"
           >
             <span className="font-titulo text-2xl leading-[1.1]">Ofrezco mis servicios</span>
             <span className="text-base leading-[1.35]">

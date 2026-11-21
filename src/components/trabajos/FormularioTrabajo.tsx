@@ -255,8 +255,8 @@ export function FormularioTrabajo({
                   className={cn(
                     "flex min-h-[46px] cursor-pointer items-center gap-2 rounded-full px-4 text-base font-bold whitespace-nowrap transition-colors",
                     seleccionado
-                      ? "bg-sol text-sobre-sol"
-                      : "bg-superficie text-texto hover:bg-sol/40",
+                      ? "bg-destacado text-sobre-destacado"
+                      : "bg-superficie text-texto hover:bg-destacado/40",
                   )}
                 >
                   <RadioGroupItem
@@ -266,7 +266,7 @@ export function FormularioTrabajo({
                     className={cn(
                       "size-5 shrink-0 border-2",
                       seleccionado
-                        ? "border-sobre-sol bg-campo data-checked:border-sobre-sol! data-checked:bg-sobre-sol! [&_[data-slot=radio-group-indicator]>span]:bg-sol"
+                        ? "border-sobre-destacado bg-campo data-checked:border-sobre-destacado! data-checked:bg-sobre-destacado! [&_[data-slot=radio-group-indicator]>span]:bg-destacado"
                         : "border-texto bg-campo",
                     )}
                   />

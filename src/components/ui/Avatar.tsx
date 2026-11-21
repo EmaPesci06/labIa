@@ -23,7 +23,7 @@ export function iniciales(nombre: string): string {
 
 /**
  * Avatar redondo: capa fina sobre el `Avatar` de shadcn, con foto (`next/image`) o iniciales sobre
- * turquesa, con borde sol. La foto no usa `AvatarImage` (que dibuja un `<img>` recién cuando carga):
+ * turquesa, con borde destacado. La foto no usa `AvatarImage` (que dibuja un `<img>` recién cuando carga):
  * así sigue saliendo en el HTML del servidor y optimizada por `next/image`.
  */
 export function Avatar({ nombre, src, tamano = 44, className }: Props) {

@@ -17,8 +17,12 @@ type Estado = TrabajoClienteItem["estado"];
 
 /** Color del toldo y pastilla de estado. Cada estado tiene un texto propio: el color solo no lo dice. */
 const ESTILO_ESTADO: Record<Estado, { texto: string; toldo: ColorToldo; pastilla: string }> = {
-  abierto: { texto: "Abierto", toldo: "accion", pastilla: "bg-sol text-sobre-sol" },
-  asignado: { texto: "Contratado", toldo: "sol", pastilla: "bg-sol text-sobre-sol" },
+  abierto: { texto: "Abierto", toldo: "accion", pastilla: "bg-destacado text-sobre-destacado" },
+  asignado: {
+    texto: "Contratado",
+    toldo: "destacado",
+    pastilla: "bg-destacado text-sobre-destacado",
+  },
   cerrado: { texto: "Terminado", toldo: "texto", pastilla: "bg-fondo text-texto" },
   cancelado: { texto: "Cancelado", toldo: "texto", pastilla: "bg-fondo text-texto" },
 };

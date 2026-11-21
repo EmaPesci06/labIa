@@ -124,7 +124,7 @@ export function HojaReportar({
           {motivoSeleccionado === "comportamiento" ? (
             <div
               role="alert"
-              className="flex items-center gap-2.5 rounded-[14px] bg-sol p-3.5 text-sm font-bold text-sobre-sol"
+              className="flex items-center gap-2.5 rounded-[14px] bg-destacado p-3.5 text-sm font-bold text-sobre-destacado"
             >
               <AlertTriangle aria-hidden className="size-5 shrink-0 text-error" />
               <span>Si estás en peligro, llamá al 911.</span>
@@ -151,7 +151,9 @@ export function HojaReportar({
                     htmlFor={inputId}
                     className={cn(
                       "flex min-h-[50px] cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-[17px]",
-                      seleccionado ? "bg-sol font-bold text-sobre-sol" : "bg-superficie text-texto",
+                      seleccionado
+                        ? "bg-destacado font-bold text-sobre-destacado"
+                        : "bg-superficie text-texto",
                     )}
                   >
                     <RadioGroupItem
@@ -161,7 +163,7 @@ export function HojaReportar({
                       className={cn(
                         "size-[22px] shrink-0 border-2",
                         seleccionado
-                          ? "border-sobre-sol bg-campo data-checked:border-sobre-sol! data-checked:bg-sobre-sol! [&_[data-slot=radio-group-indicator]>span]:bg-sol"
+                          ? "border-sobre-destacado bg-campo data-checked:border-sobre-destacado! data-checked:bg-sobre-destacado! [&_[data-slot=radio-group-indicator]>span]:bg-destacado"
                           : "border-texto bg-campo",
                       )}
                     />
@@ -169,7 +171,7 @@ export function HojaReportar({
                       id={textoId}
                       className={cn(
                         "text-[15px] leading-snug font-medium",
-                        seleccionado ? "text-sobre-sol" : "text-texto",
+                        seleccionado ? "text-sobre-destacado" : "text-texto",
                       )}
                     >
                       {ETIQUETAS_MOTIVO[motivo]}
@@ -223,7 +225,7 @@ export function HojaReportar({
           {estado.mensaje ? (
             <div
               role="alert"
-              className="rounded-xl bg-sol/60 p-3 text-sm font-semibold text-sobre-sol"
+              className="rounded-xl bg-destacado/60 p-3 text-sm font-semibold text-sobre-destacado"
             >
               {estado.mensaje}
             </div>

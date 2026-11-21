@@ -15,7 +15,7 @@ export function ListaNormas({ dosColumnas = false }: { dosColumnas?: boolean }) 
         >
           <span
             aria-hidden
-            className="flex size-7 flex-none items-center justify-center rounded-full bg-sol font-texto text-[15px] font-bold text-sobre-sol"
+            className="flex size-7 flex-none items-center justify-center rounded-full bg-destacado font-texto text-[15px] font-bold text-sobre-destacado"
           >
             {i + 1}
           </span>

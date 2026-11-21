@@ -119,7 +119,7 @@ export default async function Trabajos({ searchParams }: PaginaTrabajosProps) {
 
   return (
     <>
-      <Encabezado variante="sol" titulo="Trabajos para vos" descripcion={bajada}>
+      <Encabezado variante="destacado" titulo="Trabajos para vos" descripcion={bajada}>
         <BannerVerificacion resumen={resumen} />
         {oficiosValidos.length > 0 ? (
           <FiltrosTrabajos

@@ -374,7 +374,7 @@ test.describe("moderación del admin", () => {
     await moderado.page.setViewportSize({ width: 1440, height: 900 });
     await moderado.page.emulateMedia({ colorScheme: "light" });
 
-    // LAB-81: sobre el fondo `equipo` el foco por teclado va en `sol` (en claro `foco` y `equipo` son
+    // LAB-81: sobre el fondo `equipo` el foco por teclado va en `destacado` (en claro `foco` y `equipo` son
     // el mismo azul y el anillo no se vería).
     await moderado.page.keyboard.press("Tab");
     const apelar = moderado.page.getByRole("link", { name: "Pedir una apelación" });

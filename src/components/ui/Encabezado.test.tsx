@@ -21,11 +21,11 @@ describe("Encabezado", () => {
     expect(screen.getByRole("banner")).toHaveClass("bg-equipo", "text-sobre-encabezado");
   });
 
-  it("variante sol: texto azul noche", () => {
-    render(<Encabezado variante="sol" titulo="Trabajos para vos" />);
+  it("variante destacado: texto azul noche", () => {
+    render(<Encabezado variante="destacado" titulo="Trabajos para vos" />);
     const encabezado = screen.getByRole("banner");
-    expect(encabezado).toHaveAttribute("data-encabezado", "sol");
-    expect(encabezado).toHaveClass("bg-sol", "text-sobre-sol");
+    expect(encabezado).toHaveAttribute("data-encabezado", "destacado");
+    expect(encabezado).toHaveClass("bg-destacado", "text-sobre-destacado");
   });
 
   it("variante plano: sin bloque de color ni redondeo", () => {
@@ -45,7 +45,7 @@ describe("Encabezado", () => {
 
   it("acepta descripción y contenido (chips, filtros)", () => {
     render(
-      <Encabezado variante="sol" titulo="Trabajos" descripcion="Cerca de vos">
+      <Encabezado variante="destacado" titulo="Trabajos" descripcion="Cerca de vos">
         <p>Contenido extra</p>
       </Encabezado>,
     );
@@ -53,9 +53,9 @@ describe("Encabezado", () => {
     expect(screen.getByText("Contenido extra")).toBeInTheDocument();
   });
 
-  it("un chip elegido dentro de un encabezado sol pasa a azul noche con texto blanco", () => {
+  it("un chip elegido dentro de un encabezado destacado pasa a azul noche con texto blanco", () => {
     render(
-      <Encabezado variante="sol" titulo="Trabajos">
+      <Encabezado variante="destacado" titulo="Trabajos">
         <GrupoChips
           tipo="unica"
           etiqueta="Oficio"
@@ -71,14 +71,14 @@ describe("Encabezado", () => {
     const elegido = screen.getByRole("radio", { name: "Todos" });
     expect(elegido).toHaveClass(
       "bg-secondary",
-      "in-data-[encabezado=sol]:bg-sobre-sol",
-      "in-data-[encabezado=sol]:text-sobre-encabezado",
+      "in-data-[encabezado=destacado]:bg-sobre-destacado",
+      "in-data-[encabezado=destacado]:text-sobre-encabezado",
     );
     const sinElegir = screen.getByRole("radio", { name: "Gas" });
     expect(sinElegir).toHaveClass("bg-card");
   });
 
-  it("un chip suelto (fuera de un encabezado) elegido queda sol con texto azul noche", () => {
+  it("un chip suelto (fuera de un encabezado) elegido queda destacado con texto azul noche", () => {
     render(<Chip seleccionado>Gas</Chip>);
     expect(screen.getByRole("button", { name: "Gas" })).toHaveClass(
       "bg-secondary",
@@ -88,10 +88,10 @@ describe("Encabezado", () => {
 });
 
 describe("Distancia", () => {
-  it("muestra la distancia con el formato de la app en una pastilla sol", () => {
+  it("muestra la distancia con el formato de la app en una pastilla destacado", () => {
     render(<Distancia km={1.2} />);
     const texto = screen.getByText(formatearDistancia(1.2));
-    expect(texto).toHaveClass("bg-sol", "text-sobre-sol", "rounded-full");
+    expect(texto).toHaveClass("bg-destacado", "text-sobre-destacado", "rounded-full");
   });
 
   it("admite sufijo", () => {

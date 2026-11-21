@@ -20,7 +20,7 @@ export interface SeccionLegal {
 /** Valor pendiente de completar por Emanuel (`[RAZÓN SOCIAL]`…): resaltado para no pasarlo por alto. */
 export function Marcador({ children }: { children: ReactNode }) {
   return (
-    <mark className="rounded-sm bg-sol px-1 font-texto text-[0.92em] text-sobre-sol">
+    <mark className="rounded-sm bg-destacado px-1 font-texto text-[0.92em] text-sobre-destacado">
       {children}
     </mark>
   );
@@ -61,8 +61,8 @@ export function DocumentoLegal({
               className={cn(
                 "flex min-h-[46px] items-center justify-center rounded-full text-base transition-colors",
                 esActual
-                  ? "bg-sol font-bold text-sobre-sol"
-                  : "bg-superficie text-texto hover:bg-sol/40",
+                  ? "bg-destacado font-bold text-sobre-destacado"
+                  : "bg-superficie text-texto hover:bg-destacado/40",
               )}
             >
               {doc.etiqueta}

@@ -31,7 +31,7 @@ describe("Insignia", () => {
     }
   });
 
-  it("verificación con borde turquesa sobre superficie; matrícula en sol", () => {
+  it("verificación con borde turquesa sobre superficie; matrícula en destacado", () => {
     render(
       <>
         <Insignia variante="verificada" />
@@ -93,7 +93,7 @@ describe("Avatar", () => {
     expect(iniciales("  Ana María  López ")).toBe("AL");
   });
 
-  it("muestra las iniciales con el nombre como etiqueta, sobre turquesa con borde sol", () => {
+  it("muestra las iniciales con el nombre como etiqueta, sobre turquesa con borde destacado", () => {
     render(<Avatar nombre="Martín Gómez" tamano={84} />);
     const avatar = screen.getByRole("img", { name: "Martín Gómez" });
     expect(avatar).toHaveTextContent("MG");

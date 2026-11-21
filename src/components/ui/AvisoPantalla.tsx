@@ -6,7 +6,7 @@ import { cn } from "@/lib/cn";
 import { Toldo } from "./Toldo";
 
 type Props = {
-  /** Ícono en círculo sol. Por defecto un escudo. */
+  /** Ícono en círculo destacado. Por defecto un escudo. */
   icono?: LucideIcon;
   /** Título de la pantalla. Por defecto `h1`; dentro de otra página con su propio `h1`, usá 2. */
   titulo: string;
@@ -43,7 +43,7 @@ export function AvisoPantalla({
     >
       <span
         aria-hidden
-        className="flex size-24 items-center justify-center rounded-full bg-sol text-sobre-sol"
+        className="flex size-24 items-center justify-center rounded-full bg-destacado text-sobre-destacado"
       >
         <Icono strokeWidth={2.5} className="size-12" />
       </span>

@@ -22,9 +22,9 @@ describe("Toldo", () => {
   });
 
   it.each([
-    ["sol", "[--toldo-color:var(--color-sol)]"],
+    ["destacado", "[--toldo-color:var(--color-destacado)]"],
     ["texto", "[--toldo-color:var(--color-texto)]"],
-    ["coral", "[--toldo-color:var(--color-coral)]"],
+    ["adorno", "[--toldo-color:var(--color-adorno)]"],
   ] as const)("color %s usa su token", (color, clase) => {
     const { container } = render(<Toldo color={color} />);
     expect(container.firstElementChild).toHaveClass(clase);

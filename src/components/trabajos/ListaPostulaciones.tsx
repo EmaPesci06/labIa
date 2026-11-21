@@ -29,9 +29,9 @@ const CONFIG_ESTADO: Record<
     clasesPastilla: "bg-encabezado text-sobre-encabezado",
   },
   enviada: {
-    toldo: "sol",
+    toldo: "destacado",
     etiqueta: "Esperando respuesta",
-    clasesPastilla: "bg-sol text-sobre-sol",
+    clasesPastilla: "bg-destacado text-sobre-destacado",
   },
   descartada: {
     toldo: "texto",

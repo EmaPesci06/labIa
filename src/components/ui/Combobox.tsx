@@ -144,7 +144,7 @@ export function Combobox(props: ComboboxProps) {
                   value={opcion.etiqueta}
                   data-checked={seleccionado ? "true" : undefined}
                   onSelect={() => elegir(opcion)}
-                  className="min-h-11 cursor-pointer rounded-md px-3 text-base font-normal text-texto data-selected:bg-sol data-selected:font-bold data-selected:text-sobre-sol data-selected:*:[svg]:text-sobre-sol"
+                  className="min-h-11 cursor-pointer rounded-md px-3 text-base font-normal text-texto data-selected:bg-destacado data-selected:font-bold data-selected:text-sobre-destacado data-selected:*:[svg]:text-sobre-destacado"
                 >
                   <span className="truncate">{opcion.etiqueta}</span>
                 </CommandItem>

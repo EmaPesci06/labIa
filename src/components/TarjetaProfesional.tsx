@@ -32,7 +32,7 @@ type Props = {
 
 /**
  * Tarjeta de un profesional en los resultados (boceto `App-Buscar` y `Esc-Buscar`): avatar con borde
- * sol, nombre, calificación, oficio · años, distancia en pastilla sol e insignias. Toda la tarjeta es
+ * destacado, nombre, calificación, oficio · años, distancia en pastilla destacado e insignias. Toda la tarjeta es
  * un link al perfil público. Sin datos de contacto: el WhatsApp se pide al servidor desde el perfil.
  *
  * @example

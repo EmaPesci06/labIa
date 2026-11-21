@@ -19,7 +19,7 @@ function ContenidoListo({ nombre }: { nombre: string | null }) {
   return (
     <div className="flex min-h-dvh flex-col bg-encabezado text-sobre-encabezado">
       <SaltarAlContenido />
-      <Toldo color="sol" alto={26} />
+      <Toldo color="destacado" alto={26} />
       <main
         id="contenido"
         tabIndex={-1}
@@ -28,7 +28,7 @@ function ContenidoListo({ nombre }: { nombre: string | null }) {
         <div className="my-auto py-4">
           <span
             aria-hidden
-            className="flex size-24 items-center justify-center rounded-full bg-sol text-sobre-sol"
+            className="flex size-24 items-center justify-center rounded-full bg-destacado text-sobre-destacado"
           >
             <Check strokeWidth={3} className="size-[52px]" />
           </span>
@@ -41,7 +41,10 @@ function ContenidoListo({ nombre }: { nombre: string | null }) {
           <ul className="mt-6 flex flex-col gap-3 text-[17px] leading-[1.35]">
             {PUNTOS.map((texto) => (
               <li key={texto} className="flex gap-3">
-                <span aria-hidden className="mt-[7px] size-2.5 flex-none rounded-full bg-sol" />
+                <span
+                  aria-hidden
+                  className="mt-[7px] size-2.5 flex-none rounded-full bg-destacado"
+                />
                 <span>{texto}</span>
               </li>
             ))}

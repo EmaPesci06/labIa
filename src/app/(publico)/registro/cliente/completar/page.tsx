@@ -36,7 +36,10 @@ async function Contenido({ searchParams }: PageProps<"/registro/cliente/completa
   return (
     <>
       {aviso ? (
-        <p role="alert" className="rounded-xl bg-sol p-3.5 text-sm font-bold text-sobre-sol">
+        <p
+          role="alert"
+          className="rounded-xl bg-destacado p-3.5 text-sm font-bold text-sobre-destacado"
+        >
           Creamos tu cuenta pero no pudimos guardar tus datos. Completalos acá para seguir.
         </p>
       ) : null}

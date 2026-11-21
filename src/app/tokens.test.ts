@@ -18,9 +18,9 @@ const CLARO_README = {
   "sobre-accion": "#FFFFFF",
   encabezado: "#0E7C86",
   "sobre-encabezado": "#FFFFFF",
-  sol: "#F7C948",
-  "sobre-sol": "#123B4A",
-  coral: "#F25C54",
+  destacado: "#F7C948",
+  "sobre-destacado": "#123B4A",
+  adorno: "#F25C54",
   error: "#A62B24",
   equipo: "#123B4A",
   velo: "#123B4A",
@@ -36,9 +36,9 @@ const OSCURO_README = {
   "sobre-accion": "#0B2730",
   encabezado: "#0E7C86",
   "sobre-encabezado": "#FFFFFF",
-  sol: "#F7C948",
-  "sobre-sol": "#123B4A",
-  coral: "#F25C54",
+  destacado: "#F7C948",
+  "sobre-destacado": "#123B4A",
+  adorno: "#F25C54",
   error: "#FF9A8F",
   equipo: "#17485A",
   velo: "#05161B",
@@ -113,7 +113,7 @@ describe("contraste AA (≥ 4,5:1) de cada par texto/fondo, en claro y oscuro", 
     ["sobre-accion", "accion"],
     ["sobre-encabezado", "encabezado"],
     ["sobre-encabezado", "equipo"],
-    ["sobre-sol", "sol"],
+    ["sobre-destacado", "destacado"],
     ["error", "fondo"],
     ["error", "superficie"],
     ["texto-suave", "fondo"],
@@ -135,16 +135,16 @@ describe("contraste AA (≥ 4,5:1) de cada par texto/fondo, en claro y oscuro", 
   }
 
   // Pares que NO se usan para texto y no se exigen AA (se documentan con su número real):
-  // - coral: solo adorno (toldos). Nunca texto.
+  // - adorno: solo adorno (toldos). Nunca texto.
   // - accion sobre fondo en claro: 4,49:1, queda a 0,01 de AA. Sirve para íconos, enlaces grandes
   //   o acentos; para texto chico usar texto o superficie.
   it("accion claro sobre fondo queda en 4,49:1 (no usar para texto chico)", () => {
     expect(contraste(hexDe("claro", "accion"), hexDe("claro", "fondo"))).toBeCloseTo(4.49, 2);
   });
 
-  it("coral sobre fondo y superficie no llega a AA: solo adorno, nunca texto", () => {
-    expect(contraste(hexDe("claro", "coral"), hexDe("claro", "fondo"))).toBeLessThan(4.5);
-    expect(contraste(hexDe("claro", "coral"), hexDe("claro", "superficie"))).toBeLessThan(4.5);
+  it("adorno sobre fondo y superficie no llega a AA: solo adorno, nunca texto", () => {
+    expect(contraste(hexDe("claro", "adorno"), hexDe("claro", "fondo"))).toBeLessThan(4.5);
+    expect(contraste(hexDe("claro", "adorno"), hexDe("claro", "superficie"))).toBeLessThan(4.5);
   });
 
   it("la fórmula da los valores conocidos", () => {

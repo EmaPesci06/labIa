@@ -189,7 +189,7 @@ export function Campo(props: CampoProps) {
                 key={opcion.valor}
                 value={opcion.valor}
                 disabled={opcion.disabled}
-                className="min-h-11 cursor-pointer rounded-md px-3 text-base font-normal text-texto focus:bg-sol focus:font-bold focus:text-sobre-sol"
+                className="min-h-11 cursor-pointer rounded-md px-3 text-base font-normal text-texto focus:bg-destacado focus:font-bold focus:text-sobre-destacado"
               >
                 {opcion.etiqueta}
               </SelectItem>

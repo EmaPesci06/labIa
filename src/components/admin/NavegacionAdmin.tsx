@@ -23,9 +23,9 @@ export function NavegacionAdmin() {
             href={seccion.href}
             aria-current={activo ? "page" : undefined}
             className={cn(
-              // Sección actual: pastilla `sol` sobre el encabezado de equipo (boceto App-AdminVerificaciones).
+              // Sección actual: pastilla `destacado` sobre el encabezado de equipo (boceto App-AdminVerificaciones).
               "inline-flex min-h-11 items-center rounded-full px-3.5 text-[15px]",
-              activo ? "bg-sol font-bold text-sobre-sol" : "text-sobre-encabezado",
+              activo ? "bg-destacado font-bold text-sobre-destacado" : "text-sobre-encabezado",
             )}
           >
             {seccion.etiqueta}

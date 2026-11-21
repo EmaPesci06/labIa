@@ -70,7 +70,7 @@ export default async function Cuenta() {
         {resumen ? (
           <Link
             href="/cuenta/verificacion"
-            className="flex flex-col gap-0.5 rounded-[20px] bg-sol px-4 py-3 text-sobre-sol"
+            className="flex flex-col gap-0.5 rounded-[20px] bg-destacado px-4 py-3 text-sobre-destacado"
           >
             <span className="text-[17px] font-bold">
               {resumen.tipo === "rechazado"

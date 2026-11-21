@@ -31,7 +31,10 @@ export function ConfirmarEmail({ email }: { email: string }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <p role="status" className="rounded-xl bg-sol p-4 text-[15px] font-semibold text-sobre-sol">
+      <p
+        role="status"
+        className="rounded-xl bg-destacado p-4 text-[15px] font-semibold text-sobre-destacado"
+      >
         Te mandamos un mail a {email}. Tocá el link para activar tu cuenta.
       </p>
       <form action={accion} className="flex flex-col gap-2">
@@ -47,7 +50,7 @@ export function ConfirmarEmail({ email }: { email: string }) {
           {restan > 0 ? `Reenviar mail (en ${restan} s)` : "Reenviar mail"}
         </Boton>
         {estado.reenvio === "enviado" ? (
-          <p role="status" className="text-sm font-semibold text-sobre-sol">
+          <p role="status" className="text-sm font-semibold text-sobre-destacado">
             Listo, te lo mandamos de nuevo.
           </p>
         ) : null}

@@ -10,19 +10,19 @@ import { SIN_ANILLO_BOTON } from "./foco";
 // Pastilla de 46 px (objetivo táctil de 44 px mínimo), radio completo, texto 16 en negrita.
 const CHIP = `h-[46px] min-h-11 rounded-full px-4 text-base font-bold transition-colors ${SIN_ANILLO_BOTON}`;
 
-// Elegido: sol con texto azul noche. Sin elegir: superficie. Dentro de un encabezado sol
-// (`data-encabezado="sol"`) el elegido pasa a azul noche con texto blanco, y el hover no lo pisa.
+// Elegido: destacado con texto azul noche. Sin elegir: superficie. Dentro de un encabezado destacado
+// (`data-encabezado="destacado"`) el elegido pasa a azul noche con texto blanco, y el hover no lo pisa.
 function estadoChip(seleccionado: boolean) {
   return seleccionado
     ? "bg-secondary text-secondary-foreground aria-pressed:bg-secondary hover:bg-secondary " +
-        "hover:text-secondary-foreground in-data-[encabezado=sol]:bg-sobre-sol " +
-        "in-data-[encabezado=sol]:text-sobre-encabezado in-data-[encabezado=sol]:hover:bg-sobre-sol " +
-        "in-data-[encabezado=sol]:hover:text-sobre-encabezado in-data-[encabezado=sol]:aria-pressed:bg-sobre-sol"
+        "hover:text-secondary-foreground in-data-[encabezado=destacado]:bg-sobre-destacado " +
+        "in-data-[encabezado=destacado]:text-sobre-encabezado in-data-[encabezado=destacado]:hover:bg-sobre-destacado " +
+        "in-data-[encabezado=destacado]:hover:text-sobre-encabezado in-data-[encabezado=destacado]:aria-pressed:bg-sobre-destacado"
     : "bg-card text-card-foreground hover:bg-secondary/40 hover:text-card-foreground";
 }
 
 type PropsChip = {
-  /** Si el chip está elegido (sol; azul noche dentro de un encabezado sol). */
+  /** Si el chip está elegido (destacado; azul noche dentro de un encabezado destacado). */
   seleccionado: boolean;
   onClick?: () => void;
   /**
@@ -39,10 +39,10 @@ type PropsChip = {
 /**
  * Chip de filtro: capa fina sobre el `Toggle` de shadcn, pastilla de 46 px de alto (objetivo táctil de
  * 44 px mínimo).
- * Sin elegir: superficie blanca. Elegido: sol con texto azul noche.
+ * Sin elegir: superficie blanca. Elegido: destacado con texto azul noche.
  *
- * Dentro de un `<Encabezado variante="sol">` (ese encabezado marca `data-encabezado="sol"`), el chip
- * elegido pasa a azul noche (token sobre-sol) con texto blanco en los dos modos: sobre sol el amarillo no
+ * Dentro de un `<Encabezado variante="destacado">` (ese encabezado marca `data-encabezado="destacado"`), el chip
+ * elegido pasa a azul noche (token sobre-destacado) con texto blanco en los dos modos: sobre destacado el amarillo no
  * se distingue. Se resuelve con la variante `in-data-*` de Tailwind, sin prop extra.
  */
 export function Chip({

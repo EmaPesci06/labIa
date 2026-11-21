@@ -50,7 +50,7 @@ export function ModalSuspender({ abierta, onCambioAbierta, usuarioId, nombreUsua
       descripcion="La cuenta no podrá operar en la plataforma. Sus trabajos abiertos se cancelarán y sus postulaciones serán retiradas."
     >
       <div className="flex flex-col gap-4">
-        <div className="rounded-[14px] bg-sol p-3.5 text-sm text-sobre-sol">
+        <div className="rounded-[14px] bg-destacado p-3.5 text-sm text-sobre-destacado">
           <p className="font-semibold">Esta acción:</p>
           <ul className="mt-1 list-inside list-disc space-y-0.5">
             <li>Cambia el estado de la cuenta a suspendida inmediatamente.</li>
