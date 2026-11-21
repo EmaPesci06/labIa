@@ -1,3 +1,6 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+
 import { render } from "@react-email/render";
 import { createElement, type ComponentType } from "react";
 import { describe, expect, it } from "vitest";
@@ -64,18 +67,35 @@ describe.each(Object.entries(PLANTILLAS))("plantilla %s", (nombre, Plantilla) =>
   });
 });
 
-describe("botón de acción", () => {
-  it("es turquesa #0E7C86 con texto blanco", async () => {
+describe("marca nueva", () => {
+  it("el botón es del color de acción #b8441b con texto blanco", async () => {
     const html = await render(vista(BienvenidaCliente as unknown as ConVistaPrevia));
-    expect(html.toLowerCase()).toContain("background-color:#0e7c86");
+    expect(html.toLowerCase()).toContain("background-color:#b8441b");
     expect(html.toLowerCase()).toContain("color:#ffffff");
+  });
+
+  it("el logo es un PNG alojado con texto alternativo, no un SVG", async () => {
+    const html = await render(vista(BienvenidaCliente as unknown as ConVistaPrevia));
+    expect(html).toMatch(/<img[^>]+src="[^"]+\/emails\/logo\.png"/);
+    expect(html).toContain('alt="Oficio Seguro"');
+    expect(html).not.toContain(".svg");
+    expect(existsSync(join(process.cwd(), "public/emails/logo.png"))).toBe(true);
+  });
+
+  it("usa el fondo y el encabezado de la paleta, sin restos de Verano en la costa", async () => {
+    const html = (
+      await render(vista(BienvenidaCliente as unknown as ConVistaPrevia))
+    ).toLowerCase();
+    expect(html).toContain("background-color:#eaf0ee");
+    expect(html).toContain("background-color:#16231f");
+    expect(html).not.toMatch(/#0e7c86|#123b4a|#fff3d6|repeating-linear-gradient/);
   });
 });
 
 describe("cuenta suspendida", () => {
-  it("usa la cabecera azul noche #123B4A", async () => {
+  it("usa la cabecera gris verdosa #47564f", async () => {
     const html = await render(vista(CuentaSuspendida as unknown as ConVistaPrevia));
-    expect(html.toLowerCase()).toContain("background-color:#123b4a");
+    expect(html.toLowerCase()).toContain("background-color:#47564f");
   });
 });
 
