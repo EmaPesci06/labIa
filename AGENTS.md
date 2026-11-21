@@ -65,7 +65,7 @@ Rutas en español sin acentos: `/`, `/ingresar`, `/registro`, `/registro/cliente
 - **Distancias:** una decimal con coma, `formatearDistancia` ("a 1,2 km").
 - **Imágenes:** comprimidas en el navegador (máx. 1600 px, calidad 0,8, máx. 2 MB), mostradas con `next/image`.
 - **Diseño ("Papelería sellada", marca Oficio Seguro):** tokens de color en `src/app/globals.css` (claro y oscuro):
-  `fondo` gris verdoso claro, `superficie` y `campo` blancos, `texto` casi negro verdoso, `texto-suave`, `borde`,
+  `fondo` gris verdoso claro, `superficie` y `campo` blancos en claro (en oscuro `campo` es el fondo de página), `texto` casi negro verdoso, `texto-suave`, `borde`,
   `accion` terracota (botón principal y enlaces) con `sobre-accion`, `encabezado` tinta oscura con `sobre-encabezado`,
   `destacado` para lo elegido (con `sobre-destacado`), `adorno` naranja obra solo de adorno (nunca texto), `exito`,
   `error`, `equipo`, `marca` y `sobre-marca` (solo el logo), `velo` (fondo de las hojas) y `foco`. Tipografías con
